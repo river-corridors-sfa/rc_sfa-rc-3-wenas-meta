@@ -339,6 +339,84 @@ write_csv(Putah, here("inputs", "Studies", "Uzun_et_al_2020", "Putah_Q_05.csv"))
 
 ```
 
+```{r pulling USGS gauged data from Writer & Murphy, 2012}
+# Writer & Murphy, 2012, Wildfire effects on source-water quality # 
+# Q data is actually from Effects of flow regime on stream turbidity and suspended solids after wildfire, Colorado Front Range # 
+# FCBC Creek #
+siteNumber <- "06727500"
+FCBCInfo <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+FCBC_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "2011-04-01", "2011-10-31"
+)
+
+FCBC <- readNWISuv(
+  siteNumber, parameterCd,
+  "2011-04-01", "2011-10-31"
+)
+
+# export dataframe 
+write_csv(FCBC_daily, here("inputs", "Studies", "Writer_Murphy_2012", "FCBC_daily_Q.csv")) 
+write_csv(FCBC, here("inputs", "Studies", "Writer_Murphy_2012", "FCBC_Q_05.csv")) 
+
+# FCLM Creek #
+siteNumber <- "06727410"
+FCLMInfo <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+FCLM_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "2011-04-01", "2011-10-31"
+)
+
+FCLM <- readNWISuv(
+  siteNumber, parameterCd,
+  "2011-04-01", "2011-10-31"
+)
+
+# export dataframe 
+write_csv(FCLM_daily, here("inputs", "Studies", "Writer_Murphy_2012", "FCLM_daily_Q.csv")) 
+write_csv(FCLM, here("inputs", "Studies", "Writer_Murphy_2012", "FCLM_Q_05.csv")) 
+
+ggplot() +
+  geom_line(aes(x = Date, y = X_00060_00003), size = 1, color = "green", data = FCBC_daily) +
+  geom_line(aes(x = Date, y = X_00060_00003), size = 1, color = "red", data = FCLM_daily) +
+  theme_classic()
+
+
+```
+
+```{r pulling USGS gauged data from Hohner et al. 2016}
+# Hohner et al. 2016, Drinking water treatment response following a Colorado wildfire Colorado Front Range
+# CLPCreek # This is at Fort Collins, there should be one that is further upstream that is at the confluence of the North fork but I cant find that one 
+siteNumber <- "06752260"
+CLPInfo <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+CLP_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "2013-04-01", "2013-10-31"
+)
+
+CLP <- readNWISuv(
+  siteNumber, parameterCd,
+  "2013-04-01", "2013-10-31"
+)
+
+# export dataframe 
+write_csv(CLP_daily, here("inputs", "Studies", "Hohner_et_al_2016", "CLP_daily_Q.csv")) 
+write_csv(CLP, here("inputs", "Studies", "Hohner_et_al_2016", "CLP_Q_15.csv")) 
+
+ggplot(CLP_daily, aes(x = Date, y = X_00060_00003 * 0.028316847)) +
+  geom_line() +
+  theme_bw()
+
+USGS 06752000 CACHE LA POUDRE RIV AT MO OF CN, NR FT COLLINS, CO # 1881-2007
+```
+
+
 ```{r data prepper}
 studies_file_list <- list.files(path = "inputs/Studies/meta_final/", 
                                   recursive=F, 
