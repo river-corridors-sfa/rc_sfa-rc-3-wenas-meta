@@ -1,0 +1,11 @@
+Study_ID,DOI,Design (Control/Burn; Pre/Post),Latitude,Longitude,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
+Hohner et al. 2016,https://doi.org/10.1016/j.watres.2016.08.034,Pre_Post,40.705209,-105.238053,Pre_1,Dfb,Water Intake,7/15/08,Unburn,Pre,Mean,3.71025641,mg_TOC_L,,,,,,,Table 1,Coordinates found from Hampton. PRE_POST!
+Hohner et al. 2016,https://doi.org/10.1016/j.watres.2016.08.034,Pre_Post,40.705209,-105.238053,Pre_1,Dfb,Water Intake,7/15/09,Unburn,Pre,Mean,3.802564103,mg_TOC_L,,,,,,,Table 1,
+Hohner et al. 2016,https://doi.org/10.1016/j.watres.2016.08.034,Pre_Post,40.705209,-105.238053,Pre_1,Dfb,Water Intake,7/15/10,Unburn,Pre,Mean,4.202564103,mg_TOC_L,,,,,,,Table 1,
+Hohner et al. 2016,https://doi.org/10.1016/j.watres.2016.08.034,Pre_Post,40.705209,-105.238053,Pre_1,Dfb,Water Intake,7/15/11,Unburn,Pre,Mean,3.566666667,mg_TOC_L,,,,,,,Table 1,
+Hohner et al. 2016,https://doi.org/10.1016/j.watres.2016.08.034,Pre_Post,40.705209,-105.238053,Post_1,Dfb,Water Intake,7/15/13,Burn,1,Mean,4.671794872,mg_TOC_L,,,,,,,Table 1,
+Hohner et al. 2016,https://doi.org/10.1016/j.watres.2016.08.034,Pre_Post,40.698617,-105.578139,Pre_2,Dfb,Reference,7/15/08,Unburn,Pre,Mean,3.9,mg_TOC_L,,,,,,,Table 1,
+Hohner et al. 2016,https://doi.org/10.1016/j.watres.2016.08.034,Pre_Post,40.698617,-105.578139,Pre_2,Dfb,Reference,7/15/09,Unburn,Pre,Mean,3.9,mg_TOC_L,,,,,,,Table 1,
+Hohner et al. 2016,https://doi.org/10.1016/j.watres.2016.08.034,Pre_Post,40.698617,-105.578139,Pre_2,Dfb,Reference,7/15/10,Unburn,Pre,Mean,3.9,mg_TOC_L,,,,,,,Table 1,
+Hohner et al. 2016,https://doi.org/10.1016/j.watres.2016.08.034,Pre_Post,40.698617,-105.578139,Pre_2,Dfb,Reference,7/15/11,Unburn,Pre,Mean,3.9,mg_TOC_L,,,,,,,Table 1,
+Hohner et al. 2016,https://doi.org/10.1016/j.watres.2016.08.034,Pre_Post,40.698617,-105.578139,Post_2,Dfb,Reference,7/15/13,Burn,1,Mean,4.2,mg_TOC_L,,,,,,,Table 1,

@@ -1,0 +1,16 @@
+Study_ID,DOI,Design (Control/Burn; Pre/Post),Latitude,Longitude,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,34.503,-119.731,Control,BSk,Reference,12/5/09,Unburn,1,Individual,,,,,1.06785317,umol_NO2_NO3_L,,,,Don’t know if these are the correct units. I don’t have the exact coordinates for each watershed
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Control,BSk,Reference,12/18/09,Unburn,1,Individual,,,,,4.404894327,umol_NO2_NO3_L,,,,
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Control,BSk,Reference,3/1/10,Unburn,1,Individual,,,,,4.404894327,umol_NO2_NO3_L,,,,
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Control,BSk,Reference,6/1/10,Unburn,1,Individual,,,,,2.402669633,umol_NO2_NO3_L,,,,
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Control,BSk,Reference,7/1/10,Unburn,1,Individual,,,,,2.402669633,umol_NO2_NO3_L,,,,
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Site_1,BSk,Partially burned,12/5/09,Burn,1,Individual,,,,,9.877641824,umol_NO2_NO3_L,,,,
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Site_1,BSk,Partially burned,12/18/09,Burn,1,Individual,,,,,75.81757508,umol_NO2_NO3_L,,,,
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Site_1,BSk,Partially burned,3/1/10,Burn,1,Individual,,,,,61.80200222,umol_NO2_NO3_L,,,,
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Site_1,BSk,Partially burned,6/1/10,Burn,1,Individual,,,,,6.006674082,umol_NO2_NO3_L,,,,
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Site_1,BSk,Partially burned,7/1/10,Burn,1,Individual,,,,,5.73971079,umol_NO2_NO3_L,,,,
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Site_2,BSk,Burned,12/5/09,Burn,1,Individual,,,,,5.873192436,umol_NO2_NO3_L,,,,
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Site_2,BSk,Burned,12/18/09,Burn,1,Individual,,,,,37.64182425,umol_NO2_NO3_L,,,,
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Site_2,BSk,Burned,3/1/10,Burn,1,Individual,,,,,33.10344828,umol_NO2_NO3_L,,,,
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Site_2,BSk,Burned,6/1/10,Burn,1,Individual,,,,,7.474972191,umol_NO2_NO3_L,,,,
+Klose et al. 2015,http://www.jstor.org/stable/10.1086/683431?origin=JSTOR-pdf,Control_Reference_vs_Impact,,,Site_2,BSk,Burned,7/1/10,Burn,1,Individual,,,,,7.074527253,umol_NO2_NO3_L,,,,

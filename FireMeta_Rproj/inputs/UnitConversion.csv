@@ -1,0 +1,29 @@
+Param,Unit1,Conv,Unit2
+DOC,um,,
+DOC,umol_L,,
+DOC,mg_C_L,1,mg_C_L
+DOC,mg_L,1,mg_C_L
+DOC,mg_TOC_L,1,mg C/L
+NO3,um,,
+NO3,umol_L,,
+NO3,,,
+NO3,ug_N_L,,
+NO3,u_eq_L,,
+NO3,mg_N_L,1,mg_N_L
+NO3,ug_L,,
+NO3,mg_L,,
+NO3,umol_NO2_NO3_L,,
+,,,
+,,,
+,,,
+NO3,ug/L,0.000225905,mg N/L
+NO3,ug NO3-N/L,0.001,mg N/L
+NO3,mg/L,0.22590478,mg N/L
+NO3,mg Oxidized Nitrogen/L,0.22590478,mg N/L
+NO3,mg N/L,1,mg N/L
+NO3,mg NO3/L,0.22590478,mg N/L
+NO3,mg NO3-N / L,1,mg N/L
+NO3,mg NO3-N/L,1,mg N/L
+NO3,meq/L,14.007,mg N/L
+NO3,ueq/L,0.014007,mg N/L
+NO3,umol/L,0.014007,mg N/L

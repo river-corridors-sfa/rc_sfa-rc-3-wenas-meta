@@ -1,0 +1,74 @@
+MethodCode,MethodDescription,MethodLink
+Batt,Battery voltage reading,
+Pressure_2,CS100 Setra 278 Barometer (600-1100 hPa),
+Temp_RH_2,HMP45C-L15 Vaisala Temperature/RH Probe,
+Wind_1,WINDSONIC1-L15 Gill 2-D Sonic Wind Sensor,
+RainGage_2,385-L50-LP50 Met One AC Heated Rain Gage with 0.01inch orifice,
+DecagonMPS1,Decagon MPS-1 sensors record water potential in kPa or voltage in mV which can then be calibrated to a water potential or an equation suggested by Decagon can be used ,
+Decagon5TE,Decagon 5TE Water Content EC and Temperature Sensors,
+Wind_Sonic_1,3-D Sonic Anemometer CSI CSAT or CSAT3,
+Pressure_3,Barometer Vaisala PTB101B,
+GasAnalyzer_1,Infared Gas Analyzer LI-COR LI-7500,
+NetRad_1,Net Radiometer Kipp and Zonen CNR1,
+SoilHeat_1,Soil Heat Flux Plate REBS HFT3.1 or HFT1,
+SoilTemp_1,Soil Thermocouple Probe CSI TCAV,
+RainGage_3,Tipping Bucket Rain Gauge CSI TE525WS,
+SoilWater_1,Water Content Reflectometer CSI CS615 or CS616,
+EddyCov_1,Open path Eddy Covariance using LI-COR LI-7500 and CSI CSAT3,
+GPP_1,Calculated as Ecosystem Respiration (RE) - Net Ecosystem Exchange (NEE),
+KippZonen_1,Kipp and Zonen PAR-Lite,
+Reco_1,Computation based on Lasslop et al. 2010,
+EddyCov_2,CSI CSAT3 and Temperature/Humidity Probe Vaisala HMP45C,
+GPP_2,Calculated as Ecosystem Respiration Filled (RE_filled) - Net Ecosystem Exchange Filled (NEE_filled),
+GapFilled_1,Gap filling using Reichstein online gapfilling tool following Lasslop et al 2010,
+FillFlag,Gap filling flag where 1 represents filled data,
+Onset_RH_1,Onset HOBO Humidity Data Logger,
+KippZonen_2,Kipp and Zonen - NR Lite2 Net Radiometer ,
+DailyAvg30,Daily average value derived from 30 minute continuous values,
+DailyMin30,Daily minimum value derived from 30 minute continuous values,
+DailySum30,Daily incremental/sum value derived from 30 minute continuous values,
+DecagonMPS2,Decagon MPS-2 sensors record temperature in degC and water potential in kPa or voltage in mV which can then be calibrated to a matric potential or an equation suggested by Decagon can be used,
+RainGage_4,TE525 Texas Electronics Tipping Bucket Rain Gages coupled with CS705 Precipitation Adapter ,
+NetRad_2,CNR4-L15 Kipp and Zonen 4-Component Net Radiation Sensor,
+IncLongCorr,CALCULATED by datalogger as IncLong_corr = IncLong + 5.67*exp(-8*T^4) where T is CRN Radiometer temperature in K,
+OutLongCorr,CALCULATED by datalogger as OutLong_corr = OutLong + 5.67*exp(-8*T^4) where T is CRN Radiometer temperature in K,
+NetShortWave,CALCULATED by datalogger as NetShort = IncShort - OutShort,
+NetLongWave,CALCULATED by datalogger as NetLong = IncLong - OutLong,
+CompAlbedo,CALCULATED by datalogger as Albedo = OutShort/IncShort,
+NetRad,CALCULATED by datalogger as NetRadiation = NetSHort + NetLong,
+DailyAlbedo,Daily average value computed from values measured between 10 am and 2 pm local time.,
+DailyAvg30corr,Daily average value derived from 30 minute continuous values for corrected values,
+SnowDepth_1,"Ultrasonic depth sensor, Judd Communications LLC",http://juddcom.com/#Depth
+SapFlow_1,Sap flow measurement and computation,http://www.czo.arizona.edu/czo_data/MethodsSites/jemez/SapFlowMeasurement.pdf
+ParshallFlume12,Stream flow measured using the 12 inch Parshall flume and pressure measurements in the bottom of the stilling well.,http://www.czo.arizona.edu/czo_data/MethodsSites/jemez/StreamFlowMeasurement.pdf
+ParshallFlume18,Stream flow measured using the 18 inch Parshall flume and pressure measurements in the bottom of the stilling well.,http://www.czo.arizona.edu/czo_data/MethodsSites/jemez/StreamFlowMeasurement.pdf
+ParshallFlume6,Stream flow measured using the 6 inch Parshall flume and pressure measurements in the bottom of the stilling well.,http://www.czo.arizona.edu/czo_data/MethodsSites/jemez/StreamFlowMeasurement.pdf
+TrapezoidalFlume45,Stream flow measured using the 45-degree Trapezoidal flume and pressure measurements in the bottom of the stilling well.,http://www.czo.arizona.edu/czo_data/MethodsSites/jemez/StreamFlowMeasurement.pdf
+Vaisala_GMP222,Vaisala GMP222 CO2 Probe,
+Vaisala_GMP221,Vaisala GMP221 CO2 Probe,
+apogee_SO110,apogee SO-110: Soil Response Thermistor Reference Oxygen Sensor,http://www.apogeeinstruments.com/so-110-soil-response-thermistor-reference-oxygen-sensor/
+PH_EC1,Field probe measurement,
+PH_EC2,Lab probe measurement,
+ZeroTension,Zero Tension Soil Sampler,
+Prenart ,Prenart Super Quartz suction cups soil water sampler.,www.prenart.dk
+CeramicCup,Ceramic Cup Lysimeter,
+OxyTem,Oxygen and temperature probe,
+Wick,"Custom made, fiberglass wick-based passive capillary wick samplers (PCaps, Perdrial et al. 2012)",
+AugeredSoil,Sample produced by taking a depth-resolved soil sample via auger; reacting the sample with ultrapure water for 24 hr and extracting the solution via centrifugation for chemical analysis.,
+WellSample,Groundwater sampling at the piezometer location or well,
+GRAB,Manual stream water sample collection,
+GRAB_Auto,ISCO Automatic Sample Collector,
+PrcpColl_Auto,Automatic Rain Sample Collector Teledyne ISCO; ISCO bottles have a thin layer of mineral oil to prevent evaporation,
+PrcpColl,Bulk Precipitaion Collector consists of a funnel draining into removable 500mL nalgene plastic bottles housed within PVC,
+Snow,"Snow samples collected in DI rinsed, double-bagged 1 gallon zip lock freezer bags",
+Snow_Auto,Snow lysimeter ISCO Automatic Sample Collector,
+Snow_Lys,Water sample manually collected from snow lysimeter,
+Bucket5G,5 gallon bucket with a Win Situ transducer to record snowmelt,
+Redox4Pt, Vertical redox probes with 4 platinum sensors produced by Paleo Terra, http://www.paleoterra.nl/
+Well_Geokon4500,Vibrating wire piezometer Geokon 4500 with CR1000 data logger,https://www.geokon.com/4500-Series
+Well_Troll400,Level TROLL 400 Data Logger,https://in-situ.com/products/water-level-monitoring/level-troll-400-data-logger/
+Well_RuggedTroll,Rugged TROLL 100 Data Logger,https://in-situ.com/products/water-level-monitoring/rugged-troll-100/
+SW_Troll300,Level TROLL 300 Data Logger; non-vented; corrected with met station air pressure,https://in-situ.com/wp-content/uploads/2015/03/Level-TROLL-300-Manual.pdf
+SW_Troll500,Level TROLL 500 Data Logger; vented,https://in-situ.com/wp-content/uploads/2015/03/Level-TROLL-300-Manual.pdf
+GW_Manual,"Manual groundwater sample collected using bailer, inertial pump, electric pump, or hydro sleeve speed bag after the volume V is purged",
+GW_ISCO,ISCO Automatic Groundwater Sample Collection,

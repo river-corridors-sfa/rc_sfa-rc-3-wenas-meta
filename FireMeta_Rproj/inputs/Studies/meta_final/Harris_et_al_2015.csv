@@ -1,0 +1,10 @@
+Study_ID,DOI,Design (Control/Burn; Pre/Post),Latitude,Longitude,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
+Harris et al. 2015,10.1086/684015,Control_Reference_vs_Impact,44.9108,-116.1031,Site_1,Csb,FA,June,Burn,4,Mean,3.65,mg_C_L,,0.6,,,,,Figure_3,Don’t have exact coordinates for each watershed
+Harris et al. 2015,10.1086/684015,Control_Reference_vs_Impact,,,Site_1,Csb,FA,July,Burn,4,Mean,1.93,mg_C_L,,0.17,,,,,Figure_3,
+Harris et al. 2015,10.1086/684015,Control_Reference_vs_Impact,,,Site_1,Csb,FA,Aug,Burn,4,Mean,2.33,mg_C_L,,0.18,,,,,Figure_3,
+Harris et al. 2015,10.1086/684015,Control_Reference_vs_Impact,,,Site_2,Csb,FDA,June,Burn,4,Mean,2.95,mg_C_L,,0.33,,,,,Figure_3,Burn + Debris Flow
+Harris et al. 2015,10.1086/684015,Control_Reference_vs_Impact,,,Site_2,Csb,FDA,July,Burn,4,Mean,2.48,mg_C_L,,0.22,,,,,Figure_3,Burn + Debris Flow
+Harris et al. 2015,10.1086/684015,Control_Reference_vs_Impact,,,Site_2,Csb,FDA,Aug,Burn,4,Mean,2.99,mg_C_L,,0.78,,,,,Figure_3,Burn + Debris Flow
+Harris et al. 2015,10.1086/684015,Control_Reference_vs_Impact,,,Control,Csb,UA,June,Unburn,4,Mean,1.55,mg_C_L,,0.04,,,,,Figure_3,Values reported as just TDN; Each classification (UA/FA/FDA) has n = 5 so these are mean values
+Harris et al. 2015,10.1086/684015,Control_Reference_vs_Impact,,,Control,Csb,UA,July,Unburn,4,Mean,1.88,mg_C_L,,0.52,,,,,Figure_3,
+Harris et al. 2015,10.1086/684015,Control_Reference_vs_Impact,,,Control,Csb,UA,Aug,Unburn,4,Mean,1.48,mg_C_L,,0.1,,,,,Figure_3,

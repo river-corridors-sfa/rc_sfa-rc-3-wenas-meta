@@ -1,0 +1,388 @@
+---
+title: "01_Wenas_meta"
+output: html_document
+date: "2023-09-06"
+editor_options: 
+  chunk_output_type: console
+---
+
+The purpose of this script is take the output from SCOPUS and Web of Science and merge them into 1 working document. 
+
+## Load packages and set working directory
+```{r Jake/Mac}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+library(readr)
+library(tidyverse)
+library(here)
+library(readxl)
+library(ggmap)
+library(sf)
+library(dataRetrieval)
+
+```
+
+## Merge formal lit search 
+```{r merge web of science and Scopus results}
+web_meta <- read_csv(here("inputs", "Metaanalysis_webofscience.csv"), skip = 10) # reading in web of science output
+
+web_meta <-web_meta %>% 
+  select(-("1900":"2023")) %>% 
+  mutate_all(as.character) # removing columns that are not necessary. Column 1900:2023 are purely counting the amount of citations per year and I don't care for that. I am also making all columns characters so it will be easier to merge. 
+
+scopus_meta <- read_csv(here("inputs", "Wenas_meta_analysis_scopus.csv")) # reading in the scopus output
+
+scopus_meta <- scopus_meta %>% 
+  mutate_all(as.character) # Changing all columns to characters so it will be easier to merge
+
+merged_meta <- full_join(web_meta, scopus_meta) %>% 
+  distinct(DOI, .keep_all = TRUE) # merging both dataframes and removing duplicated DOIs. This yields 319 studies. 
+
+# export dataframe 
+write_csv(merged_meta, here("Output_for_analysis", "merged_meta.csv")) # exporting merged dataframe into outputs file
+
+
+```
+
+## Filter by geography 
+
+```{r round 2 of filter, plot where the 1st round filter on a map to see if we should filter by geographic location}
+library("rnaturalearth")
+library("rnaturalearthdata")
+
+meta <- read_excel(here("inputs", "StudiesData_Table1.xlsx"), 
+    sheet = "Study_info_filtered_take_one") # reading in filtered meta data sheet
+
+coords <- meta %>% 
+  select(Lat, Long) %>% 
+  mutate(across(everything(), as.numeric)) # creating dataframe that is just the coordinates
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+class(world)
+
+ggplot(data = world) +
+    geom_sf() +
+    geom_point(data = coords, aes(x = Long, y = Lat), size = 4, 
+        shape = 23, fill = "darkred") 
+
+ggsave("meta_map_filter_1.pdf",
+       path = here("initial_plots", "01_Wenas_meta_wrangle"),
+       width = 8, height = 10, units = "in")
+
+# We decided to remove all the studies that were out of the country
+
+```
+
+## Q 
+```{r looking into which papers have Q or not}
+meta_Q <- read_excel(here("inputs", "StudiesData_Table1.xlsx"), 
+    sheet = "Study_info_filtered_V3_Q") # reading in filtered meta data sheet
+
+table(meta_Q$Discharge)
+
+```
+
+```{r pulling USGS gauged data from Oliver et al. 2012}
+
+# Oliver et al. 2012, Water quality response to the Angora Fire, Lake Tahoe, California #
+siteNumber <- "103366097"
+AngoraInfo <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+Angora_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "2008-10-01", "2010-01-01"
+)
+
+Angora <- readNWISuv(
+  siteNumber, parameterCd,
+  "2008-10-01", "2010-01-01"
+)
+
+# export dataframe 
+write_csv(Angora_daily, here("inputs", "Studies", "Oliver_et_al_2012", "daily_Q.csv")) 
+write_csv(Angora, here("inputs", "Studies", "Oliver_et_al_2012", "Q_15.csv")) 
+
+```
+
+```{r pulling USGS gauged data from Goodale et al. 2000}
+# Goodale et al. 2000, The long-term effects of disturbance on organic and inorganic nitrogen export in the White Mountains, New Hampshire #
+# From Table 2 # 
+siteNumber <- "01137500"
+AmmonoosucInfo <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+Ammonoosuc_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "1997-09-01", "1998-11-30"
+)
+
+Ammonoosuc <- readNWISuv(
+  siteNumber, parameterCd,
+  "1997-09-01", "1998-11-30"
+)
+
+# export dataframe 
+write_csv(Ammonoosuc_daily, here("inputs", "Studies", "Goodale_et_al_2000", "Ammonoosuc_daily_Q.csv")) 
+write_csv(Ammonoosuc, here("inputs", "Studies", "Goodale_et_al_2000", "Ammonoosuc_Q_15.csv")) 
+
+# Ellis River from table 2 
+siteNumber <- "01064300"
+EllisInfo <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+Ellis_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "1997-09-01", "1998-11-30"
+)
+
+Ellis <- readNWISuv(
+  siteNumber, parameterCd,
+  "1997-09-01", "1998-11-30"
+)
+
+# export dataframe 
+write_csv(Ellis_daily, here("inputs", "Studies", "Goodale_et_al_2000", "Ellis_daily_Q.csv")) 
+write_csv(Ellis, here("inputs", "Studies", "Goodale_et_al_2000", "Ellis_Q_15.csv")) 
+
+# East Branch Pemigewasset River from table 2 
+siteNumber <- "01074520"
+PemigewassetInfo <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+Pemigewasset_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "1997-09-01", "1998-11-30"
+)
+
+Pemigewasset <- readNWISuv(
+  siteNumber, parameterCd,
+  "1997-09-01", "1998-11-30"
+)
+
+# export dataframe 
+write_csv(Pemigewasset_daily, here("inputs", "Studies", "Goodale_et_al_2000", "Pemigewasset_daily_Q.csv")) 
+write_csv(Pemigewasset, here("inputs", "Studies", "Goodale_et_al_2000", "Pemigewasset_Q_15.csv")) 
+
+```
+
+
+```{r pulling USGS gauged data from Mast & Clow. 2008}
+# Mast & Clow. 2008, Effects of 2003 wildfires on stream chemistry in Glacier National Park, Montana #
+# Coal Creek # 
+siteNumber <- "482518113420101"
+CoalInfo <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+Coal_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "2003-01-01", "2006-12-31"
+)
+
+Coal <- readNWISuv(
+  siteNumber, parameterCd,
+  "2003-01-01", "2006-12-31"
+)
+
+# export dataframe 
+write_csv(Coal_daily, here("inputs", "Studies", "Mast_Clow_2008", "Coal_daily_Q.csv")) 
+write_csv(Coal, here("inputs", "Studies", "Mast_Clow_2008", "Coal_Q_15.csv")) 
+
+# Pinchot Creek # 
+siteNumber <- "482520113420201"
+PinchotInfo <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+Pinchot_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "2003-01-01", "2006-12-31"
+)
+
+Pinchot <- readNWISuv(
+  siteNumber, parameterCd,
+  "2003-01-01", "2006-12-31"
+)
+
+# export dataframe 
+write_csv(Coal_daily, here("inputs", "Studies", "Mast_Clow_2008", "Pinchot_daily_Q.csv")) 
+write_csv(Coal, here("inputs", "Studies", "Mast_Clow_2008", "Pinchot_Q_15.csv")) 
+
+```
+
+```{r pulling USGS gauged data from Mast et al. 2016}
+# Mast et al. 2016, Water-quality response to a high-elevation wildfire in the Colorado Front Range #
+# Big Thompson River # 
+siteNumber <- "402114105350101"
+BTInfo <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+BT_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "2007-01-01", "2014-12-31"
+)
+
+BT <- readNWISuv(
+  siteNumber, parameterCd,
+  "2007-01-01", "2014-12-31"
+)
+
+# export dataframe 
+write_csv(BT_daily, here("inputs", "Studies", "Mast_et_al_2016", "BT_daily_Q.csv")) 
+write_csv(BT, here("inputs", "Studies", "Mast_et_al_2016", "BT_Q_15.csv")) 
+
+# North Saint Vrain Creek Creek # 
+siteNumber <- "401226105340100"
+NSVInfo <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+NSV_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "2007-01-01", "2023-12-31"
+)
+
+NSV <- readNWISuv(
+  siteNumber, parameterCd,
+  "2007-01-01", "2014-12-31"
+)
+
+# export dataframe 
+write_csv(NSV_daily, here("inputs", "Studies", "Mast_et_al_2016", "NSV_daily_Q.csv")) 
+write_csv(NSV, here("inputs", "Studies", "Mast_et_al_2016", "NSV_Q_15.csv")) 
+
+```
+
+```{r pulling USGS gauged data from Murphy et al. 2015}
+# Murphy et al. 2015, The role of precipitation type, intensity, and spatial distribution in source water quality after wildfire # 
+# DS2 # 
+siteNumber <- "06727500"
+DS2Info <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+DS2_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "2010-09-01", "2013-12-31"
+)
+
+DS2 <- readNWISuv(
+  siteNumber, parameterCd,
+  "2010-09-01", "2013-12-31"
+)
+
+# export dataframe 
+write_csv(DS2_daily, here("inputs", "Studies", "Murphy_et_al_2015", "DS2_daily_Q.csv")) 
+write_csv(DS2, here("inputs", "Studies", "Murphy_et_al_2015", "DS2_Q_05.csv")) 
+
+# DS3 # 
+siteNumber <- "06727410"
+DS3Info <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+DS3_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "2010-09-01", "2013-12-31"
+)
+
+DS3 <- readNWISuv(
+  siteNumber, parameterCd,
+  "2010-09-01", "2013-12-31"
+)
+
+# export dataframe 
+write_csv(DS3_daily, here("inputs", "Studies", "Murphy_et_al_2015", "DS3_daily_Q.csv")) 
+write_csv(DS3, here("inputs", "Studies", "Murphy_et_al_2015", "DS3_Q_05.csv")) 
+
+```
+
+```{r pulling USGS gauged data from Uzun et al. 2020}
+# Uzun et al. 2020, Two years of post-wildfire impacts on dissolved organic matter, nitrogen, and precursors of disinfection by-products in California stream waters # 
+# Cache Creek #
+siteNumber <- "11451800"
+CacheInfo <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+Cache_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "2016-01-01", "2017-12-31"
+)
+
+Cache <- readNWISuv(
+  siteNumber, parameterCd,
+  "2016-01-01", "2017-12-31"
+)
+
+# export dataframe 
+write_csv(Cache_daily, here("inputs", "Studies", "Uzun_et_al_2020", "Cache_daily_Q.csv")) 
+write_csv(Cache, here("inputs", "Studies", "Uzun_et_al_2020", "Cache_Q_15.csv")) 
+
+# Putah Creek flow (about 1.6 km downstream of Wragg input) #
+siteNumber <- "11454000"
+PutahInfo <- readNWISsite(siteNumber)
+parameterCd <- "00060"
+
+Putah_daily <- readNWISdv(
+  siteNumber, parameterCd,
+  "2016-01-01", "2017-12-31"
+)
+
+Putah <- readNWISuv(
+  siteNumber, parameterCd,
+  "2016-01-01", "2017-12-31"
+)
+
+# export dataframe 
+write_csv(Putah_daily, here("inputs", "Studies", "Uzun_et_al_2020", "Putah_daily_Q.csv")) 
+write_csv(Putah, here("inputs", "Studies", "Uzun_et_al_2020", "Putah_Q_05.csv")) 
+
+
+
+```
+
+```{r data prepper}
+studies_file_list <- list.files(path = "inputs/Studies/meta_final/", 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv, 
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) # Should be 6033
+
+
+unitconv=read.csv("inputs/UnitConversion.csv",stringsAsFactors = FALSE)
+
+# checking to see if my manual input of the meta analysis is good or not. 
+
+
+mean <- meta_df %>% 
+  filter(Mean_Median_or_IndividualSample == "Mean")
+table(mean$Study_ID)
+
+unique(meta_df$DOC_unit)
+unique(meta_df$NO3_unit)
+
+unique(meta_df$`Design (Control/Burn; Pre/Post)`)
+unique(meta_df$Study_ID)
+
+table(mean$Time_Since_Fire)
+
+```
+
+
+
+
+
+
+
+
+
+
+

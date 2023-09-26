@@ -1,0 +1,14 @@
+Study_ID,DOI,Design (Control/Burn; Pre/Post),Latitude,Longitude,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,39.177683,-105.26552,Site_8,Dfb,Brush,2014-2016,Burn,13,Mean,1,mg_C_L,0.1,,,,,,Table_1,Don’t have exact coordinates for each watersheds. reference/impact study design. There were 8 sites that were Burn and 5 sites that were Unburn 
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_5,Dfb,Cabin,2014-2016,Burn,13,Mean,4,mg_C_L,0.6,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,Fern,2014-2016,Unburn,13,Mean,2.4,mg_C_L,0.4,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_7,Dfb,Fourmile,2014-2016,Burn,13,Mean,1.5,mg_C_L,0.1,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_2,Dfb,Goose,2014-2016,Burn,13,Mean,3.6,mg_C_L,0.5,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_3,Dfb,Horse,2014-2016,Burn,13,Mean,2.9,mg_C_L,0.3,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,Jenny,2014-2016,Unburn,13,Mean,1.5,mg_C_L,0.2,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,No Name,2014-2016,Unburn,13,Mean,0.9,mg_C_L,0.1,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,Pine,2014-2016,Unburn,13,Mean,2.5,mg_C_L,0.3,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,Sugar,2014-2016,Unburn,13,Mean,1.8,mg_C_L,0.3,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_1,Dfb,Trout,2014-2016,Burn,13,Mean,3.9,mg_C_L,0.4,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_6,Dfb,West,2014-2016,Burn,13,Mean,2.6,mg_C_L,0.3,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_4,Dfb,Wigwam,2014-2016,Burn,13,Mean,2.2,mg_C_L,0.3,,,,,,Table_1,

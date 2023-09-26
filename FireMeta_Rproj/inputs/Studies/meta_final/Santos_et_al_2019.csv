@@ -1,0 +1,14 @@
+Study_ID,DOI,Design (Control/Burn; Pre/Post),Latitude,Longitude,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
+Santos et al. 2019,10.1186/s42408-018-0022-8,Control_Reference_vs_Impact,37.534037,-119.389139,Site_1,Csb,High Severity,,Burn,1,Mean,1.85,mg_C_L,,0.27,0.006774194,mg_N_L,,0.02,Fig. 3, Means of 6 different sites within each bucket (low severity vs. high severity). Don’t have exact coordinates of watershed
+Santos et al. 2019,10.1186/s42408-018-0022-8,Control_Reference_vs_Impact,,,Site_1,Csb,High Severity,,Burn,5,Mean,1.84,mg_C_L,,1.42,0.009032258,mg_N_L,,0.02,Fig. 3,
+Santos et al. 2019,10.1186/s42408-018-0022-8,Control_Reference_vs_Impact,,,Site_1,Csb,High Severity,,Burn,5,Mean,1.94,mg_C_L,,1.22,0.009032258,mg_N_L,,0.02,Fig. 3,
+Santos et al. 2019,10.1186/s42408-018-0022-8,Control_Reference_vs_Impact,,,Site_1,Csb,High Severity,,Burn,8,Mean,1.69,mg_C_L,,0.96,0.009032258,mg_N_L,,0.01,Fig. 3,
+Santos et al. 2019,10.1186/s42408-018-0022-8,Control_Reference_vs_Impact,,,Site_1,Csb,High Severity,,Burn,9,Mean,1.45,mg_C_L,,0.93,0.009032258,mg_N_L,,0.02,Fig. 3,
+Santos et al. 2019,10.1186/s42408-018-0022-8,Control_Reference_vs_Impact,,,Site_1,Csb,High Severity,,Burn,13,Mean,0.84,mg_C_L,,0.14,0.006774194,mg_N_L,,0,Fig. 3,
+Santos et al. 2019,10.1186/s42408-018-0022-8,Control_Reference_vs_Impact,,,Site_2,Csb,Low Severity,,Burn,1,Mean,0.11,mg_C_L,,0.04,0.009032258,mg_N_L,,0.02,Fig. 3,
+Santos et al. 2019,10.1186/s42408-018-0022-8,Control_Reference_vs_Impact,,,Site_2,Csb,Low Severity,,Burn,5,Mean,1.18,mg_C_L,,0.02,0.013548387,mg_N_L,,0.02,Fig. 3,
+Santos et al. 2019,10.1186/s42408-018-0022-8,Control_Reference_vs_Impact,,,Site_2,Csb,Low Severity,,Burn,7,Mean,1.28,mg_C_L,,0.28,0.009032258,mg_N_L,,0.02,Fig. 3,
+Santos et al. 2019,10.1186/s42408-018-0022-8,Control_Reference_vs_Impact,,,Site_2,Csb,Low Severity,,Burn,7,Mean,1.64,mg_C_L,,0.84,0.006774194,mg_N_L,,0.02,Fig. 3,
+Santos et al. 2019,10.1186/s42408-018-0022-8,Control_Reference_vs_Impact,,,Site_2,Csb,Low Severity,,Burn,9,Mean,1.52,mg_C_L,,0.2,0.009032258,mg_N_L,,0.02,Fig. 3,
+Santos et al. 2019,10.1186/s42408-018-0022-8,Control_Reference_vs_Impact,,,Site_2,Csb,Low Severity,,Burn,10,Mean,1.31,mg_C_L,,0.17,0.006774194,mg_N_L,,0.02,Fig. 3,
+Santos et al. 2019,10.1186/s42408-018-0022-8,Control_Reference_vs_Impact,,,Control,Csb,Reference,,Unburn,13,Mean,2.14,mg_C_L,,0.43,0.006774194,mg_N_L,,0.01,Table 2,

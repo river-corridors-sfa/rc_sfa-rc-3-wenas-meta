@@ -1,0 +1,17 @@
+Study_ID,DOI,Design (Control/Burn; Pre/Post),Latitude,Longitude,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Control,Dfb,NW,1974,Unburn,Pre,,,,,,4.787234043,u_eq_L,,,Figure 2c,Pre_post
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Control,Dfb,NW,1975,Unburn,Pre,,,,,,3.191489362,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Control,Dfb,NW,1976,Unburn,Pre,,,,,,3.191489362,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Control,Dfb,NW,1977,Unburn,Pre,,,,,,6.382978723,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Control,Dfb,NW,1978,Unburn,Pre,,,,,,3.191489362,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Control,Dfb,NW,1979,Unburn,Pre,,,,,,3.191489362,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Site_1,Dfb,NW,1980,Burn,0,,,,,,7.978723404,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Site_1,Dfb,NW,1981,Burn,1,,,,,,20.74468085,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Site_1,Dfb,NW,1982,Burn,2,,,,,,6.382978723,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Site_1,Dfb,NW,1983,Burn,3,,,,,,4.787234043,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Site_1,Dfb,NW,1984,Burn,4,,,,,,4.787234043,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Site_1,Dfb,NW,1985,Burn,5,,,,,,4.787234043,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Site_1,Dfb,NW,1986,Burn,6,,,,,,4.787234043,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Site_1,Dfb,NW,1987,Burn,7,,,,,,4.787234043,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Site_1,Dfb,NW,1988,Burn,8,,,,,,4.787234043,u_eq_L,,,,
+Bayley et al. 1992,10.1007/BF00004041,Pre_Post,49.667,-93.733,Site_1,Dfb,NW,1989,Burn,9,,,,,,6.382978723,u_eq_L,,,,

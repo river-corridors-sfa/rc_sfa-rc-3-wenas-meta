@@ -1,0 +1,9 @@
+Study_ID,DOI,Design (Control/Burn; Pre/Post),Latitude,Longitude,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
+Hall & Lombardozzi 2008,10.3398/1527-0904-68.4.453,Control_Reference_vs_Impact,39.028229,-105.173363,Control,Dfb,Goose Creek,,Unburn,1,Mean,,,,,0.25,mg_L,,,Table 2,"Table 2: Concentrations are the mean of 10 samples taken on one day at each site. Creeks were sampled within the burn and upstream of the burn but on the same creek. Samples were taken in 2003 (1 year since fire). Table 3 sampling consists of the mean of 3 samples samples taken at each site, samples were taken in 2004 (2 years since fire). The individual sites don’t have coordinates but I should be able to get them as the figure is pretty detailed and has coordinates on them so I can extract. Also Table 1 has stream characteristics. "
+Hall & Lombardozzi 2008,10.3398/1527-0904-68.4.453,Control_Reference_vs_Impact,,,Site_1,Dfb,Goose Creek,,Burn,1,Mean,,,,,0.34,mg_L,,,Table 2,
+Hall & Lombardozzi 2008,10.3398/1527-0904-68.4.453,Control_Reference_vs_Impact,,,Control,Dfb,West Creek,,Unburn,1,Mean,,,,,0,mg_L,,,Table 2,
+Hall & Lombardozzi 2008,10.3398/1527-0904-68.4.453,Control_Reference_vs_Impact,,,Site_2,Dfb,West Creek,,Burn,1,Mean,,,,,0.32,mg_L,,,Table 2,
+Hall & Lombardozzi 2008,10.3398/1527-0904-68.4.453,Control_Reference_vs_Impact,,,Control,Dfb,Wigwam Creek,,Unburn,1,Mean,,,,,0.25,mg_L,,,Table 2,
+Hall & Lombardozzi 2008,10.3398/1527-0904-68.4.453,Control_Reference_vs_Impact,,,Site_3,Dfb,Wigwam Creek,,Burn,1,Mean,,,,,0.57,mg_L,,,Table 2,
+Hall & Lombardozzi 2008,10.3398/1527-0904-68.4.453,Control_Reference_vs_Impact,,,Control,Dfb,Reference,,Unburn,2,Mean_Mean,,,,,0.5,mg_L,,,,
+Hall & Lombardozzi 2008,10.3398/1527-0904-68.4.453,Control_Reference_vs_Impact,,,Site_4,Dfb,Burned,,Burn,2,Mean_Mean,,,,,1.2,mg_L,,,,
