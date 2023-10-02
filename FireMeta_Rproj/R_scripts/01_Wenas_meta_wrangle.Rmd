@@ -75,6 +75,32 @@ ggsave("meta_map_filter_1.pdf",
 
 ```
 
+```{r Which sites have exact dates with their discrete sampling }
+
+dates <- read_excel(here("inputs", "StudiesData_Table1.xlsx"), 
+    sheet = "Study_info_filtered_V3_Q") 
+
+# Which studies have exact dates with their discrete sampling 
+
+exact <- dates %>% 
+  filter(Exact_Date_Extracted == "Y")
+table(exact$Study)
+
+table(dates$Exact_Date_Extracted)
+
+unique(meta_df$DOC_unit)
+unique(meta_df$NO3_unit)
+
+unique(meta_df$`Design (Control/Burn; Pre/Post)`)
+unique(meta_df$Study_ID)
+
+table(mean$Time_Since_Fire)
+
+
+
+
+```
+
 ## Q 
 ```{r looking into which papers have Q or not}
 meta_Q <- read_excel(here("inputs", "StudiesData_Table1.xlsx"), 
@@ -459,8 +485,31 @@ table(mean$Time_Since_Fire)
 
 
 
+```{r Lab minidot inventory}
+
+mini <- read_csv("~/Desktop/R_tutorials/Minidot DO correction factor tracking_2023-08-30.csv")
+
+mini <- mini %>%
+  filter(!row_number() %in% c(229:257))
+
+n_distinct(mini$InternalSN)
+
+SSF <- mini %>% 
+  filter(ExternalSN == "417508" | 
+         ExternalSN == "727993" |
+         ExternalSN == "645487" |
+         ExternalSN == "519482" |
+         ExternalSN == "424713" |
+         ExternalSN == "565200" |
+         ExternalSN == "197185")
 
 
 
+
+
+
+
+
+```
 
 
