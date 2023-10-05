@@ -32,7 +32,7 @@ transport <- read_excel(here("inputs", "Studies", "Gerla_Galloway_1998", "Gerla_
 
 ```{r calculations for concentrations}
 MeanConcTest <- conc %>%
-  group_by(Climate) %>% 
+  group_by(Climate, Time_Since_Fire) %>% 
   summarize(Ne = sum(Burn_Unburn == "Burn"),
                    Nc = sum(Burn_Unburn == "Unburn"),
                    Xe = mean(NO3[Burn_Unburn == "Burn"], na.rm = TRUE),
@@ -43,12 +43,51 @@ ggplot(conc, aes(x = Burn_Unburn, y = NO3, fill = Burn_Unburn)) +
   geom_boxplot() +
   scale_fill_manual(values=c("red3", "springgreen4")) +
   ggtitle("Concentration (mg_N_L)") +
+  facet_wrap(~Time_Since_Fire, scales = "free") +
   theme_bw()
 
 # calculating the percent change 
 percent_change_conc <- MeanConcTest %>% 
-  group_by(Climate) %>% 
-  mutate(percent_change1 = (((Xe-Xc)/Xc)*100))
+  group_by(Climate, Time_Since_Fire) %>% 
+  mutate(percent_change = (((Xe-Xc)/Xc)*100))
+
+# Calculating the summary of all of the years
+climate.summary <- percent_change_conc %>%
+  group_by(Climate) %>%
+  summarise(
+    sd = sd(percent_change, na.rm = TRUE),
+    percent_change = mean(percent_change))
+
+climate.summary <- climate.summary %>% 
+  mutate(Time_Since_Fire = 1)
+
+
+# Plot percent difference 
+ggplot(percent_change_conc, aes(percent_change, y = Climate, color = as.factor(Time_Since_Fire))) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4) +
+  geom_pointrange(aes(xmin = percent_change-sd, xmax = percent_change + sd), data = climate.summary) +
+  theme_bw()
+
+
+ggplot(analyte_table_filter, aes(Percent_Difference, Koppen, color = response_var),
+              position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4) +
+  geom_pointrange(aes(xmin = Percent_Difference - sd, xmax = Percent_Difference + sd, 
+                      color = response_var),
+                      position = position_dodge(width = -0.5), data = climate.summary) +
+  geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
+  xlim(-100, 700) +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Analyte"),
+                     labels = c('DOC', vn)) +
+  stat_summary(fun.data = give.n, geom = "text", fun.y = median,
+                  position = position_dodge(width = 0.75)) +
+  theme_classic()
+ggplot(percent_change_conc, aes(x = percent_change, y = Climate, color = as.factor(Time_Since_Fire))) +
+  geom_jitter() +
+  scale_color_brewer(palette = "Dark2") +
+  xlab("Percent Change") +
+  theme_bw()
 
 # Testing out the Boerner way vs. the Dove way to see if Effect size is calculated the same way
 Xe <- MeanConcTest$Xe
