@@ -1,14 +1,14 @@
-Study_ID,DOI,Design (Control/Burn; Pre/Post),Latitude,Longitude,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Average_watershed_km,NO3_Yield,NO3_Yield_unit,STDEV_NO3_Yield,DOC_Yield,DOC_Yield_unit,STDEV_DOC_Yield,Q,Q_unit,Data_Found,Notes
-Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,39.177683,-105.26552,Site_8,Dfb,Brush,2014-2016,Burn,13,Mean,1,mg_C_L,0.1,,,,,,,,,,94,kg_km_year,21,,,Table_1,Don’t have exact coordinates for each watersheds. reference/impact study design. There were 8 sites that were Burn and 5 sites that were Unburn 
-Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_5,Dfb,Cabin,2014-2016,Burn,13,Mean,4,mg_C_L,0.6,,,,,,,,,,634,kg_km_year,313,,,Table_1,
-Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,Fern,2014-2016,Unburn,13,Mean,2.4,mg_C_L,0.4,,,,,,,,,,198,kg_km_year,2,,,Table_1,
-Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_7,Dfb,Fourmile,2014-2016,Burn,13,Mean,1.5,mg_C_L,0.1,,,,,,,,,,226,kg_km_year,64,,,Table_1,
-Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_2,Dfb,Goose,2014-2016,Burn,13,Mean,3.6,mg_C_L,0.5,,,,,,,,,,691,kg_km_year,262,,,Table_1,
-Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_3,Dfb,Horse,2014-2016,Burn,13,Mean,2.9,mg_C_L,0.3,,,,,,,,,,270,kg_km_year,118,,,Table_1,
-Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,Jenny,2014-2016,Unburn,13,Mean,1.5,mg_C_L,0.2,,,,,,,,,,41,kg_km_year,15,,,Table_1,
-Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,No Name,2014-2016,Unburn,13,Mean,0.9,mg_C_L,0.1,,,,,,,,,,25,kg_km_year,9,,,Table_1,
-Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,Pine,2014-2016,Unburn,13,Mean,2.5,mg_C_L,0.3,,,,,,,,,,344,kg_km_year,59,,,Table_1,
-Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,Sugar,2014-2016,Unburn,13,Mean,1.8,mg_C_L,0.3,,,,,,,,,,194,kg_km_year,59,,,Table_1,
-Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_1,Dfb,Trout,2014-2016,Burn,13,Mean,3.9,mg_C_L,0.4,,,,,,,,,,251,kg_km_year,89,,,Table_1,
-Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_6,Dfb,West,2014-2016,Burn,13,Mean,2.6,mg_C_L,0.3,,,,,,,,,,386,kg_km_year,171,,,Table_1,
-Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_4,Dfb,Wigwam,2014-2016,Burn,13,Mean,2.2,mg_C_L,0.3,,,,,,,,,,658,kg_km_year,388,,,Table_1,
+Study_ID,DOI,Design (Control/Burn; Pre/Post),Latitude,Longitude,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,39.177683,-105.26552,Site_8,Dfb,Brush,2014-2016,Burn,13,Mean,1,mg_C_L,0.1,,,,,,Table_1,Don’t have exact coordinates for each watersheds. reference/impact study design. There were 8 sites that were Burn and 5 sites that were Unburn 
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_5,Dfb,Cabin,2014-2016,Burn,13,Mean,4,mg_C_L,0.6,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,Fern,2014-2016,Unburn,13,Mean,2.4,mg_C_L,0.4,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_7,Dfb,Fourmile,2014-2016,Burn,13,Mean,1.5,mg_C_L,0.1,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_2,Dfb,Goose,2014-2016,Burn,13,Mean,3.6,mg_C_L,0.5,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_3,Dfb,Horse,2014-2016,Burn,13,Mean,2.9,mg_C_L,0.3,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,Jenny,2014-2016,Unburn,13,Mean,1.5,mg_C_L,0.2,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,No Name,2014-2016,Unburn,13,Mean,0.9,mg_C_L,0.1,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,Pine,2014-2016,Unburn,13,Mean,2.5,mg_C_L,0.3,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Control,Dfb,Sugar,2014-2016,Unburn,13,Mean,1.8,mg_C_L,0.3,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_1,Dfb,Trout,2014-2016,Burn,13,Mean,3.9,mg_C_L,0.4,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_6,Dfb,West,2014-2016,Burn,13,Mean,2.6,mg_C_L,0.3,,,,,,Table_1,
+Chow et al. 2019,10.2134/jeq2019.04.0172,Control_Reference_vs_Impact,,,Site_4,Dfb,Wigwam,2014-2016,Burn,13,Mean,2.2,mg_C_L,0.3,,,,,,Table_1,

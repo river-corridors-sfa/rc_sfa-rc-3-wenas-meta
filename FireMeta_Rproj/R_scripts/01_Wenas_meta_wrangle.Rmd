@@ -440,7 +440,7 @@ ggplot(CLP_daily, aes(x = Date, y = X_00060_00003 * 0.028316847)) +
   geom_line() +
   theme_bw()
 
-USGS 06752000 CACHE LA POUDRE RIV AT MO OF CN, NR FT COLLINS, CO # 1881-2007
+# USGS 06752000 CACHE LA POUDRE RIV AT MO OF CN, NR FT COLLINS, CO # 1881-2007
 ```
 
 
@@ -466,6 +466,10 @@ unitconv=read.csv("inputs/UnitConversion.csv",stringsAsFactors = FALSE)
 
 # checking to see if my manual input of the meta analysis is good or not. 
 
+ggplot(meta_df, aes(x = as.numeric(Time_Since_Fire, fill = Study_ID))) +
+  geom_histogram(binwidth = 1) +
+  xlim(0, 20) +
+  theme_bw()
 
 mean <- meta_df %>% 
   filter(Mean_Median_or_IndividualSample == "Mean")
@@ -485,10 +489,12 @@ table(mean$Time_Since_Fire)
 meta <- read_excel(here("inputs", "StudiesData_Table1.xlsx"), 
     sheet = "Study_info_filtered_V3_Q") # reading in filtered meta data sheet
 
-fire <- meta %>% 
-  filter(Mean_Median_or_IndividualSample == "Mean")
-table(meta$Fire_name)
 
+a <-table(meta$Fire_name)
+
+b <- as.data.frame(a)
+
+write_csv(b, here("inputs", "Studies_Summary", "Fire_Name_Frequency.csv")) 
 
 
 ```
