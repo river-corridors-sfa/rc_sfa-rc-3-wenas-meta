@@ -1,0 +1,41 @@
+---
+title: "Gerla_Galloway_temporal_normalization_test"
+output: html_document
+date: "2023-10-10"
+---
+
+# This next chunk is to test the percent difference normalizing for time and looking at the area of the watersheds (conc * area)/time
+
+```{r - read in dataframe}
+gerla <- read_csv(here("inputs", "Studies", "Gerla_Galloway_1998", "Gerla_Galloway_1998.csv")) 
+
+```
+
+```{r calculations for monthly concentrations}
+# (concentrations * area)/Time 
+gerla <- gerla %>% 
+  mutate(Sampling_Date = mdy(Sampling_Date),
+         year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date)) # changing the format of the sampling date column and then separating year month and day 
+
+# Taking the mean concentrations by month for the burned and the unburned sites 
+gerla_month_mean <- gerla %>%
+  group_by(Climate, Area_watershed, NO3_unit, month) %>% 
+  summarize(Xe = mean(NO3[Burn_Unburn == "Burn"], na.rm = TRUE),
+            Xc = mean(NO3[Burn_Unburn == "Unburn"], na.rm = TRUE))
+
+gerla_month_mean
+
+gerla_time_norm <- gerla_month_mean %>% 
+  summarise(TimeNorm = Conc * (Area_watershed/100))
+
+# calculating the percent change 
+percent_change_transport <- MeanTransportTest %>% 
+  group_by(Climate, Time_Since_Fire) %>% 
+  mutate(percent_change = (((Xe-Xc)/Xc)*100))
+
+
+
+```
+
