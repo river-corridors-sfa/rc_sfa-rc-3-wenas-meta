@@ -1,0 +1,45 @@
+---
+title: "Mast_Clow_2008_Data_Wrangle"
+output: html_document
+date: "2023-10-17"
+---
+
+The purpose of this script is to merge DOC and NO3 data from Hampton that has a slight offset in their dates so I want to merge this dataframes and then export them out into my sheet format
+
+## Load libraries 
+```{r Jake/Mac}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+library(tidyverse)
+library(here)
+
+```
+
+```{r - read in dataframe}
+mast_NO3 <- read_csv(here("inputs", "Studies", "Mast_Clow_2008", "Mast and Clow - 2008 - NO3_Extracted-R.csv")) 
+
+mast_DOC <- read_csv(here("inputs", "Studies", "Mast_Clow_2008", "Mast and Clow - 2008 - DOC_Extracted-R.csv")) 
+
+
+```
+
+```{r merge}
+mast_combined <- full_join(mast_NO3, mast_DOC) %>% 
+  mutate(DateTime = mdy(SampleDate)) 
+
+mast_combined <- mast_combined[order(mast_combined$DateTime), ]
+
+```
+
+
+```{r export}
+write_csv(mast_combined, here("inputs", "Studies", "Mast_Clow_2008", "Mast_DOC_NO3_merged.csv"))
+```
+
+
+
+
+
+

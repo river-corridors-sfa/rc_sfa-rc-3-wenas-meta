@@ -1,0 +1,326 @@
+Site,SampleDate,Conc,Units
+Coal Creek,1/10/2004,0.328685259,mg NO3/L
+Coal Creek,4/11/2004,0.833665339,mg NO3/L
+Coal Creek,4/7/2004,0.800796813,mg NO3/L
+Coal Creek,4/17/2004,0.797808765,mg NO3/L
+Coal Creek,3/30/2004,0.729083665,mg NO3/L
+Coal Creek,4/5/2004,0.702191235,mg NO3/L
+Coal Creek,4/23/2004,0.720119522,mg NO3/L
+Coal Creek,4/26/2004,0.747011952,mg NO3/L
+Coal Creek,4/30/2004,0.669322709,mg NO3/L
+Coal Creek,5/3/2004,0.585657371,mg NO3/L
+Coal Creek,5/7/2004,0.507968127,mg NO3/L
+Coal Creek,5/7/2004,0.499003984,mg NO3/L
+Coal Creek,5/15/2004,0.427290837,mg NO3/L
+Coal Creek,5/22/2004,0.34063745,mg NO3/L
+Coal Creek,5/29/2004,0.334661355,mg NO3/L
+Coal Creek,6/6/2004,0.268924303,mg NO3/L
+Coal Creek,6/10/2004,0.271912351,mg NO3/L
+Coal Creek,6/16/2004,0.256972112,mg NO3/L
+Coal Creek,7/1/2004,0.253984064,mg NO3/L
+Coal Creek,7/9/2004,0.24501992,mg NO3/L
+Coal Creek,7/30/2004,0.239043825,mg NO3/L
+Coal Creek,6/23/2004,0.170318725,mg NO3/L
+Coal Creek,7/12/2004,0.155378486,mg NO3/L
+Coal Creek,7/21/2004,0.125498008,mg NO3/L
+Coal Creek,7/24/2004,0.164342629,mg NO3/L
+Coal Creek,8/2/2004,0.179282869,mg NO3/L
+Coal Creek,8/12/2004,0.176294821,mg NO3/L
+Coal Creek,8/21/2004,0.164342629,mg NO3/L
+Coal Creek,9/6/2004,0.152390438,mg NO3/L
+Coal Creek,9/24/2004,0.295816733,mg NO3/L
+Coal Creek,10/29/2004,0.19123506,mg NO3/L
+Coal Creek,12/13/2004,0.448207171,mg NO3/L
+Coal Creek,2/19/2005,0.496015936,mg NO3/L
+Coal Creek,3/23/2005,0.388446215,mg NO3/L
+Coal Creek,5/3/2005,0.493027888,mg NO3/L
+Coal Creek,5/9/2005,0.507968127,mg NO3/L
+Coal Creek,5/16/2005,0.501992032,mg NO3/L
+Coal Creek,5/1/2005,0.400398406,mg NO3/L
+Coal Creek,5/22/2005,0.38247012,mg NO3/L
+Coal Creek,5/28/2005,0.337649402,mg NO3/L
+Coal Creek,6/6/2005,0.280876494,mg NO3/L
+Coal Creek,6/26/2005,0.274900398,mg NO3/L
+Coal Creek,6/13/2005,0.227091633,mg NO3/L
+Coal Creek,7/8/2005,0.098605578,mg NO3/L
+Coal Creek,7/17/2005,0.089641434,mg NO3/L
+Coal Creek,7/24/2005,0.071713147,mg NO3/L
+Coal Creek,8/2/2005,0.080677291,mg NO3/L
+Coal Creek,8/12/2005,0.086653386,mg NO3/L
+Coal Creek,8/24/2005,0.083665339,mg NO3/L
+Coal Creek,8/31/2005,0.089641434,mg NO3/L
+Coal Creek,9/9/2005,0.059760956,mg NO3/L
+Coal Creek,9/18/2005,0.071713147,mg NO3/L
+Coal Creek,9/29/2005,0.188247012,mg NO3/L
+Coal Creek,10/14/2005,0.140438247,mg NO3/L
+Coal Creek,10/27/2005,0.176294821,mg NO3/L
+Coal Creek,11/11/2005,0.158366534,mg NO3/L
+Coal Creek,12/6/2005,0.179282869,mg NO3/L
+Coal Creek,12/28/2005,0.212151394,mg NO3/L
+Coal Creek,1/30/2006,0.24501992,mg NO3/L
+Coal Creek,3/1/2006,0.227091633,mg NO3/L
+Coal Creek,3/29/2006,0.24501992,mg NO3/L
+Coal Creek,4/30/2006,0.230079681,mg NO3/L
+Coal Creek,5/20/2006,0.194223108,mg NO3/L
+Coal Creek,5/26/2006,0.200199203,mg NO3/L
+Coal Creek,5/29/2006,0.239043825,mg NO3/L
+Coal Creek,6/7/2006,0.140438247,mg NO3/L
+Coal Creek,6/4/2006,0.101593625,mg NO3/L
+Coal Creek,6/13/2006,0.101593625,mg NO3/L
+Coal Creek,6/22/2006,0.080677291,mg NO3/L
+Coal Creek,7/2/2006,0.080677291,mg NO3/L
+Coal Creek,7/6/2006,0.0687251,mg NO3/L
+Coal Creek,7/15/2006,0.029880478,mg NO3/L
+Coal Creek,7/27/2006,0.023904382,mg NO3/L
+Coal Creek,8/9/2006,0.038844622,mg NO3/L
+Coal Creek,8/22/2006,0.035856574,mg NO3/L
+Coal Creek,9/6/2006,0.02689243,mg NO3/L
+Coal Creek,9/20/2006,0.023904382,mg NO3/L
+Coal Creek,11/8/2006,0.131474104,mg NO3/L
+Coal Creek,12/29/2006,0.224103586,mg NO3/L
+Coal Creek,3/9/2007,0.188247012,mg NO3/L
+Coal Creek,4/25/2007,0.185258964,mg NO3/L
+Coal Creek,5/22/2007,0.215139442,mg NO3/L
+Coal Creek,5/11/2007,0.31374502,mg NO3/L
+Coal Creek,5/30/2007,0.155378486,mg NO3/L
+Coal Creek,6/5/2007,0.131474104,mg NO3/L
+Coal Creek,6/20/2007,0.09561753,mg NO3/L
+Coal Creek,7/5/2007,0.065737052,mg NO3/L
+Coal Creek,7/18/2007,0.047808765,mg NO3/L
+Coal Creek,8/1/2007,0.0687251,mg NO3/L
+Coal Creek,8/13/2007,0.059760956,mg NO3/L
+Coal Creek,8/31/2007,0.032868526,mg NO3/L
+Coal Creek,9/11/2007,0.038844622,mg NO3/L
+Pinchot Creek,1/5/2004,0.065737052,mg NO3/L
+Pinchot Creek,3/30/2004,0.09561753,mg NO3/L
+Pinchot Creek,4/4/2004,0.077689243,mg NO3/L
+Pinchot Creek,4/10/2004,0.071713147,mg NO3/L
+Pinchot Creek,4/21/2004,0.065737052,mg NO3/L
+Pinchot Creek,3/30/2004,0.071713147,mg NO3/L
+Pinchot Creek,4/17/2004,0.119521912,mg NO3/L
+Pinchot Creek,4/13/2004,0.119521912,mg NO3/L
+Pinchot Creek,4/27/2004,0.110557769,mg NO3/L
+Pinchot Creek,4/26/2004,0.09561753,mg NO3/L
+Pinchot Creek,5/2/2004,0.143426295,mg NO3/L
+Pinchot Creek,5/3/2004,0.134462151,mg NO3/L
+Pinchot Creek,5/7/2004,0.116533865,mg NO3/L
+Pinchot Creek,4/29/2004,0.155378486,mg NO3/L
+Pinchot Creek,5/27/2004,0.167330677,mg NO3/L
+Pinchot Creek,6/6/2004,0.143426295,mg NO3/L
+Pinchot Creek,5/29/2004,0.119521912,mg NO3/L
+Pinchot Creek,5/21/2004,0.242031873,mg NO3/L
+Pinchot Creek,5/13/2004,0.221115538,mg NO3/L
+Pinchot Creek,6/22/2004,0.134462151,mg NO3/L
+Pinchot Creek,6/13/2004,0.110557769,mg NO3/L
+Pinchot Creek,6/20/2004,0.104581673,mg NO3/L
+Pinchot Creek,6/28/2004,0.107569721,mg NO3/L
+Pinchot Creek,6/28/2004,0.092629482,mg NO3/L
+Pinchot Creek,7/7/2004,0.080677291,mg NO3/L
+Pinchot Creek,7/11/2004,0.077689243,mg NO3/L
+Pinchot Creek,7/14/2004,0.053784861,mg NO3/L
+Pinchot Creek,7/20/2004,0.053784861,mg NO3/L
+Pinchot Creek,7/26/2004,0.050796813,mg NO3/L
+Pinchot Creek,8/2/2004,0.041832669,mg NO3/L
+Pinchot Creek,8/6/2004,0.035856574,mg NO3/L
+Pinchot Creek,8/11/2004,0.02689243,mg NO3/L
+Pinchot Creek,8/18/2004,0.023904382,mg NO3/L
+Pinchot Creek,8/24/2004,0.023904382,mg NO3/L
+Pinchot Creek,9/22/2004,0.032868526,mg NO3/L
+Pinchot Creek,10/29/2004,0.02689243,mg NO3/L
+Pinchot Creek,12/13/2004,0.056772908,mg NO3/L
+Pinchot Creek,2/19/2005,0.0687251,mg NO3/L
+Pinchot Creek,3/23/2005,0.071713147,mg NO3/L
+Pinchot Creek,4/27/2005,0.065737052,mg NO3/L
+Pinchot Creek,5/1/2005,0.074701195,mg NO3/L
+Pinchot Creek,5/3/2005,0.089641434,mg NO3/L
+Pinchot Creek,5/9/2005,0.101593625,mg NO3/L
+Pinchot Creek,5/9/2005,0.143426295,mg NO3/L
+Pinchot Creek,5/15/2005,0.134462151,mg NO3/L
+Pinchot Creek,5/22/2005,0.134462151,mg NO3/L
+Pinchot Creek,5/31/2005,0.131474104,mg NO3/L
+Pinchot Creek,6/6/2005,0.12250996,mg NO3/L
+Pinchot Creek,6/11/2005,0.107569721,mg NO3/L
+Pinchot Creek,6/16/2005,0.14940239,mg NO3/L
+Pinchot Creek,6/29/2005,0.137450199,mg NO3/L
+Pinchot Creek,6/22/2005,0.0687251,mg NO3/L
+Pinchot Creek,7/8/2005,0.062749004,mg NO3/L
+Pinchot Creek,7/9/2005,0.044820717,mg NO3/L
+Pinchot Creek,7/18/2005,0.032868526,mg NO3/L
+Pinchot Creek,7/25/2005,0.023904382,mg NO3/L
+Pinchot Creek,7/28/2005,0.023904382,mg NO3/L
+Pinchot Creek,7/31/2005,0.023904382,mg NO3/L
+Pinchot Creek,8/8/2005,0.020916335,mg NO3/L
+Pinchot Creek,8/12/2005,0.014940239,mg NO3/L
+Pinchot Creek,8/27/2005,0.014940239,mg NO3/L
+Pinchot Creek,8/18/2005,0.020916335,mg NO3/L
+Pinchot Creek,8/31/2005,0.020916335,mg NO3/L
+Pinchot Creek,9/7/2005,0.014940239,mg NO3/L
+Pinchot Creek,9/15/2005,0.014940239,mg NO3/L
+Pinchot Creek,9/28/2005,0.074701195,mg NO3/L
+Pinchot Creek,10/10/2005,0.053784861,mg NO3/L
+Pinchot Creek,10/26/2005,0.050796813,mg NO3/L
+Pinchot Creek,11/9/2005,0.059760956,mg NO3/L
+Pinchot Creek,12/4/2005,0.0687251,mg NO3/L
+Pinchot Creek,12/26/2005,0.074701195,mg NO3/L
+Pinchot Creek,1/28/2006,0.050796813,mg NO3/L
+Pinchot Creek,2/26/2006,0.050796813,mg NO3/L
+Pinchot Creek,3/26/2006,0.053784861,mg NO3/L
+Pinchot Creek,4/30/2006,0.053784861,mg NO3/L
+Pinchot Creek,5/16/2006,0.09561753,mg NO3/L
+Pinchot Creek,5/23/2006,0.086653386,mg NO3/L
+Pinchot Creek,6/4/2006,0.101593625,mg NO3/L
+Pinchot Creek,6/14/2006,0.071713147,mg NO3/L
+Pinchot Creek,6/20/2006,0.041832669,mg NO3/L
+Pinchot Creek,7/14/2006,0.020916335,mg NO3/L
+Pinchot Creek,7/25/2006,0.008964143,mg NO3/L
+Pinchot Creek,7/3/2006,0.047808765,mg NO3/L
+Pinchot Creek,8/9/2006,0.014940239,mg NO3/L
+Pinchot Creek,8/19/2006,0.002988048,mg NO3/L
+Pinchot Creek,9/7/2006,0.005976096,mg NO3/L
+Pinchot Creek,9/18/2006,0.002988048,mg NO3/L
+Pinchot Creek,11/5/2006,0.014940239,mg NO3/L
+Pinchot Creek,12/26/2006,0.038844622,mg NO3/L
+Pinchot Creek,3/6/2007,0.032868526,mg NO3/L
+Pinchot Creek,4/25/2007,0.047808765,mg NO3/L
+Pinchot Creek,5/7/2007,0.137450199,mg NO3/L
+Pinchot Creek,5/17/2007,0.140438247,mg NO3/L
+Pinchot Creek,5/23/2007,0.137450199,mg NO3/L
+Pinchot Creek,5/26/2007,0.12250996,mg NO3/L
+Pinchot Creek,6/2/2007,0.071713147,mg NO3/L
+Pinchot Creek,6/11/2007,0.080677291,mg NO3/L
+Pinchot Creek,6/19/2007,0.059760956,mg NO3/L
+Pinchot Creek,6/29/2007,0.038844622,mg NO3/L
+Pinchot Creek,7/6/2007,0.047808765,mg NO3/L
+Pinchot Creek,7/15/2007,0.029880478,mg NO3/L
+Pinchot Creek,7/31/2007,0.014940239,mg NO3/L
+Pinchot Creek,8/10/2007,0.014940239,mg NO3/L
+Pinchot Creek,8/26/2007,0.005976096,mg NO3/L
+Pinchot Creek,9/9/2007,0.008964143,mg NO3/L
+Fish Creek,12/2/2004,0.312957404,mg N/L
+Fish Creek,3/9/2005,0.206248809,mg N/L
+Fish Creek,3/27/2005,0.303771203,mg N/L
+Fish Creek,4/26/2005,0.18433867,mg N/L
+Fish Creek,5/10/2005,0.102608634,mg N/L
+Fish Creek,5/25/2005,0.11521822,mg N/L
+Fish Creek,6/10/2005,0.090096722,mg N/L
+Fish Creek,6/24/2005,0.096414618,mg N/L
+Fish Creek,7/5/2005,0.121595674,mg N/L
+Fish Creek,7/22/2005,0.154652659,mg N/L
+Fish Creek,8/5/2005,0.160970555,mg N/L
+Fish Creek,8/18/2005,0.127980274,mg N/L
+Fish Creek,9/14/2005,0.096590909,mg N/L
+Fish Creek,9/30/2005,0.107632933,mg N/L
+Fish Creek,10/12/2005,0.093508195,mg N/L
+Fish Creek,10/29/2005,0.104550219,mg N/L
+Fish Creek,11/19/2005,0.103023156,mg N/L
+Fish Creek,12/12/2005,0.162821612,mg N/L
+Fish Creek,1/14/2006,0.144025157,mg N/L
+Fish Creek,2/13/2006,0.162957404,mg N/L
+Fish Creek,3/13/2006,0.131570421,mg N/L
+Fish Creek,4/17/2006,0.109634077,mg N/L
+Fish Creek,5/5/2006,0.117533829,mg N/L
+Fish Creek,5/19/2006,0.051527063,mg N/L
+Fish Creek,6/5/2006,0.032694873,mg N/L
+Fish Creek,6/17/2006,0.097186488,mg N/L
+Fish Creek,7/4/2006,0.057914046,mg N/L
+Fish Creek,7/20/2006,0.034364875,mg N/L
+Fish Creek,8/1/2006,0.024957118,mg N/L
+Fish Creek,8/11/2006,0.084726987,mg N/L
+Fish Creek,8/31/2006,0.048606346,mg N/L
+Fish Creek,9/8/2006,0.032899752,mg N/L
+Fish Creek,10/29/2006,0.117914999,mg N/L
+Fish Creek,12/21/2006,0.154192872,mg N/L
+Fish Creek,2/24/2007,0.104018963,mg N/L
+Fish Creek,4/14/2007,0.115130074,mg N/L
+Fish Creek,4/29/2007,0.151326949,mg N/L
+Fish Creek,5/13/2007,0.09632409,mg N/L
+Fish Creek,5/27/2007,0.039751286,mg N/L
+Fish Creek,6/10/2007,0.0539332,mg N/L
+Fish Creek,6/27/2007,0.075981513,mg N/L
+Fish Creek,7/10/2007,0.042991233,mg N/L
+Fish Creek,8/5/2007,0.043046026,mg N/L
+Lower MacDonald Creek,2/5/2005,0.229764627,mg N/L
+Lower MacDonald Creek,3/8/2005,0.258133219,mg N/L
+Lower MacDonald Creek,3/25/2005,0.327351344,mg N/L
+Lower MacDonald Creek,4/24/2005,0.324271012,mg N/L
+Lower MacDonald Creek,5/10/2005,0.228394797,mg N/L
+Lower MacDonald Creek,5/24/2005,0.239429674,mg N/L
+Lower MacDonald Creek,6/9/2005,0.236320755,mg N/L
+Lower MacDonald Creek,6/23/2005,0.220626072,mg N/L
+Lower MacDonald Creek,7/6/2005,0.208076043,mg N/L
+Lower MacDonald Creek,7/21/2005,0.190813798,mg N/L
+Lower MacDonald Creek,8/5/2005,0.186127787,mg N/L
+Lower MacDonald Creek,8/19/2005,0.181441776,mg N/L
+Lower MacDonald Creek,8/31/2005,0.181467982,mg N/L
+Lower MacDonald Creek,9/15/2005,0.175209644,mg N/L
+Lower MacDonald Creek,9/30/2005,0.161092053,mg N/L
+Lower MacDonald Creek,10/13/2005,0.165837621,mg N/L
+Lower MacDonald Creek,10/28/2005,0.1721579,mg N/L
+Lower MacDonald Creek,11/20/2005,0.194220507,mg N/L
+Lower MacDonald Creek,12/10/2005,0.219420621,mg N/L
+Lower MacDonald Creek,1/15/2006,0.236794835,mg N/L
+Lower MacDonald Creek,2/11/2006,0.235279684,mg N/L
+Lower MacDonald Creek,3/11/2006,0.236911569,mg N/L
+Lower MacDonald Creek,4/15/2006,0.233843148,mg N/L
+Lower MacDonald Creek,5/6/2006,0.240177721,mg N/L
+Lower MacDonald Creek,5/18/2006,0.224480656,mg N/L
+Lower MacDonald Creek,6/4/2006,0.222944063,mg N/L
+Lower MacDonald Creek,6/15/2006,0.21038927,mg N/L
+Lower MacDonald Creek,7/5/2006,0.185274919,mg N/L
+Lower MacDonald Creek,7/19/2006,0.168010292,mg N/L
+Lower MacDonald Creek,7/30/2006,0.161744807,mg N/L
+Lower MacDonald Creek,8/10/2006,0.149190013,mg N/L
+Lower MacDonald Creek,8/30/2006,0.14137126,mg N/L
+Lower MacDonald Creek,9/8/2006,0.136673337,mg N/L
+Lower MacDonald Creek,10/28/2006,0.149359158,mg N/L
+Lower MacDonald Creek,12/20/2006,0.231234515,mg N/L
+Lower MacDonald Creek,2/23/2007,0.228230417,mg N/L
+Lower MacDonald Creek,4/15/2007,0.229912331,mg N/L
+Lower MacDonald Creek,4/26/2007,0.229936154,mg N/L
+Lower MacDonald Creek,5/12/2007,0.240975796,mg N/L
+Lower MacDonald Creek,5/25/2007,0.237859729,mg N/L
+Lower MacDonald Creek,6/7/2007,0.233171336,mg N/L
+Lower MacDonald Creek,6/24/2007,0.204905184,mg N/L
+Lower MacDonald Creek,7/8/2007,0.178206594,mg N/L
+Lower MacDonald Creek,8/4/2007,0.16725748,mg N/L
+Upper MacDonald Creek,3/7/2005,0.610332095,mg N/L
+Upper MacDonald Creek,3/25/2005,0.527036878,mg N/L
+Upper MacDonald Creek,5/12/2005,0.594749381,mg N/L
+Upper MacDonald Creek,5/24/2005,0.407668668,mg N/L
+Upper MacDonald Creek,6/8/2005,0.376255479,mg N/L
+Upper MacDonald Creek,6/23/2005,0.192324185,mg N/L
+Upper MacDonald Creek,7/6/2005,0.186063465,mg N/L
+Upper MacDonald Creek,7/21/2005,0.187669144,mg N/L
+Upper MacDonald Creek,8/4/2005,0.212854965,mg N/L
+Upper MacDonald Creek,8/18/2005,0.223892224,mg N/L
+Upper MacDonald Creek,8/30/2005,0.234924719,mg N/L
+Upper MacDonald Creek,9/15/2005,0.249109015,mg N/L
+Upper MacDonald Creek,9/30/2005,0.293167524,mg N/L
+Upper MacDonald Creek,10/13/2005,0.321497999,mg N/L
+Upper MacDonald Creek,10/29/2005,0.324676005,mg N/L
+Upper MacDonald Creek,11/20/2005,0.367176482,mg N/L
+Upper MacDonald Creek,12/11/2005,0.375083381,mg N/L
+Upper MacDonald Creek,1/15/2006,0.405033829,mg N/L
+Upper MacDonald Creek,2/11/2006,0.375216791,mg N/L
+Upper MacDonald Creek,3/11/2006,0.41143987,mg N/L
+Upper MacDonald Creek,4/15/2006,0.53101296,mg N/L
+Upper MacDonald Creek,5/5/2006,0.487030684,mg N/L
+Upper MacDonald Creek,5/18/2006,0.307813989,mg N/L
+Upper MacDonald Creek,6/3/2006,0.160048599,mg N/L
+Upper MacDonald Creek,6/14/2006,0.163217076,mg N/L
+Upper MacDonald Creek,7/5/2006,0.103513913,mg N/L
+Upper MacDonald Creek,7/17/2006,0.11297408,mg N/L
+Upper MacDonald Creek,7/30/2006,0.12243663,mg N/L
+Upper MacDonald Creek,8/29/2006,0.164953783,mg N/L
+Upper MacDonald Creek,9/8/2006,0.16183057,mg N/L
+Upper MacDonald Creek,10/27/2006,0.227973128,mg N/L
+Upper MacDonald Creek,12/18/2006,0.331858681,mg N/L
+Upper MacDonald Creek,2/24/2007,0.281691919,mg N/L
+Upper MacDonald Creek,4/14/2007,0.439029445,mg N/L
+Upper MacDonald Creek,4/28/2007,0.563274252,mg N/L
+Upper MacDonald Creek,5/13/2007,0.406072518,mg N/L
+Upper MacDonald Creek,5/27/2007,0.286606632,mg N/L
+Upper MacDonald Creek,6/7/2007,0.165561273,mg N/L
+Upper MacDonald Creek,6/24/2007,0.119999524,mg N/L
+Upper MacDonald Creek,7/9/2007,0.102737278,mg N/L
+Upper MacDonald Creek,8/2/2007,0.138953211,mg N/L
