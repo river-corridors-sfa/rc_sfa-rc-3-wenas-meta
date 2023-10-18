@@ -1,0 +1,66 @@
+---
+title: "All_Studies_Temporal_Normalization"
+output: html_document
+date: "2023-10-18"
+---
+The purpose of this script is to read in the studies from the final meta data list and to normalize daily stream concentrations by time. 
+
+Script Workflow:
+
+Step 1) Load in all the individual studies from "meta_final" located within inputs in the repository.  
+
+Step 2) Filter out studies that are Pre_Post -> we only want papers that are Control_vs_Impact
+
+Step 3) run script that fills in concentrations for missing days in between discrete sampling days and then takes an average by month. 
+
+
+# Status: in progress
+
+# ==============================================================================
+# Author: Jake Cavaiani 
+# 18 October 2023
+# ==============================================================================
+
+## Load libraries 
+```{r Jake/Mac}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+library(tidyverse)
+library(here)
+library(readr)
+
+```
+
+## Merge formal lit search 
+```{r data prepper}
+studies_file_list <- list.files(path = "inputs/Studies/meta_final/", 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv, 
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) # Should be 6033
+
+
+unitconv=read.csv("inputs/UnitConversion.csv",stringsAsFactors = FALSE)
+
+```
+
+
+
+
+
+
+
+
+
