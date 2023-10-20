@@ -1,0 +1,287 @@
+---
+title: "Map"
+output: html_document
+date: "2023-10-19"
+editor_options: 
+  chunk_output_type: console
+---
+The purpose of this script is map the map figure 
+
+Script Workflow:
+
+Step 1) Load in the summary metadata sheet that include lat and long
+
+Step 2) Load in the shape files of the burns
+
+Step 3) Plot
+
+
+# Status: in progress
+
+# ==============================================================================
+# Author: Jake Cavaiani 
+# 19 October 2023
+# ==============================================================================
+
+## Load packages and set working directory
+```{r Jake/Mac}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+
+library(tidyverse)
+library(here)
+library(readxl)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(rgdal)
+library(broom)
+
+
+```
+
+```{r}
+
+meta <- read_excel(here("inputs", "StudiesData_Table1.xlsx"), 
+    sheet = "Study_info_filtered_V3_Q") # reading in filtered meta data sheet
+
+coords <- meta %>% 
+  select(Lat, Long) %>% 
+  mutate(across(everything(), as.numeric)) # creating dataframe that is just the coordinates
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+class(world)
+
+ggplot(data = world) +
+    geom_sf() +
+    geom_point(data = coords, aes(x = Long, y = Lat), size = 4, 
+        shape = 23, fill = "darkred") +
+  coord_sf(xlim = c(-125, -70), ylim = c(24, 55), expand = FALSE) +
+  theme_bw()
+
+ggsave("meta_map_filter_2.pdf",
+       path = here("initial_plots", "01_Wenas_meta_wrangle"),
+       width = 8, height = 10, units = "in")
+
+# We decided to remove all the studies that were out of the country
+
+
+# Plot the high park fire
+shapefile <- st_read("co4058910540420120609_20110912_20130901_burn_bndy.shp")
+
+
+ggplot() +
+  geom_sf(data = shapefile, aes(fill = "red")) +
+  theme_bw()
+
+ggplot() +
+  geom_sf(data = shapefile, aes(fill = "red")) +
+  scale_fill_viridis_c(option = "A") +
+  labs(title = "Your Shapefile Plot", fill = "Legend Title")
+
+# Plot multiple fires
+angora <- st_read(here("gis_data", "Fire_Perimeters", "Angora", "ca3888612004020070623_20060812_20080630_burn_bndy.shp"))
+
+caldor <- st_read(here("gis_data", "Fire_Perimeters", "Caldor", "ca3858612053820210815_20210805_20220723_burn_bndy.shp"))
+
+camp_branch <- st_read(here("gis_data", "Fire_Perimeters", "Camp_Branch", "nc3516508354120161123_20151219_20161221_burn_bndy.shp"))
+
+clovermist <- st_read(here("gis_data", "Fire_Perimeters", "Clovermist", "wy4473710995419880709_19860818_19890802_burn_bndy.shp"))
+
+fern_lake <- st_read(here("gis_data", "Fire_Perimeters", "Fern_Lake", "co4036110556320121009_20100925_20130917_burn_bndy.shp"))
+
+four_mile <- st_read(here("gis_data", "Fire_Perimeters", "Fourmile_Canyon", "co4005110538520100906_20100621_20110624_burn_bndy.shp"))
+
+gaviota <- st_read(here("gis_data", "Fire_Perimeters", "Gaviota", "ca3448712019620040605_20040425_20050412_burn_bndy.shp"))
+  
+high_park <- st_read(here("gis_data", "Fire_Perimeters", "High_Park", "co4058910540420120609_20110912_20130901_burn_bndy.shp"))
+
+hayman <- st_read(here("gis_data", "Fire_Perimeters", "Hayman", "co3922010528720020608_20010824_20030814_burn_bndy.shp"))
+
+rampage <- st_read(here("gis_data", "Fire_Perimeters", "Rampage_Complex", "mt4839411359020030819_20010707_20040715_burn_bndy.shp"))
+
+red_bench <- st_read(here("gis_data", "Fire_Perimeters", "Red_Bench", "mt4878711426219880906_19880819_19890729_burn_bndy.shp"))
+
+rocky <- st_read(here("gis_data", "Fire_Perimeters", "Rocky", "ca3891212249320150729_20140910_20150904_burn_bndy.shp"))
+
+tellico <- st_read(here("gis_data", "Fire_Perimeters", "Tellico", "nc3527408356020161103_20151219_20161221_burn_bndy.shp"))
+
+thompson_ridge <- st_read(here("gis_data", "Fire_Perimeters", "Thompson_Ridge", "nm3589210662020130531_20110608_20140616_burn_bndy.shp"))
+
+wragg <- st_read(here("gis_data", "Fire_Perimeters", "Wragg", "ca3851412213120150722_20150711_20150812_burn_bndy.shp"))
+
+# 15 fires 
+
+
+
+combined_shapefile <- rbind(angora, caldor, camp_branch, clovermist,
+                            fern_lake, four_mile, gaviota, high_park, 
+                            hayman, rampage, red_bench, rocky,
+                            tellico, thompson_ridge, wragg)
+
+ggplot() +
+  geom_sf(data = combined_shapefile, aes(fill = "red"))
+
+ggplot() +
+  geom_sf(data = wragg, aes(fill = "red"))
+
+
+ggplot(data = world) +
+    geom_sf() +
+    geom_point(data = coords, aes(x = Long, y = Lat), size = 4, 
+        shape = 23, fill = "darkred") +
+    geom_sf(data = combined_shapefile, aes(fill = "red")) +
+    coord_sf(xlim = c(-125, -70), ylim = c(24, 55), expand = FALSE) +
+  theme_bw()
+
+ggplot() +
+  geom_sf(data = combined_shapefile, aes(fill = "red")) +
+    coord_sf(xlim = c(-125, -70), ylim = c(24, 55), expand = FALSE)
+  
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+```{r -graph gallery}
+# Read this shape file with the rgdal library. 
+library(terra)
+library(ggspatial)
+library(sf)
+library(cowplot)
+library(mgcv)
+library(visreg)
+source("rasterdf.R")
+
+setwd("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/gis_data/Fire_Perimeters/High_Park")
+
+landsat_pre <- rast("co4058910540420120609_20110912_l5_refl.tif")
+landsat_post <- rast("co4058910540420120609_20130901_l8_refl.tif")
+
+nrow(landsat_pre)
+## [1] 850
+ncol(landsat_pre)
+## [1] 1149
+res(landsat_pre)
+## [1] 30 30
+nlyr(landsat_pre)
+## [1] 6
+ext(landsat_pre)[1:4]
+##    xmin    xmax    ymin    ymax 
+## -801045 -766575 1985745 2011245
+
+nrow(landsat_post)
+## [1] 850
+ncol(landsat_post)
+## [1] 1149
+res(landsat_post)
+## [1] 30 30
+nlyr(landsat_post)
+## [1] 8
+ext(landsat_post)[1:4]
+##    xmin    xmax    ymin    ymax 
+## -801045 -766575 1985745 2011245
+
+plotRGB(landsat_pre, 
+        r = 6, 
+        g = 4, 
+        b = 2)
+
+plotRGB(landsat_post, 
+        r = 6, 
+        g = 4, 
+        b = 2)
+
+nbr_pre <- 1000 * (landsat_pre[[4]] - landsat_pre[[6]]) / 
+  (landsat_pre[[4]] + landsat_pre[[6]])
+nbr_post <- 1000 * (landsat_post[[4]] - landsat_post[[6]]) / 
+  (landsat_post[[4]] + landsat_post[[6]])
+dnbr <- nbr_pre - nbr_post
+
+nbr_stack <- c(nbr_pre, nbr_post)
+names(nbr_stack) <- c("Pre-fire NBR", "Post-fire NBR")
+nbr_stack_df <- rasterdf(nbr_stack)
+
+ggplot(nbr_stack_df) +
+  geom_raster(aes(x = x, 
+                  y = y, 
+                  fill = value)) + 
+  scale_fill_gradient(name = "NBR", 
+                       low = "lightyellow", 
+                       high = "darkgreen") +
+  coord_sf(expand = FALSE) +
+  annotation_scale(location = 'bl') +
+  facet_wrap(facets = vars(variable), 
+             ncol = 1) +
+  theme_void()
+
+dnbr_df <- rasterdf(dnbr)
+
+
+ggplot(dnbr_df) +
+  geom_raster(aes(x = x, 
+                  y = y, 
+                  fill = value)) + 
+  scale_fill_gradient2(name = "DNBR", 
+                       low = "blue", 
+                       high = "red",
+                       midpoint = 0) +
+  coord_sf(expand = F) +
+  annotation_scale(location = 'bl') +
+  theme_void()
+
+
+rclas <- matrix(c(-Inf, -970, NA,  # Missing data
+                  -970, -100, 5,   # Increased greenness
+                  -100, 80, 1,     # Unburned
+                  80, 265, 2,      # Low severity
+                  265, 490, 3,     # Moderate severity
+                  490, Inf, 4),    # High severity
+                  ncol = 3, byrow = T)
+
+severity <- classify(dnbr, rclas)
+
+fire_bndy <- st_read("co4058910540420120609_20110912_20130901_burn_bndy.shp",
+                     quiet = TRUE)
+bndy_rast <- rasterize(vect(fire_bndy), 
+                       severity, 
+                       field = "Event_ID")
+severity <- mask(severity, bndy_rast)
+
+SCcolors = c("darkgreen", 
+             "cyan3", 
+             "yellow", 
+             "red", 
+             "green")
+SCnames = c("Unburned", 
+            "Low", 
+            "Moderate", 
+            "High", 
+            "> Green")
+
+severity_df <- rasterdf(severity)
+
+ggplot(severity_df) +
+  geom_raster(aes(x = x, 
+                  y = y, 
+                  fill = as.character(value))) + 
+  scale_fill_manual(name = "Severity Class",
+                    values = SCcolors,
+                    labels = SCnames,
+                    na.translate = FALSE) +
+  annotation_scale(location = 'bl') +
+  coord_fixed(expand = F) +
+  theme_void()
+
+```

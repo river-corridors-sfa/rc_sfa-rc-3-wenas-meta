@@ -1,0 +1,263 @@
+---
+title: "All_Studies_Temporal_Normalization"
+output: html_document
+date: "2023-10-19"
+editor_options: 
+  chunk_output_type: console
+---
+
+The purpose of this script is to read in the studies from the final meta data list and to normalize daily stream concentrations by time. 
+
+Script Workflow:
+
+Step 1) Load in all the individual studies from "meta_final" located within inputs in the repository.  
+
+Step 2) Filter out studies that are Pre_Post -> we only want papers that are Control_vs_Impact
+
+Step 3) run script that fills in concentrations for missing days in between discrete sampling days and then takes an average by month. 
+
+
+# Status: in progress
+
+# ==============================================================================
+# Author: Jake Cavaiani 
+# 18 October 2023
+# ==============================================================================
+
+## Load packages and set working directory
+```{r Jake/Mac}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+
+library(tidyverse)
+library(here)
+library(forecastML)
+library(zoo)
+library(hrbrthemes)
+library(viridis)
+
+```
+
+```{r data prepper}
+studies_file_list <- list.files(path = "inputs/Studies/meta_final/", 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv, 
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) 
+
+unitconv=read.csv("inputs/UnitConversion.csv",stringsAsFactors = FALSE)
+
+
+```
+
+
+```{r data prep}
+# Filtering by only the control vs.impact studies because the pre_post are going to go through a different calculation 
+# Also filtering out the studies where I don't have exact sampling days 
+control_impact <- meta_df %>% 
+  filter(`Design (Control/Burn; Pre/Post)` == "Control_Reference_vs_Impact",
+         Study_ID != "Caldwell et al. 2020",
+         Study_ID != "Stephan et al. 2015",
+         Study_ID != "Writer & Murphy, 2012", 
+         Mean_Median_or_IndividualSample == "Individual")
+
+# separate out the time columns 
+time_format <- control_impact %>% 
+  select(Study_ID, Sampling_Date) 
+
+# Make them all the same format and then merge back together in one column
+time_format <- time_format %>% 
+  mutate(DateTime = mdy(Sampling_Date),
+         DateTime2 = mdy_hm(Sampling_Date), 
+         DateTime2 = as.Date(DateTime2)) %>% 
+  select(-Sampling_Date) %>% 
+  mutate(Sampling_Date = coalesce(DateTime, DateTime2),
+         Sampling_Date = as.character(Sampling_Date)) %>% 
+  select(-DateTime, -DateTime2) 
+
+# merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
+control_impact <- control_impact %>% 
+  mutate(Sampling_Date = time_format$Sampling_Date)
+
+
+# Creating a year month and day separate column
+control_impact <- control_impact %>% 
+  mutate(Sampling_Date = ymd(Sampling_Date),
+         year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+
+# changing the structure of the concentrations
+control_impact <- control_impact %>% 
+  mutate(DOC = as.numeric(DOC),
+         NO3 = as.numeric(NO3))
+
+# Changing the units to make sure everything is consistent in mg_N_L or mg_C_L
+control_impact_units <- control_impact %>% 
+  mutate(Area_watershed_km = case_when(Area_unit == 'ha' ~ Area_watershed * .01,
+                                       Area_unit == 'km' ~ print(Area_watershed)),
+         
+         DOC_mg_C_L = case_when(DOC_unit == 'mg_C_L' ~ print(DOC),
+                                DOC_unit == 'mg_L' ~ print(DOC),
+                                DOC_unit == 'um' ~ print(DOC)),
+         
+         NO3_mg_N_L = case_when(NO3_unit == 'um' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_NO2_NO3_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'mg_N_L' ~ print(NO3),
+                                NO3_unit == 'ug_N_L' ~ NO3 * .001, 
+                                NO3_unit == 'mg_L' ~ NO3 * 0.225904780))
+
+
+```
+
+```{r - Abbott test}
+# Abbott test #
+abbott <- control_impact %>% 
+  filter(Study_ID == "Abbott et al. 2021")
+
+abbott_time_fill <- abbott %>% 
+  complete(Sampling_Date = seq.Date(min(Sampling_Date), max(Sampling_Date), by = "day")) %>% 
+  select("Sampling_Date", "Site", "DOC", "NO3") 
+
+ggplot(abbott_time_fill, aes(x = Sampling_Date, y = NO3)) +
+  geom_point() +
+  facet_wrap(~Site, scales = "free") +
+  theme_bw()
+
+
+abbott_time_fill_filter <- abbott_time_fill %>% 
+  filter(Site %in% c("BS.11", "BS.12"))
+
+abbott_time_fill_filter <- abbott_time_fill_filter %>% 
+  fill_gaps(date_col = 1, frequency = '1 day',
+            groups = 'Site') %>% 
+  mutate(NO3_Interp = na.approx(NO3, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC, na.rm = FALSE))
+
+
+  
+abbott_solute_fill <-  abbott_time_fill %>%
+  fill_gaps(date_col = 1, frequency = '1 day',
+            groups = 'Site') %>% 
+  mutate(NO3_Interp = na.approx(NO3, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC, na.rm = FALSE))
+
+ggplot(abbott_solute_fill, aes(x = Sampling_Date, y = NO3_Interp)) +
+  geom_point() +
+  facet_wrap(~Site, scales = "free") +
+  theme_bw()
+
+```
+
+
+```{r 2 study test}
+# lets try to do this for 2 studies # 
+multiple <- control_impact %>% 
+  filter(Study_ID %in% c("Abbott et al. 2021", "Burd et al 2018"))
+
+multiple_time_fill <- multiple %>% 
+  select("Study_ID", "Sampling_Date", "Site", "DOC", "NO3") 
+
+multiple_time_fill <- multiple_time_fill %>%
+  group_by(Study_ID) %>% 
+  fill_gaps(date_col = 2, frequency = '1 day',
+            groups = 'Site') %>% 
+  mutate(NO3_Interp = na.approx(NO3, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC, na.rm = FALSE))
+
+```
+
+```{r - all the studies}
+# Okay lets do this for all the studies # 
+# filling in daily time series and interpolating by study and site
+control_impact_fill <-  control_impact_units %>% 
+  select("Study_ID", "Latitude", "Longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L", "year", "month", "day") %>% 
+  group_by(Study_ID) %>% 
+  fill_gaps(date_col = 10, frequency = '1 day',
+            groups = 'Site') %>% 
+  mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>% 
+  fill(Study_ID:Time_Since_Fire, year:day)
+  
+
+# Taking the mean concentrations by month for the burned and the unburned sites
+# pivoting to make the responses in one column
+metadata_long <- control_impact_fill %>%
+  pivot_longer(
+    cols = NO3_Interp:DOC_Interp,
+    names_to = "response_var",
+    values_to = "mean_concentration",
+    values_drop_na = TRUE
+  )
+
+MeanConcTest <- metadata_long %>%
+  group_by(Study_ID, Pair, Burn_Unburn, response_var, Climate, Time_Since_Fire) %>%
+  dplyr::summarize(Ne = sum(Burn_Unburn == "Burn"),
+                   Nc = sum(Burn_Unburn == "Unburn"),
+                   Xe = mean(mean_concentration[Burn_Unburn == "Burn"], na.rm = TRUE),
+                   Xc = mean(mean_concentration[Burn_Unburn == "Unburn"], na.rm = TRUE))
+
+
+
+control_impact_summary <- control_impact_fill %>% 
+  group_by(Study_ID, Site, year, month) %>% 
+  summarise(XeNO3 = mean(NO3_Interp[Burn_Unburn == "Burn"], na.rm = TRUE),
+            XcNO3 = mean(NO3_Interp[Burn_Unburn == "Unburn"], na.rm = TRUE),
+            XeDOC = mean(DOC_Interp[Burn_Unburn == "Burn"], na.rm = TRUE),
+            XcDOC = mean(DOC_Interp[Burn_Unburn == "Unburn"], na.rm = TRUE))
+
+
+
+  
+gerla_month_mean_burn <- gerla_burn_fill %>%
+  group_by(Climate, year, month) %>%
+  summarize(Xe = mean(NO3[Burn_Unburn == "Burn"], na.rm = TRUE),
+            TimeNorm_Burn = Xe * 6423/100)
+```
+
+
+
+```{r - code graveyard}
+# # Fill gaps
+# control_impact_gap_fill <- control_impact %>% 
+#   group_by(Study_ID) %>% 
+#   complete(Sampling_Date = seq.Date(min(Sampling_Date), max(Sampling_Date), by = "day")) %>% 
+#   mutate(NO3 = na.approx(NO3))  
+#   
+# 
+# df <- tibble(
+#   Group = c("A", "A", "A", "B", "B"),
+#   Date = as.Date(c("2023-10-01", "2023-10-02", "2023-10-04", "2023-10-01", "2023-10-03")),
+#   Value = c(10, 15, 20, 5, 10)
+# )
+# 
+# df_filled <- df %>%
+#   group_by(Group) %>%
+#   complete(Date = seq.Date(min(Date), max(Date), by = "day")) %>%
+#   fill(Value, .direction = "up")
+
+
+
+
+
+
+
+
+
+
+
+
+```
