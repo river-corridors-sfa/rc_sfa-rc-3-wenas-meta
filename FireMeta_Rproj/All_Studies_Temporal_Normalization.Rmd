@@ -92,17 +92,11 @@ control_impact <- control_impact %>%
   mutate(Sampling_Date = time_format$Sampling_Date)
 
 
-# Creating a year month and day separate column
-control_impact <- control_impact %>% 
-  mutate(Sampling_Date = ymd(Sampling_Date),
-         year = year(Sampling_Date),
-         month = month(Sampling_Date),
-         day = day(Sampling_Date))
-
 # changing the structure of the concentrations
 control_impact <- control_impact %>% 
   mutate(DOC = as.numeric(DOC),
-         NO3 = as.numeric(NO3))
+         NO3 = as.numeric(NO3), 
+         Sampling_Date = ymd(Sampling_Date))
 
 # Changing the units to make sure everything is consistent in mg_N_L or mg_C_L
 control_impact_units <- control_impact %>% 
@@ -121,6 +115,9 @@ control_impact_units <- control_impact %>%
                                 NO3_unit == 'mg_L' ~ NO3 * 0.225904780))
 
 
+site_data <- control_impact_units %>% 
+  select(Study_ID, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn,
+         Time_Since_Fire)
 ```
 
 ```{r - Abbott test}
@@ -180,19 +177,19 @@ multiple_time_fill <- multiple_time_fill %>%
 
 ```
 
-```{r - Coombs test}
-# Coombs test #
-coombs <- control_impact %>% 
-  filter(Study_ID == "Coombs & Melack, 2013")
 
-coombs_time_fill <- coombs %>% 
-  select("Sampling_Date", "Site", "DOC", "NO3") 
+```{r - Hauer test}
+# Hauer test #
+hauer <- control_impact %>% 
+  filter(Study_ID == "Hauer & Spencer 1998")
 
-coombs_time_fill_filter <- coombs_time_fill %>% 
-  fill_gaps(date_col = 1, frequency = '1 day',
-            groups = 'Site') %>% 
-  mutate(NO3_Interp = na.approx(NO3, na.rm = FALSE),
-         DOC_Interp = na.approx(DOC, na.rm = FALSE))
+hauer_time_fill <- hauer %>% 
+  select("Sampling_Date", "Site", "NO3") 
+
+hauer_time_fill_filter <- hauer_time_fill %>% 
+  group_by(Site) %>% 
+  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day"))
+
 
 
 ggplot(coombs_time_fill_filter, aes(x = Sampling_Date, y = NO3_Interp)) +
@@ -202,18 +199,20 @@ ggplot(coombs_time_fill_filter, aes(x = Sampling_Date, y = NO3_Interp)) +
 
 ```
 
-
 ```{r - all the studies}
 # Okay lets do this for all the studies # 
 # filling in daily time series and interpolating by study and site
 control_impact_fill <-  control_impact_units %>% 
-  select("Study_ID", "Latitude", "Longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L", "year", "month", "day") %>% 
-  group_by(Study_ID) %>% 
-  fill_gaps(date_col = 10, frequency = '1 day',
-            groups = 'Site') %>% 
+  select("Study_ID", "Latitude", "Longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+  group_by(Study_ID, Site) %>%
+  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
+  fill(Study_ID:Time_Since_Fire) %>%
+  fill(Study_ID, Site) %>%
+  ungroup() %>%
+  group_by(Site) %>%
   mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
-         DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>% 
-  fill(Study_ID:Time_Since_Fire, year:day)
+         DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
+  fill(Study_ID:Time_Since_Fire)
   
 ```
 
@@ -225,129 +224,58 @@ metadata_long <- control_impact_fill %>%
   pivot_longer(
     cols = NO3_Interp:DOC_Interp,
     names_to = "response_var",
-    values_to = "mean_concentration",
+    values_to = "concentration",
     values_drop_na = TRUE
   )
 
-MeanConcTest <- metadata_long %>%
-  group_by(Study_ID, Pair, Burn_Unburn, response_var, Climate, Time_Since_Fire) %>%
-  dplyr::summarize(Ne = sum(Burn_Unburn == "Burn"),
-                   Nc = sum(Burn_Unburn == "Unburn"),
-                   Xe = mean(mean_concentration[Burn_Unburn == "Burn"], na.rm = TRUE),
-                   Xc = mean(mean_concentration[Burn_Unburn == "Unburn"], na.rm = TRUE))
+metadata_long <- metadata_long %>% 
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
 
-# This is calculating the mean for EACH site within a study_ID # 
-    # Any study_ID that doesn't have up to 10 sites will have a 0 in the respective Xen column 
-analyte_table_means <- MeanConcTest %>%
-  select(-Pair) %>%
-  group_by(Study_ID, response_var, Climate, Time_Since_Fire) %>%
-  summarize(Ne = sum(Ne),
-            Nc = sum(Nc),
-            Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
-            Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
-            Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
-            Xe4 = sum(Xe[Pair == "Site_4"], na.rm = TRUE),
-            Xe5 = sum(Xe[Pair == "Site_5"], na.rm = TRUE),
-            Xe6 = sum(Xe[Pair == "Site_6"], na.rm = TRUE),
-            Xe7 = sum(Xe[Pair == "Site_7"], na.rm = TRUE),
-            Xe8 = sum(Xe[Pair == "Site_8"], na.rm = TRUE),
-            Xe9 = sum(Xe[Pair == "Site_9"], na.rm = TRUE),
-            Xe10 = sum(Xe[Pair == "Site_10"], na.rm = TRUE),
-            Xe11 = sum(Xe[Pair == "Site_11"], na.rm = TRUE),
-            Xe12 = sum(Xe[Pair == "Site_12"], na.rm = TRUE),
-            Xe13 = sum(Xe[Pair == "Site_13"], na.rm = TRUE),
-            Xe14 = sum(Xe[Pair == "Site_14"], na.rm = TRUE),
-            Xe15 = sum(Xe[Pair == "Site_15"], na.rm = TRUE),
-            Xe16 = sum(Xe[Pair == "Site_16"], na.rm = TRUE),
-            Xe17 = sum(Xe[Pair == "Site_17"], na.rm = TRUE),
-            Xe18 = sum(Xe[Pair == "Site_18"], na.rm = TRUE),
-            Xe19 = sum(Xe[Pair == "Site_19"], na.rm = TRUE),
-            Xe20 = sum(Xe[Pair == "Site_20"], na.rm = TRUE),
-            Xe21 = sum(Xe[Pair == "Site_21"], na.rm = TRUE),
-            Xe22 = sum(Xe[Pair == "Site_22"], na.rm = TRUE),
-            Xc = sum(Xc[Pair == "Control"], na.rm = TRUE),
-            Xc1 = sum(Xc[Pair == "Control_1"], na.rm = TRUE),
-            Xc2 = sum(Xc[Pair == "Control_2"], na.rm = TRUE),
-            Xc345 = sum(Xc[Pair == "Control_3_4_5"], na.rm = TRUE),
-            ) 
+monthly_mean_site <-  metadata_long %>%
+  group_by(Study_ID, response_var, Pair, year, month) %>% 
+  summarize(meanConc = mean(concentration)) %>% 
+  left_join(site_data, by = "Study_ID") %>% 
+  group_by(month) %>% 
+  distinct(meanConc, .keep_all = TRUE) %>% 
+  mutate(TempNorm = meanConc * Area_watershed_km)
 
-# making all the cells with 0 due to no sites beyond what the study had NAs to visualize the dataframe a little better. 
-analyte_table_means[analyte_table_means == 0] <- NA
-
-# check here to make sure this is calculating what you want it to calculate. 
-#lets filter out Coombs and Melack here to check 
-coombs_fill_check <- control_impact_fill %>% 
-  filter(Study_ID == "Coombs & Melack, 2013")
-
-burd_fill_check <- control_impact_fill %>% 
-  filter(Study_ID == "Burd et al 2018")
-
-write_csv(coombs_fill_check, here("Output_for_analysis", "coombs_fill_check.csv"))
-
-coombs_long_check <- metadata_long %>% 
-  filter(Study_ID == "Coombs & Melack, 2013")
-
-coombs_mean_check <- MeanConcTest %>% 
-  filter(Study_ID == "Coombs & Melack, 2013")
-
-coombs_summary_check <- analyte_table_means %>% 
-  filter(Study_ID == "Coombs & Melack, 2013")
+# Calculating the standard deviation for all of the TempNorms
+climate.summary <- monthly_mean_site %>%
+  group_by(Climate, response_var, Burn_Unburn) %>%
+  summarise(sd = sd(TempNorm, na.rm = TRUE),
+            TempNorm = mean(TempNorm, na.rm = TRUE))
 
 
-coombs_check <- metadata_long %>% 
-  filter(Study_ID == "Coombs & Melack, 2013")
+
 
 ```
 
 
+```{r - plots}
+# Plotting #
+vn = expression(paste(""*N*O[3]^"-"))
 
-
-
-
-
-
-
-```{r}
-# This is another attempt to get what we are looking for 
-control_impact_summary <- control_impact_fill %>% 
-  group_by(Study_ID, Site, year, month) %>% 
-  summarise(XeNO3 = mean(NO3_Interp[Burn_Unburn == "Burn"], na.rm = TRUE),
-            XcNO3 = mean(NO3_Interp[Burn_Unburn == "Unburn"], na.rm = TRUE),
-            XeDOC = mean(DOC_Interp[Burn_Unburn == "Burn"], na.rm = TRUE),
-            XcDOC = mean(DOC_Interp[Burn_Unburn == "Unburn"], na.rm = TRUE))
-
-
-
-  
-gerla_month_mean_burn <- gerla_burn_fill %>%
-  group_by(Climate, year, month) %>%
-  summarize(Xe = mean(NO3[Burn_Unburn == "Burn"], na.rm = TRUE),
-            TimeNorm_Burn = Xe * 6423/100)
-```
-
-```{r for loop attempt}
-setwd("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/inputs/Studies/meta_final")
-# Step 1: Create a list of CSV file names
-csv_files <- c("Abbott_et_al_2021.csv", "Burd_et_al_2018.csv", "Coombs_Melack_2013.csv")
-
-# Step 2: Iterate through the list using a for loop
-for (file_name in csv_files) {
-  # Step 3: Read the CSV file into a data frame
-  data <- read_csv(file_name) # Assuming you're using CSV files
-
-  # Step 4: Fill time gaps in the data frame
-  # Example: Assuming a "timestamp" column with time data
-  # You can use functions from the tidyverse for this purpose
-  data <- data %>%
-    mutate(timestamp = mdy(Sampling_Date)) %>%  # Convert timestamp to a datetime object
-    complete(timestamp = seq(min(timestamp), max(timestamp), by = "1 day")) %>%  # Fill time gaps
-    fill(everything())  # Fill in missing values with the previous value
-
-  # Step 5: Write the updated data frame back to a new CSV file
-  # You can create a new file or overwrite the original file, depending on your needs
-  # write_csv(data, file_name)  # Uncomment this line to overwrite the original file
-  # write_csv(data, paste0("filled_", file_name))  # Uncomment this line to create a new file
-}
+ggplot(monthly_mean_site, aes(x = log(TempNorm), y = Climate, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.09, size = 3) +
+  geom_pointrange(aes(xmin = log(TempNorm - sd), xmax = log(TempNorm + sd), 
+                      color = response_var),
+                      position = position_dodge(width = -0.5), size = 1.5, 
+                      data = climate.summary) +
+  geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Koppen (Climate Classification)") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Analyte"),
+                     labels = c('DOC', vn)) +
+  theme(axis.text.x = element_text(size = 30, angle = -90),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 34),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.9, 0.65)) +
+  theme_bw()
 
 
 
@@ -374,7 +302,92 @@ for (file_name in csv_files) {
 #   fill(Value, .direction = "up")
 
 
+# control_impact_summary <- control_impact_fill %>% 
+#   group_by(Study_ID, Site, year, month) %>% 
+#   summarise(XeNO3 = mean(NO3_Interp[Burn_Unburn == "Burn"], na.rm = TRUE),
+#             XcNO3 = mean(NO3_Interp[Burn_Unburn == "Unburn"], na.rm = TRUE),
+#             XeDOC = mean(DOC_Interp[Burn_Unburn == "Burn"], na.rm = TRUE),
+#             XcDOC = mean(DOC_Interp[Burn_Unburn == "Unburn"], na.rm = TRUE))
+# 
+# 
+# 
+#   
+# gerla_month_mean_burn <- gerla_burn_fill %>%
+#   group_by(Climate, year, month) %>%
+#   summarize(Xe = mean(NO3[Burn_Unburn == "Burn"], na.rm = TRUE),
+#             TimeNorm_Burn = Xe * 6423/100)
 
+
+# MeanConcTest <- metadata_long %>%
+#   group_by(Study_ID, Pair, response_var) %>%
+#   summarize(Ne = sum(Burn_Unburn == "Burn"),
+#                    Nc = sum(Burn_Unburn == "Unburn"),
+#                    Xe = mean(mean_concentration[Burn_Unburn == "Burn"], na.rm = TRUE),
+#                    Xc = mean(mean_concentration[Burn_Unburn == "Unburn"], na.rm = TRUE))
+# 
+# # This is calculating the mean for EACH site within a study_ID # 
+#     # Any study_ID that doesn't have up to 10 sites will have a 0 in the respective Xen column 
+# analyte_table_means
+# 
+# 
+# analyte_table_means <- MeanConcTest %>%
+#   select(-Pair) %>%
+#   group_by(Study_ID, response_var) %>%
+#   summarize(Ne = sum(Ne),
+#             Nc = sum(Nc),
+#             Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
+#             Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
+#             Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
+#             Xe4 = sum(Xe[Pair == "Site_4"], na.rm = TRUE),
+#             Xe5 = sum(Xe[Pair == "Site_5"], na.rm = TRUE),
+#             Xe6 = sum(Xe[Pair == "Site_6"], na.rm = TRUE),
+#             Xe7 = sum(Xe[Pair == "Site_7"], na.rm = TRUE),
+#             Xe8 = sum(Xe[Pair == "Site_8"], na.rm = TRUE),
+#             Xe9 = sum(Xe[Pair == "Site_9"], na.rm = TRUE),
+#             Xe10 = sum(Xe[Pair == "Site_10"], na.rm = TRUE),
+#             Xe11 = sum(Xe[Pair == "Site_11"], na.rm = TRUE),
+#             Xe12 = sum(Xe[Pair == "Site_12"], na.rm = TRUE),
+#             Xe13 = sum(Xe[Pair == "Site_13"], na.rm = TRUE),
+#             Xe14 = sum(Xe[Pair == "Site_14"], na.rm = TRUE),
+#             Xe15 = sum(Xe[Pair == "Site_15"], na.rm = TRUE),
+#             Xe16 = sum(Xe[Pair == "Site_16"], na.rm = TRUE),
+#             Xe17 = sum(Xe[Pair == "Site_17"], na.rm = TRUE),
+#             Xe18 = sum(Xe[Pair == "Site_18"], na.rm = TRUE),
+#             Xe19 = sum(Xe[Pair == "Site_19"], na.rm = TRUE),
+#             Xe20 = sum(Xe[Pair == "Site_20"], na.rm = TRUE),
+#             Xe21 = sum(Xe[Pair == "Site_21"], na.rm = TRUE),
+#             Xe22 = sum(Xe[Pair == "Site_22"], na.rm = TRUE),
+#             Xc = sum(Xc[Pair == "Control"], na.rm = TRUE),
+#             Xc1 = sum(Xc[Pair == "Control_1"], na.rm = TRUE),
+#             Xc2 = sum(Xc[Pair == "Control_2"], na.rm = TRUE),
+#             Xc345 = sum(Xc[Pair == "Control_3_4_5"], na.rm = TRUE),
+#             ) 
+# 
+# # making all the cells with 0 due to no sites beyond what the study had NAs to visualize the dataframe a little better. 
+# analyte_table_means[analyte_table_means == 0] <- NA
+# 
+# # check here to make sure this is calculating what you want it to calculate. 
+# #lets filter out Coombs and Melack here to check 
+# coombs_fill_check <- control_impact_fill %>% 
+#   filter(Study_ID == "Coombs & Melack, 2013")
+# 
+# burd_fill_check <- analyte_table_means %>% 
+#   filter(Study_ID == "Burd et al 2018")
+# 
+# write_csv(coombs_fill_check, here("Output_for_analysis", "coombs_fill_check.csv"))
+# 
+# coombs_long_check <- metadata_long %>% 
+#   filter(Study_ID == "Coombs & Melack, 2013")
+# 
+# coombs_mean_check <- MeanConcTest %>% 
+#   filter(Study_ID == "Coombs & Melack, 2013")
+# 
+# coombs_summary_check <- analyte_table_means %>% 
+#   filter(Study_ID == "Coombs & Melack, 2013")
+# 
+# 
+# coombs_check <- metadata_long %>% 
+#   filter(Study_ID == "Coombs & Melack, 2013")
 
 
 
