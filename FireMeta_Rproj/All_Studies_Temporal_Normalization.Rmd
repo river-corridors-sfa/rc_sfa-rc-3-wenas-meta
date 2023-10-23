@@ -60,10 +60,12 @@ meta_df <-do.call("rbind", lapply(studies_file_list,
 unitconv=read.csv("inputs/UnitConversion.csv",stringsAsFactors = FALSE)
 
 
+
 ```
 
 
 ```{r data prep}
+options(max.print = 1)
 # Filtering by only the control vs.impact studies because the pre_post are going to go through a different calculation 
 # Also filtering out the studies where I don't have exact sampling days 
 control_impact <- meta_df %>% 
@@ -115,87 +117,39 @@ control_impact_units <- control_impact %>%
                                 NO3_unit == 'mg_L' ~ NO3 * 0.225904780))
 
 
+# Creating a site characteristics data frame that I will use to merge later to add in the proper data 
 site_data <- control_impact_units %>% 
-  select(Study_ID, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn,
+  select(Study_ID, Pair, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn,
          Time_Since_Fire)
-```
 
-```{r - Abbott test}
-# Abbott test #
-abbott <- control_impact %>% 
-  filter(Study_ID == "Abbott et al. 2021")
+# Selection process from total metadata
+table(meta_df$Study_ID) # 35 studies 
 
-abbott_time_fill <- abbott %>% 
-  complete(Sampling_Date = seq.Date(min(Sampling_Date), max(Sampling_Date), by = "day")) %>% 
-  select("Sampling_Date", "Site", "DOC", "NO3") 
+pre_post <- meta_df %>% 
+  filter(`Design (Control/Burn; Pre/Post)` == "Pre_Post") 
+table(pre_post$Study_ID) # 5 studies that are pre_post so that brings us to 30 total 
 
-ggplot(abbott_time_fill, aes(x = Sampling_Date, y = NO3)) +
-  geom_point() +
-  facet_wrap(~Site, scales = "free") +
-  theme_bw()
+control_pre_post <- meta_df %>% 
+  filter(`Design (Control/Burn; Pre/Post)` == "Control_Reference_vs_Impact_Pre_Post") 
+table(control_pre_post$Study_ID) # 2 additional studies have both so those are also removed
+# now at 28 total 
 
+# Caldwell, Stephan, and writer and murphy dont have exact dates so that will elimate those 3 studies. 
+# now at 25 total
 
-abbott_time_fill_filter <- abbott_time_fill %>% 
-  filter(Site %in% c("BS.11", "BS.12"))
+mean <- meta_df %>% 
+  filter(Mean_Median_or_IndividualSample == "Mean")
+table(mean$Study_ID) # 6 additional studies that report means 
 
-abbott_time_fill_filter <- abbott_time_fill_filter %>% 
-  fill_gaps(date_col = 1, frequency = '1 day',
-            groups = 'Site') %>% 
-  mutate(NO3_Interp = na.approx(NO3, na.rm = FALSE),
-         DOC_Interp = na.approx(DOC, na.rm = FALSE))
+# now at 19 total 
+# Goodale is a mean of means so that brings us to 18
 
 
-  
-abbott_solute_fill <-  abbott_time_fill %>%
-  fill_gaps(date_col = 1, frequency = '1 day',
-            groups = 'Site') %>% 
-  mutate(NO3_Interp = na.approx(NO3, na.rm = FALSE),
-         DOC_Interp = na.approx(DOC, na.rm = FALSE))
+# Does this match?
+table(control_impact$Study_ID)
+# 18 
+# YES IT DOES
 
-ggplot(abbott_solute_fill, aes(x = Sampling_Date, y = NO3_Interp)) +
-  geom_point() +
-  facet_wrap(~Site, scales = "free") +
-  theme_bw()
-
-```
-
-
-```{r 2 study test}
-# lets try to do this for 2 studies # 
-multiple <- control_impact %>% 
-  filter(Study_ID %in% c("Abbott et al. 2021", "Burd et al 2018"))
-
-multiple_time_fill <- multiple %>% 
-  select("Study_ID", "Sampling_Date", "Site", "DOC", "NO3") 
-
-multiple_time_fill <- multiple_time_fill %>%
-  group_by(Study_ID) %>% 
-  fill_gaps(date_col = 2, frequency = '1 day',
-            groups = 'Site') %>% 
-  mutate(NO3_Interp = na.approx(NO3, na.rm = FALSE),
-         DOC_Interp = na.approx(DOC, na.rm = FALSE))
-
-```
-
-
-```{r - Hauer test}
-# Hauer test #
-hauer <- control_impact %>% 
-  filter(Study_ID == "Hauer & Spencer 1998")
-
-hauer_time_fill <- hauer %>% 
-  select("Sampling_Date", "Site", "NO3") 
-
-hauer_time_fill_filter <- hauer_time_fill %>% 
-  group_by(Site) %>% 
-  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day"))
-
-
-
-ggplot(coombs_time_fill_filter, aes(x = Sampling_Date, y = NO3_Interp)) +
-  geom_point() +
-  facet_wrap(~Site, scales = "free") +
-  theme_bw()
 
 ```
 
@@ -214,6 +168,7 @@ control_impact_fill <-  control_impact_units %>%
          DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
   fill(Study_ID:Time_Since_Fire)
   
+
 ```
 
 
@@ -236,10 +191,31 @@ metadata_long <- metadata_long %>%
 monthly_mean_site <-  metadata_long %>%
   group_by(Study_ID, response_var, Pair, year, month) %>% 
   summarize(meanConc = mean(concentration)) %>% 
-  left_join(site_data, by = "Study_ID") %>% 
+  left_join(site_data) %>% 
   group_by(month) %>% 
   distinct(meanConc, .keep_all = TRUE) %>% 
   mutate(TempNorm = meanConc * Area_watershed_km)
+
+
+# Check to make sure the output is accurate
+burd <- monthly_mean_site %>% 
+  filter(Study_ID == "Burd et al 2018")
+
+burd_site <- site_data %>% 
+  filter(Study_ID == "Burd et al 2018")
+
+# Table of each climate guild #
+table(monthly_mean_site$Climate)
+
+Csa <- monthly_mean_site %>% 
+  filter(Climate == "Csa")
+table(Csa$Study_ID) # Uzun 
+
+Dfb <- monthly_mean_site %>% 
+  filter(Climate == "Dfb")
+table(Dfb$Study_ID) # Wagner et al. 2015, Writer et al. 2014
+
+table(monthly_mean_site$Study_ID)
 
 # Calculating the standard deviation for all of the TempNorms
 climate.summary <- monthly_mean_site %>%
@@ -248,7 +224,7 @@ climate.summary <- monthly_mean_site %>%
             TempNorm = mean(TempNorm, na.rm = TRUE))
 
 
-
+table(monthly_mean_site$Study_ID)
 
 ```
 
@@ -257,7 +233,7 @@ climate.summary <- monthly_mean_site %>%
 # Plotting #
 vn = expression(paste(""*N*O[3]^"-"))
 
-ggplot(monthly_mean_site, aes(x = log(TempNorm), y = Climate, color = response_var),
+ggplot(monthly_mean_site, aes(x = log(TempNorm), y = Climate, color = response_var, shape = Burn_Unburn),
        position = position_dodge(width = -0.5)) +
   geom_jitter(position = position_jitter(0.1), alpha = 0.09, size = 3) +
   geom_pointrange(aes(xmin = log(TempNorm - sd), xmax = log(TempNorm + sd), 
@@ -390,8 +366,75 @@ ggplot(monthly_mean_site, aes(x = log(TempNorm), y = Climate, color = response_v
 #   filter(Study_ID == "Coombs & Melack, 2013")
 
 
+# Abbott test #
+# abbott <- control_impact %>% 
+#   filter(Study_ID == "Abbott et al. 2021")
+# 
+# abbott_time_fill <- abbott %>% 
+#   complete(Sampling_Date = seq.Date(min(Sampling_Date), max(Sampling_Date), by = "day")) %>% 
+#   select("Sampling_Date", "Site", "DOC", "NO3") 
+# 
+# ggplot(abbott_time_fill, aes(x = Sampling_Date, y = NO3)) +
+#   geom_point() +
+#   facet_wrap(~Site, scales = "free") +
+#   theme_bw()
+# 
+# 
+# abbott_time_fill_filter <- abbott_time_fill %>% 
+#   filter(Site %in% c("BS.11", "BS.12"))
+# 
+# abbott_time_fill_filter <- abbott_time_fill_filter %>% 
+#   fill_gaps(date_col = 1, frequency = '1 day',
+#             groups = 'Site') %>% 
+#   mutate(NO3_Interp = na.approx(NO3, na.rm = FALSE),
+#          DOC_Interp = na.approx(DOC, na.rm = FALSE))
+# 
+# 
+#   
+# abbott_solute_fill <-  abbott_time_fill %>%
+#   fill_gaps(date_col = 1, frequency = '1 day',
+#             groups = 'Site') %>% 
+#   mutate(NO3_Interp = na.approx(NO3, na.rm = FALSE),
+#          DOC_Interp = na.approx(DOC, na.rm = FALSE))
+# 
+# ggplot(abbott_solute_fill, aes(x = Sampling_Date, y = NO3_Interp)) +
+#   geom_point() +
+#   facet_wrap(~Site, scales = "free") +
+#   theme_bw()
 
 
+# lets try to do this for 2 studies # 
+# multiple <- control_impact %>% 
+#   filter(Study_ID %in% c("Abbott et al. 2021", "Burd et al 2018"))
+# 
+# multiple_time_fill <- multiple %>% 
+#   select("Study_ID", "Sampling_Date", "Site", "DOC", "NO3") 
+# 
+# multiple_time_fill <- multiple_time_fill %>%
+#   group_by(Study_ID) %>% 
+#   fill_gaps(date_col = 2, frequency = '1 day',
+#             groups = 'Site') %>% 
+#   mutate(NO3_Interp = na.approx(NO3, na.rm = FALSE),
+#          DOC_Interp = na.approx(DOC, na.rm = FALSE))
+
+
+# # Hauer test #
+# hauer <- control_impact %>% 
+#   filter(Study_ID == "Hauer & Spencer 1998")
+# 
+# hauer_time_fill <- hauer %>% 
+#   select("Sampling_Date", "Site", "NO3") 
+# 
+# hauer_time_fill_filter <- hauer_time_fill %>% 
+#   group_by(Site) %>% 
+#   complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day"))
+# 
+# 
+# 
+# ggplot(coombs_time_fill_filter, aes(x = Sampling_Date, y = NO3_Interp)) +
+#   geom_point() +
+#   facet_wrap(~Site, scales = "free") +
+#   theme_bw()
 
 
 
