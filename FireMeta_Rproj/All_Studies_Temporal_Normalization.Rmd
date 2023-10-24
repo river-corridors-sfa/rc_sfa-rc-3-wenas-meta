@@ -256,6 +256,7 @@ table(Dfb$Study_ID) # Wagner et al. 2015, Writer et al. 2014
 
 table(monthly_mean_site$Study_ID)
 
+table(yearly_mean_site$Study_ID)
 # Calculating the standard deviation for all of the TempNorms
 climate.summary <- monthly_mean_site %>%
   group_by(Climate, response_var, Burn_Unburn) %>%
