@@ -65,7 +65,7 @@ unitconv=read.csv("inputs/UnitConversion.csv",stringsAsFactors = FALSE)
 
 
 ```{r data prep}
-options(max.print = 1)
+options(max.print = 25)
 # Filtering by only the control vs.impact studies because the pre_post are going to go through a different calculation 
 # Also filtering out the studies where I don't have exact sampling days 
 control_impact <- meta_df %>% 
@@ -73,7 +73,8 @@ control_impact <- meta_df %>%
          Study_ID != "Caldwell et al. 2020",
          Study_ID != "Stephan et al. 2015",
          Study_ID != "Writer & Murphy, 2012", 
-         Mean_Median_or_IndividualSample == "Individual")
+         Mean_Median_or_IndividualSample == "Individual",
+         as.numeric(Time_Since_Fire) < 5)
 
 # separate out the time columns 
 time_format <- control_impact %>% 
@@ -114,7 +115,20 @@ control_impact_units <- control_impact %>%
                                 NO3_unit == 'umol_NO2_NO3_L' ~ NO3 * 0.014007000,
                                 NO3_unit == 'mg_N_L' ~ print(NO3),
                                 NO3_unit == 'ug_N_L' ~ NO3 * .001, 
-                                NO3_unit == 'mg_L' ~ NO3 * 0.225904780))
+                                NO3_unit == 'mg_L' ~ NO3 * 0.225904780),
+         
+         DOC_uM_C = case_when(DOC_unit == 'um' ~ print(DOC),
+                              DOC_unit == 'mg_C_L' ~ DOC * 83.2639467,
+                              DOC_unit == 'mg_L' ~ DOC * 83.2639467),
+
+         NO3_uM_N = case_when(NO3_unit == 'um' ~ print(NO3),
+                              NO3_unit == 'umol_L' ~ print(NO3),
+                              NO3_unit == 'umol_NO2_NO3_L' ~ print(NO3),
+                              NO3_unit == 'mg_L' ~ NO3 * 16.127729,
+                              NO3_unit == 'mg_N_L' ~ NO3 * 225.949484,
+                              NO3_unit == 'ug_N_L' ~ NO3 * 0.22594948))
+
+
 
 
 # Creating a site characteristics data frame that I will use to merge later to add in the proper data 
@@ -123,31 +137,33 @@ site_data <- control_impact_units %>%
          Time_Since_Fire)
 
 # Selection process from total metadata
-table(meta_df$Study_ID) # 35 studies 
+table(meta_df$Study_ID) # 36 studies 
 
 pre_post <- meta_df %>% 
   filter(`Design (Control/Burn; Pre/Post)` == "Pre_Post") 
-table(pre_post$Study_ID) # 5 studies that are pre_post so that brings us to 30 total 
+table(pre_post$Study_ID) # 5 studies that are pre_post so that brings us to 31 total 
 
 control_pre_post <- meta_df %>% 
   filter(`Design (Control/Burn; Pre/Post)` == "Control_Reference_vs_Impact_Pre_Post") 
 table(control_pre_post$Study_ID) # 2 additional studies have both so those are also removed
-# now at 28 total 
+# now at 29 total 
 
 # Caldwell, Stephan, and writer and murphy dont have exact dates so that will elimate those 3 studies. 
 # now at 25 total
+
+# Abbott and goodale had fires greater than 5 years ago
+
+# now at 23
 
 mean <- meta_df %>% 
   filter(Mean_Median_or_IndividualSample == "Mean")
 table(mean$Study_ID) # 6 additional studies that report means 
 
-# now at 19 total 
-# Goodale is a mean of means so that brings us to 18
-
+# now at 17
 
 # Does this match?
 table(control_impact$Study_ID)
-# 18 
+# 17 
 # YES IT DOES
 
 
@@ -157,15 +173,15 @@ table(control_impact$Study_ID)
 # Okay lets do this for all the studies # 
 # filling in daily time series and interpolating by study and site
 control_impact_fill <-  control_impact_units %>% 
-  select("Study_ID", "Latitude", "Longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+  select("Study_ID", "Latitude", "Longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_uM_C", "NO3_uM_N") %>%
   group_by(Study_ID, Site) %>%
   complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
   fill(Study_ID:Time_Since_Fire) %>%
   fill(Study_ID, Site) %>%
   ungroup() %>%
   group_by(Site) %>%
-  mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
-         DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
+  mutate(NO3_Interp = na.approx(NO3_uM_N, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC_uM_C, na.rm = FALSE)) %>%
   fill(Study_ID:Time_Since_Fire)
   
 
@@ -196,8 +212,10 @@ monthly_mean_site <-  metadata_long %>%
   distinct(meanConc, .keep_all = TRUE) %>% 
   mutate(TempNorm = meanConc * Area_watershed_km)
 
-
 # Check to make sure the output is accurate
+abbott <- monthly_mean_site %>% 
+  filter(Study_ID == "Abbott et al. 2021")
+
 burd <- monthly_mean_site %>% 
   filter(Study_ID == "Burd et al 2018")
 
@@ -206,6 +224,24 @@ burd_site <- site_data %>%
 
 crandall <- monthly_mean_site %>% 
   filter(Study_ID == "Crandall et al. 2021")
+
+# aggregate by year 
+yearly_mean_site <-  metadata_long %>%
+  group_by(Study_ID, response_var, Pair, year) %>% 
+  summarize(meanConc = mean(concentration)) %>% 
+  left_join(site_data) %>% 
+  group_by(year) %>% 
+  distinct(meanConc, .keep_all = TRUE) %>% 
+  mutate(TempNorm = meanConc / Area_watershed_km)
+
+burd <- yearly_mean_site %>% 
+  filter(Study_ID == "Burd et al 2018")
+
+coombs <- yearly_mean_site %>% 
+  filter(Study_ID == "Coombs & Melack, 2013")
+
+
+
 
 # Table of each climate guild #
 table(monthly_mean_site$Climate)
@@ -226,8 +262,14 @@ climate.summary <- monthly_mean_site %>%
   summarise(sd = sd(TempNorm, na.rm = TRUE),
             TempNorm = mean(TempNorm, na.rm = TRUE))
 
+# Calculating the standard deviation for all of the TempNorms for yearly aggregate
+climate.summary.year <- yearly_mean_site %>%
+  group_by(Climate, response_var, Burn_Unburn) %>%
+  summarise(sd = sd(TempNorm, na.rm = TRUE),
+            TempNorm = mean(TempNorm, na.rm = TRUE))
 
-table(monthly_mean_site$Study_ID)
+
+
 
 ```
 
@@ -235,6 +277,7 @@ table(monthly_mean_site$Study_ID)
 ```{r - plots}
 # Plotting #
 vn = expression(paste(""*N*O[3]^"-"))
+um = expression(paste(""*N*O[3]^"-"))
 
 ggplot(monthly_mean_site, aes(x = log(TempNorm), y = Climate, color = response_var, shape = Burn_Unburn),
        position = position_dodge(width = -0.5)) +
@@ -265,6 +308,29 @@ ggplot(monthly_mean_site, aes(x = TempNorm, y = Climate, color = response_var, s
                       data = climate.summary) +
   geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
   ylab("Koppen (Climate Classification)") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Analyte"),
+                     labels = c('DOC', vn)) +
+  theme(axis.text.x = element_text(size = 30, angle = -90),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 34),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.9, 0.65)) +
+  theme_bw()
+
+# Yearly aggregate
+ggplot(yearly_mean_site, aes(x = TempNorm, y = Climate, color = response_var, shape = Burn_Unburn),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.09, size = 3) +
+  geom_pointrange(aes(xmin = TempNorm - sd, xmax = TempNorm + sd, 
+                      color = response_var),
+                      position = position_dodge(width = -0.5), size = 1.5, 
+                      data = climate.summary.year) +
+  xlim(-5, 30) +
+  geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Koppen (Climate Classification)") +
+  xlab("uM km-2 yr-1") +
   scale_color_manual(values = c("#00AFBB", "#E7B800"),
                      guide = guide_legend(title = "Analyte"),
                      labels = c('DOC', vn)) +
