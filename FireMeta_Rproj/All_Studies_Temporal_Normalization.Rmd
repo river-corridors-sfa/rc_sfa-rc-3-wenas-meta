@@ -125,7 +125,7 @@ control_impact_units <- control_impact %>%
                               NO3_unit == 'umol_L' ~ print(NO3),
                               NO3_unit == 'umol_NO2_NO3_L' ~ print(NO3),
                               NO3_unit == 'mg_L' ~ NO3 * 16.127729,
-                              NO3_unit == 'mg_N_L' ~ NO3 * 225.949484,
+                              NO3_unit == 'mg_N_L' ~ NO3 * 3.64145101,
                               NO3_unit == 'ug_N_L' ~ NO3 * 0.22594948))
 
 
@@ -278,7 +278,7 @@ climate.summary.year <- yearly_mean_site %>%
 ```{r - plots}
 # Plotting #
 vn = expression(paste(""*N*O[3]^"-"))
-um = expression(paste(""*N*O[3]^"-"))
+# um = expression(paste(""*N*O[3]^"-"))
 
 ggplot(monthly_mean_site, aes(x = log(TempNorm), y = Climate, color = response_var, shape = Burn_Unburn),
        position = position_dodge(width = -0.5)) +
