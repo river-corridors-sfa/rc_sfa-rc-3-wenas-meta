@@ -1,0 +1,141 @@
+---
+title: "HUC_MTBS"
+output: html_document
+date: "2023-10-27"
+---
+
+The purpose of this script is to obtain HUC for each watershed listed in the meta analysis and then overlay the burn on top of the HUC to get burn severity and % for each catchment/watershed
+
+
+This workflow pulls geospatial data for selected waterbody sites in CONUS and their watersheds. Data in this workflow comes from the following sources:
+
+  1) National Hydrography Dataset (NHD) Plus V2 Data
+  2) StreamCat Data
+  3) Omernik Ecoregion Data
+  4) Aridity Index Data
+
+The complete workflow can be deployed by running the geospatial_for_conus_waters_workflow.Rmd. Functions used within this workflow are found in the src folder; descriptions of each function can also be found in each function's unique .R file.
+
+For every site, NHD comids are used as the basis for watershed delineation. Subsequently, the resolution of these watershed statistics is at the NHDPlusV2 catchment level.
+
+# Status: in progress
+
+# ==============================================================================
+# Author: Jake Cavaiani 
+# 18 October 2023
+# ==============================================================================
+
+## Load packages and set working directory
+
+
+---
+title: "geospatial_for_conus_waters_workflow"
+author: "Kathryn Willi"
+date: "2023-02-20"
+output: html_document
+---
+
+```{r setup, include=TRUE, echo = T, warning = F, comment = F, message = FALSE}
+library(sf)
+library(tidyverse)
+library(terra)
+library(nhdplusTools)
+library(mapview)
+library(dataRetrieval)
+library(lubridate)
+library(prism)
+library(ggspatial)
+library(nngeo)
+library(stars)
+library(here)
+
+#load in functions
+purrr::map(list.files(path = here("R_scripts", "data", "src"),
+                       pattern="*.R",
+                       full.names=TRUE),
+            source)
+
+# Rmarkdown options
+knitr::opts_chunk$set(echo = T, warning = F, comment = F, message = F)
+
+# mapview options
+mapviewOptions(basemaps.color.shuffle=FALSE,basemaps='OpenTopoMap')
+```
+
+### Setting up your site data set.
+
+For this code to run properly, your site data must be configured as follows:
+
+1)  Each site is identified with a unique site name. In the data set, this column must be called `site`.
+2)  Each site has their known COMID, with column name `comid`. 
+4)  Site data table is a CSV, and stored in the `data/` folder. 
+
+
+#### Downloading necessary data sets
+
+Currently, this workflow requires downloading several data sets locally for much speedier run times. This includes: PRISM climate & aridity rasters, NHD flow direction data, and CONUS-wide NHD catchments. All data sets are found in the shared `data` folder.
+
+
+# National Hydrodraphy Dataset (NHD) data extraction
+
+Use COMID to allow site linkages with all datasets in this workflow. 
+
+```{r}
+sf_use_s2(FALSE)
+site_type = "comid" # This steps assumes you have checked your COMIDs
+# sites <- read_csv("~/GitHub/geospatial_for_conus_waters/data/placeholder.csv") # Katies example dataset 
+
+sites <- read_csv(here("inputs", "Studies_Summary", "watershed_lat_long_katie_format.csv")) %>% 
+  distinct(site, .keep_all = TRUE)
+  
+
+
+
+# Filter the sites that are too small to have COMIDS or are outside of the US. Also select and change column names to match the code needs
+
+# sites = sites %>% filter(COMID!=-9999) %>% dplyr::select(site = 'Site_ID', comid = 'COMID')
+```
+
+
+Identify each sample's NHD COMID. This COMID will allow site linkages with all datasets in this workflow. If COMID is already listed in the CSV, make `site_type = "comid"`.
+
+```{r}
+sf_use_s2(FALSE)
+
+site_type = "xy" # OR site_type = "comid"
+
+```
+
+Additional steps for sites with coordinates, and no COMID:
+
+```{r}
+if(site_type == "xy"){
+  sites <- sites %>%
+    dplyr::select(site, latitude, longitude) %>% 
+    sf::st_as_sf(coords = c("longitude","latitude"), crs = 4269) # 4269 = NAD83 CRS
+  
+  if(sf::st_crs(sites) != sf::st_crs(4269)){
+    sites <- sites %>% st_transform(., crs = 4269)
+  }
+  
+}
+```
+
+```{r}
+if(site_type == "xy"){
+  sites <- getNHDxy(df = sites)
+}
+
+```
+
+Make NHD-based watershed shapefiles for all CONUS sites. To make this step MUCH faster, it is best to have a locally downloaded version on the National NHD catchment shapefile stored on your local system. I have already included this shapefile in the `data` folder. 
+
+```{r}
+site_watersheds <- getWatersheds(df = sites, make_pretty = TRUE) %>%
+  inner_join(., select(sf::st_drop_geometry(sites), site, comid), by = "comid")
+```
+
+
+
+
+

@@ -48,3 +48,5 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 .DS_Store
+FireMeta_Rproj/R_scripts/data/us_catchments.RDS
+FireMeta_Rproj/R_scripts/data/nhd_flow_network.csv

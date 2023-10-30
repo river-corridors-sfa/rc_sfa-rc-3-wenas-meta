@@ -1,0 +1,181 @@
+---
+title: "geospatial_check_comids"
+output: html_document
+date: "2023-10-30"
+---
+
+```{r setup, include=TRUE, echo = T, warning = F, comment = F, message = FALSE}
+rm(list = ls())
+library(sf)
+library(tidyverse)
+library(terra)
+library(nhdplusTools)
+library(mapview)
+library(dataRetrieval)
+library(lubridate)
+library(prism)
+library(ggspatial)
+library(nngeo)# Added from original code
+library(stars)# Added from original code
+library(here)
+
+# this gives you an error, but it can be ignored:
+try(plyr::ldply(list.files(path = here("R_scripts", "data", "src"),
+                           pattern="*.R",
+                           full.names=TRUE),
+                source))
+# Rmarkdown options
+knitr::opts_chunk$set(echo = T, warning = F, comment = F, message = F)
+
+# mapview options
+mapviewOptions(basemaps.color.shuffle=FALSE,basemaps='OpenTopoMap')
+```
+
+### Setting up your site data set.
+
+For this code to run properly, your site data must be configured as follows:
+
+1)  Each site is identified with a unique site name. In the data set, this column must be called `site`.
+2)  Each site has coordinates, with column names `longitude` and `latitude`. Knowledge of coordinate projection required. **OR:**
+    Each site has their known COMID, with column name `comid`. 
+4)  Site data table is a CSV, and stored in the `data/` folder. 
+
+I have included an example data set called `placeholder.csv`, along with all of the additional data sets necessary for the code to run, stored in the `data` folder. 
+
+#### Downloading necessary data sets
+
+Currently, this workflow requires downloading several data sets locally for much speedier run times. This includes: PRISM climate & aridity rasters, NHD flow direction data, and CONUS-wide NHD catchments. All data sets are found in the shared `data` folder.
+
+### Site data assumptions.
+
+This analysis is only appropriate for locations along adequately-sized streams. Some streams are too small to be captured by NHDPlusV2; it is also common for coordinates to fall in the wrong catchment (especially for big rivers). For that reason, review each site and make sure that the NHD feature attributes were appropriately captured.
+
+# National Hydrodraphy Dataset (NHD) data extraction
+
+Identify each sample's NHD COMID. This COMID will allow site linkages with all datasets in this workflow. If COMID is already listed in the CSV, make `site_type = "comid"`.
+
+```{r}
+sf_use_s2(FALSE)
+
+site_type = "xy" # OR site_type = "comid"
+
+sites <- read_csv(here("inputs", "Studies_Summary", "watershed_lat_long_katie_format.csv")) %>%
+  distinct(site, .keep_all = TRUE) %>%
+  dplyr::select('site','latitude','longitude') %>% 
+  drop_na()
+
+```
+
+Additional steps for sites with coordinates, and no COMID:
+
+```{r}
+if(site_type == "xy"){
+  sites <- sites %>%
+    dplyr::select(site, latitude, longitude) %>% 
+    sf::st_as_sf(coords = c("longitude","latitude"), crs = 4269) # 4269 = NAD83 CRS
+  
+  if(sf::st_crs(sites) != sf::st_crs(4269)){
+    sites <- sites %>% st_transform(., crs = 4269)
+  }
+  
+  mapview(sites)
+}
+```
+
+Pull all meta data associated with each site's COMID. 
+
+```{r}
+if(site_type == "xy"){
+  sites <- getNHDxy(df = sites)
+}
+
+# site_type = "comid"
+# 
+# if(site_type == "comid"){
+#   sites <- getNHDcomid(df = dplyr::select(sites, site, comid))
+# }
+# 
+
+# sites_export <- sites %>% 
+#   select(site, latitude, longitude, comid)
+# 
+# write.csv(sites_export, here("inputs", "Studies_Summary", "wenas_watershed_lat_long_comids.csv"))
+
+
+```
+
+Make NHD-based watershed shapefiles for all CONUS sites. To make this step MUCH faster, it is best to have a locally downloaded version on the National NHD catchment shapefile stored on your local system. I have already included this shapefile in the `data` folder. 
+
+```{r}
+site_watersheds <- getWatersheds(df = sites, make_pretty = TRUE) %>%
+  inner_join(., dplyr::select(sf::st_drop_geometry(sites), site, comid), by = "comid")
+```
+
+Ensure that each site is accurately represented by the NHD (some locations may be located on streams that are too small to be captured by the NHD, others may have coordinates that are slightly off, potentially placing them in the wrong catchment). Here, we create simple maps of each watershed, to determine if the delineated watershed/NHD attributes are appropriate. This can take a while depending on how many sites you are doing this for. Maps are automatically stored in the `data/maps/` folder. It is highly recommended to review each map, particularly for known locations along BIG rivers and TINY streams.
+
+```{r}
+map2(sites$site, sites$comid, getMaps) 
+```
+
+Interactive map showing all sites and their delineated watersheds:
+
+```{r}
+mapview(site_watersheds, col.regions = "#56B4E9", alpha.regions = 0.2, lwd = 3, layer.name = "Watershed") +
+  mapview(sites, cex = 5, col.regions = "black", layer.name = "Points") + 
+  mapview(st_read('~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/R_scripts/data/site_flowlines.gpkg', quiet = T), lwd = 3, color = "red", layer.name = "Flowline")
+```
+
+## View sites and adjacent COMIDs
+
+If after reviewing the delineated watersheds you have found that some site coordinates place that location in the wrong catchment, we will need to explore that site's nearby catchments to link it to the correct COMID:
+
+```{r}
+sus_points <- sites 
+  # Comment the line below if you want to remove some sites:
+  # %>%
+  #filter(site %in% c("site_name","sine_name2"))
+
+sus_nhd <- sus_points %>%
+  sf::st_buffer(., dist = 0.01) %>%
+  sus_mapper(.)
+
+
+mapview(sus_nhd[[2]], col.regions = "#56B4E9", alpha.regions = 0.4, legend = FALSE) +
+ # mapview(sbux_sf, cex = 5, col.regions = "red", legend = FALSE) +
+  mapview(sus_points, cex = 5, col.regions = "black", legend = FALSE) +
+  mapview(sus_nhd[[1]], lwd = 1.5, color = "red", legend = FALSE)
+```
+
+
+
+## In the table below, add sites and their correct comid's
+
+```{r}
+# # Based on the map, it appears that this site should be linked to comid a different comid
+
+updated_sites <- tibble(site = c("site8"),comid = c(17416032))
+ 
+sites <- updated_sites %>%
+  getNHDcomid(.) %>%
+  # Replace this new data in the sites df:
+  bind_rows(filter(sites, !site %in% sus_points$site))
+
+site_watersheds <- getWatersheds(df = updated_sites, make_pretty = TRUE) %>%
+  inner_join(., select(sf::st_drop_geometry(updated_sites), site, comid), by = "comid") %>%
+  bind_rows(filter(site_watersheds, !site %in% sus_points$site))
+```
+
+If after reviewing the delineated watersheds you have found that some locations are in fact not appropriate for this analysis, remove them now:
+
+```{r}
+small_sites <- c("site9")
+
+# site 9 appears to be a headwater stream too small for analysis with NHDPlus V2:
+sites <- sites %>%
+  filter(!site %in% small_sites)
+
+site_watersheds <- site_watersheds %>%
+  filter(!site %in% small_sites)
+```
+
+
