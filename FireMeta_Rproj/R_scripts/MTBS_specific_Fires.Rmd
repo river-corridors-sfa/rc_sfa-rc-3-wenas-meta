@@ -2,6 +2,8 @@
 title: "MTBS_specific_Fires"
 output: html_document
 date: "2023-11-01"
+editor_options: 
+  chunk_output_type: console
 ---
 
 This is adapted Kristian code to get burn severity from specific fires 
@@ -24,15 +26,35 @@ p_load(readr,
        nhdplusTools, 
        elevatr, 
        sf,
-       units) 
+       units,
+       here) 
+
+
+
+# Test #
+shapefile <- st_read("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/inputs/KN_code/wa4685412079920200831_20200830_20200909_burn_bndy.shp")
+
+gaviota <- st_read(here("gis_data", "Fire_Perimeters", "Gaviota", "ca3448712019620040605_20040425_20050412_burn_bndy.shp"))
+
+ggplot() +
+  geom_sf(data = gaviota, aes(fill = "red"))
+
+watershed_bnd <-  st_read(here("inputs", "KN_code", "YRB.shp"))
+
+st_drivers()
+
+gdal.SetConfigOption('SHAPE_RESTORE_SHX', 'YES')
+####
 
 # Output Path 
-# output_path <- "C:/Users/nels863/Documents/SFA_RIVER/Fire_Maps/"
+output_path <- "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/Maps/"
 
 # Evans Canyon
-specific_fire <- "C:/Users/nels863/Documents/SFA_RIVER/data_dir/EvansCanyon/wa4685412079920200831_20200830_20200909_burn_bndy.shp"
-burnSeverity <- "C:/Users/nels863/Documents/SFA_RIVER/data_dir/WA_Burn_Severity/mtbs_WA_2020.tif"
-watershed_bnd <-"C:/Users/nels863/Documents/SFA_RIVER/data_dir/YRB.shp"
+
+specific_fire <- "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/inputs/KN_code/wa4685412079920200831_20200830_20200909_burn_bndy.shp"
+
+burnSeverity <- "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/inputs/KN_code/WA_Burn_Severity/mtbs_WA_2020.tif"
+watershed_bnd <-"~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/inputs/KN_code/YRB.shp"
 
 # Schneider Springs
 

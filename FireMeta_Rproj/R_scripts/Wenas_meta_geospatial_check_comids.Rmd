@@ -153,10 +153,13 @@ mapview(sus_nhd[[2]], col.regions = "#56B4E9", alpha.regions = 0.4, legend = FAL
 ```{r}
 # # Based on the map, it appears that this site should be linked to comid a different comid
 
-updated_sites <- tibble(site = c("site 3"),comid = c(8943613)) # Site 3 in the Oliver paper is supposed to be this COMID 
+updated_sites <- tibble(site = c("site 3"),comid = c(8943613)) # Site 3 in the Oliver paper is supposed to be this COMID: 8943613 
 
 # Control is probably supposed to be COMID: 8943655, but also + 8944047 & + 25078055 for the Oliver paper 
 # How to add COMIDs to it? Resolution issue?
+
+# Dry Creek in Crandall paper is supposed to be COMID: 10329181
+
  
 sites <- updated_sites %>%
   getNHDcomid(.) %>%
