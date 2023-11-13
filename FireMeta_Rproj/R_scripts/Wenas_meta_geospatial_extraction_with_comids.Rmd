@@ -105,7 +105,7 @@ To download the data that you want, be sure to update the `epa_categories` vecto
 ```{r cat,echo = T, warning = FALSE, comment = F, message = FALSE, results='hide'}
 sites <- getStreamCat(sites = sites,
                       # Choose EPA categories to download here. These example two categories took a few minutes to download. 
-                      epa_categories = c("MTBS"),
+                      epa_categories = c("MTBS", "FirePerimeters"),
                       save = FALSE)
 
 #NOTE: the getStreamCat is setup to extract ALL of the variables available on StreamCat, the user will have to modify the epa_categories function input to extract all the variables of interest. 

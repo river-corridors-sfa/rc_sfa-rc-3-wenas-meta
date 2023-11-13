@@ -59,7 +59,7 @@ sf_use_s2(FALSE)
 
 site_type = "xy" # OR site_type = "comid"
 
-sites <- read_csv(here("inputs", "Studies_Summary", "studies_not_included_in_temporal_study.csv")) %>%
+sites <- read_csv(here("inputs", "Studies_Summary", "watershed_lat_long_katie_format.csv")) %>%
   distinct(site, .keep_all = TRUE) %>%
   dplyr::select('site','latitude','longitude') %>% 
   drop_na()
@@ -95,8 +95,8 @@ if(site_type == "xy"){
 #   sites <- getNHDcomid(df = dplyr::select(sites, site, comid))
 # }
 # 
-
-# sites_export <- sites %>% 
+# 
+# sites_export <- sites %>%
 #   select(site, latitude, longitude, comid)
 # 
 # write.csv(sites_export, here("inputs", "Studies_Summary", "wenas_watershed_lat_long_comids.csv"))

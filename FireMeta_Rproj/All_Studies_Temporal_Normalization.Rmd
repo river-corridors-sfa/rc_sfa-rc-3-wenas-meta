@@ -24,8 +24,8 @@ Step 3) run script that fills in concentrations for missing days in between disc
 # 18 October 2023
 # ==============================================================================
 
-## Load packages and set working directory
-```{r Jake/Mac}
+## Temporal Normalization 
+```{r Jake/Mac Load Packages and}
 #for Jake/mac
 
 rm(list=ls(all=T)) #this clears your Environment
@@ -226,6 +226,13 @@ crandall <- monthly_mean_site %>%
   filter(Study_ID == "Crandall et al. 2021")
 
 # aggregate by year 
+MeanConcTest <- metadata_long %>%
+  group_by(Study_ID, Pair_JSC, Treatment, response_var, Koppen, TSF) %>%
+  dplyr::summarize(Ne = sum(Treatment == "Burn"),
+                   Nc = sum(Treatment == "Unburn"),
+                   Xe = mean(mean_concentration[Treatment == "Burn"], na.rm = TRUE),
+                   Xc = mean(mean_concentration[Treatment == "Unburn"], na.rm = TRUE))
+
 yearly_mean_site <-  metadata_long %>%
   group_by(Study_ID, response_var, Pair, year) %>% 
   summarize(meanConc = mean(concentration)) %>% 
@@ -233,6 +240,8 @@ yearly_mean_site <-  metadata_long %>%
   group_by(year) %>% 
   distinct(meanConc, .keep_all = TRUE) %>% 
   mutate(TempNorm = meanConc / Area_watershed_km)
+
+yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
 
 burd <- yearly_mean_site %>% 
   filter(Study_ID == "Burd et al 2018")
@@ -347,6 +356,183 @@ ggplot(yearly_mean_site, aes(x = TempNorm, y = Climate, color = response_var, sh
 
 ```
 
+#### EFFECT SIZE 
+```{r}
+
+
+# Bringing the columns back up to match to be able to calculate
+yearly_mean_site_test <- yearly_mean_site %>%
+  filter(Study_ID != "Hauer & Spencer 1998", Study_ID != "Hickenbottom et al. 2023") %>%
+  mutate(TempNorm = as.numeric(TempNorm))  # Taking out Hauer and Spencer and Hickenbottom because they have mutliple controls and that is different than the rest of these sites
+
+yearly_mean_site_test_2 <- yearly_mean_site_test %>%
+  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate) %>%
+  dplyr::summarize(Xe = sum(TempNorm[Burn_Unburn == "Burn"], na.rm = TRUE),
+                   Xc = sum(TempNorm[Burn_Unburn == "Unburn"], na.rm = TRUE)) # Creating a control and treatment column for the temporal normalization 
+
+yearly_mean_site_test_3 <- yearly_mean_site_test_2 %>%
+  select(-Pair) %>%
+  group_by(Study_ID, response_var, Climate, year) %>%
+  summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
+            Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
+            Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
+            Xe4 = sum(Xe[Pair == "Site_4"], na.rm = TRUE),
+            Xe5 = sum(Xe[Pair == "Site_5"], na.rm = TRUE),
+            Xc = sum(Xc[Pair == "Control"], na.rm = TRUE)) # Creating an individual column for each site and merging them into one row. 
+
+# making all the cells with 0 due to no sites beyond what the study had NAs to visualize the dataframe a little better. 
+yearly_mean_site_test_3[yearly_mean_site_test_3 == 0] <- NA
+
+
+# yearly_mean_site_test_2$TempNorm <- format(yearly_mean_site_test_2$TempNorm, scientific = F)
+
+# Calculating effect size: ln((MeanTreatment/MeanControl)) for all the sites with only one control 
+yearly_effect_size <- yearly_mean_site_test_3 %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  mutate(lnR1 = log(Xe1/Xc),
+         lnR2 = log(Xe2/Xc),
+         lnR3 = log(Xe3/Xc),
+         lnR4 = log(Xe4/Xc),
+         lnR5 = log(Xe5/Xc))
+
+# This is doing the same thing as chunck before where we are creating a column header for each individual site but doing it for the studies that have multiple controls. 
+yearly_mean_hauer_hickenbottom <- yearly_mean_site %>%
+  filter(Study_ID == "Hauer & Spencer 1998" | Study_ID == "Hickenbottom et al. 2023") %>%
+  mutate(TempNorm = as.numeric(TempNorm))
+
+
+
+hauer_hickenbottom_test <- yearly_mean_hauer_hickenbottom %>%
+  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate) %>%
+  dplyr::summarize(Xe = sum(TempNorm[Burn_Unburn == "Burn"], na.rm = TRUE),
+                   Xc = sum(TempNorm[Burn_Unburn == "Unburn"], na.rm = TRUE)) # Creating a control and treatment column for the temporal normalization 
+
+yearly_multiple_control <- hauer_hickenbottom_test %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
+            Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
+            Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
+            Xe4 = sum(Xe[Pair == "Site_4"], na.rm = TRUE),
+            Xe5 = sum(Xe[Pair == "Site_5"], na.rm = TRUE),
+            Xc345 = sum(Xc[Pair == "Control_3_4_5"], na.rm = TRUE),
+            Xc2 = sum(Xc[Pair == "Control_2"], na.rm = TRUE),
+            Xc = sum(Xc[Pair == "Control_1"], na.rm = TRUE)) 
+
+# making all the cells with 0 due to no sites beyond what the study had NAs to visualize the dataframe a little better. 
+yearly_multiple_control[yearly_multiple_control == 0] <- NA
+
+
+yearly_effect_multiple <- yearly_multiple_control %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  mutate(lnR1 = log(Xe1/Xc),
+         lnR2 = log(Xe2/Xc2),
+         lnR3 = log(Xe3/Xc345),
+         lnR4 = log(Xe4/Xc345),
+         lnR5 = log(Xe5/Xc345)) %>% 
+  ungroup()
+
+# Adding columns to match brie_test_stats
+yearly_effect_size <-yearly_effect_size %>% 
+  add_column(Xc345 = NA,
+             Xc2 = NA) %>% 
+  ungroup()
+
+# combining Hauer and Hickenbottom back into the mix 
+yearly_effect_size_combine <- yearly_effect_size %>% 
+  add_row(yearly_effect_multiple)
+
+# Adding in more broad climate 
+unique(yearly_effect_size_combine$Climate)
+
+yearly_effect_size_combine <- yearly_effect_size_combine %>% 
+  mutate(yearly_effect_size_combine, Biome = ifelse(grepl("Dfb|Dfc|Dsb", Climate), "Cold",
+                              ifelse(grepl("Cfb|Csa|Csb|Cfa", Climate), "Temperate",
+                              ifelse(grepl("BSk", Climate), "Arid",
+                              ifelse(grepl("As|Af|Am", Climate), "Tropical",
+                              ifelse(grepl("ET|EF", Climate), "Polar", "Other"))))))
+
+# pivoting to make the responses in one column
+# effect size 
+yearly_effect_size_combine_long <- yearly_effect_size_combine %>% 
+  pivot_longer(
+    cols = lnR1:lnR5,
+    names_to = "Site",
+    values_to = "Effect_size",
+    values_drop_na = TRUE
+  )
+
+# Calculating a confidence interval for all of the effect sizes
+# calculating the mean percent_difference by climate
+climate_summary_effect <- yearly_effect_size_combine_long %>%
+  group_by(Climate, response_var, Biome) %>%
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>%
+  mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
+
+
+
+```
+
+```{r - plotting effect size }
+# Ploting #
+vn = expression(paste(""*N*O[3]^"-"))
+
+# geom_jitter for climate # 
+ggplot(yearly_effect_size_combine_long, aes(Effect_size, Climate, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(xmin = lower_ci_effect, xmax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = climate_summary_effect) +
+  geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
+  xlim(-11, 8.5) +
+  ylab("Koppen (Climate Classification)") +
+  xlab("Effect_size") +
+  geom_segment(aes(x = 6.25, xend = 6.25, y = 8.5, yend = 5.5), color = "black") +
+  geom_segment(aes(x = 5.5, xend = 6.25, y = 8.5, yend = 8.5), color = "black") +
+  geom_segment(aes(x = 5.5, xend = 6.25, y = 5.5, yend = 5.5), color = "black") +
+  
+  geom_segment(aes(x = 6.25, xend = 6.25, y = 5.3, yend = 1.5), color = "black") +
+  geom_segment(aes(x = 5.5, xend = 6.25, y = 5.3, yend = 5.3), color = "black") +
+  geom_segment(aes(x = 5.5, xend = 6.25, y = 1.5, yend = 1.5), color = "black") +
+  
+  geom_segment(aes(x = 6.25, xend = 6.25, y = 1.3, yend = 0.7), color = "black") +
+  geom_segment(aes(x = 5.5, xend = 6.25, y = 1.3, yend = 1.3), color = "black") +
+  geom_segment(aes(x = 5.5, xend = 6.25, y = 0.7, yend = 0.7), color = "black") +
+  annotate("text",
+           x = c(7, 7.75, 7),
+           y = c(7, 3.5, 1),
+           label = c("Cold", "Temperate", "Arid"),
+           family = "", fontface = "bold") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Analyte"),
+                     labels = c('DOC', vn)) +
+  theme_classic() +
+  theme(axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.2, 0.75))
+  
+
+
+
+
+ggsave("Effect_Size.climate.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
+
+
+
+
+
+
+```
 
 ```{r - code graveyard}
 # # Fill gaps
