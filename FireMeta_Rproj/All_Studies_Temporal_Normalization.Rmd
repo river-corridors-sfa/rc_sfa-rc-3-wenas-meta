@@ -569,6 +569,27 @@ ggplot(yearly_effect_size_combine_long, aes(Effect_size, Time_Since_Fire, color 
         legend.text = element_text(size = 30),
         legend.position = c(0.2, 0.75))
 
+ggplot(yearly_effect_size_combine_long, aes(Time_Since_Fire, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = TSF_summary_effect) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylim(-2, 2) +
+  ylab("Effect Size") +
+  xlab("Years since fire") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Analyte"),
+                     labels = c('DOC', vn)) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = "none")
+
 
 
 ```
