@@ -89,18 +89,6 @@ if(site_type == "xy"){
   sites <- getNHDxy(df = sites)
 }
 
-# site_type = "comid"
-# 
-# if(site_type == "comid"){
-#   sites <- getNHDcomid(df = dplyr::select(sites, site, comid))
-# }
-# 
-# 
-# sites_export <- sites %>%
-#   select(site, latitude, longitude, comid)
-# 
-# write.csv(sites_export, here("inputs", "Studies_Summary", "wenas_watershed_lat_long_comids.csv"))
-
 
 ```
 
@@ -130,6 +118,9 @@ mapview(site_watersheds, col.regions = "#56B4E9", alpha.regions = 0.2, lwd = 3, 
 If after reviewing the delineated watersheds you have found that some site coordinates place that location in the wrong catchment, we will need to explore that site's nearby catchments to link it to the correct COMID:
 
 ```{r}
+size <- sites %>% 
+  select(site, comid, totdasqkm)
+
 sus_points <- sites 
   # Comment the line below if you want to remove some sites:
   # %>%
@@ -153,23 +144,49 @@ mapview(sus_nhd[[2]], col.regions = "#56B4E9", alpha.regions = 0.4, legend = FAL
 ```{r}
 # # Based on the map, it appears that this site should be linked to comid a different comid
 
-updated_sites <- tibble(site = c("site 3"),comid = c(8943613)) # Site 3 in the Oliver paper is supposed to be this COMID: 8943613 
+updated_sites <- tibble(site = c("Site 3", "Reference", "Payson", "Dry Creek"),comid = c(8943613, 15032969, 10350360, 10329181)) 
+# Site 3 in the Oliver paper is supposed to be this COMID: 8943613 
 
-# Control is probably supposed to be COMID: 8943655, but also + 8944047 & + 25078055 for the Oliver paper 
-# How to add COMIDs to it? Resolution issue?
+# Reference from the Uzun paper is supposed to be COMID 15032969
+
+# Payson from Crandall paper is supposed to be COMID: 10350360
 
 # Dry Creek in Crandall paper is supposed to be COMID: 10329181
 
- 
-sites <- updated_sites %>%
-  getNHDcomid(.) %>%
-  # Replace this new data in the sites df:
-  bind_rows(filter(sites, !site %in% sus_points$site))
+sites <- updated_sites %>% 
+  getNHDcomid(.) %>% 
+  bind_rows(filter(sites, site %in% sus_points$site)) %>% 
+  distinct(site, .keep_all = TRUE)
 
-site_watersheds <- getWatersheds(df = updated_sites, make_pretty = TRUE) %>%
-  inner_join(., select(sf::st_drop_geometry(updated_sites), site, comid), by = "comid") %>%
-  bind_rows(filter(site_watersheds, !site %in% sus_points$site))
+site_watersheds <- getWatersheds(df = sites, make_pretty = TRUE) %>%
+  inner_join(., dplyr::select(sf::st_drop_geometry(sites), site, comid), by = "comid")
+
 ```
+Interactive map showing all sites and their delineated watersheds:
+
+```{r}
+mapview(site_watersheds, col.regions = "#56B4E9", alpha.regions = 0.2, lwd = 3, layer.name = "Watershed") +
+  mapview(sites, cex = 5, col.regions = "black", layer.name = "Points") + 
+  mapview(st_read('~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/R_scripts/data/site_flowlines.gpkg', quiet = T), lwd = 3, color = "red", layer.name = "Flowline")
+```
+
+```{r export COMIDs}
+site_type = "comid"
+
+if(site_type == "comid"){
+  sites <- getNHDcomid(df = dplyr::select(sites, site, comid))
+}
+
+
+sites_export <- sites %>%
+  select(site, latitude, longitude, comid)
+
+write.csv(sites_export, here("inputs", "Studies_Summary", "wenas_watershed_lat_long_comids.csv"))
+
+
+
+```
+
 
 If after reviewing the delineated watersheds you have found that some locations are in fact not appropriate for this analysis, remove them now:
 

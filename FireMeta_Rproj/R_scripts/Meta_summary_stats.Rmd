@@ -1,0 +1,76 @@
+---
+title: "Meta_summary_stats"
+output: html_document
+date: "2023-11-13"
+---
+
+The purpose of this script is to investigate the structure and makeup of the data that we have from the studies that are included. I want to spit out histograms that will show how much of each study design we have, how many fall into different climates and time since fire buckets
+
+
+```{r Load packages}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+library(ggplot2)
+library(googlesheets4)
+library(tidyverse)
+library(lubridate)
+library(ggpubr)
+library(here)
+```
+
+```{r data prepper}
+studies_file_list <- list.files(path = "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/inputs/Studies/meta_final/", 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv, 
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) 
+
+```
+
+```{r - plot}
+
+ggplot(meta_df, aes(x = `Design (Control/Burn; Pre/Post)`, fill = `Design (Control/Burn; Pre/Post)`)) +
+  geom_bar() +
+  scale_fill_manual(values = c("darksalmon", "darkslategray4", "cornflowerblue")) +
+  theme_bw() +
+  theme(legend.position = "none")
+
+
+# Time since Fire 
+# Reorder the categories 
+meta_df$Time_Since_Fire <- factor(meta_df$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "13", "15", "80", "90", "110", "Pre", "Post"))
+
+ggplot(meta_df, aes(x = Time_Since_Fire, fill = Time_Since_Fire)) +
+  geom_bar() +
+  xlab("Time Since Fire") +
+  ylab("Frequency") +
+  theme_bw() +
+  theme(legend.position = "none")
+
+
+
+
+
+
+```
+
+```{r gap fill}
+
+
+
+
+
+
+
