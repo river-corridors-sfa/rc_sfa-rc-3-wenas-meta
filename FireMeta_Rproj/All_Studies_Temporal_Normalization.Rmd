@@ -557,7 +557,7 @@ ggplot(yearly_effect_size_combine_long, aes(Effect_size, Time_Since_Fire, color 
                   position = position_dodge(width = -0.5), size = 1.5, data = TSF_summary_effect) +
   geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
   ylab("Years since Fire") +
-  xlab("Effect_size") +
+  xlab("Effect Size") +
   scale_color_manual(values = c("#00AFBB", "#E7B800"),
                      guide = guide_legend(title = "Analyte"),
                      labels = c('DOC', vn)) +
@@ -568,6 +568,10 @@ ggplot(yearly_effect_size_combine_long, aes(Effect_size, Time_Since_Fire, color 
         axis.title.y = element_text(size = 35),
         legend.text = element_text(size = 30),
         legend.position = c(0.2, 0.75))
+
+ggsave("Effect_Size.TSF_Vertical.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
 
 ggplot(yearly_effect_size_combine_long, aes(Time_Since_Fire, Effect_size, color = response_var),
        position = position_dodge(width = -0.5)) +
@@ -589,6 +593,11 @@ ggplot(yearly_effect_size_combine_long, aes(Time_Since_Fire, Effect_size, color 
         axis.title.y = element_text(size = 35),
         legend.text = element_text(size = 30),
         legend.position = "none")
+
+ggsave("Effect_Size.TSF_Horizontal.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
+
 
 
 
