@@ -1,0 +1,16 @@
+---
+title: "older than 5 years"
+output: html_document
+date: "2023-11-15"
+---
+
+```{r setup, include=FALSE}
+unique(meta_df$Time_Since_Fire)
+
+# Binning TSFs
+meta_df <- meta_df %>% 
+  mutate(Time_Since_Fire = ifelse(grepl("6|7|8|9|10|11|13|15", Time_Since_Fire), "50",
+                                             ifelse(grepl("80|90|110", Time_Since_Fire), "110", meta_df$Time_Since_Fire)))
+
+```
+

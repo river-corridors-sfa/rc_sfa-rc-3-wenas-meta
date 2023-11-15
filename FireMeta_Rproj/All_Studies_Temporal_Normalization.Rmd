@@ -59,12 +59,7 @@ meta_df <-do.call("rbind", lapply(studies_file_list,
 
 unitconv=read.csv("inputs/UnitConversion.csv",stringsAsFactors = FALSE)
 
-unique(meta_df$Time_Since_Fire)
 
-# Binning TSFs
-meta_df <- meta_df %>% 
-  mutate(Time_Since_Fire = ifelse(grepl("6|7|8|9|10|11|13|15", Time_Since_Fire), "50",
-                                             ifelse(grepl("80|90|110", Time_Since_Fire), "110", meta_df$Time_Since_Fire)))
 
 ```
 
@@ -74,12 +69,12 @@ options(max.print = 25)
 # Filtering by only the control vs.impact studies because the pre_post are going to go through a different calculation 
 # Also filtering out the studies where I don't have exact sampling days 
 control_impact <- meta_df %>% 
-  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire)) %>% 
   filter(`Design (Control/Burn; Pre/Post)` == "Control_Reference_vs_Impact",
          Study_ID != "Caldwell et al. 2020",
          Study_ID != "Stephan et al. 2015",
          Study_ID != "Writer & Murphy, 2012", 
-         Mean_Median_or_IndividualSample == "Individual")
+         Mean_Median_or_IndividualSample == "Individual",
+         as.numeric(Time_Since_Fire) < 5)
 
 # separate out the time columns 
 time_format <- control_impact %>% 
@@ -105,10 +100,6 @@ control_impact <- control_impact %>%
   mutate(DOC = as.numeric(DOC),
          NO3 = as.numeric(NO3), 
          Sampling_Date = ymd(Sampling_Date))
-
-crandall <- control_impact %>% 
-  filter(Study_ID == "Crandall et al. 2021")
-
 
 # Changing the units to make sure everything is consistent in mg_N_L or mg_C_L
 control_impact_units <- control_impact %>% 
@@ -142,7 +133,7 @@ control_impact_units <- control_impact %>%
 
 # Creating a site characteristics data frame that I will use to merge later to add in the proper data 
 site_data <- control_impact_units %>% 
-  select(Study_ID, Pair, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn, Time_Since_Fire)
+  select(Study_ID, Pair, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn)
 
 site_data_unique <- site_data %>% 
   group_by(Study_ID, Pair, Area_watershed_km) %>% 
@@ -197,16 +188,10 @@ control_impact_fill <-  control_impact_units %>%
   fill(Study_ID:Time_Since_Fire)
   
 
-range <- control_impact_fill %>% 
-  group_by(Study_ID) %>% 
-  summarise(Range = max(Sampling_Date) - min(Sampling_Date))
-  
 ```
 
 ```{r - plot summary stats}
-unique(control_impact_fill$Time_Since_Fire)
-
-control_impact_fill$Time_Since_Fire <- factor(control_impact_fill$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", "50"))
+control_impact_fill$Time_Since_Fire <- factor(control_impact_fill$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "13", "15", "80", "90", "110", "Pre", "Post"))
 
 ggplot(control_impact_fill, aes(x = Time_Since_Fire, fill = Time_Since_Fire)) +
   geom_bar() +
@@ -234,47 +219,53 @@ metadata_long <- metadata_long %>%
          month = month(Sampling_Date),
          day = day(Sampling_Date))
 
-# monthly_mean_site <-  metadata_long %>%
-#   group_by(Study_ID, response_var, Pair, year, month) %>% 
-#   summarize(meanConc = mean(concentration)) %>% 
-#   left_join(site_data) %>% 
-#   group_by(month) %>% 
-#   distinct(meanConc, .keep_all = TRUE) %>% 
-#   mutate(TempNorm = meanConc * Area_watershed_km)
-# 
-# # Check to make sure the output is accurate
-# abbott <- monthly_mean_site %>% 
-#   filter(Study_ID == "Abbott et al. 2021")
-# 
-# burd <- monthly_mean_site %>% 
-#   filter(Study_ID == "Burd et al 2018")
-# 
-# burd_site <- site_data %>% 
-#   filter(Study_ID == "Burd et al 2018")
-# 
-# crandall <- monthly_mean_site %>% 
-#   filter(Study_ID == "Crandall et al. 2021")
+monthly_mean_site <-  metadata_long %>%
+  group_by(Study_ID, response_var, Pair, year, month) %>% 
+  summarize(meanConc = mean(concentration)) %>% 
+  left_join(site_data) %>% 
+  group_by(month) %>% 
+  distinct(meanConc, .keep_all = TRUE) %>% 
+  mutate(TempNorm = meanConc * Area_watershed_km)
+
+# Check to make sure the output is accurate
+abbott <- monthly_mean_site %>% 
+  filter(Study_ID == "Abbott et al. 2021")
+
+burd <- monthly_mean_site %>% 
+  filter(Study_ID == "Burd et al 2018")
+
+burd_site <- site_data %>% 
+  filter(Study_ID == "Burd et al 2018")
+
+crandall <- monthly_mean_site %>% 
+  filter(Study_ID == "Crandall et al. 2021")
 
 # aggregate by year 
 yearly_mean_site <-  metadata_long %>%
   group_by(Study_ID, response_var, Pair, year) %>% 
   summarize(meanConc = mean(concentration)) %>% 
   left_join(site_data) %>% 
-  group_by(Pair, year) %>%
-  distinct(meanConc, .keep_all = TRUE) %>%
-  mutate(TempNorm = meanConc / Area_watershed_km)
+  group_by(year) %>% 
+  distinct(meanConc, .keep_all = TRUE) %>% 
+  mutate(TempNorm = meanConc / Area_watershed_km) 
+
+yearly_mean_site <-  metadata_long %>%
+  group_by(Study_ID, response_var, Pair, year, Time_Since_Fire) %>% 
+  summarize(meanConc = mean(concentration)) %>% 
+  left_join(site_data_unique) %>% 
+  group_by(year) %>% 
+  distinct(meanConc, .keep_all = TRUE) %>% 
+  mutate(TempNorm = meanConc / Area_watershed_km) 
+  
     
 yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
 
-# burd <- yearly_mean_site %>% 
-#   filter(Study_ID == "Burd et al 2018")
-# 
-# coombs <- yearly_mean_site %>% 
-#   filter(Study_ID == "Coombs & Melack, 2013")
-# 
-# crandall <- yearly_mean_site %>% 
-#   filter(Study_ID == "Crandall et al. 2021")
-# 
+burd <- yearly_mean_site %>% 
+  filter(Study_ID == "Burd et al 2018")
+
+coombs <- yearly_mean_site %>% 
+  filter(Study_ID == "Coombs & Melack, 2013")
+
 
 
 
@@ -303,6 +294,9 @@ climate.summary.year <- yearly_mean_site %>%
   group_by(Climate, response_var, Burn_Unburn) %>%
   summarise(sd = sd(TempNorm, na.rm = TRUE),
             TempNorm = mean(TempNorm, na.rm = TRUE))
+
+
+
 
 ```
 
@@ -387,35 +381,18 @@ yearly_mean_site_test <- yearly_mean_site %>%
   mutate(TempNorm = as.numeric(TempNorm))  # Taking out Hauer and Spencer and Hickenbottom because they have mutliple controls and that is different than the rest of these sites
 
 yearly_mean_site_test_2 <- yearly_mean_site_test %>%
-  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate) %>%
+  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate, Time_Since_Fire) %>%
   dplyr::summarize(Xe = sum(TempNorm[Burn_Unburn == "Burn"], na.rm = TRUE),
                    Xc = sum(TempNorm[Burn_Unburn == "Unburn"], na.rm = TRUE)) # Creating a control and treatment column for the temporal normalization 
 
 yearly_mean_site_test_3 <- yearly_mean_site_test_2 %>%
   select(-Pair) %>%
-  group_by(Study_ID, response_var, Climate, year) %>%
+  group_by(Study_ID, response_var, Climate, year, Time_Since_Fire) %>%
   summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
             Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
             Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
             Xe4 = sum(Xe[Pair == "Site_4"], na.rm = TRUE),
             Xe5 = sum(Xe[Pair == "Site_5"], na.rm = TRUE),
-            Xe6 = sum(Xe[Pair == "Site_6"], na.rm = TRUE),
-            Xe7 = sum(Xe[Pair == "Site_7"], na.rm = TRUE),
-            Xe8 = sum(Xe[Pair == "Site_8"], na.rm = TRUE),
-            Xe9 = sum(Xe[Pair == "Site_9"], na.rm = TRUE),
-            Xe10 = sum(Xe[Pair == "Site_10"], na.rm = TRUE),
-            Xe11 = sum(Xe[Pair == "Site_11"], na.rm = TRUE),
-            Xe12 = sum(Xe[Pair == "Site_12"], na.rm = TRUE),
-            Xe13 = sum(Xe[Pair == "Site_13"], na.rm = TRUE),
-            Xe14 = sum(Xe[Pair == "Site_14"], na.rm = TRUE),
-            Xe15 = sum(Xe[Pair == "Site_15"], na.rm = TRUE),
-            Xe16 = sum(Xe[Pair == "Site_16"], na.rm = TRUE),
-            Xe17 = sum(Xe[Pair == "Site_17"], na.rm = TRUE),
-            Xe18 = sum(Xe[Pair == "Site_18"], na.rm = TRUE),
-            Xe19 = sum(Xe[Pair == "Site_19"], na.rm = TRUE),
-            Xe20 = sum(Xe[Pair == "Site_20"], na.rm = TRUE),
-            Xe21 = sum(Xe[Pair == "Site_21"], na.rm = TRUE),
-            Xe22 = sum(Xe[Pair == "Site_22"], na.rm = TRUE),
             Xc = sum(Xc[Pair == "Control"], na.rm = TRUE)) # Creating an individual column for each site and merging them into one row. 
 
 
@@ -423,29 +400,12 @@ yearly_mean_site_test_3 <- yearly_mean_site_test_2 %>%
 
 # Calculating effect size: ln((MeanTreatment/MeanControl)) for all the sites with only one control 
 yearly_effect_size <- yearly_mean_site_test_3 %>% 
-  group_by(Study_ID, response_var, Climate, year) %>%
+  group_by(Study_ID, response_var, Climate, year, Time_Since_Fire) %>%
   mutate(lnR1 = log(Xe1/Xc),
          lnR2 = log(Xe2/Xc),
          lnR3 = log(Xe3/Xc),
          lnR4 = log(Xe4/Xc),
-         lnR5 = log(Xe5/Xc),
-         lnR6 = log(Xe6/Xc),
-         lnR7 = log(Xe7/Xc),
-         lnR8 = log(Xe8/Xc),
-         lnR9 = log(Xe9/Xc),
-         lnR10 = log(Xe10/Xc),
-         lnR11 = log(Xe11/Xc),
-         lnR12 = log(Xe12/Xc),
-         lnR13 = log(Xe13/Xc),
-         lnR14 = log(Xe14/Xc),
-         lnR15 = log(Xe15/Xc),
-         lnR16 = log(Xe16/Xc),
-         lnR17 = log(Xe17/Xc),
-         lnR18 = log(Xe18/Xc),
-         lnR19 = log(Xe19/Xc),
-         lnR20 = log(Xe20/Xc),
-         lnR21 = log(Xe21/Xc),
-         lnR22 = log(Xe22/Xc))
+         lnR5 = log(Xe5/Xc))
 
 # This is doing the same thing as chunck before where we are creating a column header for each individual site but doing it for the studies that have multiple controls. 
 yearly_mean_hauer_hickenbottom <- yearly_mean_site %>%
@@ -455,12 +415,12 @@ yearly_mean_hauer_hickenbottom <- yearly_mean_site %>%
 
 
 hauer_hickenbottom_test <- yearly_mean_hauer_hickenbottom %>%
-  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate) %>%
+  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate, Time_Since_Fire) %>%
   dplyr::summarize(Xe = sum(TempNorm[Burn_Unburn == "Burn"], na.rm = TRUE),
                    Xc = sum(TempNorm[Burn_Unburn == "Unburn"], na.rm = TRUE)) # Creating a control and treatment column for the temporal normalization 
 
 yearly_multiple_control <- hauer_hickenbottom_test %>% 
-  group_by(Study_ID, response_var, Climate, year) %>%
+  group_by(Study_ID, response_var, Climate, year, Time_Since_Fire) %>%
   summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
             Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
             Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
@@ -472,7 +432,7 @@ yearly_multiple_control <- hauer_hickenbottom_test %>%
 
 
 yearly_effect_multiple <- yearly_multiple_control %>% 
-  group_by(Study_ID, response_var, Climate, year) %>%
+  group_by(Study_ID, response_var, Climate, year, Time_Since_Fire) %>%
   mutate(lnR1 = log(Xe1/Xc),
          lnR2 = log(Xe2/Xc2),
          lnR3 = log(Xe3/Xc345),
@@ -494,7 +454,7 @@ yearly_effect_size_combine <- yearly_effect_size %>%
 unique(yearly_effect_size_combine$Climate)
 
 yearly_effect_size_combine <- yearly_effect_size_combine %>% 
-  mutate(yearly_effect_size_combine, Biome = ifelse(grepl("Dfb|Dfc|Dsb|Dwc", Climate), "Cold",
+  mutate(yearly_effect_size_combine, Biome = ifelse(grepl("Dfb|Dfc|Dsb", Climate), "Cold",
                               ifelse(grepl("Cfb|Csa|Csb|Cfa", Climate), "Temperate",
                               ifelse(grepl("BSk", Climate), "Arid",
                               ifelse(grepl("As|Af|Am", Climate), "Tropical",
@@ -504,17 +464,12 @@ yearly_effect_size_combine <- yearly_effect_size_combine %>%
 # effect size 
 yearly_effect_size_combine_long <- yearly_effect_size_combine %>% 
   pivot_longer(
-    cols = lnR1:lnR22,
+    cols = lnR1:lnR5,
     names_to = "Site",
     values_to = "Effect_size",
     values_drop_na = TRUE
   ) %>% 
   filter(is.finite(Effect_size))
-
-# crandall <- yearly_effect_size_combine_long %>% 
-#   filter(Study_ID == "Crandall et al. 2021")
-# 
-# write.csv(crandall, here("Output_for_analysis", "aggregated_effect_crandall_4sites.csv"))
 
 # Calculating a confidence interval for all of the effect sizes
 # calculating the mean percent_difference by climate
@@ -602,7 +557,7 @@ ggplot(yearly_effect_size_combine_long, aes(Effect_size, Time_Since_Fire, color 
                   position = position_dodge(width = -0.5), size = 1.5, data = TSF_summary_effect) +
   geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
   ylab("Years since Fire") +
-  xlab("Effect Size") +
+  xlab("Effect_size") +
   scale_color_manual(values = c("#00AFBB", "#E7B800"),
                      guide = guide_legend(title = "Analyte"),
                      labels = c('DOC', vn)) +
@@ -613,10 +568,6 @@ ggplot(yearly_effect_size_combine_long, aes(Effect_size, Time_Since_Fire, color 
         axis.title.y = element_text(size = 35),
         legend.text = element_text(size = 30),
         legend.position = c(0.2, 0.75))
-
-ggsave("Effect_Size.TSF_Vertical.pdf",
-       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
-       width = 10, height = 8, units = "in")
 
 ggplot(yearly_effect_size_combine_long, aes(Time_Since_Fire, Effect_size, color = response_var),
        position = position_dodge(width = -0.5)) +
@@ -638,11 +589,6 @@ ggplot(yearly_effect_size_combine_long, aes(Time_Since_Fire, Effect_size, color 
         axis.title.y = element_text(size = 35),
         legend.text = element_text(size = 30),
         legend.position = "none")
-
-ggsave("Effect_Size.TSF_Horizontal.pdf",
-       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
-       width = 10, height = 8, units = "in")
-
 
 
 
@@ -826,7 +772,6 @@ ggsave("Effect_Size.TSF_Horizontal.pdf",
 #   facet_wrap(~Site, scales = "free") +
 #   theme_bw()
 ```
-
 
 
 
