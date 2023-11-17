@@ -203,7 +203,7 @@ yearly_effect_size_combine_long <- yearly_effect_multiple %>%
   ) %>% 
   filter(is.finite(Effect_size))
 
-write.csv(yearly_effect_size_combine_long, here("Output_for_analysis", "Crandall_effect_size.csv "))
+write.csv(yearly_effect_size_combine_long, here("Output_for_analysis", "Crandall_effect_size.csv"))
 
 
 ```

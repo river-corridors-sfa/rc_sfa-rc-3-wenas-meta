@@ -2,15 +2,371 @@
 title: "older than 5 years"
 output: html_document
 date: "2023-11-15"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
-unique(meta_df$Time_Since_Fire)
-
-# Binning TSFs
-meta_df <- meta_df %>% 
-  mutate(Time_Since_Fire = ifelse(grepl("6|7|8|9|10|11|13|15", Time_Since_Fire), "50",
-                                             ifelse(grepl("80|90|110", Time_Since_Fire), "110", meta_df$Time_Since_Fire)))
+# unique(meta_df$Time_Since_Fire)
+# 
+# # Binning TSFs
+# meta_df <- meta_df %>% 
+#   mutate(Time_Since_Fire = ifelse(grepl("6|7|8|9|10|11|13|15", Time_Since_Fire), "50",
+#                                              ifelse(grepl("80|90|110", Time_Since_Fire), "110", meta_df$Time_Since_Fire)))
 
 ```
+
+```{r Jake/Mac Load Packages and}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+
+library(tidyverse)
+library(here)
+library(forecastML)
+library(zoo)
+library(hrbrthemes)
+library(viridis)
+library(ggplot2)
+```
+
+```{r data prepper}
+studies_file_list <- list.files(path = "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/inputs/Studies/meta_final/", 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv, 
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) 
+
+
+```
+
+
+```{r data prep}
+options(max.print = 25)
+# Filtering by only the control vs.impact studies because the pre_post are going to go through a different calculation 
+# Also filtering out the studies where I don't have exact sampling days 
+control_impact <- meta_df %>% 
+  filter(`Design (Control/Burn; Pre/Post)` == "Control_Reference_vs_Impact",
+         Study_ID != "Caldwell et al. 2020",
+         Study_ID != "Stephan et al. 2015",
+         Study_ID != "Writer & Murphy, 2012", 
+         Mean_Median_or_IndividualSample == "Individual",
+         as.numeric(Time_Since_Fire) > 5)
+
+# separate out the time columns 
+time_format <- control_impact %>% 
+  select(Study_ID, Sampling_Date) 
+
+# Make them all the same format and then merge back together in one column
+time_format <- time_format %>% 
+  mutate(DateTime = mdy(Sampling_Date),
+         DateTime2 = mdy_hm(Sampling_Date), 
+         DateTime2 = as.Date(DateTime2)) %>% 
+  select(-Sampling_Date) %>% 
+  mutate(Sampling_Date = coalesce(DateTime, DateTime2),
+         Sampling_Date = as.character(Sampling_Date)) %>% 
+  select(-DateTime, -DateTime2) 
+
+# merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
+control_impact <- control_impact %>% 
+  mutate(Sampling_Date = time_format$Sampling_Date)
+
+
+# changing the structure of the concentrations
+control_impact <- control_impact %>% 
+  mutate(DOC = as.numeric(DOC),
+         NO3 = as.numeric(NO3), 
+         Sampling_Date = ymd(Sampling_Date))
+
+# Changing the units to make sure everything is consistent in mg_N_L or mg_C_L
+control_impact_units <- control_impact %>% 
+  mutate(Area_watershed_km = case_when(Area_unit == 'ha' ~ Area_watershed * .01,
+                                       Area_unit == 'km' ~ print(Area_watershed)),
+         
+         DOC_mg_C_L = case_when(DOC_unit == 'mg_C_L' ~ print(DOC),
+                                DOC_unit == 'mg_L' ~ print(DOC),
+                                DOC_unit == 'um' ~ DOC * 0.01201),
+         
+         NO3_mg_N_L = case_when(NO3_unit == 'um' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_NO2_NO3_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'mg_N_L' ~ print(NO3),
+                                NO3_unit == 'ug_N_L' ~ NO3 * .001, 
+                                NO3_unit == 'mg_L' ~ NO3 * 0.225904780),
+         
+         DOC_uM_C = case_when(DOC_unit == 'um' ~ print(DOC),
+                              DOC_unit == 'mg_C_L' ~ DOC * 83.2639467,
+                              DOC_unit == 'mg_L' ~ DOC * 83.2639467),
+
+         NO3_uM_N = case_when(NO3_unit == 'um' ~ print(NO3),
+                              NO3_unit == 'umol_L' ~ print(NO3),
+                              NO3_unit == 'umol_NO2_NO3_L' ~ print(NO3),
+                              NO3_unit == 'mg_L' ~ NO3 * 16.127729,
+                              NO3_unit == 'mg_N_L' ~ NO3 * 3.64145101,
+                              NO3_unit == 'ug_N_L' ~ NO3 * 0.22594948))
+
+
+
+
+# Creating a site characteristics data frame that I will use to merge later to add in the proper data 
+site_data <- control_impact_units %>% 
+  select(Study_ID, Pair, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn)
+
+site_data_unique <- site_data %>% 
+  group_by(Study_ID, Pair, Area_watershed_km) %>% 
+  distinct(Area_watershed_km, .keep_all = TRUE)
+
+# Which studies are left 
+table(control_impact$Study_ID)
+# Abbott which is 10 years since fire
+# Rhea which is 15 years since fire 
+
+
+```
+
+```{r - all the studies}
+# Okay lets do this for all the studies # 
+# filling in daily time series and interpolating by study and site
+control_impact_fill <-  control_impact_units %>% 
+  select("Study_ID", "Latitude", "Longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_uM_C", "NO3_uM_N") %>%
+  group_by(Study_ID, Site) %>%
+  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
+  fill(Study_ID:Time_Since_Fire) %>%
+  fill(Study_ID, Site) %>%
+  ungroup() %>%
+  group_by(Site) %>%
+  mutate(NO3_Interp = na.approx(NO3_uM_N, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC_uM_C, na.rm = FALSE)) %>%
+  fill(Study_ID:Time_Since_Fire)
+  
+
+```
+
+```{r}
+# This is code from my other script. I am going to try this way to see if this is what we want to get to 
+# pivoting to make the responses in one column
+metadata_long <- control_impact_fill %>%
+  pivot_longer(
+    cols = NO3_Interp:DOC_Interp,
+    names_to = "response_var",
+    values_to = "concentration",
+    values_drop_na = TRUE
+  )
+
+metadata_long <- metadata_long %>% 
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+
+# aggregate by year 
+yearly_mean_site <-  metadata_long %>%
+  group_by(Study_ID, response_var, Pair, year, Time_Since_Fire) %>% 
+  summarize(meanConc = mean(concentration)) %>% 
+  left_join(site_data_unique) %>% 
+  group_by(year) %>% 
+  distinct(meanConc, .keep_all = TRUE) %>% 
+  mutate(TempNorm = meanConc / Area_watershed_km) 
+  
+    
+yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
+
+```
+
+#### EFFECT SIZE 
+```{r}
+# Bringing the columns back up to match to be able to calculate
+yearly_mean_site_test <- yearly_mean_site %>%
+  mutate(TempNorm = as.numeric(TempNorm)) 
+
+yearly_mean_site_test_2 <- yearly_mean_site_test %>%
+  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate, Time_Since_Fire) %>%
+  dplyr::summarize(Xe = sum(TempNorm[Burn_Unburn == "Burn"], na.rm = TRUE),
+                   Xc = sum(TempNorm[Burn_Unburn == "Unburn"], na.rm = TRUE)) # Creating a control and treatment column for the temporal normalization 
+
+yearly_mean_site_test_3 <- yearly_mean_site_test_2 %>%
+  select(-Pair) %>%
+  group_by(Study_ID, response_var, Climate, year, Time_Since_Fire) %>%
+  summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
+            Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
+            Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
+            Xe4 = sum(Xe[Pair == "Site_4"], na.rm = TRUE),
+            Xe5 = sum(Xe[Pair == "Site_5"], na.rm = TRUE),
+            Xe6 = sum(Xe[Pair == "Site_6"], na.rm = TRUE),
+            Xe7 = sum(Xe[Pair == "Site_7"], na.rm = TRUE),
+            Xe8 = sum(Xe[Pair == "Site_8"], na.rm = TRUE),
+            Xe9 = sum(Xe[Pair == "Site_9"], na.rm = TRUE),
+            Xe10 = sum(Xe[Pair == "Site_10"], na.rm = TRUE),
+            Xe11 = sum(Xe[Pair == "Site_11"], na.rm = TRUE),
+            Xe12 = sum(Xe[Pair == "Site_12"], na.rm = TRUE),
+            Xe13 = sum(Xe[Pair == "Site_13"], na.rm = TRUE),
+            Xe14 = sum(Xe[Pair == "Site_14"], na.rm = TRUE),
+            Xe15 = sum(Xe[Pair == "Site_15"], na.rm = TRUE),
+            Xe16 = sum(Xe[Pair == "Site_16"], na.rm = TRUE),
+            Xe17 = sum(Xe[Pair == "Site_17"], na.rm = TRUE),
+            Xe18 = sum(Xe[Pair == "Site_18"], na.rm = TRUE),
+            Xe19 = sum(Xe[Pair == "Site_19"], na.rm = TRUE),
+            Xe20 = sum(Xe[Pair == "Site_20"], na.rm = TRUE),
+            Xe21 = sum(Xe[Pair == "Site_21"], na.rm = TRUE),
+            Xe22 = sum(Xe[Pair == "Site_22"], na.rm = TRUE),
+            Xc = sum(Xc[Pair == "Control"], na.rm = TRUE)) # Creating an individual column for each site and merging them into one row. 
+
+
+# yearly_mean_site_test_2$TempNorm <- format(yearly_mean_site_test_2$TempNorm, scientific = F)
+
+# Calculating effect size: ln((MeanTreatment/MeanControl)) for all the sites with only one control 
+yearly_effect_size <- yearly_mean_site_test_3 %>% 
+  group_by(Study_ID, response_var, Climate, year, Time_Since_Fire) %>%
+  mutate(lnR1 = log(Xe1/Xc),
+         lnR2 = log(Xe2/Xc),
+         lnR3 = log(Xe3/Xc),
+         lnR4 = log(Xe4/Xc),
+         lnR5 = log(Xe5/Xc),
+         lnR6 = log(Xe6/Xc),
+         lnR7 = log(Xe7/Xc),
+         lnR8 = log(Xe8/Xc),
+         lnR9 = log(Xe9/Xc),
+         lnR10 = log(Xe10/Xc),
+         lnR11 = log(Xe11/Xc),
+         lnR12 = log(Xe12/Xc),
+         lnR13 = log(Xe13/Xc),
+         lnR14 = log(Xe14/Xc),
+         lnR15 = log(Xe15/Xc),
+         lnR16 = log(Xe16/Xc),
+         lnR17 = log(Xe17/Xc),
+         lnR18 = log(Xe18/Xc),
+         lnR19 = log(Xe19/Xc),
+         lnR20 = log(Xe20/Xc),
+         lnR21 = log(Xe21/Xc),
+         lnR22 = log(Xe22/Xc))
+         
+# Adding in more broad climate 
+
+yearly_effect_size$Biome <- "Cold"
+# yearly_effect_size <- yearly_effect_size %>% 
+#   mutate(yearly_effect_size, Biome = ifelse(grepl("Dwc|Dfc", Climate), "Cold", "Other"))
+
+# pivoting to make the responses in one column
+# effect size 
+yearly_effect_size_long <- yearly_effect_size %>% 
+  pivot_longer(
+    cols = lnR1:lnR22,
+    names_to = "Site",
+    values_to = "Effect_size",
+    values_drop_na = TRUE
+  ) %>% 
+  filter(is.finite(Effect_size))
+
+# Calculating a confidence interval for all of the effect sizes
+# calculating the mean percent_difference by climate
+climate_summary_effect <- yearly_effect_size_long %>%
+  group_by(Climate, response_var, Biome) %>%
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>%
+  mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
+
+
+# Calculating a confidence interval for all of the effect sizes
+# calculating the mean effect_size by climate
+TSF_summary_effect <- yearly_effect_size_long %>%
+  group_by(Time_Since_Fire, response_var) %>%
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>%
+  mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
+
+write.csv(yearly_effect_size_long, here("Output_for_analysis", "greater_than_5_years_effect_size.csv"))
+
+
+
+```
+
+```{r - plotting effect size }
+# Ploting #
+vn = expression(paste(""*N*O[3]^"-"))
+
+give.n <- function(x){
+  return(c(y = median(x)*1.05, label = length(x))) 
+  # experiment with the multiplier to find the perfect position
+}
+
+# geom_jitter for climate # 
+ggplot(yearly_effect_size_long, aes(Effect_size, Climate, color = response_var),
+        position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(xmin = lower_ci_effect, xmax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = climate_summary_effect) +
+  geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Years since Fire") +
+  xlab("Effect_size") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Analyte"),
+                     labels = c('DOC', vn)) +
+  stat_summary(fun.data = give.n, geom = "text", fun.y = median,
+                  position = position_nudge(x = 5)) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = "none")
+
+  
+
+
+
+```
+
+```{r - chat gpt}
+library(ggplot2)
+
+# Sample data frame
+df <- data.frame(
+  group = rep(c("A", "B", "C"), each = 30),
+  x = rnorm(90),
+  y = rnorm(90)
+)
+
+# Calculate counts for each group
+counts <- table(df$group)
+
+# Create a ggplot with scatter plot
+ggplot(df, aes(x = x, y = y, color = group)) +
+  geom_point() +
+  labs(title = "Scatter Plot with Number of Observations", x = "X-axis", y = "Y-axis") +
+
+  # Add number of observations using geom_text
+  geom_text(
+    data = data.frame(group = names(counts), count = as.vector(counts)),
+    aes(label = count, group = group),
+    position = position_nudge(y = 0.2),
+    vjust = -0.5,
+    color = "blue",
+    size = 4
+  )
+
+
+
+```
+
+
 
