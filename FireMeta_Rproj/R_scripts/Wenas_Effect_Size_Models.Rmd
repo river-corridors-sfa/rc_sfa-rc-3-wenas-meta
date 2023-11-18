@@ -83,7 +83,76 @@ geospatial_long <- geospatial %>%
 
 fire_clip <- geospatial_long %>% 
   group_by(site) %>% 
-  filter(burn_percentage > 0)
+  filter(!site %in% c("Camas Creek", "Crane Creek", "Grade Creek", "Wash Branch")) # These are sites that are from fires before 1980 and dont have MTBS data 
+
+fire_clip_further <- fire_clip %>% 
+  filter(!site %in% c("Benjamin Slough", "Coal_Creek", "Cold_Creek", )) # These are 
+
+# Filtering out the incorrect burns for each site
+fire_clip_correct_fire <- fire_clip %>% 
+  filter(!burn_percentage %in% c(51.0351, 99.7333, 1.5043, 2.7923, 0.0032, 2.8842))
+
+# Akokala_Creek: 13.8379 is correct 
+# Arroyo Hondo: 16.4842 is correct 
+# Benjamin Slough doesnt have the correct burn year from the study to the MTBS year
+# Bowman Creek: 5.7229 is correct 
+# Camas Creek is from Tidemann paper which was in 1973 with a burn from 1970 so there is not MTBS data 
+# Coal: 55.8481 is correct 
+# Coal_Creek is from Hauer & Spencer from a burn in 1988. The MTBS years don't match the burn
+# Cold Creek is from Hickenbottom at is from too recent of a burn to have MTBS data 
+# Control: 0 is correct 
+# Crane Creek is from the Neary & Currier paper which investigates a burn from 1978. No MTBS data 
+# Crow creek: 9.1827 is correct. 
+# DS1: 16.3095 is correct 
+# DS2: 27.1144 is correct 
+# DS3: 27.1121 is correct 
+# Fish Creek: 72.8600.....is the only MTBS data and is correct
+# Gaviota: 12.9690....is the only MTBS data and is correct 
+# Grade creek is from Tiedemann paper which investigates a 1970 fire so there will be no MTBS data
+# Hobble Creek Upper doesnt have the correct burn year from the study (2018) to the MTBS years given
+# Hobble Creek Lower doesnt have the correct burn year from the study (2018) to the MTBS years given
+# Jones creek: 96.1969 is correct
+# Logging Creek: 1.5154 is correct
+# Lower Mcdonald Creek: 31.3921 is correct
+# Middle Fork is from the Hickenbottom paper which investigates a burn from 2021. Dont think we have that updated MTBS data yet
+# Mill Race doesnt have the correect burn year from the study (2018) to the MTBS year given 
+# Mitsubishi Race doesnt have the correect burn year from the study (2018) to the MTBS year given 
+# North Fork is from the Hickenbottom paper which investigates a burn from 2021. Dont think we have that updated MTBS data yet
+# Payson doesnt have the correect burn year from the study (2018) to the MTBS year given 
+#Pinchot: 0.2982....is the only MTBS data and it is correct 
+# PNF: 16.7187 is correct
+# Prove river: doesnt have the correect burn year from the study (2018) to the MTBS year given 
+# PSF: 1.5243...is the only MTBS data and it is correct 
+# Quartz Creek: 27.0952....is the only MTBS data and it is correct 
+# Rattlesnake is a control site so should be 0 *
+# Red_Bench_Creek: 100....is the only MTBS data and it is correct
+# Red_Meadow_Creek: 24.0870....is the only MTBS data and it is correct 
+# Reference: Supposed to be 0....but it lists it as 70.0648 which is the same as the Wragg which is not correct *
+# Rocky Fire: 12.8141 is correct 
+# San Onofre: 98.9419 is correct
+# Site 1: 76.4673 is correct 
+# Site 2: 76.4673 is correct 
+# Site 3: 6.7889 is correct
+# Spanish Fork Lower: 0 is correct
+# Spanish Fork Upper: 0 is correct 
+# Upper MacDonald Creek: 24.9105 is correct 
+# Wally Creek: 93.5391 is correct 
+# Wash Branch is in the Neary & Currier paper which investigates a 1978 fire so there is no MTBS data 
+# Wragg Fire: 70.0648 is correct 
+
+
+
+
+ 
+df <- data.frame(
+  ID = 1:5,
+  Value = c(10, 25, 40, 15, 30),
+  AnotherValue = c(100, 200, 300, 400, 500)
+)
+
+# Select specific rows (e.g., rows where ID is 2 or 4)
+df_selected_rows <- df %>%
+  filter(ID %in% c(2, 4))
 
 ```
 
