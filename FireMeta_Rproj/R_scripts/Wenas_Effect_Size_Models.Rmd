@@ -40,6 +40,9 @@ library(zoo)
 library(hrbrthemes)
 library(viridis)
 library(readxl)
+library(lme4)
+library(GGally)
+library(merTools)
 
 ```
 
@@ -48,7 +51,7 @@ options(max.print = 200)
 
 # Geospatial csv from stream cat with only the sites and the total area + the burn percentages 
 geospatial <- read_csv(here("R_scripts", "Geospatial_data_2023-11-13.csv")) %>% 
-  select(site, comid, totdasqkm, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws)
+  select(site, comid, totdasqkm, streamorde, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws)
 
 # Site summary of each study and its respective fire and the year of that fire
 studies_data <- read_excel(here("inputs", "StudiesData_Table1.xlsx"),
@@ -57,20 +60,22 @@ studies_data <- read_excel(here("inputs", "StudiesData_Table1.xlsx"),
 
 # The effect sizes of each study's watershed
 effect_size <- read_csv(here("Output_for_analysis", "Effect_Size.csv")) %>% 
-  select(Study_ID, response_var, Climate, year, Biome, Site, Effect_size, Time_Since_Fire)
+  select(Study_ID, response_var, Climate, Biome, Effect_size, Site, Time_Since_Fire)
+
+effect_size_doc <- effect_size %>% 
+  filter(response_var == "DOC_Interp")
+
+effect_size_no3 <- effect_size %>% 
+  filter(response_var == "NO3_Interp")
 
 # Read in the study and site csv 
 study_site_data <- read_excel(here("inputs", "Studies_Summary", "Fire_name_Lat_Long.xlsx")) %>% 
-  select(Study, Site) %>% 
+  select(Study, Site, Fire_year, Effect_size_site) %>% 
   rename(site = Site, 
-         Study_ID = Study) %>% 
+         Study_ID = Study, 
+         year = Fire_year, 
+         Site = Effect_size_site) %>% 
   na.omit()
-
-
-```
-
-
-```{r - data prep}
 
 # pivoting to make the responses in one column
 geospatial_long <- geospatial %>%
@@ -81,47 +86,74 @@ geospatial_long <- geospatial %>%
     values_drop_na = TRUE
   )
 
-fire_clip <- geospatial_long %>% 
-  group_by(site) %>% 
-  filter(!site %in% c("Camas Creek", "Crane Creek", "Grade Creek", "Wash Branch")) # These are sites that are from fires before 1980 and dont have MTBS data 
+```
 
-fire_clip_further <- fire_clip %>% 
-  filter(!site %in% c("Benjamin Slough", "Coal_Creek", "Cold_Creek", )) # These are 
+```{r - histogram of data summary}
+ggplot(geospatial, aes(x = streamorde)) +
+  geom_histogram(binwidth = 1, color = "black", fill = "#56B4E9") +
+  theme_bw()
 
-# Filtering out the incorrect burns for each site
-fire_clip_correct_fire <- fire_clip %>% 
-  filter(!burn_percentage %in% c(51.0351, 99.7333, 1.5043, 2.7923, 0.0032, 2.8842))
+ggsave("Effect_Size_stream_order.pdf",
+       path = here("initial_plots", "03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
 
+```
+
+```{r - plotting MTBS fire years }
+ggplot(geospatial_long, aes(x = seq_along(year), y = burn_percentage)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~site, scales = "free") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+```
+
+
+```{r - manually check fire years vs. MTBS data}
+
+fire_clip <- right_join(geospatial_long, study_site_data) # 64 watersheds
+
+fire_clip <- fire_clip %>% 
+  na.omit() 
+# The na.omit function is removing sites that dont have MTBS data which is due to out of country/too old or too recent!
+# 51 watersheds now. 
+
+######################### I am gonna manually check each one! 
 # Akokala_Creek: 13.8379 is correct 
 # Arroyo Hondo: 16.4842 is correct 
-# Benjamin Slough doesnt have the correct burn year from the study to the MTBS year
+# Benjamin Slough: doesnt have the correct burn year from the study to the MTBS year
 # Bowman Creek: 5.7229 is correct 
 # Camas Creek is from Tidemann paper which was in 1973 with a burn from 1970 so there is not MTBS data 
 # Coal: 55.8481 is correct 
-# Coal_Creek is from Hauer & Spencer from a burn in 1988. The MTBS years don't match the burn
+# Coal_Creek: 0 is correct; from Hauer & Spencer from a burn in 1988. 
 # Cold Creek is from Hickenbottom at is from too recent of a burn to have MTBS data 
-# Control: 0 is correct 
+# Control: The paper lists 74 % but ours says 42.78. 
 # Crane Creek is from the Neary & Currier paper which investigates a burn from 1978. No MTBS data 
 # Crow creek: 9.1827 is correct. 
+# Dry Creek: 0 is correct
 # DS1: 16.3095 is correct 
 # DS2: 27.1144 is correct 
 # DS3: 27.1121 is correct 
+# East Fork: doesnt exist in here because its in Canada
 # Fish Creek: 72.8600.....is the only MTBS data and is correct
 # Gaviota: 12.9690....is the only MTBS data and is correct 
 # Grade creek is from Tiedemann paper which investigates a 1970 fire so there will be no MTBS data
-# Hobble Creek Upper doesnt have the correct burn year from the study (2018) to the MTBS years given
-# Hobble Creek Lower doesnt have the correct burn year from the study (2018) to the MTBS years given
+# Hobble Creek Upper: 0 is correct; doesnt have the correct burn year from the study (2018) to the MTBS years given
+# Hobble Creek Lower: 0 is correct; doesnt have the correct burn year from the study (2018) to the MTBS years given
 # Jones creek: 96.1969 is correct
 # Logging Creek: 1.5154 is correct
 # Lower Mcdonald Creek: 31.3921 is correct
-# Middle Fork is from the Hickenbottom paper which investigates a burn from 2021. Dont think we have that updated MTBS data yet
-# Mill Race doesnt have the correect burn year from the study (2018) to the MTBS year given 
-# Mitsubishi Race doesnt have the correect burn year from the study (2018) to the MTBS year given 
+# Middle_Fork is from the Hickenbottom paper which investigates a burn from 2021. Dont think we have that updated MTBS data yet
+# Mill Race: 0 is correct; doesnt have the correect burn year from the study (2018) to the MTBS year given 
+# Mitsubishi Race: 0 is correct; doesnt have the correect burn year from the study (2018) to the MTBS year given
 # North Fork is from the Hickenbottom paper which investigates a burn from 2021. Dont think we have that updated MTBS data yet
+# Notawohka Creek: doesnt have MTBS data because the site is located within Canada
 # Payson doesnt have the correect burn year from the study (2018) to the MTBS year given 
-#Pinchot: 0.2982....is the only MTBS data and it is correct 
+# PBR: 0 is correct 
+# Pinchot: 0.2982....is the only MTBS data and it is correct 
 # PNF: 16.7187 is correct
-# Prove river: doesnt have the correect burn year from the study (2018) to the MTBS year given 
+# Provo river: 0 is correct; doesnt have the correect burn year from the study (2018) to the MTBS year given 
 # PSF: 1.5243...is the only MTBS data and it is correct 
 # Quartz Creek: 27.0952....is the only MTBS data and it is correct 
 # Rattlesnake is a control site so should be 0 *
@@ -135,44 +167,85 @@ fire_clip_correct_fire <- fire_clip %>%
 # Site 3: 6.7889 is correct
 # Spanish Fork Lower: 0 is correct
 # Spanish Fork Upper: 0 is correct 
+# Trout Creek: In the Hickenbottom paper so its too new for MTBS data 
+# US1: 0 is correct;
+# US2: Doesnt have the correct MTBS data 
 # Upper MacDonald Creek: 24.9105 is correct 
 # Wally Creek: 93.5391 is correct 
 # Wash Branch is in the Neary & Currier paper which investigates a 1978 fire so there is no MTBS data 
 # Wragg Fire: 70.0648 is correct 
 
 
-
-
- 
-df <- data.frame(
-  ID = 1:5,
-  Value = c(10, 25, 40, 15, 30),
-  AnotherValue = c(100, 200, 300, 400, 500)
-)
-
-# Select specific rows (e.g., rows where ID is 2 or 4)
-df_selected_rows <- df %>%
-  filter(ID %in% c(2, 4))
+fire_clip <- fire_clip %>% 
+  mutate(burn_percentage = case_when(site == 'Benjamin Slough' ~ 67,
+                                     site == 'Payson' ~ 90,
+                                     site == 'Spanish Fork Lower' ~ 24,
+                                     site == 'Spanish Fork Upper' ~ 25,
+                                     site == 'Reference' ~ 0,
+                                     TRUE ~ burn_percentage))
+# These papers report the burn percentages so I manually put them in because the Streamcat data did not pull the proper data. 
 
 ```
 
-```{r - plot}
-ggplot(geospatial_long, aes(x = seq_along(year), y = burn_percentage)) +
-  geom_line() +
-  geom_point() +
-  facet_wrap(~site, scales = "free") +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```{r Effect size models-DOC}
+# DOC #
+# Effect_size ~ burn_percentage*TSF + (1|Site)
+doc_effect_size_burn_merged <- right_join(effect_size_doc, fire_clip) %>% 
+  na.omit() 
 
+
+ggpairs(doc_effect_size_burn_merged,
+        columns = c("burn_percentage", "Time_Since_Fire"))
+
+doc_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = doc_effect_size_burn_merged)
+
+summary(doc_burn_mixed)
+confint(doc_burn_mixed)
+
+ranef(doc_burn_mixed)$site %>% 
+  head(5)
+
+coef(doc_burn_mixed)$site %>% 
+  head(5)
+
+predictInterval(doc_burn_mixed)
+
+REsim(doc_burn_mixed) 
+
+plotREsim(REsim(doc_burn_mixed))
+
+```
+
+```{r Effect size models-NO3}
+# NO3 #
+# Effect_size ~ burn_percentage*TSF + (1|Site)
+no3_effect_size_burn_merged <- right_join(effect_size_no3, fire_clip) %>% 
+  na.omit() 
+
+
+ggpairs(no3_effect_size_burn_merged,
+        columns = c("burn_percentage", "Time_Since_Fire"))
+
+no3_burn_mixed = lmer(Effect_size ~ burn_percentage*Time_Since_Fire + (1 | site), data = no3_effect_size_burn_merged)
+
+summary(no3_burn_mixed)
+confint(no3_burn_mixed)
+
+ranef(no3_burn_mixed)$site %>% 
+  head(5)
+
+coef(no3_burn_mixed)$site %>% 
+  head(5)
+
+predictInterval(no3_burn_mixed)
+
+REsim(no3_burn_mixed) 
+
+plotREsim(REsim(no3_burn_mixed))
 
 
 
 ```
-
-
-
-
-
 
 
 
