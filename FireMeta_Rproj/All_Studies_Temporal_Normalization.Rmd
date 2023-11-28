@@ -389,87 +389,64 @@ yearly_effect_size_combine_long <- yearly_effect_size_combine %>%
 
 # Add in corrected Crandall and papers that are greater than 5 years to this list 
 ```{r}
-# combine the yearly_effect_size_combine_long with Crandall and above_five_effect_size
+# combine the yearly_effect_size_combine_long with Crandall, Abbott, and Rhea. 
 
 Crandall_effect_size <- read_csv(here("Output_for_analysis", "Crandall_effect_size.csv")) %>% 
   select(-...1)
 
-above_five_effect_size <- read_csv(here("Output_for_analysis", "greater_than_5_years_effect_size.csv")) %>% 
+abbott_effect_size <- read_csv(here("Output_for_analysis", "Abbott_effect_size.csv")) %>% 
   select(-...1)
 
+rhea_effect_size <- read_csv(here("Output_for_analysis", "Rhea_effect_size.csv")) %>% 
+  select(-...1)
 
 
 # Adding columns to yearly_effect_size_combine_long to match Crandall_effect_size and above_five_effect_size 
 yearly_effect_size_combine_long <-yearly_effect_size_combine_long %>% 
-  add_column(Xe6 = NA,
-             Xe7 = NA,
-             Xe8 = NA,
-             Xe9 = NA,
-             Xe10 = NA,
-             Xe11 = NA,
-             Xe12 = NA,
-             Xe13 = NA,
-             Xe14 = NA,
-             Xe15 = NA,
-             Xe16 = NA,
-             Xe17 = NA,
-             Xe18 = NA,
-             Xe19 = NA,
-             Xe20 = NA,
-             Xe21 = NA,
-             Xe22 = NA, 
-             Xc34 = NA) %>% 
+  add_column(Xc34 = NA) %>% 
   ungroup() %>% 
-  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xe6, Xe7, Xe8, Xe9, Xe10,
-         Xe11, Xe12, Xe13, Xe14, Xe15, Xe16, Xe17, Xe18, Xe19, Xe20, Xe21, Xe22, Xc, Xc2, Xc34, Xc345, Biome, Site, Effect_size)
+  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Site, Effect_size)
 
 # Adding columns to Crandall_effect_size to match yearly_effect_size_combine_long and above_five_effect_size 
 Crandall_effect_size <-Crandall_effect_size %>% 
   add_column(Time_Since_Fire = as.numeric(0),
              Biome = "Temperate",
              Xe5 = NA,
-             Xe6 = NA,
-             Xe7 = NA,
-             Xe8 = NA,
-             Xe9 = NA,
-             Xe10 = NA,
-             Xe11 = NA,
-             Xe12 = NA,
-             Xe13 = NA,
-             Xe14 = NA,
-             Xe15 = NA,
-             Xe16 = NA,
-             Xe17 = NA,
-             Xe18 = NA,
-             Xe19 = NA,
-             Xe20 = NA,
-             Xe21 = NA,
-             Xe22 = NA,
              Xc345 = NA) %>% 
   ungroup() %>% 
-  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xe6, Xe7, Xe8, Xe9, Xe10,
-         Xe11, Xe12, Xe13, Xe14, Xe15, Xe16, Xe17, Xe18, Xe19, Xe20, Xe21, Xe22, Xc, Xc2, Xc34, Xc345, Biome, Site, Effect_size) 
+  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Site, Effect_size) 
 
-# Adding columns to above_five_effect_size to match yearly_effect_size_combine_long and Crandall_effect_size 
-above_five_effect_size <-above_five_effect_size %>% 
-  add_column(Xc2 = NA, 
+# Adding columns to abbott_effect_size to match yearly_effect_size_combine_long and Crandall_effect_size 
+abbott_effect_size <-abbott_effect_size %>% 
+  add_column(Xe2 = NA, 
+             Xe3 = NA, 
+             Xe4 = NA, 
+             Xe5 = NA, 
+             Xc2 = NA, 
              Xc34 = NA,
-             Xc345 = NA) %>% 
+             Xc345 = NA, 
+             Biome = NA) %>% 
   ungroup() %>% 
-  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xe6, Xe7, Xe8, Xe9, Xe10,
-         Xe11, Xe12, Xe13, Xe14, Xe15, Xe16, Xe17, Xe18, Xe19, Xe20, Xe21, Xe22, Xc, Xc2, Xc34, Xc345, Biome, Site, Effect_size) 
+  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Site, Effect_size) 
+
+# Adding columns to rhea_effect_size to match abbott_effect_size, yearly_effect_size_combine_long and Crandall_effect_size 
+rhea_effect_size <-rhea_effect_size %>% 
+  add_column(Xe4 = NA, 
+             Xe5 = NA, 
+             Xc2 = NA, 
+             Xc34 = NA,
+             Xc345 = NA, 
+             Biome = NA) %>% 
+  ungroup() %>% 
+  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Site, Effect_size) 
 
 
-# combining Hauer and Hickenbottom back into the mix 
+# combining all of them back into the mix back into the mix 
 yearly_effect_size_combine_long <- yearly_effect_size_combine_long %>% 
   add_row(Crandall_effect_size) %>% 
-  add_row(above_five_effect_size)
+  add_row(abbott_effect_size) %>% 
+  add_row(rhea_effect_size)
 
-
-
-### TESTING TO SEE IF THIS PAIRS CORRECTLY ####
-crandall <- yearly_effect_size_combine_long %>% 
-  filter(Study_ID == "Crandall et al. 2021") # This checks out. Lovely
 
 ### LOOKS LIKE THE TIME SINCE FIRE AND YEARS ARENT PAIRING UP LIKE I WANT THEM TO ####
 # Creating a year column with a dataframe that has TSF accurately 
@@ -490,7 +467,12 @@ yearly_effect_size_combine_long <- yearly_effect_size_combine_long %>%
                                      Study_ID == 'Rhea et al. 2021' ~ ">10",
                                      Study_ID == 'Crandall et al. 2021' ~ "0",
                                   TRUE ~ Time_Since_Fire))
-         
+
+yearly_effect_size_combine_long <- yearly_effect_size_combine_long %>% 
+  mutate(Biome = case_when(Study_ID == 'Abbott et al. 2021' ~ "Cold",
+                           Study_ID == 'Rhea et al. 2021' ~ "Cold",
+                         TRUE ~ Biome))
+
 write_csv(yearly_effect_size_combine_long, here("Output_for_analysis", "Effect_Size.csv"))
 
 ```
@@ -538,7 +520,8 @@ under_ten <- yearly_effect_size_combine_long %>%
   filter(!Time_Since_Fire == ">10") 
 
 no_dwc <- climate_summary_effect %>% 
-  filter(!Climate == "Dwc")  # Removing the abbott paper that is greater than 5 years from TSF
+  filter(!Climate == "Dwc",
+         !Climate == "Dfc")  # Removing the abbott and Rhea paper that is greater than 5 years from TSF
 
 # geom_jitter for climate for studies within 5 years # 
 ggplot(under_ten, aes(Effect_size, Climate, color = response_var),
@@ -608,7 +591,7 @@ ggplot(yearly_effect_size_combine_long, aes(Time_Since_Fire, Effect_size, color 
                       color = response_var),
                   position = position_dodge(width = -0.5), size = 1.5, data = TSF_summary_effect) +
   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
-  ylim(-2, 2) +
+  ylim(-3, 4) +
   ylab("Effect Size") +
   xlab("Years since fire") +
   scale_color_manual(values = c("#00AFBB", "#E7B800"),

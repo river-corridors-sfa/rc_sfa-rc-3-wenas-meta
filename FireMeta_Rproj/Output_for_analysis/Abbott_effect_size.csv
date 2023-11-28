@@ -1,0 +1,5 @@
+"","Study_ID","response_var","Climate","year","Xe1","Xc","Site","Effect_size"
+"1","Abbott et al. 2021","DOC_Interp","Dwc",2017,79.27278187,51.64304479,"lnR1",0.428539313745898
+"2","Abbott et al. 2021","DOC_Interp","Dwc",2018,68.98335332,46.019751,"lnR1",0.404794545356831
+"3","Abbott et al. 2021","NO3_Interp","Dwc",2017,0.02402695,0.01301984,"lnR1",0.612701769096839
+"4","Abbott et al. 2021","NO3_Interp","Dwc",2018,0.03032707,0.01460699,"lnR1",0.730540531746434
