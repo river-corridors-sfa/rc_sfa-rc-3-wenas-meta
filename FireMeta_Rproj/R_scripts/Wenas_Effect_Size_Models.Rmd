@@ -43,6 +43,9 @@ library(readxl)
 library(lme4)
 library(GGally)
 library(merTools)
+library(ggcorrplot)
+library(ggpmisc)
+library(RColorBrewer)
 
 ```
 
@@ -51,16 +54,16 @@ options(max.print = 200)
 
 # Geospatial csv from stream cat with only the sites and the total area + the burn percentages 
 geospatial <- read_csv(here("R_scripts", "Geospatial_data_2023-11-13.csv")) %>% 
-  select(site, comid, totdasqkm, streamorde, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws)
+  dplyr::select(site, comid, totdasqkm, streamorde, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws)
 
 # Site summary of each study and its respective fire and the year of that fire
 studies_data <- read_excel(here("inputs", "StudiesData_Table1.xlsx"),
     sheet = "Study_info_filtered_V3_Q") %>% 
-  select(Study, Fire_name, Fire_year)
+  dplyr::select(Study, Fire_name, Fire_year)
 
 # The effect sizes of each study's watershed
 effect_size <- read_csv(here("Output_for_analysis", "Effect_Size.csv")) %>% 
-  select(Study_ID, response_var, Climate, Biome, Effect_size, Site, Time_Since_Fire)
+  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Site, Time_Since_Fire)
 
 effect_size_doc <- effect_size %>% 
   filter(response_var == "DOC_Interp")
@@ -70,7 +73,7 @@ effect_size_no3 <- effect_size %>%
 
 # Read in the study and site csv 
 study_site_data <- read_excel(here("inputs", "Studies_Summary", "Fire_name_Lat_Long.xlsx")) %>% 
-  select(Study, Site, Fire_year, Effect_size_site) %>% 
+  dplyr::select(Study, Site, Fire_year, Effect_size_site) %>% 
   rename(site = Site, 
          Study_ID = Study, 
          year = Fire_year, 
@@ -214,6 +217,54 @@ REsim(doc_burn_mixed)
 
 plotREsim(REsim(doc_burn_mixed))
 
+# plot effect size vs. burn percentage
+give.n <- function(x){
+  return(c(y = median(x)*1.05, label = length(x))) 
+  # experiment with the multiplier to find the perfect position
+}
+
+ggpairs(doc_effect_size_burn_merged, 
+        columns = c("Effect_size", "burn_percentage", "Time_Since_Fire")) +
+  theme_bw() +
+  ggtitle("Effect Size - DOC")
+  
+  
+brewer.pal(n = 9, name = "YlOrRd")
+brewer.pal(n = 9, name = "YlGn")
+brewer.pal(n = 8, name = "Dark2")
+
+ggpairs(doc_effect_size_burn_merged,
+        columns = c("Effect_size", "burn_percentage"), 
+        ggplot2::aes(color = Time_Since_Fire, alpha = 0.5)) +
+  scale_color_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
+  scale_fill_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
+  theme_bw() +
+  ggtitle("Effect Size - DOC")
+
+ggsave("Effect_Size_Burn_Percentage_DOC.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
+
+
+# Burn percentage
+ggplot(data = doc_effect_size_burn_merged, aes(x = burn_percentage, y = Effect_size)) +
+  stat_poly_line() +
+  stat_poly_eq() +
+  geom_boxplot() +
+  theme_bw()
+
+ggplot(data = doc_effect_size_burn_merged, aes(x = burn_percentage, y = Effect_size, color = Time_Since_Fire)) +
+  stat_poly_line() +
+  stat_poly_eq() +
+  geom_point() +
+  scale_color_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
+  theme_bw() +
+  theme(legend.position = "none")
+
+
+
+
+
 ```
 
 ```{r Effect size models-NO3}
@@ -242,6 +293,19 @@ predictInterval(no3_burn_mixed)
 REsim(no3_burn_mixed) 
 
 plotREsim(REsim(no3_burn_mixed))
+
+ggpairs(no3_effect_size_burn_merged,
+        columns = c("Effect_size", "burn_percentage"), 
+        ggplot2::aes(color = Time_Since_Fire, alpha = 0.5)) +
+  scale_color_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
+  scale_fill_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
+  theme_bw() +
+  ggtitle("Effect Size - Nitrate")
+
+ggsave("Effect_Size_Burn_Percentage_NO3.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
+
 
 
 
