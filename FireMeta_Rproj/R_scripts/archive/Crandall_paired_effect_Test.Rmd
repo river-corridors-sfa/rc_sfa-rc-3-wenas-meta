@@ -122,6 +122,8 @@ control_impact_fill <-  control_impact_units %>%
   fill(Study_ID:Time_Since_Fire)
   
 
+write.csv(control_impact_fill, here("Output_for_analysis", "crandall_conc_fill.csv"))
+
 ```
 
 ```{r}

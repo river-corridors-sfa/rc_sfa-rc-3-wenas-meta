@@ -217,7 +217,10 @@ REsim(doc_burn_mixed)
 
 plotREsim(REsim(doc_burn_mixed))
 
-# plot effect size vs. burn percentage
+
+```
+
+```{r plot DOC}
 give.n <- function(x){
   return(c(y = median(x)*1.05, label = length(x))) 
   # experiment with the multiplier to find the perfect position
@@ -267,6 +270,8 @@ ggplot(data = doc_effect_size_burn_merged, aes(x = burn_percentage, y = Effect_s
 
 ```
 
+
+
 ```{r Effect size models-NO3}
 # NO3 #
 # Effect_size ~ burn_percentage*TSF + (1|Site)
@@ -311,5 +316,57 @@ ggsave("Effect_Size_Burn_Percentage_NO3.pdf",
 
 ```
 
+
+# Make the same TSF plot but with Burn percentage #
+
+```{r}
+effect_both_doc_no3 <- rbind(no3_effect_size_burn_merged, doc_effect_size_burn_merged)
+
+vn = expression(paste(""*N*O[3]^"-"))
+
+# calculating the mean percent_difference by climate
+burn_percentage_effect <- effect_both_doc_no3 %>% 
+  group_by(response_var, Site, burn_percentage) %>% 
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
+   mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
+
+
+ggplot(effect_both_doc_no3, aes(burn_percentage, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = burn_percentage_effect) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("Burn Percentage") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Analyte"),
+                     labels = c('DOC', vn)) +
+  ylim(-5, 5) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = "top")
+
+ggsave("Effect_Size_Burn_Percentage.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
+
+
+
+
+
+  
+
+```
 
 

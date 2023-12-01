@@ -1,0 +1,252 @@
+---
+title: "AGU_2023_Burn_Unburn_comp"
+output: html_document
+date: "2023-12-01"
+editor_options: 
+  chunk_output_type: console
+---
+
+The purpose of this script is to read in the studies from the final meta data list and to normalize daily stream concentrations by time and plot burn vs. unburned concentrations for a figure for my presentation
+
+# Status: in progress
+
+# ==============================================================================
+# Author: Jake Cavaiani 
+# 18 October 2023
+# ==============================================================================
+
+## Temporal Normalization 
+```{r Jake/Mac Load Packages and}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+
+library(tidyverse)
+library(here)
+library(forecastML)
+library(zoo)
+library(hrbrthemes)
+library(viridis)
+
+```
+
+```{r data prepper}
+studies_file_list <- list.files(path = "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/inputs/Studies/meta_final/", 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv, 
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) 
+
+
+```
+
+
+```{r data prep}
+options(max.print = 40)
+# Filtering by only the control vs.impact studies because the pre_post are going to go through a different calculation 
+# Also filtering out the studies where I don't have exact sampling days 
+# Crandall is filtered out because the burned and reference sites are not paired so I do that is a separate script and will read that csv in later to merge to this dataframe to get the more accurate effect size calculations 
+
+control_impact <- meta_df %>% 
+  filter(`Design (Control/Burn; Pre/Post)` == "Control_Reference_vs_Impact",
+         Study_ID != "Caldwell et al. 2020",
+         Study_ID != "Stephan et al. 2015",
+         Study_ID != "Writer & Murphy, 2012", 
+         Mean_Median_or_IndividualSample == "Individual")
+
+# separate out the time columns 
+time_format <- control_impact %>% 
+  select(Study_ID, Sampling_Date) 
+
+# Make them all the same format and then merge back together in one column
+time_format <- time_format %>% 
+  mutate(DateTime = mdy(Sampling_Date),
+         DateTime2 = mdy_hm(Sampling_Date), 
+         DateTime2 = as.Date(DateTime2)) %>% 
+  select(-Sampling_Date) %>% 
+  mutate(Sampling_Date = coalesce(DateTime, DateTime2),
+         Sampling_Date = as.character(Sampling_Date)) %>% 
+  select(-DateTime, -DateTime2) 
+
+# merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
+control_impact <- control_impact %>% 
+  mutate(Sampling_Date = time_format$Sampling_Date)
+
+
+# changing the structure of the concentrations
+control_impact <- control_impact %>% 
+  mutate(DOC = as.numeric(DOC),
+         NO3 = as.numeric(NO3), 
+         Sampling_Date = ymd(Sampling_Date))
+
+# Changing the units to make sure everything is consistent in mg_N_L or mg_C_L
+control_impact_units <- control_impact %>% 
+  mutate(Area_watershed_km = case_when(Area_unit == 'ha' ~ Area_watershed * .01,
+                                       Area_unit == 'km' ~ print(Area_watershed)),
+         
+         DOC_mg_C_L = case_when(DOC_unit == 'mg_C_L' ~ print(DOC),
+                                DOC_unit == 'mg_L' ~ print(DOC),
+                                DOC_unit == 'um' ~ DOC * 0.01201),
+         
+         NO3_mg_N_L = case_when(NO3_unit == 'um' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_NO2_NO3_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'mg_N_L' ~ print(NO3),
+                                NO3_unit == 'ug_N_L' ~ NO3 * .001, 
+                                NO3_unit == 'mg_L' ~ NO3 * 0.225904780),
+         
+         DOC_uM_C = case_when(DOC_unit == 'um' ~ print(DOC),
+                              DOC_unit == 'mg_C_L' ~ DOC * 83.2639467,
+                              DOC_unit == 'mg_L' ~ DOC * 83.2639467),
+
+         NO3_uM_N = case_when(NO3_unit == 'um' ~ print(NO3),
+                              NO3_unit == 'umol_L' ~ print(NO3),
+                              NO3_unit == 'umol_NO2_NO3_L' ~ print(NO3),
+                              NO3_unit == 'mg_L' ~ NO3 * 16.127729,
+                              NO3_unit == 'mg_N_L' ~ NO3 * 3.64145101,
+                              NO3_unit == 'ug_N_L' ~ NO3 * 0.22594948))
+
+
+
+
+# Creating a site characteristics data frame that I will use to merge later to add in the proper data 
+site_data <- control_impact_units %>% 
+  select(Study_ID, Pair, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn)
+
+site_data_unique <- site_data %>% 
+  group_by(Study_ID, Pair, Area_watershed_km) %>% 
+  distinct(Area_watershed_km, .keep_all = TRUE)
+
+```
+
+
+```{r - all the studies}
+# Okay lets do this for all the studies # 
+# filling in daily time series and interpolating by study and site
+control_impact_fill <-  control_impact_units %>% 
+  select("Study_ID", "Latitude", "Longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_uM_C", "NO3_uM_N") %>%
+  group_by(Study_ID, Site) %>%
+  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
+  fill(Study_ID:Burn_Unburn) %>%
+  fill(Study_ID, Site) %>%
+  ungroup() %>%
+  group_by(Site) %>%
+  mutate(NO3_Interp = na.approx(NO3_uM_N, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC_uM_C, na.rm = FALSE)) %>%
+  fill(Study_ID:Burn_Unburn)
+
+
+control_impact_fill <- control_impact_fill %>% 
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+  
+
+```
+
+```{r}
+# This is code from my other script. I am going to try this way to see if this is what we want to get to 
+# pivoting to make the responses in one column
+metadata_long <- control_impact_fill %>%
+  pivot_longer(
+    cols = NO3_Interp:DOC_Interp,
+    names_to = "response_var",
+    values_to = "concentration",
+    values_drop_na = TRUE
+  )
+
+
+# aggregate by year 
+yearly_mean_site <-  metadata_long %>%
+  group_by(Study_ID, response_var, Pair, year) %>% 
+  summarize(meanConc = mean(concentration)) %>% 
+  left_join(site_data) %>% 
+  group_by(year) %>% 
+  distinct(meanConc, .keep_all = TRUE) %>% 
+  mutate(TempNorm = meanConc / Area_watershed_km) 
+
+yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
+
+yearly_mean_site <-  yearly_mean_site %>% 
+  mutate(TempNorm = as.numeric(TempNorm)) %>% 
+  filter(TempNorm < 10000)
+
+```
+### PLOT Burn vs. Unburn ###
+
+```{r}
+# DOC 
+doc_yearly <- yearly_mean_site %>% 
+  filter(response_var == "DOC_Interp")
+
+# simple box plot 
+ggplot(doc_yearly, aes(Burn_Unburn, TempNorm, fill = Burn_Unburn)) +
+  geom_boxplot() +
+  ylim(0,100) +
+  theme_bw()
+  
+# Boxplot with density plot   
+ggplot(doc_yearly, aes(x = Burn_Unburn, y = TempNorm, fill = Burn_Unburn)) +
+  scale_fill_manual(values = c("darkred", "green")) +
+  labs(x =  " ", y = expression(paste("Yield (mg  ", DOC ," ", L^-1, km^-2, ")"))) +
+  ggdist::stat_halfeye(adjust = 0.5, 
+                       justification = -.2,
+                       .width = 0,
+                       point_colour = NA) +
+  geom_boxplot(width = .25,
+                 outlier.colour = NA,
+                 alpha = 0.5) +
+  ylim(0,100) +
+  ggtitle("DOC Yield") +
+  theme_bw() +
+  theme(legend.position = "none")
+
+ggsave("DOC_yield.pdf",
+       path = here("initial_plots"),
+       width = 6, height = 8,  units = "in")
+
+
+# NO3
+no3_yearly <- yearly_mean_site %>% 
+  filter(response_var == "NO3_Interp")
+
+vn = expression(paste("Yield (mg " *N*O[3]^"-",  L^-1, km^-2, ")"))
+
+# Boxplot with density plot   
+ggplot(no3_yearly, aes(x = Burn_Unburn, y = TempNorm, fill = Burn_Unburn)) +
+  scale_fill_manual(values = c("darkred", "green")) +
+  ggdist::stat_halfeye(adjust = 0.5, 
+                       justification = -.2,
+                       .width = 0,
+                       point_colour = NA) +
+  geom_boxplot(width = .25,
+                 outlier.colour = NA,
+                 alpha = 0.5) +
+  ylab(vn) +
+  xlab("") +
+  ylim(0, 0.5) +
+  ggtitle("Nitrate Yield") +
+  theme_bw() +
+  theme(legend.position = "none")
+
+ggsave("NO3_yield.pdf",
+       path = here("initial_plots"),
+       width = 6, height = 8,  units = "in")
+
+
+
+
+
+
+```

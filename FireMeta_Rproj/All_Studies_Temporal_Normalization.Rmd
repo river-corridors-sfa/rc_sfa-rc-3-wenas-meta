@@ -533,7 +533,7 @@ ggplot(under_ten, aes(Effect_size, Climate, color = response_var),
   geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
   xlim(-6.5, 8.5) +
   ylab("Koppen (Climate Classification)") +
-  xlab("Effect_size") +
+  xlab("Effect Size") +
   geom_segment(aes(x = 6.25, xend = 6.25, y = 8.5, yend = 5.5), color = "black") +
   geom_segment(aes(x = 5.5, xend = 6.25, y = 8.5, yend = 8.5), color = "black") +
   geom_segment(aes(x = 5.5, xend = 6.25, y = 5.5, yend = 5.5), color = "black") +
@@ -593,19 +593,22 @@ ggplot(yearly_effect_size_combine_long, aes(Time_Since_Fire, Effect_size, color 
   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
   ylim(-3, 4) +
   ylab("Effect Size") +
-  xlab("Years since fire") +
+  xlab("Year since Fire") +
   scale_color_manual(values = c("#00AFBB", "#E7B800"),
                      guide = guide_legend(title = "Analyte"),
                      labels = c('DOC', vn)) +
   stat_summary(fun.data = give.n, geom = "text", fun.y = median,
                   position = position_nudge(x = -0.4)) +
+  scale_x_discrete(labels=c("0" = "0-1", "1" = "1-2",
+                            "2" = "2-3", "3" = "3-4", "4" = "4-5",
+                            "5" = "5-6", ">10" = ">10")) +
   theme_bw() +
-  theme(axis.text.x = element_text(size = 30),
+  theme(axis.text.x = element_text(size = 20),
         axis.text.y = element_text(size = 30),
         axis.title.x = element_text(size = 40),
         axis.title.y = element_text(size = 35),
         legend.text = element_text(size = 30),
-        legend.position = "none")
+        legend.position = "top")
 
 ggsave("Effect_Size_TSF_Horizontal.pdf",
        path = here("initial_plots", "03_Wenas_effect_size"),

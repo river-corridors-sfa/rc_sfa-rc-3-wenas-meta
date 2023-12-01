@@ -37,34 +37,73 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 library(rgdal)
 library(broom)
-
-
+library(usmap)
+library(maps)
+library(mapdata)
+library(cowplot)
+library(sf)
+library(RColorBrewer)
 ```
 
 ```{r}
 
-meta <- read_excel(here("inputs", "StudiesData_Table1.xlsx"), 
-    sheet = "Study_info_filtered_V3_Q") # reading in filtered meta data sheet
+meta <- read_csv(here("inputs", "Studies_Summary", "Studies_included_in_climate_figure.csv")) # reading in filtered meta data sheet
 
 coords <- meta %>% 
-  select(Lat, Long) %>% 
-  mutate(across(everything(), as.numeric)) # creating dataframe that is just the coordinates
+  select(Fire_Name, Lat, Long, number_of_sites, State, group)
 
-world <- ne_countries(scale = "medium", returnclass = "sf")
-class(world)
+# attempt to make sites bigger size with more sites
 
-ggplot(data = world) +
-    geom_sf() +
-    geom_point(data = coords, aes(x = Long, y = Lat), size = 4, 
-        shape = 23, fill = "darkred") +
-  coord_sf(xlim = c(-125, -70), ylim = c(24, 55), expand = FALSE) +
-  theme_bw()
 
-ggsave("meta_map_filter_2.pdf",
-       path = here("initial_plots", "01_Wenas_meta_wrangle"),
-       width = 8, height = 10, units = "in")
+# Load your CSV file with coordinates and conditional variable
+# Replace "your_data.csv" with the actual file path and name
+data <- coords %>% 
+    drop_na(Fire_Name)
 
-# We decided to remove all the studies that were out of the country
+# Assuming your CSV file has columns "longitude", "latitude", and "conditional_variable"
+
+# Create an sf object from the data
+coordinates <- st_as_sf(data, coords = c("Long", "Lat"), crs = 4326)
+
+# Download the United States map shapefile from the US Census Bureau
+# Replace "cb_2019_us_state_20m.zip" with the most recent shapefile available
+url <- "https://www2.census.gov/geo/tiger/GENZ2021/shp/cb_2021_us_state_20m.zip"
+download.file(url, "us_states.zip", mode = "wb")
+unzip("us_states.zip", exdir = "us_states")
+
+# Read the shapefile
+us_states <- st_read("us_states/cb_2021_us_state_20m.shp")
+
+# Plot the map with points
+ggplot() +
+  geom_sf(data = us_states, fill = "white", color = "black") +
+  geom_sf(data = coordinates, aes(size = number_of_sites)) +
+  scale_size_continuous(range = c(1, 10)) +
+  labs(title = "Points on US Map with Conditional Variable") +
+  theme_minimal()
+
+brewer.pal(n = 8, name = "YlOrRd")
+
+ggplot() +
+  geom_sf(data = us_states, fill = "white", color = "black") +
+  geom_sf(data = coordinates, aes(size = number_of_sites, color = Fire_Name)) +
+  scale_color_manual(values = c("#666666", "#00AFBB", "#666666", "#1B9E77", "#1B9E77", "#7570B3", "#E7298A", "darkred", "darkred", "darkred", "black", "#A6CEE3", "#1F78B4", "#E31A1C", "#33A02C", "#FB9A99", "#1B9E77")) +
+  xlim(-125, -68) +
+  ylim(25, 52) +
+  theme_map() +
+  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank())
+
+ggsave("climate_figure_map.pdf",
+       path = here("initial_plots", "Maps"),
+       width = 4, height = 2.5,  units = "in")
+
+
+
+
+
+
+
 
 
 # Plot the high park fire
