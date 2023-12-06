@@ -620,6 +620,12 @@ ggsave("Effect_Size_TSF_Horizontal.pdf",
 
 
 ```{r AGU plots}
+vn = expression(paste(""*N*O[3]^"-"))
+
+# within 5 years #
+under_ten <- yearly_effect_size_combine_long %>% 
+  filter(!Time_Since_Fire == ">10") 
+
 no_dwc <- climate_summary_effect %>% 
   filter(!Climate == "Dwc")
 
@@ -671,8 +677,45 @@ ggplot(under_ten, aes(Effect_size, Climate, color = response_var),
   
 
 ggsave("AGU_Effect_Size_climate.pdf",
-       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
-       width = 10, height = 8, units = "in")
+       path = here("initial_plots", "AGU"),
+       width = 10, height = 8,  units = "in")
+
+
+
+
+# TSF #
+yearly_effect_size_combine_long$Time_Since_Fire <- factor(yearly_effect_size_combine_long$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", ">10"))
+
+ggplot(yearly_effect_size_combine_long, aes(Time_Since_Fire, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = TSF_summary_effect) +
+  geom_hline(yintercept = 0, linewidth = 1, color = "red") +
+  ylim(-3, 4) +
+  ylab("Effect Size") +
+  xlab("Year since Fire") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Analyte"),
+                     labels = c('DOC', vn)) +
+  
+  scale_x_discrete(labels=c("0" = "0-1", "1" = "1-2",
+                            "2" = "2-3", "3" = "3-4", "4" = "4-5",
+                            "5" = "5-6", ">10" = ">10")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 20),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.17, 0.90))
+
+ggsave("AGU_Effect_Size_TSF.pdf",
+       path = here("initial_plots", "AGU"),
+       width = 10, height = 8,  units = "in")
+
+#
 
 
 ```

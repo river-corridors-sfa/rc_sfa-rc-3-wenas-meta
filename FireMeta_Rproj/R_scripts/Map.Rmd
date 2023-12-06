@@ -77,18 +77,33 @@ us_states <- st_read("us_states/cb_2021_us_state_20m.shp")
 # Plot the map with points
 ggplot() +
   geom_sf(data = us_states, fill = "white", color = "black") +
-  geom_sf(data = coordinates, aes(size = number_of_sites)) +
+  geom_sf(data = coordinates, aes(color = Fire_Name)) +
+  xlim(-125, -68) +
   scale_size_continuous(range = c(1, 10)) +
   labs(title = "Points on US Map with Conditional Variable") +
   theme_minimal()
 
-brewer.pal(n = 8, name = "YlOrRd")
-
+# Color values #
+"#666666"
+"#00AFBB"
+"#1B9E77"
+"#7570B3"
+"#E7298A"
+"darkred"
+"#A6CEE3"
+"#1F78B4"
+"#E31A1C"
+"#33A02C"
+"#FB9A99"
+"black"
 ggplot() +
   geom_sf(data = us_states, fill = "white", color = "black") +
   geom_sf(data = coordinates, aes(size = number_of_pairs, color = Fire_Name)) +
   scale_size_continuous(guide = guide_legend(title = "Number of Paired Watersheds")) +
-  scale_color_manual(values = c("#666666", "#00AFBB", "#666666", "#1B9E77", "#1B9E77", "#7570B3", "#E7298A", "darkred", "blue", "red", "black", "#A6CEE3", "#1F78B4", "#E31A1C", "#33A02C", "#FB9A99", "#1B9E77"), 
+  scale_color_manual(values = c("#666666", "#A6CEE3", "#00AFBB", "#1B9E77",
+                                "#7570B3", "#E7298A", "darkred", "black", 
+                                "#1F78B4", "#E31A1C", "#33A02C", "#FB9A99",
+                                "darkblue", "darkgreen"), 
                      guide = guide_legend(title = "Fire Name")) +
   xlim(-125, -68) +
   ylim(25, 52) +
@@ -99,16 +114,16 @@ ggplot() +
 
 ggsave("climate_figure_map.pdf",
        path = here("initial_plots", "Maps"),
-       width = 10, height = 12,  units = "in")
+       width = 8, height = 6,  units = "in")
+
+
+```
 
 
 
 
 
-
-
-
-
+```{r}
 # Plot the high park fire
 shapefile <- st_read("co4058910540420120609_20110912_20130901_burn_bndy.shp")
 
@@ -196,134 +211,3 @@ ggplot() +
 
 
 
-```{r -graph gallery}
-# Read this shape file with the rgdal library. 
-library(terra)
-library(ggspatial)
-library(sf)
-library(cowplot)
-library(mgcv)
-library(visreg)
-source("rasterdf.R")
-
-setwd("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/gis_data/Fire_Perimeters/High_Park")
-
-landsat_pre <- rast("co4058910540420120609_20110912_l5_refl.tif")
-landsat_post <- rast("co4058910540420120609_20130901_l8_refl.tif")
-
-nrow(landsat_pre)
-## [1] 850
-ncol(landsat_pre)
-## [1] 1149
-res(landsat_pre)
-## [1] 30 30
-nlyr(landsat_pre)
-## [1] 6
-ext(landsat_pre)[1:4]
-##    xmin    xmax    ymin    ymax 
-## -801045 -766575 1985745 2011245
-
-nrow(landsat_post)
-## [1] 850
-ncol(landsat_post)
-## [1] 1149
-res(landsat_post)
-## [1] 30 30
-nlyr(landsat_post)
-## [1] 8
-ext(landsat_post)[1:4]
-##    xmin    xmax    ymin    ymax 
-## -801045 -766575 1985745 2011245
-
-plotRGB(landsat_pre, 
-        r = 6, 
-        g = 4, 
-        b = 2)
-
-plotRGB(landsat_post, 
-        r = 6, 
-        g = 4, 
-        b = 2)
-
-nbr_pre <- 1000 * (landsat_pre[[4]] - landsat_pre[[6]]) / 
-  (landsat_pre[[4]] + landsat_pre[[6]])
-nbr_post <- 1000 * (landsat_post[[4]] - landsat_post[[6]]) / 
-  (landsat_post[[4]] + landsat_post[[6]])
-dnbr <- nbr_pre - nbr_post
-
-nbr_stack <- c(nbr_pre, nbr_post)
-names(nbr_stack) <- c("Pre-fire NBR", "Post-fire NBR")
-nbr_stack_df <- rasterdf(nbr_stack)
-
-ggplot(nbr_stack_df) +
-  geom_raster(aes(x = x, 
-                  y = y, 
-                  fill = value)) + 
-  scale_fill_gradient(name = "NBR", 
-                       low = "lightyellow", 
-                       high = "darkgreen") +
-  coord_sf(expand = FALSE) +
-  annotation_scale(location = 'bl') +
-  facet_wrap(facets = vars(variable), 
-             ncol = 1) +
-  theme_void()
-
-dnbr_df <- rasterdf(dnbr)
-
-
-ggplot(dnbr_df) +
-  geom_raster(aes(x = x, 
-                  y = y, 
-                  fill = value)) + 
-  scale_fill_gradient2(name = "DNBR", 
-                       low = "blue", 
-                       high = "red",
-                       midpoint = 0) +
-  coord_sf(expand = F) +
-  annotation_scale(location = 'bl') +
-  theme_void()
-
-
-rclas <- matrix(c(-Inf, -970, NA,  # Missing data
-                  -970, -100, 5,   # Increased greenness
-                  -100, 80, 1,     # Unburned
-                  80, 265, 2,      # Low severity
-                  265, 490, 3,     # Moderate severity
-                  490, Inf, 4),    # High severity
-                  ncol = 3, byrow = T)
-
-severity <- classify(dnbr, rclas)
-
-fire_bndy <- st_read("co4058910540420120609_20110912_20130901_burn_bndy.shp",
-                     quiet = TRUE)
-bndy_rast <- rasterize(vect(fire_bndy), 
-                       severity, 
-                       field = "Event_ID")
-severity <- mask(severity, bndy_rast)
-
-SCcolors = c("darkgreen", 
-             "cyan3", 
-             "yellow", 
-             "red", 
-             "green")
-SCnames = c("Unburned", 
-            "Low", 
-            "Moderate", 
-            "High", 
-            "> Green")
-
-severity_df <- rasterdf(severity)
-
-ggplot(severity_df) +
-  geom_raster(aes(x = x, 
-                  y = y, 
-                  fill = as.character(value))) + 
-  scale_fill_manual(name = "Severity Class",
-                    values = SCcolors,
-                    labels = SCnames,
-                    na.translate = FALSE) +
-  annotation_scale(location = 'bl') +
-  coord_fixed(expand = F) +
-  theme_void()
-
-```
