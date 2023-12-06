@@ -126,8 +126,6 @@ control_impact_fill <-  control_impact_units %>%
   mutate(NO3_Interp = na.approx(NO3_uM_N, na.rm = FALSE),
          DOC_Interp = na.approx(DOC_uM_C, na.rm = FALSE)) %>%
   fill(Study_ID:Time_Since_Fire)
-
-write.csv(control_impact_fill, here("Output_for_analysis", "Rhea_conc_fill.csv"))
   
 
 ```
@@ -159,6 +157,8 @@ yearly_mean_site <-  metadata_long %>%
   mutate(TempNorm = meanConc / Area_watershed_km)
     
 yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
+
+write.csv(yearly_mean_site, here("Output_for_analysis", "Rhea_conc_fill.csv"))
 
 ```
 

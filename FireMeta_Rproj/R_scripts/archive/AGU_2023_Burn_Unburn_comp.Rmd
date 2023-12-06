@@ -28,6 +28,7 @@ library(forecastML)
 library(zoo)
 library(hrbrthemes)
 library(viridis)
+library(car)
 
 ```
 
@@ -55,15 +56,15 @@ meta_df <-do.call("rbind", lapply(studies_file_list,
 ```{r data prep}
 options(max.print = 40)
 # Filtering by only the control vs.impact studies because the pre_post are going to go through a different calculation 
-# Also filtering out the studies where I don't have exact sampling days 
-# Crandall is filtered out because the burned and reference sites are not paired so I do that is a separate script and will read that csv in later to merge to this dataframe to get the more accurate effect size calculations 
-
+# Also filtering out the studies where I don't have exact sampling days  (Caldwell, Stephan, Writer)
+# Greater than 5 years, those are done in separate scripts 
 control_impact <- meta_df %>% 
   filter(`Design (Control/Burn; Pre/Post)` == "Control_Reference_vs_Impact",
          Study_ID != "Caldwell et al. 2020",
          Study_ID != "Stephan et al. 2015",
          Study_ID != "Writer & Murphy, 2012", 
-         Mean_Median_or_IndividualSample == "Individual")
+         Mean_Median_or_IndividualSample == "Individual",
+         as.numeric(Time_Since_Fire) < 6)
 
 # separate out the time columns 
 time_format <- control_impact %>% 
@@ -155,7 +156,8 @@ control_impact_fill <- control_impact_fill %>%
 
 ```
 
-```{r}
+
+```{r pivot long and create TempNorm}
 # This is code from my other script. I am going to try this way to see if this is what we want to get to 
 # pivoting to make the responses in one column
 metadata_long <- control_impact_fill %>%
@@ -179,21 +181,83 @@ yearly_mean_site <-  metadata_long %>%
 yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
 
 yearly_mean_site <-  yearly_mean_site %>% 
-  mutate(TempNorm = as.numeric(TempNorm)) %>% 
-  filter(TempNorm < 10000)
+  mutate(TempNorm = as.numeric(TempNorm)) 
 
 ```
-### PLOT Burn vs. Unburn ###
 
+# Add in corrected Crandall and papers that are greater than 5 years to this list 
 ```{r}
+# combine the conc. fill of Crandall, Abbott, and Rhea with the rest of it 
+
+crandall_conc_fill <- read_csv(here("Output_for_analysis", "crandall_conc_fill.csv")) %>% 
+  select(-...1)
+
+abbott_conc_fill <- read_csv(here("Output_for_analysis", "Abbott_conc_fill.csv")) %>% 
+  select(-...1)
+
+rhea_conc_fill <- read_csv(here("Output_for_analysis", "Rhea_conc_fill.csv")) %>% 
+  select(-...1)
+
+
+yearly_mean_site <- rbind(yearly_mean_site, crandall_conc_fill, abbott_conc_fill, rhea_conc_fill)
+
+```
+
+
+```{r Calculate CV}
+metadata_cv <- yearly_mean_site %>% 
+  group_by(Study_ID, response_var, Burn_Unburn) %>% 
+  summarise(meanconc = mean(TempNorm, na.rm = TRUE),
+            sdconc = sd(TempNorm, na.rm = TRUE),
+            CVconc = sdconc/meanconc) # generating CVs
+
+doc_cv <- metadata_cv %>% 
+  filter(response_var == "DOC_Interp")
+
 # DOC 
 doc_yearly <- yearly_mean_site %>% 
   filter(response_var == "DOC_Interp")
 
+# doc_cv <- doc_yearly %>% 
+#   group_by(Burn_Unburn) %>% 
+#   summarise(meanconc = mean(TempNorm, na.rm = TRUE),
+#             sdConc = sd(TempNorm, na.rm = TRUE),
+#             CVconc = sdConc/meanconc)
+
+# conduct Levene's Test for equality of variances
+leveneTest(TempNorm ~ Burn_Unburn, data = doc_yearly)
+
+# p-value: 0.42 - not significant 
+
+
+# NO3 
+no3_yearly <- yearly_mean_site %>% 
+  filter(response_var == "NO3_Interp")
+
+no3_cv <- metadata_cv %>% 
+  filter(response_var == "NO3_Interp")
+
+
+# no3_cv <- no3_yearly %>% 
+#   group_by(Burn_Unburn) %>% 
+#   summarise(meanconc = mean(TempNorm, na.rm = TRUE),
+#             sdConc = sd(TempNorm, na.rm = TRUE),
+#             CVconc = sdConc/meanconc)
+
+# conduct Levene's Test for equality of variances
+leveneTest(TempNorm ~ Burn_Unburn, data = no3_yearly)
+
+# p-value: 0.38 - not significant 
+
+```
+
+### PLOT Burn vs. Unburn ###
+
+```{r}
+# DOC 
 # simple box plot 
 ggplot(doc_yearly, aes(Burn_Unburn, TempNorm, fill = Burn_Unburn)) +
   geom_boxplot() +
-  ylim(0,100) +
   theme_bw()
   
 # Boxplot with density plot   
@@ -216,10 +280,50 @@ ggsave("DOC_yield.pdf",
        path = here("initial_plots"),
        width = 6, height = 8,  units = "in")
 
+# histogram with burn/unburned on top of each other
+doc_yearly %>% 
+ggplot(aes(x = TempNorm, fill = Burn_Unburn)) +
+    geom_histogram(binwidth=3, color="#e9ecef", alpha=0.9) +
+    scale_fill_manual(values = c("darkred", "#69b3a2")) +
+    labs(x = expression(paste("Yield (mg  ", DOC ," ", L^-1, km^-2, ")"))) +
+    ggtitle("DOC Yield") +
+    theme_bw() +
+    theme(plot.title = element_text(size=15),
+          axis.text.x = element_text(size = 25),
+          axis.title.x = element_text(size = 25),
+          axis.text.y = element_text(size = 25),
+          axis.title.y = element_text(size = 25))
+
+ggsave("DOC_histogram.pdf",
+       path = here("initial_plots", "AGU"),
+       width = 6, height = 8,  units = "in")
+
+# Box plot with CV
+ggplot(doc_cv, aes(x = Burn_Unburn, y = CVconc, fill = Burn_Unburn)) +
+  scale_fill_manual(values = c("darkred", "#69b3a2")) +
+  labs(y = "CV", x = "") +
+  ggdist::stat_halfeye(adjust = 0.5, 
+                       justification = -.2,
+                       .width = 0,
+                       point_colour = NA) +
+  geom_boxplot(width = .25,
+                 outlier.colour = NA,
+                 alpha = 0.5) +
+  ggtitle("Coefficient of Variation for DOC") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25),
+        axis.title.y = element_text(size = 25))
+        
+
+ggsave("DOC_CV.pdf",
+       path = here("initial_plots", "AGU"),
+       width = 6, height = 8,  units = "in")
+
 
 # NO3
-no3_yearly <- yearly_mean_site %>% 
-  filter(response_var == "NO3_Interp")
+
 
 vn = expression(paste("Yield (mg " *N*O[3]^"-",  L^-1, km^-2, ")"))
 
@@ -235,7 +339,6 @@ ggplot(no3_yearly, aes(x = Burn_Unburn, y = TempNorm, fill = Burn_Unburn)) +
                  alpha = 0.5) +
   ylab(vn) +
   xlab("") +
-  ylim(0, 0.5) +
   ggtitle("Nitrate Yield") +
   theme_bw() +
   theme(legend.position = "none")
@@ -245,6 +348,46 @@ ggsave("NO3_yield.pdf",
        width = 6, height = 8,  units = "in")
 
 
+
+# histogram with burn/unburned on top of each other
+no3_yearly %>% 
+ggplot(aes(x = TempNorm, fill = Burn_Unburn)) +
+    geom_histogram(binwidth=3, color="#e9ecef", alpha=0.9) +
+    scale_fill_manual(values = c("darkred", "#69b3a2")) +
+    xlab(vn) +
+    ggtitle("Nitrate Yield") +
+    theme_bw() +
+    theme(plot.title = element_text(size=15),
+          axis.text.x = element_text(size = 25),
+          axis.title.x = element_text(size = 25),
+          axis.text.y = element_text(size = 25),
+          axis.title.y = element_text(size = 25))
+
+ggsave("NO3_histogram.pdf",
+       path = here("initial_plots", "AGU"),
+       width = 6, height = 8,  units = "in")
+
+# Box plot with CV
+ggplot(no3_cv, aes(x = Burn_Unburn, y = CVconc, fill = Burn_Unburn)) +
+  scale_fill_manual(values = c("darkred", "#69b3a2")) +
+  labs(y = "CV", x = "") +
+  ggdist::stat_halfeye(adjust = 0.5, 
+                       justification = -.2,
+                       .width = 0,
+                       point_colour = NA) +
+  geom_boxplot(width = .25,
+                 outlier.colour = NA,
+                 alpha = 0.5) +
+  ggtitle("Coefficient of Variation for Nitrate") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25),
+        axis.title.y = element_text(size = 25))
+
+ggsave("NO3_CV.pdf",
+       path = here("initial_plots", "AGU"),
+       width = 6, height = 8,  units = "in")
 
 
 
