@@ -50,7 +50,7 @@ library(RColorBrewer)
 meta <- read_csv(here("inputs", "Studies_Summary", "Studies_included_in_climate_figure.csv")) # reading in filtered meta data sheet
 
 coords <- meta %>% 
-  select(Fire_Name, Lat, Long, number_of_sites, State, group)
+  select(Fire_Name, Lat, Long, number_of_pairs, State, group)
 
 # attempt to make sites bigger size with more sites
 
@@ -86,17 +86,20 @@ brewer.pal(n = 8, name = "YlOrRd")
 
 ggplot() +
   geom_sf(data = us_states, fill = "white", color = "black") +
-  geom_sf(data = coordinates, aes(size = number_of_sites, color = Fire_Name)) +
-  scale_color_manual(values = c("#666666", "#00AFBB", "#666666", "#1B9E77", "#1B9E77", "#7570B3", "#E7298A", "darkred", "darkred", "darkred", "black", "#A6CEE3", "#1F78B4", "#E31A1C", "#33A02C", "#FB9A99", "#1B9E77")) +
+  geom_sf(data = coordinates, aes(size = number_of_pairs, color = Fire_Name)) +
+  scale_size_continuous(guide = guide_legend(title = "Number of Paired Watersheds")) +
+  scale_color_manual(values = c("#666666", "#00AFBB", "#666666", "#1B9E77", "#1B9E77", "#7570B3", "#E7298A", "darkred", "blue", "red", "black", "#A6CEE3", "#1F78B4", "#E31A1C", "#33A02C", "#FB9A99", "#1B9E77"), 
+                     guide = guide_legend(title = "Fire Name")) +
   xlim(-125, -68) +
   ylim(25, 52) +
   theme_map() +
   theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
-        axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank())
+        axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),
+        )
 
 ggsave("climate_figure_map.pdf",
        path = here("initial_plots", "Maps"),
-       width = 4, height = 2.5,  units = "in")
+       width = 10, height = 12,  units = "in")
 
 
 
