@@ -262,8 +262,8 @@ ggplot(doc_yearly, aes(Burn_Unburn, TempNorm, fill = Burn_Unburn)) +
   
 # Boxplot with density plot   
 ggplot(doc_yearly, aes(x = Burn_Unburn, y = TempNorm, fill = Burn_Unburn)) +
-  scale_fill_manual(values = c("darkred", "green")) +
-  labs(x =  " ", y = expression(paste("Yield (mg  ", DOC ," ", L^-1, km^-2, ")"))) +
+  scale_fill_manual(values = c("darkred", "#69b3a2")) +
+  labs(x =  " ", y = expression(paste("mg  ", DOC ," ", L^-1, km^-2, ""))) +
   ggdist::stat_halfeye(adjust = 0.5, 
                        justification = -.2,
                        .width = 0,
@@ -271,14 +271,16 @@ ggplot(doc_yearly, aes(x = Burn_Unburn, y = TempNorm, fill = Burn_Unburn)) +
   geom_boxplot(width = .25,
                  outlier.colour = NA,
                  alpha = 0.5) +
-  ylim(0,100) +
-  ggtitle("DOC Yield") +
+  ggtitle("") +
   theme_bw() +
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 20),
+        axis.title.y = element_text(size = 25))
 
 ggsave("DOC_yield.pdf",
        path = here("initial_plots"),
-       width = 6, height = 8,  units = "in")
+       width = 6, height = 6,  units = "in")
 
 # histogram with burn/unburned on top of each other
 doc_yearly %>% 
@@ -325,11 +327,11 @@ ggsave("DOC_CV.pdf",
 # NO3
 
 
-vn = expression(paste("Yield (mg " *N*O[3]^"-",  L^-1, km^-2, ")"))
+vn = expression(paste("mg " *N*O[3]^"-",  L^-1, km^-2, ""))
 
 # Boxplot with density plot   
 ggplot(no3_yearly, aes(x = Burn_Unburn, y = TempNorm, fill = Burn_Unburn)) +
-  scale_fill_manual(values = c("darkred", "green")) +
+  scale_fill_manual(values = c("darkred", "#69b3a2")) +
   ggdist::stat_halfeye(adjust = 0.5, 
                        justification = -.2,
                        .width = 0,
@@ -337,15 +339,19 @@ ggplot(no3_yearly, aes(x = Burn_Unburn, y = TempNorm, fill = Burn_Unburn)) +
   geom_boxplot(width = .25,
                  outlier.colour = NA,
                  alpha = 0.5) +
+  ylim(0,1) +
   ylab(vn) +
   xlab("") +
-  ggtitle("Nitrate Yield") +
+  ggtitle("") +
   theme_bw() +
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 20),
+        axis.title.y = element_text(size = 25))
 
 ggsave("NO3_yield.pdf",
        path = here("initial_plots"),
-       width = 6, height = 8,  units = "in")
+       width = 6.25, height = 6.25,  units = "in")
 
 
 
