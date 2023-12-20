@@ -47,6 +47,7 @@ library(ggcorrplot)
 library(ggpmisc)
 library(RColorBrewer)
 library(ggbreak)
+library(lmerTest)
 ```
 
 ```{r load in csv's}
@@ -91,6 +92,7 @@ geospatial_long <- geospatial %>%
 
 ```
 
+### Data summary visualization 
 ```{r - histogram of data summary}
 ggplot(geospatial, aes(x = streamorde)) +
   geom_histogram(binwidth = 1, color = "black", fill = "#56B4E9") +
@@ -190,37 +192,11 @@ fire_clip <- fire_clip %>%
 
 ```
 
-```{r Effect size models-DOC}
-# DOC #
-# Effect_size ~ burn_percentage*TSF + (1|Site)
+### Burn percentage plots 
+```{r plot DOC}
 doc_effect_size_burn_merged <- right_join(effect_size_doc, fire_clip) %>% 
   na.omit() 
 
-
-ggpairs(doc_effect_size_burn_merged,
-        columns = c("burn_percentage", "Time_Since_Fire"))
-
-doc_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = doc_effect_size_burn_merged)
-
-summary(doc_burn_mixed)
-confint(doc_burn_mixed)
-
-ranef(doc_burn_mixed)$site %>% 
-  head(5)
-
-coef(doc_burn_mixed)$site %>% 
-  head(5)
-
-predictInterval(doc_burn_mixed)
-
-REsim(doc_burn_mixed) 
-
-plotREsim(REsim(doc_burn_mixed))
-
-
-```
-
-```{r plot DOC}
 give.n <- function(x){
   return(c(y = median(x)*1.05, label = length(x))) 
   # experiment with the multiplier to find the perfect position
@@ -270,7 +246,41 @@ ggplot(data = doc_effect_size_burn_merged, aes(x = burn_percentage, y = Effect_s
 
 ```
 
+### Burn percentage models
+```{r Effect size models-DOC}
+# DOC #
+# Effect_size ~ burn_percentage*TSF + (1|Site)
 
+ggpairs(doc_effect_size_burn_merged,
+        columns = c("burn_percentage", "Time_Since_Fire"))
+
+doc_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = doc_effect_size_burn_merged)
+
+doc_burn_mixed
+
+summary(doc_burn_mixed)
+fixef(doc_burn_mixed)
+confint(doc_burn_mixed)
+
+ranef(doc_burn_mixed)$site %>% 
+  head(5)
+
+coef(doc_burn_mixed)$site %>% 
+  head(5)
+
+predictInterval(doc_burn_mixed)
+
+REsim(doc_burn_mixed) 
+
+plotREsim(REsim(doc_burn_mixed))
+
+# anova #
+doc_aov = aov(Effect_size ~ burn_percentage, data = doc_effect_size_burn_merged)
+plot(doc_aov)
+summary(doc_aov)
+
+
+```
 
 ```{r Effect size models-NO3}
 # NO3 #
@@ -282,7 +292,7 @@ no3_effect_size_burn_merged <- right_join(effect_size_no3, fire_clip) %>%
 ggpairs(no3_effect_size_burn_merged,
         columns = c("burn_percentage", "Time_Since_Fire"))
 
-no3_burn_mixed = lmer(Effect_size ~ burn_percentage*Time_Since_Fire + (1 | site), data = no3_effect_size_burn_merged)
+no3_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = no3_effect_size_burn_merged)
 
 summary(no3_burn_mixed)
 confint(no3_burn_mixed)
@@ -316,6 +326,77 @@ ggsave("Effect_Size_Burn_Percentage_NO3.pdf",
 
 ```
 
+
+### Climate models
+```{r DOC climate models}
+doc_climate_mixed <-  lmer(Effect_size ~ Climate + (1 | site), data = doc_effect_size_burn_merged)
+
+doc_climate_mixed
+
+summary(doc_climate_mixed)
+fixef(doc_climate_mixed)
+confint(doc_climate_mixed)
+
+predictInterval(doc_climate_mixed)
+
+REsim(doc_climate_mixed) 
+
+plotREsim(REsim(doc_climate_mixed))
+
+```
+
+```{r NO3 climate models}
+no3_climate_mixed <-  lmer(Effect_size ~ Climate + (1 | site), data = no3_effect_size_burn_merged)
+
+no3_climate_mixed
+
+summary(no3_climate_mixed)
+fixef(no3_climate_mixed)
+confint(no3_climate_mixed)
+
+predictInterval(no3_climate_mixed)
+
+REsim(no3_climate_mixed) 
+
+plotREsim(REsim(no3_climate_mixed))
+
+```
+
+
+### TSF models
+```{r DOC TSF models}
+doc_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | site), data = doc_effect_size_burn_merged)
+
+doc_tsf_mixed
+
+summary(doc_tsf_mixed)
+fixef(doc_tsf_mixed)
+confint(doc_tsf_mixed)
+
+predictInterval(doc_tsf_mixed)
+
+REsim(doc_tsf_mixed) 
+
+plotREsim(REsim(doc_tsf_mixed))
+
+```
+
+```{r NO3 TSF models}
+no3_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | site), data = no3_effect_size_burn_merged)
+
+no3_tsf_mixed
+
+summary(no3_tsf_mixed)
+fixef(no3_tsf_mixed)
+confint(no3_tsf_mixed)
+
+predictInterval(no3_tsf_mixed)
+
+REsim(no3_tsf_mixed) 
+
+plotREsim(REsim(no3_tsf_mixed))
+
+```
 
 # Make the same TSF plot but with Burn percentage #
 
@@ -437,20 +518,20 @@ ggsave("AGU_Effect_Size_burn_percentage.pdf",
        path = here("initial_plots", "AGU"),
        width = 10, height = 8,  units = "in")
 
+# Fade DOC
+test <- burn_percentage_effect[c(10:21, 1:9), ]
 
-# Fading certain alpha values:
-alpha <- ifelse(burn_percentage_effect$response_var, 0.9, 0.35)
+test2 <- effect_both_doc_no3[c(79:123, 1:78), ]
 
-ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = response_var),
+ggplot(test2, aes(burn_percentage_group, Effect_size, alpha = response_var, color = response_var),
        position = position_dodge(width = -0.5)) +
   geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
   theme(legend.position = "none") +
-
   geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
-                      color = response_var,
-                      alpha = response_var),
-                  position = position_dodge(width = -0.5), size = 1.5, data = burn_percentage_effect) +
-  
+                      color = response_var
+                      ),
+                  position = position_dodge(width = -0.5), size = 1.5, data = test) +
+  scale_alpha_manual(values = c(0.25, 1)) +
   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
   ylab("Effect Size") +
   xlab("Burn Percentage") +
@@ -473,11 +554,8 @@ ggsave("Fade_DOC_AGU_Effect_Size_burn_percentage.pdf",
        path = here("initial_plots", "AGU"),
        width = 10, height = 8,  units = "in")
 
-# Fade nitrate
-test <- burn_percentage_effect[c(10:21, 1:9), ]
 
-test2 <- effect_both_doc_no3[c(79:123, 1:78), ]
-
+# Fade NO3
 ggplot(test2, aes(burn_percentage_group, Effect_size, alpha = response_var, color = response_var),
        position = position_dodge(width = -0.5)) +
   geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
@@ -486,7 +564,7 @@ ggplot(test2, aes(burn_percentage_group, Effect_size, alpha = response_var, colo
                       color = response_var
                       ),
                   position = position_dodge(width = -0.5), size = 1.5, data = test) +
-  
+  scale_alpha_manual(values = c(1, 0.25)) +
   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
   ylab("Effect Size") +
   xlab("Burn Percentage") +
@@ -505,7 +583,7 @@ ggplot(test2, aes(burn_percentage_group, Effect_size, alpha = response_var, colo
         legend.text = element_text(size = 30),
         legend.position = "none")
 
-ggsave("Fade_DOC_AGU_Effect_Size_burn_percentage.pdf",
+ggsave("Fade_NO3_AGU_Effect_Size_burn_percentage.pdf",
        path = here("initial_plots", "AGU"),
        width = 10, height = 8,  units = "in")
 

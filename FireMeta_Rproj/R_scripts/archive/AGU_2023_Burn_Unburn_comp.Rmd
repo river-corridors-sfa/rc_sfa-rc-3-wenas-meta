@@ -224,10 +224,22 @@ doc_yearly <- yearly_mean_site %>%
 #             sdConc = sd(TempNorm, na.rm = TRUE),
 #             CVconc = sdConc/meanconc)
 
-# conduct Levene's Test for equality of variances
-leveneTest(TempNorm ~ Burn_Unburn, data = doc_yearly)
+# conduct anova test to see if the mean concentrations were different between burn and unbunr
+one.way.doc <- aov(TempNorm ~ Burn_Unburn, data = doc_yearly)
 
-# p-value: 0.42 - not significant 
+plot(one.way.doc)
+# QQ plot is not great. Looks like I should log transform. Lets try that. 
+
+doc_yearly <- doc_yearly %>% 
+  mutate(logTempNorm = log(TempNorm))
+
+log.one.way.doc <- aov(logTempNorm ~ Burn_Unburn, data = doc_yearly)
+plot(log.one.way.doc)
+
+summary(log.one.way.doc) # F-value: 1.113, p-value: 0.294
+
+# conduct Levene's Test for equality of variances
+leveneTest(TempNorm ~ Burn_Unburn, data = doc_yearly) #F-value: 0.6377, p-value: 0.4266,
 
 
 # NO3 
@@ -244,10 +256,25 @@ no3_cv <- metadata_cv %>%
 #             sdConc = sd(TempNorm, na.rm = TRUE),
 #             CVconc = sdConc/meanconc)
 
-# conduct Levene's Test for equality of variances
-leveneTest(TempNorm ~ Burn_Unburn, data = no3_yearly)
+# conduct anova test to see if the mean concentrations were different between burn and unbunr
+one.way.no3 <- aov(TempNorm ~ Burn_Unburn, data = no3_yearly)
 
-# p-value: 0.38 - not significant 
+plot(one.way.no3)
+
+# QQ plot is not great. Looks like I should log transform. Lets try that. 
+
+no3_yearly <- no3_yearly %>% 
+  mutate(logTempNorm = log(TempNorm))
+
+log.one.way.no3 <- aov(logTempNorm ~ Burn_Unburn, data = no3_yearly)
+plot(log.one.way.no3)
+
+summary(log.one.way.no3) # df: 1,181, F-value: 0.152, p-value: 0.697
+
+
+
+# conduct Levene's Test for equality of variances
+leveneTest(TempNorm ~ Burn_Unburn, data = no3_yearly) # df: 1,181, F-value: 0.7465,  p-value: 0.38 
 
 ```
 
