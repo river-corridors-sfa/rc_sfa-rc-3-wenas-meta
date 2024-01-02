@@ -1,0 +1,286 @@
+---
+title: "Pre_post"
+output:
+  pdf_document: default
+  html_document: default
+date: "2023-12-21"
+editor_options:
+  chunk_output_type: console
+---
+The purpose of this script is to read in the studies from the final meta data list that are pre and post study designs and do a resistance/resilience analysis 
+
+Script Workflow:
+
+Step 1) Load in all the individual studies from "meta_final" located within inputs in the repository.  
+
+Step 2) Select studies that are Pre_Post.... We already did Control_vs_Impact analysis in other scripts 
+
+
+
+# Status: in progress
+
+# ==============================================================================
+# Author: Jake Cavaiani 
+# 21 December 2023
+# ==============================================================================
+
+## Temporal Normalization 
+```{r Jake/Mac Load Packages and}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+
+library(tidyverse)
+library(here)
+library(forecastML)
+library(zoo)
+library(hrbrthemes)
+library(viridis)
+library(RColorBrewer)
+library(ggpubr)
+
+```
+
+```{r data prepper}
+studies_file_list <- list.files(path = "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/inputs/Studies/meta_final/", 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv, 
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) 
+
+
+```
+
+```{r data prep}
+options(max.print = 20)
+# Filtering the pre and post studies 
+pre_post <- meta_df %>% 
+  filter(`Design (Control/Burn; Pre/Post)` == "Pre_Post")
+
+pre_post <- pre_post %>% 
+  mutate(DOC = as.numeric(DOC),
+         NO3 = as.numeric(NO3))
+
+# Changing the units to make sure everything is consistent in mg_N_L or mg_C_L
+pre_post <- pre_post %>% 
+  mutate(Area_watershed_km = case_when(Area_unit == 'ha' ~ Area_watershed * .01,
+                                       Area_unit == 'km' ~ print(Area_watershed)),
+         
+         DOC_mg_C_L = case_when(DOC_unit == 'mg_C_L' ~ print(DOC),
+                                DOC_unit == 'mg_L' ~ print(DOC),
+                                DOC_unit == 'um' ~ DOC * 0.01201),
+         
+         NO3_mg_N_L = case_when(NO3_unit == 'um' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_NO2_NO3_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'mg_N_L' ~ print(NO3),
+                                NO3_unit == 'ug_N_L' ~ NO3 * .001, 
+                                NO3_unit == 'mg_L' ~ NO3 * 0.225904780),
+         
+         DOC_uM_C = case_when(DOC_unit == 'um' ~ print(DOC),
+                              DOC_unit == 'mg_C_L' ~ DOC * 83.2639467,
+                              DOC_unit == 'mg_L' ~ DOC * 83.2639467),
+
+         NO3_uM_N = case_when(NO3_unit == 'um' ~ print(NO3),
+                              NO3_unit == 'umol_L' ~ print(NO3),
+                              NO3_unit == 'umol_NO2_NO3_L' ~ print(NO3),
+                              NO3_unit == 'mg_L' ~ NO3 * 16.127729,
+                              NO3_unit == 'mg_N_L' ~ NO3 * 3.64145101,
+                              NO3_unit == 'ug_N_L' ~ NO3 * 0.22594948))
+
+
+
+```
+
+#### calculate the means for each analyte by site  ### 
+```{r data prep}
+pre_post <- pre_post %>% 
+  mutate(Pre_Post = ifelse(Time_Since_Fire == "Pre", "Pre", "Post"))
+
+
+pre_post_select <- pre_post %>% 
+  select("Study_ID", "Climate", "Time_Since_Fire", "Pair", "Site", "Pre_Post", "DOC_uM_C", "NO3_uM_N", "Area_watershed_km")
+
+# pivot longer 
+pre_post_long <- pre_post_select %>%
+  pivot_longer(
+    cols = DOC_uM_C:NO3_uM_N,
+    names_to = "response_var",
+    values_to = "concentration",
+    values_drop_na = TRUE
+  )
+
+# Group and average 
+pre_post_analysis <-  pre_post_long %>%
+  group_by(Study_ID, Site, response_var, Pre_Post) %>% 
+  summarize(meanConc = mean(concentration))
+
+# Making wide so I can calculate percent change 
+df_wide <- pre_post_analysis %>%
+  pivot_wider(names_from = Pre_Post, values_from = meanConc)
+
+# Percent change 
+percent_change <- df_wide %>% 
+  group_by(Study_ID, Site, response_var) %>%
+  summarize(percent_change = (((Post-Pre)/Pre)*100))
+
+pre_post_analysis <- pre_post_analysis %>% 
+  mutate(Pre_Post_Factor = factor(Pre_Post, levels = c("Pre", "Post")))
+
+  
+```
+
+
+```{r}
+doc_pre_post_long <- pre_post_long %>% 
+  filter(response_var == "DOC_uM_C")
+
+no3_pre_post_long <- pre_post_long %>% 
+  filter(response_var == "NO3_uM_N")
+
+
+ggplot(doc_pre_post_long, aes(Pre_Post, y = concentration, fill = Pre_Post)) +
+  geom_boxplot() +
+  facet_wrap(~Site, scales = "free") +
+  theme_bw()
+
+
+```
+# Plot raw concentration #
+```{r}
+level_order <- c('Pre', 'Post') 
+
+display.brewer.pal(n = 8, name = 'PuOr')
+brewer.pal(n = 8, name = "PuOr")
+
+
+ggplot(no3_pre_post_long, aes(x = factor(Pre_Post, level = level_order), y = concentration, fill = Pre_Post)) +
+  geom_boxplot() +
+  facet_wrap(~Site, scales = "free") +
+  scale_fill_manual(values = c("#FDB863", "#B2ABD2")) +
+  ggtitle("Nitrate") +
+  xlab("") +
+  theme(legend.position = "none") +
+  theme_bw()
+
+
+```
+
+# Plot percent change # 
+```{r}
+display.brewer.pal(n = 8, name = 'PuOr')
+brewer.pal(n = 8, name = "PuOr")
+
+
+ggplot(percent_change, aes(x = percent_change)) +
+  geom_histogram(binwidth = 10) +
+  facet_wrap(~response_var) +
+  theme_bw()
+
+
+
+```
+
+# stats of percent change # 
+```{r}
+percent_difference_DOC <- percent_change %>% 
+  filter(response_var == "DOC_uM_C")
+
+percent_difference_NO3 <- percent_change %>% 
+  filter(response_var == "NO3_uM_N")
+
+```
+
+
+### STEP 2 check normality for DOC ###
+```{r DOC}
+summary(percent_difference_DOC$percent_change)
+
+#Visualize data
+ggboxplot(percent_difference_DOC$percent_change, 
+          ylab = "Percent Difference (%)", xlab = FALSE,
+          ggtheme = theme_minimal())
+
+
+#perform shapiro-wilk test
+shapiro.test(percent_difference_DOC$percent_change)
+# p-value is greater than 0.05 which indicates that the data is normally distributed
+
+
+# checking to see if the data is normal 
+ggqqplot(percent_difference_DOC$percent_change, ylab = "Percent Difference",
+         ggtheme = theme_minimal())
+
+# p-value is greater than 0.05 which indicates that the data is normally distributed
+
+```
+
+### STEP 3 perform t-test for DOC ###
+```{r one-sample t-test DOC}
+# 
+res <- t.test(percent_difference_DOC$percent_change, mu = 0)
+# printing the results
+res
+
+sd(percent_difference_DOC$percent_change)
+
+```
+t is the test-statistic value (t = -0.50492)
+df is the degrees of freedom (df = 3)
+p-value is the significance level of the t-test (p-value = 0.6484)
+conf.int is the confidence interval of the mean at 95% ([-12.934239,9.391983])
+sample estimates is the mean value of the sample (mean = -1.771128)
+
+The p-value of the test is 0.6484, which is greater than the significance level alpha = 0.05. We can conclude that the mean percent difference for DOC is NOT significantly different from 0%. 
+
+### STEP 4 Do the same thing for nitrate ###
+```{r DOC}
+summary(percent_difference_NO3$percent_change)
+
+#Visualize data
+ggboxplot(percent_difference_NO3$percent_change, 
+          ylab = "Percent Difference (%)", xlab = FALSE,
+          ggtheme = theme_minimal())
+
+
+#perform shapiro-wilk test
+shapiro.test(percent_difference_NO3$percent_change)
+# p-value is greater than 0.05 which indicates that the data is normally distributed
+
+
+# checking to see if the data is normal 
+ggqqplot(percent_difference_NO3$percent_change, ylab = "Percent Difference",
+         ggtheme = theme_minimal())
+
+# p-value is greater than 0.05 which indicates that the data is normally distributed
+
+```
+
+### STEP 3 perform t-test for DOC ###
+```{r one-sample t-test DOC}
+# 
+res <- t.test(percent_difference_NO3$percent_change, mu = 0)
+# printing the results
+res
+
+sd(percent_difference_NO3$percent_change)
+
+```
+t is the test-statistic value (t = -3.4386)
+df is the degrees of freedom (df = 9)
+p-value is the significance level of the t-test (p-value = 0.007407)
+conf.int is the confidence interval of the mean at 95% ([40.89351,198.15692])
+sample estimates is the mean value of the sample (mean = 119.5252)
+
+The p-value of the test is 0.007407, which is less than the significance level alpha = 0.05. We can conclude that the mean percent difference for nitrate is significantly different from 0%. 

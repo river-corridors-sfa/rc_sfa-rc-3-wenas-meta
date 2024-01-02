@@ -523,6 +523,32 @@ no_dwc <- climate_summary_effect %>%
   filter(!Climate == "Dwc",
          !Climate == "Dfc")  # Removing the abbott and Rhea paper that is greater than 5 years from TSF
 
+# Count how many watersheds are being included for the climate analysis #
+under_ten_long <- under_ten %>% 
+  pivot_longer(
+    cols = Xe1:Xc345,
+    names_to = "Watershed",
+    values_to = "Mean",
+    values_drop_na = TRUE
+  ) %>% 
+  filter(is.finite(Effect_size))
+
+under_ten_long <- under_ten_long %>% 
+  group_by(Study_ID) %>% 
+  distinct(Watershed, .keep_all = T) %>% 
+  filter(Mean != 0) %>% 
+  dplyr::select(Study_ID, Watershed, Mean) 
+  
+
+count_climate <- under_ten_long %>% 
+  count(Study_ID)
+sum(count_climate$n)
+
+write_csv(count_climate, "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/Output_for_analysis/Climate_count.csv")
+
+
+# 58 watersheds are included in the climate analysis 
+
 # geom_jitter for climate for studies within 5 years # 
 ggplot(under_ten, aes(Effect_size, Climate, color = response_var),
        position = position_dodge(width = -0.5)) +
@@ -581,6 +607,31 @@ ggsave("Effect_Size.climate.pdf",
 # geom_jitter for TSF # 
 # Reordering for plotting purposes
 yearly_effect_size_combine_long$Time_Since_Fire <- factor(yearly_effect_size_combine_long$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", ">10"))
+
+# Count how many watersheds are being included for the climate analysis #
+TSF_long <- yearly_effect_size_combine_long %>% 
+  pivot_longer(
+    cols = Xe1:Xc345,
+    names_to = "Watershed",
+    values_to = "Mean",
+    values_drop_na = TRUE
+  ) %>% 
+  filter(is.finite(Effect_size))
+
+TSF_long <- TSF_long %>% 
+  group_by(Study_ID) %>% 
+  distinct(Watershed, .keep_all = T) %>% 
+  filter(Mean != 0) %>% 
+  dplyr::select(Study_ID, Watershed, Mean)
+
+count_TSF <- TSF_long %>% 
+  count(Study_ID)
+sum(count_TSF$n)
+
+write_csv(count_TSF, "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/Output_for_analysis/TSF_count.csv")
+
+# 58 watersheds are included in the climate analysis 
+
  
 
 
