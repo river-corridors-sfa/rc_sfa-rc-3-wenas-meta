@@ -457,14 +457,19 @@ ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = resp
   scale_color_manual(values = c("#00AFBB", "#E7B800"),
                      guide = guide_legend(title = "Analyte"),
                      labels = c('DOC', vn)) +
+  stat_summary(fun.data = give.n, geom = "text", fun.y = median,
+                  position = position_nudge(x = -0.4)) +
+  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
+                                                   "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
+                                                    "91-95", "96-100")) +
   ylim(-5, 5) +
   theme_bw() +
-  theme(axis.text.x = element_text(size = 30),
+  theme(axis.text.x = element_text(size = 30, angle = -90),
         axis.text.y = element_text(size = 30),
         axis.title.x = element_text(size = 40),
         axis.title.y = element_text(size = 35),
         legend.text = element_text(size = 30),
-        legend.position = "top")
+        legend.position = c(0.5, 0.86))
 
 ggsave("Effect_Size_Burn_Percentage.pdf",
        path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),

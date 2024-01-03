@@ -254,7 +254,7 @@ vn = expression(paste(""*N*O[3]^"-"))
 # um = expression(paste(""*N*O[3]^"-"))
 
 give.n <- function(x){
-  return(c(y = median(x)*1.05, label = length(x))) 
+  return(c(y = median(x)*1.5, label = length(x))) 
   # experiment with the multiplier to find the perfect position
 }
 
@@ -650,7 +650,7 @@ ggplot(yearly_effect_size_combine_long, aes(Time_Since_Fire, Effect_size, color 
                      labels = c('DOC', vn)) +
   stat_summary(fun.data = give.n, geom = "text", fun.y = median,
                   position = position_nudge(x = -0.4)) +
-  scale_x_discrete(labels=c("0" = "0-1", "1" = "1-2",
+  scale_x_discrete(labels=c("0" = "Year of Fire", "1" = "1-2",
                             "2" = "2-3", "3" = "3-4", "4" = "4-5",
                             "5" = "5-6", ">10" = ">10")) +
   theme_bw() +
@@ -659,7 +659,7 @@ ggplot(yearly_effect_size_combine_long, aes(Time_Since_Fire, Effect_size, color 
         axis.title.x = element_text(size = 40),
         axis.title.y = element_text(size = 35),
         legend.text = element_text(size = 30),
-        legend.position = "top")
+        legend.position = c(0.17, 0.90))
 
 ggsave("Effect_Size_TSF_Horizontal.pdf",
        path = here("initial_plots", "03_Wenas_effect_size"),
