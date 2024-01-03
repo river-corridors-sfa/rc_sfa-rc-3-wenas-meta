@@ -110,15 +110,15 @@ site_data_unique <- site_data %>%
 # Okay lets do this for all the studies # 
 # filling in daily time series and interpolating by study and site
 control_impact_fill <-  control_impact_units %>% 
-  select("Study_ID", "Latitude", "Longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_uM_C", "NO3_uM_N") %>%
+  select("Study_ID", "Latitude", "Longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
   group_by(Study_ID, Site) %>%
   complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
   fill(Study_ID:Time_Since_Fire) %>%
   fill(Study_ID, Site) %>%
   ungroup() %>%
   group_by(Site) %>%
-  mutate(NO3_Interp = na.approx(NO3_uM_N, na.rm = FALSE),
-         DOC_Interp = na.approx(DOC_uM_C, na.rm = FALSE)) %>%
+  mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
   fill(Study_ID:Time_Since_Fire)
   
 

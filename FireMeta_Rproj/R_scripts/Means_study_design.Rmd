@@ -1,0 +1,199 @@
+---
+title: "Means"
+output: html_document
+date: "2024-01-03"
+editor_options: 
+  chunk_output_type: console
+---
+
+The purpose of this script is to read in the studies from the final meta data list that only report means and perform a t-test to see if they are statistically different
+
+Script Workflow:
+
+Step 1) Load in all the individual studies from "meta_final" located within inputs in the repository.  
+
+Step 2) Select studies that only report means.... We already did Control_vs_Impact analysis in other scripts 
+
+
+
+# Status: in progress
+
+# ==============================================================================
+# Author: Jake Cavaiani 
+# 03 January 2024
+# ==============================================================================
+
+## Temporal Normalization 
+```{r Jake/Mac Load Packages and}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+
+library(tidyverse)
+library(here)
+library(forecastML)
+library(zoo)
+library(hrbrthemes)
+library(viridis)
+library(RColorBrewer)
+library(ggpubr)
+library(ggsignif)
+
+```
+
+```{r data prepper}
+studies_file_list <- list.files(path = "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/inputs/Studies/meta_final/", 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv, 
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) 
+
+
+```
+
+
+```{r data prep}
+options(max.print = 20)
+# Filtering the pre and post studies 
+mean <- meta_df %>% 
+  filter(Mean_Median_or_IndividualSample == "Mean" |
+         Mean_Median_or_IndividualSample == "Mean_Mean")
+
+mean <- mean %>% 
+  mutate(DOC = as.numeric(DOC),
+         NO3 = as.numeric(NO3))
+
+# Changing the units to make sure everything is consistent in mg_N_L or mg_C_L
+mean <- mean %>% 
+  mutate(Area_watershed_km = case_when(Area_unit == 'ha' ~ Area_watershed * .01,
+                                       Area_unit == 'km' ~ print(Area_watershed)),
+         
+         DOC_mg_C_L = case_when(DOC_unit == 'mg_C_L' ~ print(DOC),
+                                DOC_unit == 'mg_L' ~ print(DOC),
+                                DOC_unit == 'um' ~ DOC * 0.01201),
+         
+         NO3_mg_N_L = case_when(NO3_unit == 'um' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_NO2_NO3_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'mg_N_L' ~ print(NO3),
+                                NO3_unit == 'ug_N_L' ~ NO3 * .001, 
+                                NO3_unit == 'ug_L' ~ NO3 * 0.000225904780, 
+                                NO3_unit == 'mg_L' ~ NO3 * 0.225904780),
+         
+         DOC_uM_C = case_when(DOC_unit == 'um' ~ print(DOC),
+                              DOC_unit == 'mg_C_L' ~ DOC * 83.2639467,
+                              DOC_unit == 'mg_L' ~ DOC * 83.2639467),
+
+         NO3_uM_N = case_when(NO3_unit == 'um' ~ print(NO3),
+                              NO3_unit == 'umol_L' ~ print(NO3),
+                              NO3_unit == 'umol_NO2_NO3_L' ~ print(NO3),
+                              NO3_unit == 'mg_L' ~ NO3 * 16.127729,
+                              NO3_unit == 'mg_N_L' ~ NO3 * 3.64145101,
+                              NO3_unit == 'ug_N_L' ~ NO3 * 0.22594948))
+
+
+
+```
+
+#### calculate the means for each analyte by site  ### 
+```{r data prep}
+mean_select <- mean %>% 
+  select("Study_ID", "Design (Control/Burn; Pre/Post)", "Climate", "Time_Since_Fire", "Pair", "Site", "DOC_mg_C_L", "NO3_mg_N_L", "Area_watershed_km")
+
+mean_reference_impact <- mean_select %>% 
+  filter(`Design (Control/Burn; Pre/Post)` != "Pre_Post") %>% 
+  filter(Study_ID != "Betts & Jones, 2009")
+
+# I want to make a data frame that includes all the studies that only report means that are not the pre-post study designs as those are analyzed in the "Pre_post" script. I want to compare control vs. impact sites that are just means to see if the results are similar to the gap filling strategy that is done within the "All_Studies_Temporal_Normalization" script. 
+
+# pivot longer 
+mean_reference_impact_long <- mean_reference_impact %>%
+  pivot_longer(
+    cols = DOC_mg_C_L:NO3_mg_N_L,
+    names_to = "response_var",
+    values_to = "concentration",
+    values_drop_na = TRUE
+  )
+
+# Group and average 
+mean_analysis <-  mean_reference_impact_long %>%
+  group_by(Study_ID, Pair, response_var) %>% 
+  summarize(meanConc = mean(concentration))
+
+
+  
+```
+
+# plotting
+```{r}
+mean_analysis %>% 
+  filter(Study_ID != "Caldwell et al. 2020") %>% 
+ggplot(aes(x = Pair, y = meanConc, color = response_var)) +
+  geom_point() +
+  facet_grid(Study_ID~response_var, scales = "free") +
+  theme_bw()
+
+
+mean_analysis_test <- mean_analysis %>% 
+  mutate(PairTest = ifelse(startsWith(Pair, "Control"), "Control", "Impact")) # This is turning all the controls into one control variable and taking all the sites and turing them into an impact 
+
+doc <- mean_analysis_test %>% 
+  filter(response_var == "DOC_mg_C_L")
+
+ggplot(doc, aes(PairTest, meanConc, fill = PairTest)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("#B2ABD2", "#FDB863")) +
+  facet_wrap(~Study_ID, scales = "free") +
+  ggtitle("DOC") +
+  theme_bw()
+
+doc$PairTest <- factor(doc$PairTest)
+
+doc %>% filter(Study_ID == "Caldwell et al. 2020") %>% 
+  ggplot(aes(PairTest, meanConc, fill = PairTest)) +
+  geom_boxplot() +
+  geom_signif(comparisons = list(c("Control", "Impact"),
+              map_signif_level = TRUE)) +
+  scale_fill_manual(values = c("#B2ABD2", "#FDB863")) +
+  ggtitle("DOC") +
+  theme_bw()
+
+t.test(meanConc ~ PairTest, data = doc)
+
+plot(extra ~ group, data = sleep)
+
+
+no3 <- mean_analysis_test %>% 
+  filter(response_var == "NO3_mg_N_L")
+
+ggplot(no3, aes(PairTest, meanConc, fill = PairTest)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("#B2ABD2", "#FDB863")) +
+  facet_wrap(~Study_ID, scales = "free") +
+  ggtitle("NO3") +
+  theme_bw()
+
+no3 %>% filter(Study_ID == "Caldwell et al. 2020") %>% 
+  ggplot(aes(PairTest, meanConc, fill = PairTest)) +
+  geom_boxplot() +
+  geom_signif(comparisons = list(c("Control", "Impact"),
+              map_signif_level = TRUE)) +
+  scale_fill_manual(values = c("#B2ABD2", "#FDB863")) +
+  ggtitle("NO3") +
+  theme_bw()
+
+
+
+
+```
