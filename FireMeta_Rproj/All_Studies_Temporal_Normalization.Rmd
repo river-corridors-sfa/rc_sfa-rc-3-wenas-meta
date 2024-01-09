@@ -480,9 +480,13 @@ write_csv(yearly_effect_size_combine_long, here("Output_for_analysis", "Effect_S
 
 # Calculating a confidence interval for all of the effect sizes
 ```{r}
+yearly_effect_size_combine_long_climate <- yearly_effect_size_combine_long %>% 
+  filter(Study_ID != "Abbott et al. 2021",
+         Study_ID != "Rhea et al. 2021")
+
 # calculating the mean percent_difference by climate
-climate_summary_effect <- yearly_effect_size_combine_long %>%
-  group_by(Climate, response_var, Biome) %>%
+climate_summary_effect <- yearly_effect_size_combine_long_climate %>%
+  group_by(response_var, Climate) %>%
   summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
             sd_effect = sd(Effect_size, na.rm = TRUE),
             n_effect = n(),
@@ -490,7 +494,6 @@ climate_summary_effect <- yearly_effect_size_combine_long %>%
   mutate(se_effect = sd_effect / sqrt(n_effect),
          lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
          upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
-
 
 # Calculating a confidence interval for all of the effect sizes
 # calculating the mean effect_size by climate
@@ -504,9 +507,7 @@ TSF_summary_effect <- yearly_effect_size_combine_long %>%
          lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
          upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
 
-
 ```
-
 
 
 
@@ -516,12 +517,12 @@ TSF_summary_effect <- yearly_effect_size_combine_long %>%
 vn = expression(paste(""*N*O[3]^"-"))
 
 # within 5 years #
-under_ten <- yearly_effect_size_combine_long %>% 
+under_ten <- yearly_effect_size_combine_long_climate %>% 
   filter(!Time_Since_Fire == ">10") 
 
-no_dwc <- climate_summary_effect %>% 
-  filter(!Climate == "Dwc",
-         !Climate == "Dfc")  # Removing the abbott and Rhea paper that is greater than 5 years from TSF
+# no_dwc <- climate_summary_effect %>% 
+#   filter(!Climate == "Dwc",
+#          !Climate == "Dfc")  # Removing the abbott and Rhea paper that is greater than 5 years from TSF
 
 # Count how many watersheds are being included for the climate analysis #
 under_ten_long <- under_ten %>% 
@@ -546,16 +547,17 @@ sum(count_climate$n)
 
 write_csv(count_climate, "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/Output_for_analysis/Climate_count.csv")
 
-
 # 58 watersheds are included in the climate analysis 
 
 # geom_jitter for climate for studies within 5 years # 
+
+#
 ggplot(under_ten, aes(Effect_size, Climate, color = response_var),
        position = position_dodge(width = -0.5)) +
   geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
   geom_pointrange(aes(xmin = lower_ci_effect, xmax = upper_ci_effect,
                       color = response_var),
-                  position = position_dodge(width = -0.5), size = 1.5, data = no_dwc) +
+                  position = position_dodge(width = -0.5), size = 1.5, data = climate_summary_effect) +
   geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
   xlim(-6.5, 8.5) +
   ylab("Koppen (Climate Classification)") +
@@ -668,6 +670,45 @@ ggsave("Effect_Size_TSF_Horizontal.pdf",
 
 
 ```
+
+
+```{r testing Confidence intervals}
+# Confidence Interval just for Cfa
+cfa <- yearly_effect_size_combine_long %>% 
+  filter(Climate == "Cfa")
+
+cfa_summary_effect <- cfa %>% 
+  group_by(response_var, Climate) %>% 
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>%
+  mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
+
+# Testing CI for climate #
+#
+ggplot(under_ten, aes(Effect_size, Climate, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(xmin = lower_ci_effect, xmax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 0.75, data = climate_summary_effect)
+
+
+# Testing CI for TSF
+ggplot(yearly_effect_size_combine_long, aes(Time_Since_Fire, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = TSF_summary_effect)
+#
+
+
+```
+
 
 
 ```{r AGU plots}

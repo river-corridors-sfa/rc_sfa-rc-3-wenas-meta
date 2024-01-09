@@ -1,8 +1,11 @@
 ---
 title: "Wenas_Effect_Size_Models"
-output: html_document
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
 date: "2023-11-16"
-editor_options: 
+editor_options:
   chunk_output_type: console
 ---
 
@@ -27,7 +30,7 @@ Our model:Effect_size ~ burn_percentage*TSF + (1|Site)
 # ==============================================================================
 
 ## Geospatial data
-```{r Jake/Mac Load Packages and}
+```{r Jake/Mac Load Packages}
 #for Jake/mac
 
 rm(list=ls(all=T)) #this clears your Environment
@@ -48,6 +51,7 @@ library(ggpmisc)
 library(RColorBrewer)
 library(ggbreak)
 library(lmerTest)
+library(car)
 ```
 
 ```{r load in csv's}
@@ -345,6 +349,30 @@ plotREsim(REsim(doc_climate_mixed))
 
 ```
 
+```{r DOC levenes test}
+doc_climate_levene <- effect_size_doc %>% 
+  filter(Study_ID != "Abbott et al. 2021",
+         Study_ID != "Rhea et al. 2021") # Eliminating studies that monitor sites that are greater than 10 years post-fire
+
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ Climate, data = doc_climate_levene) #F-value: 66.819, p-value: <2.2e-16, Df: 4, 44
+
+# plot 
+
+boxplot(Effect_size ~ Climate,
+  data = doc_climate_levene,
+  main = "Effect size Distribution by Climate - DOC",
+  xlab = "Climate",
+  ylab = "Effect Size",
+  col = "steelblue",
+  border = "black")
+```
+The p-value of the test is <2.2e-16, which is less than our significance level of 0.05. 
+Thus, we reject the null hypothesis and conclude that the variance among the climate groups is NOT equal. 
+
+From the plot, Csa (Hot-Mediterranean) is the most variable. Now we have to think about why?
+
 ```{r NO3 climate models}
 no3_climate_mixed <-  lmer(Effect_size ~ Climate + (1 | site), data = no3_effect_size_burn_merged)
 
@@ -361,6 +389,39 @@ REsim(no3_climate_mixed)
 plotREsim(REsim(no3_climate_mixed))
 
 ```
+
+```{r NO3 levenes test}
+no3_climate_levene <- effect_size_no3 %>% 
+  filter(Study_ID != "Abbott et al. 2021",
+         Study_ID != "Rhea et al. 2021") # Eliminating studies that monitor sites that are greater than 10 years post-fire
+
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ Climate, data = no3_climate_levene) #F-value: 2.8984, p-value: 0.008966, Df: 7,88
+
+# plot 
+
+boxplot(Effect_size ~ Climate,
+  data = no3_climate_levene,
+  main = "Effect size Distribution by Climate - NO3",
+  xlab = "Climate",
+  ylab = "Effect Size",
+  col = "steelblue",
+  border = "black")
+
+```
+The p-value of the test is 0.008966, which is less than our significance level of 0.05. 
+Thus, we reject the null hypothesis and conclude that the variance among the climate groups is NOT equal. 
+
+"BSk" = "Cold semi-arid"
+"Cfb" = "Subtropical highland",
+"Csa" = "Hot-Mediterranean",
+"Csb" = "Warm-Mediterranean",
+"Dfb" = "Warm-humid",
+"Dfc" = "Subarctic",
+
+"Dsb" = "Mediterranean", 
+"Cfa" = "Humid subtropical",
 
 
 ### TSF models
@@ -381,6 +442,28 @@ plotREsim(REsim(doc_tsf_mixed))
 
 ```
 
+```{r DOC levenes test}
+effect_size_doc$Time_Since_Fire <- factor(effect_size_doc$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", ">10")) # reordering to make sure that the >10 year bin is at the end of the plot to visualize through time. 
+
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ Time_Since_Fire, data = effect_size_doc) #F-value: 0.73 p-value: 0.6277, Df: 6, 48
+
+# plot 
+
+boxplot(Effect_size ~ Time_Since_Fire,
+  data = effect_size_doc,
+  main = "Effect size Distribution by Time Since Fire - DOC",
+  xlab = "Time Since Fire",
+  ylab = "Effect Size",
+  col = "steelblue",
+  border = "black") 
+
+```
+The p-value of the test is 0.73, which is greater than our significance level of 0.05. 
+Thus, we do not reject the null hypothesis and conclude that the variance among the climate groups is equal. 
+
+
 ```{r NO3 TSF models}
 no3_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | site), data = no3_effect_size_burn_merged)
 
@@ -397,6 +480,29 @@ REsim(no3_tsf_mixed)
 plotREsim(REsim(no3_tsf_mixed))
 
 ```
+
+```{r NO3 levenes test}
+effect_size_no3$Time_Since_Fire <- factor(effect_size_no3$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", ">10")) # reordering to make sure that the >10 year bin is at the end of the plot to visualize through time. 
+
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ Time_Since_Fire, data = effect_size_no3) #F-value: 2.4422, p-value: 0.03067, Df: 6,95
+
+# plot 
+
+boxplot(Effect_size ~ Time_Since_Fire,
+  data = effect_size_no3,
+  main = "Effect size Distribution by Time Since Fire - NO3",
+  xlab = "Time Since Fire",
+  ylab = "Effect Size",
+  col = "steelblue",
+  border = "black")
+
+
+```
+The p-value of the test is 0.03067, which is less than our significance level of 0.05. 
+Thus, we reject the null hypothesis and conclude that the variance among the time since fire groups is NOT equal. 
+
 
 # Make the same TSF plot but with Burn percentage #
 
