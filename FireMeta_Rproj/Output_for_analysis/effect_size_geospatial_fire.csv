@@ -1,0 +1,180 @@
+Study_ID,Fire_name,Fire_year,site,comid,totdasqkm,streamorde,burn_percentage,Climate,Biome,Time_Since_Fire,response_var,Effect_size
+Burd et al 2018,Northwest Territories Fire,2013,NA,NA,NA,NA,NA,Dfc,Cold,3,DOC_Interp,-0.8074667025846229
+"Coombs & Melack, 2013",Gaviota Fire,2004,San Onofre,17594757,5.3586,1,98.9419,BSk,Arid,0,NO3_Interp,1.75295228052377
+"Coombs & Melack, 2013",Gaviota Fire,2004,Gaviota,17594763,52.1721,3,12.969,BSk,Arid,0,NO3_Interp,-2.0473966314124756
+"Coombs & Melack, 2013",Gaviota Fire,2004,Arroyo Hondo,17594741,11.2635,2,16.4842,BSk,Arid,0,NO3_Interp,-0.2030079720285851
+"Coombs & Melack, 2013",Gaviota Fire,2004,San Onofre,17594757,5.3586,1,98.9419,BSk,Arid,1,NO3_Interp,1.702459542946486
+"Coombs & Melack, 2013",Gaviota Fire,2004,Gaviota,17594763,52.1721,3,12.969,BSk,Arid,1,NO3_Interp,-1.8565999926447945
+"Coombs & Melack, 2013",Gaviota Fire,2004,Arroyo Hondo,17594741,11.2635,2,16.4842,BSk,Arid,1,NO3_Interp,0.17335251790747283
+"Gerla & Galloway, 1998",Clover-Mist Wildfire,1988,Jones Creek,12794005,64.9602,1,96.1969,Dfc,Cold,1,NO3_Interp,-0.9404498708553406
+"Gerla & Galloway, 1998",Clover-Mist Wildfire,1988,Jones Creek,12794005,64.9602,1,96.1969,Dfc,Cold,2,NO3_Interp,0.8469826044301482
+"Gerla & Galloway, 1998",Clover-Mist Wildfire,1988,Jones Creek,12794005,64.9602,1,96.1969,Dfc,Cold,3,NO3_Interp,0.9767219657876396
+"Gerla & Galloway, 1998",Clover-Mist Wildfire,1988,Jones Creek,12794005,64.9602,1,96.1969,Dfc,Cold,4,NO3_Interp,1.3512432699490873
+"Gerla & Galloway, 1998",Clover-Mist Wildfire,1988,Jones Creek,12794005,64.9602,1,96.1969,Dfc,Cold,5,NO3_Interp,0.8936477010811649
+"Gluns & Toews, 1989",Matt fire,1985,NA,NA,NA,NA,NA,Dfc,Cold,0,NO3_Interp,2.1175380180518832
+"Gluns & Toews, 1989",Matt fire,1985,NA,NA,NA,NA,NA,Dfc,Cold,0,NO3_Interp,1.5124370882941682
+"Gluns & Toews, 1989",Matt fire,1985,NA,NA,NA,NA,NA,Dfc,Cold,1,NO3_Interp,2.043287391906721
+"Gluns & Toews, 1989",Matt fire,1985,NA,NA,NA,NA,NA,Dfc,Cold,1,NO3_Interp,1.7902711083086134
+"Gluns & Toews, 1989",Matt fire,1985,NA,NA,NA,NA,NA,Dfc,Cold,2,NO3_Interp,2.4793176404333854
+"Gluns & Toews, 1989",Matt fire,1985,NA,NA,NA,NA,NA,Dfc,Cold,2,NO3_Interp,2.175364252047078
+"Gluns & Toews, 1989",Matt fire,1985,NA,NA,NA,NA,NA,Dfc,Cold,3,NO3_Interp,1.8413502470540644
+"Gluns & Toews, 1989",Matt fire,1985,NA,NA,NA,NA,NA,Dfc,Cold,3,NO3_Interp,1.8853069011924857
+"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,1,DOC_Interp,-0.05198944083147036
+"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,1,DOC_Interp,-0.23267430480315815
+"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,2,DOC_Interp,-0.05485661026893528
+"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,3,DOC_Interp,-0.33386212088645906
+"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,4,DOC_Interp,-0.06876044186758228
+"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,1,NO3_Interp,0.9217624797354468
+"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,2,NO3_Interp,0.6938414248359014
+"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,3,NO3_Interp,0.6238798035979927
+"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,4,NO3_Interp,0.4513944740791651
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,1,DOC_Interp,-0.02209144774333893
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,1,DOC_Interp,-0.09143869394625465
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,1,DOC_Interp,-0.4759788799445507
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,2,DOC_Interp,-0.30682413734353803
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,2,DOC_Interp,-0.35352180878763056
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,2,DOC_Interp,-0.41287873547224674
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,3,DOC_Interp,-0.3312863465111103
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,3,DOC_Interp,-0.4227882497149223
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,3,DOC_Interp,-0.5499098148014181
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,1,NO3_Interp,1.2334337255408905
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,1,NO3_Interp,0.8906940242456102
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,1,NO3_Interp,-0.05699676485766621
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,2,NO3_Interp,0.2945684815767112
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,2,NO3_Interp,1.6229567188536114
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,2,NO3_Interp,2.1167271828264864
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,3,NO3_Interp,1.1134630802037473
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,3,NO3_Interp,2.138023384509159
+Murphy et al. 2015,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,3,NO3_Interp,1.1987594531267192
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,0,DOC_Interp,-0.19586948633799223
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,0,DOC_Interp,-0.02058262147733873
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,0,DOC_Interp,-0.09253034556904192
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,0,DOC_Interp,-0.2794571534661146
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,0,DOC_Interp,-0.5290874956151702
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,2,DOC_Interp,-0.4059504771372809
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,2,DOC_Interp,-0.42051599123248457
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,2,DOC_Interp,-0.504700788827816
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,3,DOC_Interp,-0.4838929792642086
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,3,DOC_Interp,-0.5412446599785048
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,3,DOC_Interp,-0.6939952120636859
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,4,DOC_Interp,-0.3881077782646473
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,4,DOC_Interp,-0.5762560227751916
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,4,DOC_Interp,-0.7185013536732262
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,5,DOC_Interp,-0.3676420649753068
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,5,DOC_Interp,-0.5510697334216398
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,5,DOC_Interp,-0.7218292413374722
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,0,NO3_Interp,-0.9251679798500448
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,0,NO3_Interp,-0.5401482686656407
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,0,NO3_Interp,0.34874637041195555
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,0,NO3_Interp,0.4924902954548207
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,0,NO3_Interp,-0.5324776921953114
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,2,NO3_Interp,0.4896719200329616
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,2,NO3_Interp,1.0609399607508578
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,2,NO3_Interp,0.6606550881027107
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,3,NO3_Interp,0.5260874760635659
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,3,NO3_Interp,0.9631628551436824
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,3,NO3_Interp,0.5319120776509874
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,4,NO3_Interp,0.10679525211943049
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,4,NO3_Interp,0.3707771777527453
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,4,NO3_Interp,-0.04505357676425826
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,5,NO3_Interp,0.27085562181965056
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,5,NO3_Interp,0.5277273450124165
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,5,NO3_Interp,0.13000465508024311
+"Neary & Currier, 1982",Jumping Branch Wildfire,NA,NA,NA,NA,NA,NA,Cfa,Temperate,0,NO3_Interp,1.5739271177981005
+"Neary & Currier, 1982",Jumping Branch Wildfire,NA,NA,NA,NA,NA,NA,Cfa,Temperate,1,NO3_Interp,0.7765290563903371
+Oliver et al. 2012,Angora Fire,2007,Site 2,8943617,8.0658,2,76.4673,Csb,Temperate,1,NO3_Interp,0.7146311795090584
+Oliver et al. 2012,Angora Fire,2007,Site 3,8943613,130.7673,3,6.7889,Csb,Temperate,1,NO3_Interp,0.1083671999910158
+Oliver et al. 2012,Angora Fire,2007,NA,NA,NA,NA,NA,Csb,Temperate,1,NO3_Interp,-1.2564969709571707
+Oliver et al. 2012,Angora Fire,2007,Site 2,8943617,8.0658,2,76.4673,Csb,Temperate,2,NO3_Interp,-0.5396214946346434
+Oliver et al. 2012,Angora Fire,2007,Site 3,8943613,130.7673,3,6.7889,Csb,Temperate,2,NO3_Interp,-1.76671099295381
+Oliver et al. 2012,Angora Fire,2007,NA,NA,NA,NA,NA,Csb,Temperate,2,NO3_Interp,-2.169919002561115
+Rhea et al. 2021,Hayman Fire_High Park Fire,2002_2012,NA,NA,NA,NA,NA,Dfc,Cold,>10,DOC_Interp,0.4142753540035392
+Rhea et al. 2021,Hayman Fire_High Park Fire,2002_2012,NA,NA,NA,NA,NA,Dfc,Cold,>10,NO3_Interp,3.3673554612544394
+"Tiedemann, 1997",NA,NA,NA,NA,NA,NA,NA,Dsb,Cold,0,NO3_Interp,0.700384479651557
+"Tiedemann, 1997",NA,NA,NA,NA,NA,NA,NA,Dsb,Cold,1,NO3_Interp,2.032749426158762
+"Tiedemann, 1997",NA,NA,NA,NA,NA,NA,NA,Dsb,Cold,2,NO3_Interp,3.4497656138466612
+Uzun et al. 2020,Rocky Fire_Wragg Fire,2015,Rocky Fire,8009327,2390.2362,6,12.8141,Csa,Temperate,1,DOC_Interp,-3.5873302571008643
+Uzun et al. 2020,Rocky Fire_Wragg Fire,2015,Wragg Fire,15032969,16.5357,2,70.0648,Csa,Temperate,1,DOC_Interp,-2.781397262801667
+Uzun et al. 2020,Rocky Fire_Wragg Fire,2015,Rocky Fire,8009327,2390.2362,6,12.8141,Csa,Temperate,2,DOC_Interp,-3.488635457510704
+Uzun et al. 2020,Rocky Fire_Wragg Fire,2015,Wragg Fire,15032969,16.5357,2,70.0648,Csa,Temperate,2,DOC_Interp,-2.8617192837255008
+Uzun et al. 2020,Rocky Fire_Wragg Fire,2015,Rocky Fire,8009327,2390.2362,6,12.8141,Csa,Temperate,1,NO3_Interp,-2.343905190475006
+Uzun et al. 2020,Rocky Fire_Wragg Fire,2015,Wragg Fire,15032969,16.5357,2,70.0648,Csa,Temperate,1,NO3_Interp,-1.4038784576475674
+Uzun et al. 2020,Rocky Fire_Wragg Fire,2015,Rocky Fire,8009327,2390.2362,6,12.8141,Csa,Temperate,2,NO3_Interp,-2.523624055603431
+Uzun et al. 2020,Rocky Fire_Wragg Fire,2015,Wragg Fire,15032969,16.5357,2,70.0648,Csa,Temperate,2,NO3_Interp,-1.9038360329879964
+Wagner et al. 2015,High Park Fire,2012,PSF,2899449,693.8973,4,1.5243,Dfb,Cold,1,DOC_Interp,-0.4217573948728868
+Wagner et al. 2015,High Park Fire,2012,PNF,2900989,1254.2697,5,16.7187,Dfb,Cold,1,DOC_Interp,-0.6091057775083416
+Writer et al. 2014,Hewlett Gulch_High Park fire,2012_2012,PNF,2900989,1254.2697,5,16.7187,Dfb,Cold,0,DOC_Interp,-0.3651480585147016
+Writer et al. 2014,Hewlett Gulch_High Park fire,2012_2012,PSF,2899449,693.8973,4,1.5243,Dfb,Cold,0,DOC_Interp,-0.4623748929438658
+Writer et al. 2014,Hewlett Gulch_High Park fire,2012_2012,PNF,2900989,1254.2697,5,16.7187,Dfb,Cold,1,DOC_Interp,-0.619805853304341
+Writer et al. 2014,Hewlett Gulch_High Park fire,2012_2012,PSF,2899449,693.8973,4,1.5243,Dfb,Cold,1,DOC_Interp,-0.3994634277186648
+Writer et al. 2014,Hewlett Gulch_High Park fire,2012_2012,PNF,2900989,1254.2697,5,16.7187,Dfb,Cold,0,NO3_Interp,-0.22445633786858216
+Writer et al. 2014,Hewlett Gulch_High Park fire,2012_2012,PSF,2899449,693.8973,4,1.5243,Dfb,Cold,0,NO3_Interp,-0.1726924417168119
+Writer et al. 2014,Hewlett Gulch_High Park fire,2012_2012,PNF,2900989,1254.2697,5,16.7187,Dfb,Cold,1,NO3_Interp,-0.73752899074672
+Writer et al. 2014,Hewlett Gulch_High Park fire,2012_2012,PSF,2899449,693.8973,4,1.5243,Dfb,Cold,1,NO3_Interp,0.6342845717183738
+Hauer & Spencer 1998,Red Bench Fire,1988,Red_Bench_Creek,22950879,1.9386,1,100,Dfc,Cold,1,NO3_Interp,1.911426272610421
+Hauer & Spencer 1998,Red Bench Fire,1988,Red_Meadow_Creek,22949989,77.9949,3,24.087,Dfc,Cold,1,NO3_Interp,1.872308461156119
+Hauer & Spencer 1998,Red Bench Fire,1988,Akokala_Creek,22949619,105.8112,3,13.8379,Dfc,Cold,1,NO3_Interp,2.332128722301076
+Hauer & Spencer 1998,Red Bench Fire,1988,Quartz_Creek,22949475,136.8477,3,27.0952,Dfc,Cold,1,NO3_Interp,2.4314632577693227
+Hauer & Spencer 1998,Red Bench Fire,1988,Red_Bench_Creek,22950879,1.9386,1,100,Dfc,Cold,2,NO3_Interp,0.9052735213660048
+Hauer & Spencer 1998,Red Bench Fire,1988,Red_Meadow_Creek,22949989,77.9949,3,24.087,Dfc,Cold,2,NO3_Interp,1.7931305712867058
+Hauer & Spencer 1998,Red Bench Fire,1988,Akokala_Creek,22949619,105.8112,3,13.8379,Dfc,Cold,2,NO3_Interp,2.2632756340805606
+Hauer & Spencer 1998,Red Bench Fire,1988,Quartz_Creek,22949475,136.8477,3,27.0952,Dfc,Cold,2,NO3_Interp,2.1956752619491127
+Hauer & Spencer 1998,Red Bench Fire,1988,Red_Bench_Creek,22950879,1.9386,1,100,Dfc,Cold,3,NO3_Interp,0.5730656823751883
+Hauer & Spencer 1998,Red Bench Fire,1988,Red_Meadow_Creek,22949989,77.9949,3,24.087,Dfc,Cold,3,NO3_Interp,2.123237518978183
+Hauer & Spencer 1998,Red Bench Fire,1988,Akokala_Creek,22949619,105.8112,3,13.8379,Dfc,Cold,3,NO3_Interp,1.1968588798283115
+Hauer & Spencer 1998,Red Bench Fire,1988,Bowman_Creek,22949571,137.0853,3,5.7229,Dfc,Cold,3,NO3_Interp,1.2844252245417789
+Hauer & Spencer 1998,Red Bench Fire,1988,Quartz_Creek,22949475,136.8477,3,27.0952,Dfc,Cold,3,NO3_Interp,1.4865638267876355
+Hauer & Spencer 1998,Red Bench Fire,1988,Red_Bench_Creek,22950879,1.9386,1,100,Dfc,Cold,4,NO3_Interp,0.6206869330306183
+Hauer & Spencer 1998,Red Bench Fire,1988,Red_Meadow_Creek,22949989,77.9949,3,24.087,Dfc,Cold,4,NO3_Interp,2.355939128240543
+Hauer & Spencer 1998,Red Bench Fire,1988,Akokala_Creek,22949619,105.8112,3,13.8379,Dfc,Cold,4,NO3_Interp,1.144040408000032
+Hauer & Spencer 1998,Red Bench Fire,1988,Bowman_Creek,22949571,137.0853,3,5.7229,Dfc,Cold,4,NO3_Interp,0.5376175802346618
+Hauer & Spencer 1998,Red Bench Fire,1988,Red_Bench_Creek,22950879,1.9386,1,100,Dfc,Cold,5,NO3_Interp,0.16719947859094442
+Hauer & Spencer 1998,Red Bench Fire,1988,Red_Meadow_Creek,22949989,77.9949,3,24.087,Dfc,Cold,5,NO3_Interp,2.4331464456086973
+Hauer & Spencer 1998,Red Bench Fire,1988,Akokala_Creek,22949619,105.8112,3,13.8379,Dfc,Cold,5,NO3_Interp,1.464134057717891
+Hauer & Spencer 1998,Red Bench Fire,1988,Bowman_Creek,22949571,137.0853,3,5.7229,Dfc,Cold,5,NO3_Interp,0.8274961058239492
+Hickenbottom et al. 2023,Caldor Fire_Mosquito Fire,2021_2022,NA,NA,NA,NA,NA,Csb,Temperate,0,DOC_Interp,0.6030917563718091
+Hickenbottom et al. 2023,Caldor Fire_Mosquito Fire,2021_2022,NA,NA,NA,NA,NA,Csb,Temperate,1,DOC_Interp,-0.00482902444212002
+Hickenbottom et al. 2023,Caldor Fire_Mosquito Fire,2021_2022,NA,NA,NA,NA,NA,Csb,Temperate,1,DOC_Interp,0.2765406443670772
+Hickenbottom et al. 2023,Caldor Fire_Mosquito Fire,2021_2022,NA,NA,NA,NA,NA,Csb,Temperate,0,NO3_Interp,0.5604775611436323
+Hickenbottom et al. 2023,Caldor Fire_Mosquito Fire,2021_2022,NA,NA,NA,NA,NA,Csb,Temperate,1,NO3_Interp,0.4248453259394459
+Hickenbottom et al. 2023,Caldor Fire_Mosquito Fire,2021_2022,NA,NA,NA,NA,NA,Csb,Temperate,1,NO3_Interp,-0.919819570352142
+Crandall et al. 2021,Pole Creek Fire Complex,2018,Benjamin Slough,10349048,337.365,3,67,Csa,Temperate,0,DOC_Interp,0.809328715796117
+Crandall et al. 2021,Pole Creek Fire Complex,2018,Payson,10350360,70.5753,3,90,Csa,Temperate,0,DOC_Interp,-0.501232466511102
+Crandall et al. 2021,Pole Creek Fire Complex,2018,Spanish Fork Lower,10349108,2010.5073,5,24,Csa,Temperate,0,DOC_Interp,0.62791521729215
+Crandall et al. 2021,Pole Creek Fire Complex,2018,Spanish Fork Upper,10349244,1642.5162,5,25,Csa,Temperate,0,DOC_Interp,0.802869522035744
+Crandall et al. 2021,Pole Creek Fire Complex,2018,Benjamin Slough,10349048,337.365,3,67,Csa,Temperate,0,NO3_Interp,1.28743921860061
+Crandall et al. 2021,Pole Creek Fire Complex,2018,Payson,10350360,70.5753,3,90,Csa,Temperate,0,NO3_Interp,-4.24608696789537
+Crandall et al. 2021,Pole Creek Fire Complex,2018,Spanish Fork Lower,10349108,2010.5073,5,24,Csa,Temperate,0,NO3_Interp,0.361724196267397
+Crandall et al. 2021,Pole Creek Fire Complex,2018,Spanish Fork Upper,10349244,1642.5162,5,25,Csa,Temperate,0,NO3_Interp,-1.01399784917132
+Abbott et al. 2021,Anaktuvuk River wildfire,2007,NA,NA,NA,NA,NA,Dwc,Cold,>10,DOC_Interp,0.428539313567996
+Abbott et al. 2021,Anaktuvuk River wildfire,2007,NA,NA,NA,NA,NA,Dwc,Cold,>10,DOC_Interp,0.404794545407272
+Abbott et al. 2021,Anaktuvuk River wildfire,2007,NA,NA,NA,NA,NA,Dwc,Cold,>10,NO3_Interp,0.61270234501971
+Abbott et al. 2021,Anaktuvuk River wildfire,2007,NA,NA,NA,NA,NA,Dwc,Cold,>10,NO3_Interp,0.730540647216058
+Rhea et al. 2021,Hayman Fire_High Park Fire,2002_2012,NA,NA,NA,NA,NA,Dfc,Cold,>10,DOC_Interp,0.67513692475464
+Rhea et al. 2021,Hayman Fire_High Park Fire,2002_2012,NA,NA,NA,NA,NA,Dfc,Cold,>10,DOC_Interp,-0.774248595960927
+Rhea et al. 2021,Hayman Fire_High Park Fire,2002_2012,NA,NA,NA,NA,NA,Dfc,Cold,>10,DOC_Interp,-0.786783811960335
+Rhea et al. 2021,Hayman Fire_High Park Fire,2002_2012,NA,NA,NA,NA,NA,Dfc,Cold,>10,NO3_Interp,2.1593115537283
+Rhea et al. 2021,Hayman Fire_High Park Fire,2002_2012,NA,NA,NA,NA,NA,Dfc,Cold,>10,NO3_Interp,3.2167748383195
+Rhea et al. 2021,Hayman Fire_High Park Fire,2002_2012,NA,NA,NA,NA,NA,Dfc,Cold,>10,NO3_Interp,2.65582826001489
+"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Fish Creek,22958009,37.1574,3,72.86,NA,NA,NA,NA,NA
+"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Lower MacDonald Creek,22957903,459.8946,4,31.3921,NA,NA,NA,NA,NA
+"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Upper MacDonald Creek,22957933,287.7372,4,24.9105,NA,NA,NA,NA,NA
+Andres Sanchez et al. 2023,Thompson Ridge Wildfire,2013,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Bayley et al. 1992,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Bayley et al. 1992,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+"Betts & Jones, 2009",Boundary Fire,2004,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Bladon et al. 2008,Lost Creek Wildfire,2003,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Caldwell et al. 2020,Camp Branch Fire_Tellico Fire,2016,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Chow et al. 2019,Hayman Fire,2002,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Goodale et al. 2000,Historic Fires,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Hall & Lombardozzi 2008,Hayman Fire,2002,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Harris et al. 2015,No name given,2007,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Hohner et al. 2016,Hewlett Gulch_High Park fire,2012_2012,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Klose et al. 2015,Jesusita Fire,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Mast et al. 2016,Fern Lake,2012,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Rhoades et al. 2011,Hayman Fire,2002,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Rhoades et al. 2019,Hayman Fire,2002,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Santos et al. 2019,Yosemite NP Fire,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Stephan et al. 2015,No name given,2002,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Tiedemann 1973,Safety Harbor Fire,1970,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+"Writer & Murphy, 2012",Fourmile Canyon Fire,2010,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA

@@ -5,7 +5,7 @@ date: "2023-10-19"
 editor_options: 
   chunk_output_type: console
 ---
-The purpose of this script is map the map figure 
+The purpose of this script is create the map figure 
 
 Script Workflow:
 
@@ -45,25 +45,19 @@ library(sf)
 library(RColorBrewer)
 ```
 
-```{r}
+This is the workflow to read in the meta analysis studies and the fires they are studying and then loading in a CONUS map and plotting our data on top of that
+```{r load in fire names and associated study}
 
 meta <- read_csv(here("inputs", "Studies_Summary", "Studies_included_in_climate_figure.csv")) # reading in filtered meta data sheet
 
 coords <- meta %>% 
-  select(Fire_Name, Lat, Long, number_of_burn, State, group)
+  select(Fire_Name, Lat, Long, number_of_burn, State, group) # Picking only the columns I want 
 
-# attempt to make sites bigger size with more sites
-
-
-# Load your CSV file with coordinates and conditional variable
-# Replace "your_data.csv" with the actual file path and name
-data <- coords %>% 
+coords_noNA <- coords %>% 
     drop_na(Fire_Name)
-
-# Assuming your CSV file has columns "longitude", "latitude", and "conditional_variable"
-
+ 
 # Create an sf object from the data
-coordinates <- st_as_sf(data, coords = c("Long", "Lat"), crs = 4326)
+coordinates_sf <- st_as_sf(coords_noNA, coords = c("Long", "Lat"), crs = 4326)
 
 # Download the United States map shapefile from the US Census Bureau
 # Replace "cb_2019_us_state_20m.zip" with the most recent shapefile available
@@ -77,7 +71,7 @@ us_states <- st_read("us_states/cb_2021_us_state_20m.shp")
 # Plot the map with points
 ggplot() +
   geom_sf(data = us_states, fill = "white", color = "black") +
-  geom_sf(data = coordinates, aes(color = Fire_Name)) +
+  geom_sf(data = coordinates_sf, aes(color = Fire_Name)) +
   xlim(-125, -68) +
   scale_size_continuous(range = c(1, 10)) +
   labs(title = "Points on US Map with Conditional Variable") +
@@ -98,7 +92,7 @@ ggplot() +
 "black"
 ggplot() +
   geom_sf(data = us_states, fill = "white", color = "black") +
-  geom_sf(data = coordinates, aes(size = number_of_burn, color = Fire_Name)) +
+  geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_Name)) +
   scale_size_continuous(guide = guide_legend(title = "")) +
   scale_color_manual(values = c("#666666", "#A6CEE3", "#00AFBB", "#1B9E77",
                                 "#7570B3", "#E7298A", "darkred", "black", 
@@ -120,82 +114,86 @@ ggsave("climate_figure_map.pdf",
 ```
 
 
+### Dataframe for Xia to make a map ###
 
 
 
-```{r}
+
+
+
+```{r graveyard code }
 # Plot the high park fire
-shapefile <- st_read("co4058910540420120609_20110912_20130901_burn_bndy.shp")
-
-
-ggplot() +
-  geom_sf(data = shapefile, aes(fill = "red")) +
-  theme_bw()
-
-ggplot() +
-  geom_sf(data = shapefile, aes(fill = "red")) +
-  scale_fill_viridis_c(option = "A") +
-  labs(title = "Your Shapefile Plot", fill = "Legend Title")
-
-# Plot multiple fires
-angora <- st_read(here("gis_data", "Fire_Perimeters", "Angora", "ca3888612004020070623_20060812_20080630_burn_bndy.shp"))
-
-caldor <- st_read(here("gis_data", "Fire_Perimeters", "Caldor", "ca3858612053820210815_20210805_20220723_burn_bndy.shp"))
-
-camp_branch <- st_read(here("gis_data", "Fire_Perimeters", "Camp_Branch", "nc3516508354120161123_20151219_20161221_burn_bndy.shp"))
-
-clovermist <- st_read(here("gis_data", "Fire_Perimeters", "Clovermist", "wy4473710995419880709_19860818_19890802_burn_bndy.shp"))
-
-fern_lake <- st_read(here("gis_data", "Fire_Perimeters", "Fern_Lake", "co4036110556320121009_20100925_20130917_burn_bndy.shp"))
-
-four_mile <- st_read(here("gis_data", "Fire_Perimeters", "Fourmile_Canyon", "co4005110538520100906_20100621_20110624_burn_bndy.shp"))
-
-gaviota <- st_read(here("gis_data", "Fire_Perimeters", "Gaviota", "ca3448712019620040605_20040425_20050412_burn_bndy.shp"))
-  
-high_park <- st_read(here("gis_data", "Fire_Perimeters", "High_Park", "co4058910540420120609_20110912_20130901_burn_bndy.shp"))
-
-hayman <- st_read(here("gis_data", "Fire_Perimeters", "Hayman", "co3922010528720020608_20010824_20030814_burn_bndy.shp"))
-
-rampage <- st_read(here("gis_data", "Fire_Perimeters", "Rampage_Complex", "mt4839411359020030819_20010707_20040715_burn_bndy.shp"))
-
-red_bench <- st_read(here("gis_data", "Fire_Perimeters", "Red_Bench", "mt4878711426219880906_19880819_19890729_burn_bndy.shp"))
-
-rocky <- st_read(here("gis_data", "Fire_Perimeters", "Rocky", "ca3891212249320150729_20140910_20150904_burn_bndy.shp"))
-
-tellico <- st_read(here("gis_data", "Fire_Perimeters", "Tellico", "nc3527408356020161103_20151219_20161221_burn_bndy.shp"))
-
-thompson_ridge <- st_read(here("gis_data", "Fire_Perimeters", "Thompson_Ridge", "nm3589210662020130531_20110608_20140616_burn_bndy.shp"))
-
-wragg <- st_read(here("gis_data", "Fire_Perimeters", "Wragg", "ca3851412213120150722_20150711_20150812_burn_bndy.shp"))
-
-# 15 fires 
-
-
-
-combined_shapefile <- rbind(angora, caldor, camp_branch, clovermist,
-                            fern_lake, four_mile, gaviota, high_park, 
-                            hayman, rampage, red_bench, rocky,
-                            tellico, thompson_ridge, wragg)
-
-ggplot() +
-  geom_sf(data = combined_shapefile, aes(fill = "red"))
-
-ggplot() +
-  geom_sf(data = wragg, aes(fill = "red"))
-
-
-ggplot(data = world) +
-    geom_sf() +
-    geom_point(data = coords, aes(x = Long, y = Lat), size = 4, 
-        shape = 23, fill = "darkred") +
-    geom_sf(data = combined_shapefile, aes(fill = "red")) +
-    coord_sf(xlim = c(-125, -70), ylim = c(24, 55), expand = FALSE) +
-  theme_bw()
-
-ggplot() +
-  geom_sf(data = combined_shapefile, aes(fill = "red")) +
-    coord_sf(xlim = c(-125, -70), ylim = c(24, 55), expand = FALSE)
-  
+# shapefile <- st_read("co4058910540420120609_20110912_20130901_burn_bndy.shp")
+# 
+# 
+# ggplot() +
+#   geom_sf(data = shapefile, aes(fill = "red")) +
+#   theme_bw()
+# 
+# ggplot() +
+#   geom_sf(data = shapefile, aes(fill = "red")) +
+#   scale_fill_viridis_c(option = "A") +
+#   labs(title = "Your Shapefile Plot", fill = "Legend Title")
+# 
+# # Plot multiple fires
+# angora <- st_read(here("gis_data", "Fire_Perimeters", "Angora", "ca3888612004020070623_20060812_20080630_burn_bndy.shp"))
+# 
+# caldor <- st_read(here("gis_data", "Fire_Perimeters", "Caldor", "ca3858612053820210815_20210805_20220723_burn_bndy.shp"))
+# 
+# camp_branch <- st_read(here("gis_data", "Fire_Perimeters", "Camp_Branch", "nc3516508354120161123_20151219_20161221_burn_bndy.shp"))
+# 
+# clovermist <- st_read(here("gis_data", "Fire_Perimeters", "Clovermist", "wy4473710995419880709_19860818_19890802_burn_bndy.shp"))
+# 
+# fern_lake <- st_read(here("gis_data", "Fire_Perimeters", "Fern_Lake", "co4036110556320121009_20100925_20130917_burn_bndy.shp"))
+# 
+# four_mile <- st_read(here("gis_data", "Fire_Perimeters", "Fourmile_Canyon", "co4005110538520100906_20100621_20110624_burn_bndy.shp"))
+# 
+# gaviota <- st_read(here("gis_data", "Fire_Perimeters", "Gaviota", "ca3448712019620040605_20040425_20050412_burn_bndy.shp"))
+#   
+# high_park <- st_read(here("gis_data", "Fire_Perimeters", "High_Park", "co4058910540420120609_20110912_20130901_burn_bndy.shp"))
+# 
+# hayman <- st_read(here("gis_data", "Fire_Perimeters", "Hayman", "co3922010528720020608_20010824_20030814_burn_bndy.shp"))
+# 
+# rampage <- st_read(here("gis_data", "Fire_Perimeters", "Rampage_Complex", "mt4839411359020030819_20010707_20040715_burn_bndy.shp"))
+# 
+# red_bench <- st_read(here("gis_data", "Fire_Perimeters", "Red_Bench", "mt4878711426219880906_19880819_19890729_burn_bndy.shp"))
+# 
+# rocky <- st_read(here("gis_data", "Fire_Perimeters", "Rocky", "ca3891212249320150729_20140910_20150904_burn_bndy.shp"))
+# 
+# tellico <- st_read(here("gis_data", "Fire_Perimeters", "Tellico", "nc3527408356020161103_20151219_20161221_burn_bndy.shp"))
+# 
+# thompson_ridge <- st_read(here("gis_data", "Fire_Perimeters", "Thompson_Ridge", "nm3589210662020130531_20110608_20140616_burn_bndy.shp"))
+# 
+# wragg <- st_read(here("gis_data", "Fire_Perimeters", "Wragg", "ca3851412213120150722_20150711_20150812_burn_bndy.shp"))
+# 
+# # 15 fires 
+# 
+# 
+# 
+# combined_shapefile <- rbind(angora, caldor, camp_branch, clovermist,
+#                             fern_lake, four_mile, gaviota, high_park, 
+#                             hayman, rampage, red_bench, rocky,
+#                             tellico, thompson_ridge, wragg)
+# 
+# ggplot() +
+#   geom_sf(data = combined_shapefile, aes(fill = "red"))
+# 
+# ggplot() +
+#   geom_sf(data = wragg, aes(fill = "red"))
+# 
+# 
+# ggplot(data = world) +
+#     geom_sf() +
+#     geom_point(data = coords, aes(x = Long, y = Lat), size = 4, 
+#         shape = 23, fill = "darkred") +
+#     geom_sf(data = combined_shapefile, aes(fill = "red")) +
+#     coord_sf(xlim = c(-125, -70), ylim = c(24, 55), expand = FALSE) +
+#   theme_bw()
+# 
+# ggplot() +
+#   geom_sf(data = combined_shapefile, aes(fill = "red")) +
+#     coord_sf(xlim = c(-125, -70), ylim = c(24, 55), expand = FALSE)
+#   
 
 
 

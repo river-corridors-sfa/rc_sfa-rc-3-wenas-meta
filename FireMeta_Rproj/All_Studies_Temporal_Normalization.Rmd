@@ -473,7 +473,52 @@ yearly_effect_size_combine_long <- yearly_effect_size_combine_long %>%
                            Study_ID == 'Rhea et al. 2021' ~ "Cold",
                          TRUE ~ Biome))
 
+```
+
+```{r - clean up effect size if there are any mistakes csv}
+
+manual_effect_size <- yearly_effect_size_combine_long 
+
+# burd is good
+# Coombs & Melack is good
+# Gerla & Galloway, 1998 is good
+# Gluns & Toews, 1989 is good
+
+manual_effect_size <- manual_effect_size %>% 
+  mutate(Time_Since_Fire = case_when(Study_ID == 'Mast & Clow, 2008' & 
+                                     year == '2003' ~ "0",
+                                     TRUE ~ Time_Since_Fire))
+# Mast & Clow, 2008 is good 
+# Murphy et al. 2015 is good
+
+manual_effect_size <- manual_effect_size %>% 
+  mutate(Time_Since_Fire = case_when(Study_ID == 'Murphy et al. 2018' & 
+                                     year == '2011' ~ "1",
+                                     TRUE ~ Time_Since_Fire))
+
+# Murphy et al. 2018 is good
+# Neary & Currier, 1982 is good 
+# Oliver et al. 2012 is good 
+manual_effect_size <- manual_effect_size[-c(90:91), ] # eliminating bad Rhea data 
+# Rhea et al. 2021 is good 
+# Tiedemann, 1997 is good 
+# Uzun et al. 2020 is good 
+# Wagner et al. 2015 is good 
+# Writer et al. 2014 is good 
+# Hauer & Spencer 1998 is good 
+# Hickenbottom et al. 2023 is good 
+# Crandall et al. 2021 is good 
+# Abbott et al. 2021 is good
+
+
+yearly_effect_size_combine_long <- manual_effect_size
+
+
+
+
 write_csv(yearly_effect_size_combine_long, here("Output_for_analysis", "Effect_Size.csv"))
+
+
 
 ```
 

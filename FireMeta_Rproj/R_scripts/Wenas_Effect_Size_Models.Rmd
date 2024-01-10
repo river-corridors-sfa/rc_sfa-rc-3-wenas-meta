@@ -194,6 +194,18 @@ fire_clip <- fire_clip %>%
                                      TRUE ~ burn_percentage))
 # These papers report the burn percentages so I manually put them in because the Streamcat data did not pull the proper data. 
 
+# Merge fire_clip, effect_size, studies_data
+effect_size_geospatial <- full_join(effect_size, fire_clip) # merging the effect size and the geospatial dataframes
+
+studies_data$Study_ID <- studies_data$Study # making a new column header to match the effect_size_geospatial dataframe
+
+effect_size_geospatial_fire <- full_join(effect_size_geospatial, studies_data)
+
+effect_size_geospatial_fire <- effect_size_geospatial_fire %>% 
+  dplyr::select(Study_ID, Fire_name, Fire_year, site, comid, totdasqkm, streamorde, burn_percentage, Climate, Biome, Time_Since_Fire, response_var, Effect_size)
+
+write_csv(effect_size_geospatial_fire, here("Output_for_analysis", "effect_size_geospatial_fire.csv"))
+
 ```
 
 ### Burn percentage plots 
@@ -291,6 +303,10 @@ summary(doc_aov)
 # Effect_size ~ burn_percentage*TSF + (1|Site)
 no3_effect_size_burn_merged <- right_join(effect_size_no3, fire_clip) %>% 
   na.omit() 
+
+doc_no3_effect_size <- rbind(no3_effect_size_burn_merged, doc_effect_size_burn_merged)  # merging nitrate and DOC 
+
+write.csv(no3_effect_size_burn_merged, "")
 
 
 ggpairs(no3_effect_size_burn_merged,
@@ -776,5 +792,11 @@ ggsave("DOC_Effect_Size_Burn_Percentage.pdf",
   
 
 ```
+
+
+
+
+
+
 
 
