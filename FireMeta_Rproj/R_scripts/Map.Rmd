@@ -114,10 +114,188 @@ ggsave("climate_figure_map.pdf",
 ```
 
 
-### Dataframe for Xia to make a map ###
+### Xia map making ###
+```{r workflow for a map Xia}
+effect_size_fire <- read_csv(here("Output_for_analysis", "Effect_Size_Geospatial_Fire_Lat_Long.csv")) # effect size data frame with lat longs and geospatial data and fire names
+
+# IF there are no geospatial data (comid, totdasqkm, streamorde, burn_percentage) its because the watersheds couldn't be pulled from the NHD+ database. This might be because:
+    #1) Might be out of the country
+    #2) fires are too old (pre-1984) or too recent (2021-present)
+# There is a subset of papers that were used for the Climate analysis and a subset of papers that were used for the burn percentage analysis due to these factors. So unfortunately this is what we got to work with. 
+
+# Create an sf object from the data
+map_sf <- st_as_sf(effect_size_fire, coords = c("Long", "Lat"), crs = 4326)
+
+# Download the United States map shapefile from the US Census Bureau
+# Replace "cb_2019_us_state_20m.zip" with the most recent shapefile available
+url <- "https://www2.census.gov/geo/tiger/GENZ2021/shp/cb_2021_us_state_20m.zip"
+download.file(url, "us_states.zip", mode = "wb")
+unzip("us_states.zip", exdir = "us_states")
+
+# Read the shapefile
+us_states <- st_read("us_states/cb_2021_us_state_20m.shp")
+
+# Plot the map with points
+ggplot() +
+  geom_sf(data = us_states, fill = "white", color = "black") +
+  geom_sf(data = map_sf, aes(color = Fire_name)) +
+  xlim(-125, -68) +
+  scale_size_continuous(range = c(1, 10)) +
+  labs(title = "Points on US Map with Conditional Variable") +
+  theme_minimal()
+
+
+```
 
 
 
+
+
+
+### Dataframe for Xia to make a map ### - completed on 1/10/2024
+```{r - merge effect size dataframe with the fires dataframe}
+effect_size <- read_csv(here("Output_for_analysis", "effect_size_geospatial_fire.csv"))
+
+meta <- read_csv(here("inputs", "Studies_Summary", "Studies_included_in_climate_figure.csv")) # reading in filtered meta data sheet
+
+meta <- meta %>%
+  rename(Study_ID = Study) # rename Study to Study_ID to match the effect size dataframe
+
+
+coords <- meta %>%
+  select(Study_ID, Fire_Name, Lat, Long, number_of_burn, State, group) %>%  # Picking only the columns I want
+  rename(Fire_name = Fire_Name) # rename Fire_Name in the meta df to Fire_name to match the effect size df to merge
+
+effect_size_fire <- full_join(effect_size, coords) # this merges the df with lat/longs
+
+effect_size_fire <- effect_size_fire %>% 
+   drop_na(Effect_size) # This is dropping any row that doesn't have an effect size calculated for a specific site which means these are the sites that have a pre/post study design that we arent analyzing for the final product 
+  
+
+# Anaktuvuk River wildfire coordinates: 68.932756,	-150.7
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Lat = case_when(Study_ID == 'Abbott et al. 2021' ~ 68.932756,
+                                     TRUE ~ Lat),
+         Long = case_when(Study_ID == 'Abbott et al. 2021' ~ -150.7,
+                                     TRUE ~ Long))
+
+# Northwest Territories Fire coordinates: 61.4	-121.433
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Lat = case_when(Study_ID == 'Burd et al 2018' ~ 61.4,
+                                     TRUE ~ Lat),
+         Long = case_when(Study_ID == 'Burd et al 2018' ~ -121.433,
+                                     TRUE ~ Long))
+# Caldor Fire: 38.88376	-119.978005
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Hickenbottom et al. 2023' &
+                               Time_Since_Fire == 1 ~ 'Caldor Fire',
+                                        TRUE ~ Fire_name))
+
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_year = case_when(Study_ID == 'Hickenbottom et al. 2023' &
+                               Fire_name == 'Caldor Fire' ~ '2021',
+                                        TRUE ~ Fire_year))
+
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Lat = case_when(Fire_name == 'Caldor Fire' ~ 38.88376,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Caldor Fire' ~ -119.978005,
+                                     TRUE ~ Long))
+                          
+# Mosquito Fire: 38.958701	-120.920501
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Hickenbottom et al. 2023' &
+                               Time_Since_Fire == 0 ~ 'Mosquito Fire',
+                                        TRUE ~ Fire_name))
+
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_year = case_when(Study_ID == 'Hickenbottom et al. 2023' &
+                               Fire_name == 'Mosquito Fire' ~ '2022',
+                                        TRUE ~ Fire_year))
+
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Lat = case_when(Fire_name == 'Mosquito Fire' ~ 38.958701,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Mosquito Fire' ~ -120.920501,
+                                     TRUE ~ Long))
+
+# Rampage Fire Coordinates 48.418961	-113.696178: 
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Lat = case_when(Study_ID == 'Mast & Clow, 2008' ~ 48.418961,
+                                     TRUE ~ Lat),
+         Long = case_when(Study_ID == 'Mast & Clow, 2008' ~ -113.696178,
+                                     TRUE ~ Long))
+
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Mast & Clow, 2008' ~ 'Rampage Fire',
+                                     TRUE ~ Fire_name))
+
+# Fourmile canyon coordinates: 40.03333 -105.4167
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Lat = case_when(Fire_name == 'Fourmile Canyon Fire' ~ 40.03333,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Fourmile Canyon Fire' ~ -105.4167,
+                                     TRUE ~ Long))
+
+# Hayman Fire coordinates: 
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Rhea et al. 2021' ~ 'Hayman Fire',
+                                     TRUE ~ Fire_name),
+         Fire_year = case_when(Study_ID == 'Rhea et al. 2021' ~ '2002',
+                                     TRUE ~ Fire_year),
+         Lat = case_when(Fire_name == 'Hayman Fire' ~ 39.2,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Hayman Fire' ~ -105.3,
+                                     TRUE ~ Long))
+
+# Tiedemann, 1997 Safety Harbor Fire 48.10267, -120.3523
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Tiedemann, 1997' ~ 'Safety Harbor Fire',
+                                     TRUE ~ Fire_name),
+         Fire_year = case_when(Study_ID == 'Tiedemann, 1997' ~ '1980',
+                                     TRUE ~ Fire_year),
+         Lat = case_when(Fire_name == 'Safety Harbor Fire' ~ 48.10267,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Safety Harbor Fire' ~ -120.3523,
+                                     TRUE ~ Long))
+
+# Uzun Rocky Fire coordinates: 38.923564	-122.326478
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Uzun et al. 2020' &
+                               site == 'Rocky Fire' ~ 'Rocky Fire',
+                                     TRUE ~ Fire_name),
+         Lat = case_when(Fire_name == 'Rocky Fire' ~ 38.923564,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Rocky Fire' ~ -122.326478,
+                                     TRUE ~ Long))
+# Uzun Wragg Fire coordinates: 38.512031	-122.097228
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Uzun et al. 2020' &
+                               site == 'Wragg Fire' ~ 'Wragg Fire',
+                                     TRUE ~ Fire_name),
+         Lat = case_when(Fire_name == 'Wragg Fire' ~ 38.512031,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Wragg Fire' ~ -122.097228,
+                                     TRUE ~ Long))
+
+# Writer et al. 2014 # High Park Fire 40.71600 -105.2330
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Writer et al. 2014' ~ 'High Park Fire',
+                                     TRUE ~ Fire_name),
+         Fire_year = case_when(Study_ID == 'Writer et al. 2014' ~ '2012',
+                                     TRUE ~ Fire_year),
+         Lat = case_when(Fire_name == 'High Park Fire' ~ 40.71600,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'High Park Fire' ~ -105.2330,
+                                     TRUE ~ Long))
+
+# Neary fire year - 1978 
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_year = case_when(Study_ID == 'Neary & Currier, 1982' ~ '1978',
+                                     TRUE ~ Fire_year))
+
+write_csv(effect_size_fire, here("Output_for_analysis", "Effect_Size_Geospatial_Fire_Lat_Long.csv"))
+```
 
 
 
