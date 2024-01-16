@@ -19,7 +19,7 @@ Burd et al 2018,Northwest Territories Fire,2013,NA,NA,NA,NA,NA,Dfc,Cold,3,DOC_In
 "Gluns & Toews, 1989",Matt fire,1985,NA,NA,NA,NA,NA,Dfc,Cold,2,NO3_Interp,2.175364252047078
 "Gluns & Toews, 1989",Matt fire,1985,NA,NA,NA,NA,NA,Dfc,Cold,3,NO3_Interp,1.8413502470540644
 "Gluns & Toews, 1989",Matt fire,1985,NA,NA,NA,NA,NA,Dfc,Cold,3,NO3_Interp,1.8853069011924857
-"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,1,DOC_Interp,-0.05198944083147036
+"Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,0,DOC_Interp,-0.05198944083147036
 "Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,1,DOC_Interp,-0.23267430480315815
 "Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,2,DOC_Interp,-0.05485661026893528
 "Mast & Clow, 2008",Rampage Fire_Others in Glacier NP,2003,Coal,22957705,96.5538,3,55.8481,Dfc,Cold,3,DOC_Interp,-0.33386212088645906
@@ -48,9 +48,9 @@ Murphy et al. 2015,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,T
 Murphy et al. 2015,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,3,NO3_Interp,1.1987594531267192
 Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,0,DOC_Interp,-0.19586948633799223
 Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,0,DOC_Interp,-0.02058262147733873
-Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,0,DOC_Interp,-0.09253034556904192
-Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,0,DOC_Interp,-0.2794571534661146
-Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,0,DOC_Interp,-0.5290874956151702
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,1,DOC_Interp,-0.09253034556904192
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,1,DOC_Interp,-0.2794571534661146
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,1,DOC_Interp,-0.5290874956151702
 Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,2,DOC_Interp,-0.4059504771372809
 Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,2,DOC_Interp,-0.42051599123248457
 Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,2,DOC_Interp,-0.504700788827816
@@ -65,9 +65,9 @@ Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,T
 Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,5,DOC_Interp,-0.7218292413374722
 Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,0,NO3_Interp,-0.9251679798500448
 Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,0,NO3_Interp,-0.5401482686656407
-Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,0,NO3_Interp,0.34874637041195555
-Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,0,NO3_Interp,0.4924902954548207
-Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,0,NO3_Interp,-0.5324776921953114
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,1,NO3_Interp,0.34874637041195555
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,1,NO3_Interp,0.4924902954548207
+Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,1,NO3_Interp,-0.5324776921953114
 Murphy et al. 2018,Fourmile Canyon Fire,2010,DS1,2889268,41.4918,2,16.3095,Cfb,Temperate,2,NO3_Interp,0.4896719200329616
 Murphy et al. 2018,Fourmile Canyon Fire,2010,DS2,2889346,62.9001,2,27.1144,Cfb,Temperate,2,NO3_Interp,1.0609399607508578
 Murphy et al. 2018,Fourmile Canyon Fire,2010,DS3,2889356,62.9055,2,27.1121,Cfb,Temperate,2,NO3_Interp,0.6606550881027107
@@ -88,8 +88,6 @@ Oliver et al. 2012,Angora Fire,2007,NA,NA,NA,NA,NA,Csb,Temperate,1,NO3_Interp,-1
 Oliver et al. 2012,Angora Fire,2007,Site 2,8943617,8.0658,2,76.4673,Csb,Temperate,2,NO3_Interp,-0.5396214946346434
 Oliver et al. 2012,Angora Fire,2007,Site 3,8943613,130.7673,3,6.7889,Csb,Temperate,2,NO3_Interp,-1.76671099295381
 Oliver et al. 2012,Angora Fire,2007,NA,NA,NA,NA,NA,Csb,Temperate,2,NO3_Interp,-2.169919002561115
-Rhea et al. 2021,Hayman Fire_High Park Fire,2002_2012,NA,NA,NA,NA,NA,Dfc,Cold,>10,DOC_Interp,0.4142753540035392
-Rhea et al. 2021,Hayman Fire_High Park Fire,2002_2012,NA,NA,NA,NA,NA,Dfc,Cold,>10,NO3_Interp,3.3673554612544394
 "Tiedemann, 1997",NA,NA,NA,NA,NA,NA,NA,Dsb,Cold,0,NO3_Interp,0.700384479651557
 "Tiedemann, 1997",NA,NA,NA,NA,NA,NA,NA,Dsb,Cold,1,NO3_Interp,2.032749426158762
 "Tiedemann, 1997",NA,NA,NA,NA,NA,NA,NA,Dsb,Cold,2,NO3_Interp,3.4497656138466612

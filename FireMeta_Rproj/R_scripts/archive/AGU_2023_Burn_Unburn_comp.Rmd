@@ -426,3 +426,37 @@ ggsave("NO3_CV.pdf",
 
 
 ```
+
+
+```{r - report summary stats}
+# DOC
+doc_summary <- doc_yearly %>%
+  group_by(Burn_Unburn) %>% 
+  summarise(meanDOC = mean(TempNorm),
+            sdDOC = sd(TempNorm),
+            range = range(TempNorm))
+# Burn mean: 4.661536
+# Burn sd: 11.02459
+# Burn range: [0.010632809:79.805081141]
+
+# Unburn mean: 6.511373
+# Unburn sd: 12.59621
+# Unburn range: [0.005674765:52.736711286]
+
+# NO3
+no3_summary <- no3_yearly %>%
+  group_by(Burn_Unburn) %>% 
+  summarise(meanDOC = mean(TempNorm),
+            sdDOC = sd(TempNorm),
+            range = range(TempNorm, scientific = F))
+
+# Burn mean: 2.527080
+# Burn sd: 10.383352
+# Burn range: [0:87.40485]
+
+# Unburn mean: 1.339846
+# Unburn sd: 3.505517
+# Unburn range: [0:15.14391]
+
+
+```

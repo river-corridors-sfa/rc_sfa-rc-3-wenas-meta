@@ -199,21 +199,8 @@ control_impact_fill <- control_impact_fill %>%
 
 ```
 
-```{r - plot summary stats}
-# unique(control_impact_fill$Time_Since_Fire)
-# control_impact_fill$Time_Since_Fire <- factor(control_impact_fill$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "13", "15", "80", "90", "110", "Pre", "Post"))
-# 
-# ggplot(control_impact_fill, aes(x = Time_Since_Fire, fill = Time_Since_Fire)) +
-#   geom_bar() +
-#   xlab("Time Since Fire") +
-#   ylab("Frequency") +
-#   theme_bw() +
-#   theme(legend.position = "none")
 
-
-```
-
-```{r}
+```{r calculating the temporal normalized data}
 # This is code from my other script. I am going to try this way to see if this is what we want to get to 
 # pivoting to make the responses in one column
 metadata_long <- control_impact_fill %>%
@@ -247,6 +234,20 @@ climate.summary.year <- yearly_mean_site %>%
 
 ```
 
+```{r - export/plot summary stats}
+
+# unique(control_impact_fill$Time_Since_Fire)
+# control_impact_fill$Time_Since_Fire <- factor(control_impact_fill$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "13", "15", "80", "90", "110", "Pre", "Post"))
+# 
+# ggplot(control_impact_fill, aes(x = Time_Since_Fire, fill = Time_Since_Fire)) +
+#   geom_bar() +
+#   xlab("Time Since Fire") +
+#   ylab("Frequency") +
+#   theme_bw() +
+#   theme(legend.position = "none")
+
+
+```
 
 ```{r - plots}
 # Plotting #
@@ -858,6 +859,125 @@ ggsave("AGU_Effect_Size_TSF.pdf",
 
 
 
+### Calculating percent difference ### 
+```{r}
+# For instance, on average, how much was DOC lower in the burned sites on a percent base and vice versa for nitrate?  - ALAN 
+
+
+# Also, does effect size scale to % in some way? Cause effect size is harder for me to interpret, but if we can put a supplemental figure with percents and fit a line to NO3, we could get towards "as a rough approximation, NO3 increased across all sites by an estimated % per year. I guess we would need to use actual years since fire for that analysis, but might be cool if it fits nicely. Could use Sen-Theil slope since x-axis is time.
+# effect_size <- read_csv("Output_for_analysis/Effect_Size_Geospatial_Fire_Lat_Long.csv")
+
+# 
+Burn = 10
+unburn = 5
+
+log(Burn/unburn) # 0.693 
+# Positive effect size = burn is higher concentration than the unburn 
+
+burn = 5
+unburn = 10
+log(burn/unburn) # -0.6931472
+# negative effect size = burn is lower concentration than the unburn 
+#
+
+percent_difference <- yearly_effect_size_combine_long %>% 
+  mutate(pd = (100*(1-exp(Effect_size)))*-1) %>% 
+  select(Study_ID, response_var, Site, Climate, Biome, Time_Since_Fire, Effect_size, pd) # creating percent difference 
+
+# caculating confidence intervals # 
+
+TSF_summary_effect <- percent_difference %>%
+  group_by(Time_Since_Fire, response_var) %>%
+  summarise(mean_effect = mean(pd, na.rm = TRUE),
+            sd_effect = sd(pd, na.rm = TRUE),
+            n_effect = n(),
+            pd = mean(pd, na.rm = TRUE)) %>%
+  mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
+
+
+# TSF 
+ggplot(percent_difference, aes(Time_Since_Fire, pd, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = TSF_summary_effect) +
+  scale_y_log10() +
+  geom_hline(yintercept = 3000, linewidth = 0.5, color = "red") +
+  ylab("Percent Difference") +
+  xlab("Year since Fire") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Analyte"),
+                     labels = c('DOC', vn)) +
+  # stat_summary(fun.data = give.n, geom = "text", fun.y = median,
+  #                 position = position_nudge(x = -0.4)) +
+  scale_x_discrete(labels=c("0" = "Year of Fire", "1" = "1-2",
+                            "2" = "2-3", "3" = "3-4", "4" = "4-5",
+                            "5" = "5-6", ">10" = ">10")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 20),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.17, 0.90))
+
+
+
+# Scatter plot with linear regression for both DOC and nitrate 
+library(ggpmisc)
+ggplot(percent_difference, aes(Time_Since_Fire, pd, color = response_var)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+percent_difference_test <- percent_difference %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire)) %>% 
+  mutate(Time_Since_Fire = case_when(Study_ID == "Abbott et al. 2021" ~ 10,
+                                     Study_ID == "Rhea et al. 2021" ~ 15,
+                                     TRUE ~ Time_Since_Fire))
+
+percent_difference_test %>% 
+  filter(response_var == "DOC_Interp") %>% 
+  filter(Time_Since_Fire < 7) %>% 
+  ggplot(aes(Time_Since_Fire, pd, color = response_var)) +
+  geom_point() +
+  stat_poly_line() +
+  stat_poly_eq(use_label(c("eq", "R2")))
+
+doc_filter <- percent_difference_test%>% 
+  filter(response_var == "DOC_Interp") %>% 
+  filter(Time_Since_Fire < 7)
+
+doc <- percent_difference_test%>% 
+  filter(response_var == "DOC_Interp")
+
+lm.mod <- lm(pd ~ Time_Since_Fire, data = doc_filter)
+summary(lm.mod) # slope = -12.5
+
+model <- theil_sen_regression(pd ~ Time_Since_Fire, data = doc_filter)
+summary(model) # slope = -6.991
+
+model_full <- theil_sen_regression(pd ~ Time_Since_Fire, data = doc)
+summary(model_full) # slope = -3.748
+
+# no3
+percent_difference_test %>% 
+  filter(response_var == "NO3_Interp") %>% 
+  ggplot(aes(Time_Since_Fire, pd, color = response_var)) +
+  geom_point() +
+  stat_poly_line() +
+  stat_poly_eq(use_label(c("eq", "R2")))
+# slope = 62.1
+
+no3 <- percent_difference_test%>% 
+  filter(response_var == "NO3_Interp")
+
+no3_theil <- theil_sen_regression(pd ~ Time_Since_Fire, data = no3)
+summary(no3_theil) # Slope: 26.31
+
+```
 
 
 
@@ -889,9 +1009,7 @@ ggsave("AGU_Effect_Size_TSF.pdf",
 
 
 
-
-
-
+### code graveyard ###
 
 ```{r - code graveyard}
 # # Fill gaps
