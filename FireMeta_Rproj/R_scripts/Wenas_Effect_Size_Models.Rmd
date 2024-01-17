@@ -300,6 +300,7 @@ TukeyHSD(doc_aov, which = "Climate")
 
 ```
 
+
 ```{r Effect size models-NO3}
 # NO3 #
 # Effect_size ~ burn_percentage*TSF + (1|Site)
@@ -893,7 +894,136 @@ ggsave("Effect_Size_Burn_Percentage_10s.pdf",
        path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
        width = 10, height = 8, units = "in")
 
-#### 20 % grouping ####
+```
+
+### Burn percentage models for 10% intervals
+```{r Effect size models-DOC}
+# DOC #
+# Effect_size ~ burn_percentage*TSF + (1|Site)
+
+doc_10_burn <- effect_both_doc_no3 %>% 
+  filter(response_var == "DOC_Interp")
+
+doc_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = doc_10_burn)
+
+doc_burn_mixed
+
+summary(doc_burn_mixed) # p-value: 0.973 - > 0.05
+
+# now making this by the burn percentage groupings 
+doc_burn_mixed = lmer(Effect_size ~ burn_percentage_group + (1 | site), data = doc_10_burn)
+
+doc_burn_mixed
+
+summary(doc_burn_mixed) # p-value: for all groupings are > 0.05
+# burn_percentage_group11-20 -1.02189    1.45939  4.98650  -0.700    0.515
+# burn_percentage_group21-30  0.54756    1.41353  4.99319   0.387    0.714
+# burn_percentage_group51-60  0.27944    1.78662  4.97804   0.156    0.882
+# burn_percentage_group61-70  1.23719    1.79152  5.03288   0.691    0.520
+# burn_percentage_group71-80 -2.39369    1.78846  4.99857  -1.338    0.238
+# burn_percentage_group81-90 -0.07337    1.79152  5.03288  -0.041    0.969
+
+fixef(doc_burn_mixed)
+confint(doc_burn_mixed)
+
+ranef(doc_burn_mixed)$site %>% 
+  head(5)
+
+coef(doc_burn_mixed)$site %>% 
+  head(5)
+
+predictInterval(doc_burn_mixed)
+
+REsim(doc_burn_mixed) 
+
+plotREsim(REsim(doc_burn_mixed))
+
+```
+
+```{r DOC levenes test}
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ burn_percentage_group, data = doc_10_burn) #F-value: 0.621, p-value: 0.7122, Df: 6, 38
+
+# plot 
+
+boxplot(Effect_size ~ burn_percentage_group,
+  data = doc_10_burn,
+  main = "Effect size Distribution by burn percentage - DOC",
+  xlab = "Burn Percentage",
+  ylab = "Effect Size",
+  col = "steelblue",
+  border = "black")
+```
+The p-value of the test is 0.7122, which is greater than our significance level of 0.05. 
+Thus, we do not reject the null hypothesis and conclude that the variance among the climate groups is equal. 
+
+```{r Effect size models-NO3}
+# NO3 #
+# Effect_size ~ burn_percentage*TSF + (1|Site)
+
+no3_10_burn <- effect_both_doc_no3 %>% 
+  filter(response_var == "NO3_Interp")
+
+no3_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = no3_10_burn)
+
+no3_burn_mixed
+
+summary(no3_burn_mixed) # p-value: 0.949 - > 0.05
+
+# now making this by the burn percentage groupings 
+no3_burn_mixed = lmer(Effect_size ~ burn_percentage_group + (1 | site), data = no3_10_burn)
+
+no3_burn_mixed
+
+summary(no3_burn_mixed) # p-value: All groupings except 81-90 are insignificant (>0.05)
+#burn_percentage_group11-20   -0.5275     0.8514 14.8742  -0.620  0.54495   
+#burn_percentage_group21-30    0.7697     0.8533 14.9168   0.902  0.38136   
+#burn_percentage_group51-60    0.5647     1.3650 13.8405   0.414  0.68542   
+#burn_percentage_group61-70    1.1795     1.4779 18.9576   0.798  0.43471   
+#burn_percentage_group71-80   -0.8912     1.1083 15.4049  -0.804  0.43359   
+#burn_percentage_group81-90   -4.3541     1.4779 18.9576  -2.946  0.00831 **
+#burn_percentage_group91-100   0.9352     0.9755 14.4181   0.959  0.35351 
+
+fixef(no3_burn_mixed)
+confint(no3_burn_mixed)
+
+ranef(no3_burn_mixed)$site %>% 
+  head(5)
+
+coef(no3_burn_mixed)$site %>% 
+  head(5)
+
+predictInterval(no3_burn_mixed)
+
+REsim(no3_burn_mixed) 
+
+plotREsim(REsim(no3_burn_mixed))
+
+
+
+```
+
+```{r NO3 levenes test}
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ burn_percentage_group, data = no3_10_burn) #F-value: 1.643, p-value: 0.1377, Df: 7, 70
+
+# plot 
+
+boxplot(Effect_size ~ burn_percentage_group,
+  data = no3_10_burn,
+  main = "Effect size Distribution by burn percentage - NO3",
+  xlab = "Burn Percentage",
+  ylab = "Effect Size",
+  col = "#E7B800",
+  border = "black")
+```
+The p-value of the test is 0.1377, which is greater than our significance level of 0.05. 
+Thus, we do not reject the null hypothesis and conclude that the variance among the climate groups ARE equal. 
+
+### 20 % grouping ###
+```{r 20 % grouping}
 # Test for grouping 
 df <- effect_both_doc_no3 %>%
   mutate(grouped_percentage = cut(burn_percentage, breaks = seq(0, 100, by = 20), include.lowest = TRUE, labels = FALSE))

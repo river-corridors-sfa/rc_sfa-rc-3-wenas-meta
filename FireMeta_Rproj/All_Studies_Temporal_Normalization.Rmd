@@ -860,7 +860,7 @@ ggsave("AGU_Effect_Size_TSF.pdf",
 
 
 ### Calculating percent difference ### 
-```{r}
+```{r - plotting supplemental figures - scatterplot}
 # For instance, on average, how much was DOC lower in the burned sites on a percent base and vice versa for nitrate?  - ALAN 
 
 
@@ -928,6 +928,7 @@ ggplot(percent_difference, aes(Time_Since_Fire, pd, color = response_var),
 
 # Scatter plot with linear regression for both DOC and nitrate 
 library(ggpmisc)
+library(RobustLinearReg)
 ggplot(percent_difference, aes(Time_Since_Fire, pd, color = response_var)) +
   geom_point() +
   geom_smooth(method = "lm")
@@ -962,6 +963,29 @@ summary(model) # slope = -6.991
 model_full <- theil_sen_regression(pd ~ Time_Since_Fire, data = doc)
 summary(model_full) # slope = -3.748
 
+# plot for supplemental # 
+ggplot(doc, aes(Time_Since_Fire, pd, color = response_var)) +
+  geom_point() +
+  stat_poly_line() +
+  stat_poly_eq(use_label(c("eq", "R2"))) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Percent Difference") +
+  xlab("Year since Fire") +
+  scale_color_manual(values = c("#00AFBB" ),
+                     guide = guide_legend(title = ""),
+                     labels = c('DOC')) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 20),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.65, 0.90))
+
+ggsave("DOC_Percent_Difference_Scatter.pdf",
+       path = here("initial_plots", "Percent_difference"),
+       width = 10, height = 8,  units = "in")
+
 # no3
 percent_difference_test %>% 
   filter(response_var == "NO3_Interp") %>% 
@@ -976,6 +1000,29 @@ no3 <- percent_difference_test%>%
 
 no3_theil <- theil_sen_regression(pd ~ Time_Since_Fire, data = no3)
 summary(no3_theil) # Slope: 26.31
+
+# plot for supplemental # 
+ggplot(no3, aes(Time_Since_Fire, pd, color = response_var)) +
+  geom_point() +
+  stat_poly_line() +
+  stat_poly_eq(use_label(c("eq", "R2"))) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Percent Difference") +
+  xlab("Year since Fire") +
+  scale_color_manual(values = c("#E7B800" ),
+                     guide = guide_legend(title = ""),
+                     labels = c(vn)) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 20),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.65, 0.90))
+
+ggsave("NO3_Percent_Difference_Scatter.pdf",
+       path = here("initial_plots", "Percent_difference"),
+       width = 10, height = 8,  units = "in")
 
 ```
 
