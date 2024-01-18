@@ -1,0 +1,204 @@
+---
+title: "Meta_summary_stats"
+output: html_document
+date: "2023-11-13"
+editor_options: 
+  chunk_output_type: console
+---
+
+The purpose of this script is to investigate the structure and makeup of the data that we have from the studies that are included. I want to spit out histograms that will show how much of each study design we have, how many fall into different climates and time since fire buckets
+
+
+```{r Load packages}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+library(ggplot2)
+library(googlesheets4)
+library(tidyverse)
+library(lubridate)
+library(ggpubr)
+library(here)
+library(corrplot)
+library(PerformanceAnalytics)
+library(Hmisc)
+library(GGally)
+```
+
+#### NHD Catchment characteristics ####
+```{r}
+geospatial_data<- read_csv(here("R_scripts", "Geospatial_data_2023-11-13.csv"))
+names(geospatial_data)
+# It doesnt look like they have any vegetation data. 
+#T hey have size of watershed, elevation, slope 
+```
+
+
+```{r data prepper - raw all data}
+studies_file_list <- list.files(path = "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/inputs/Studies/meta_final/", 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv, 
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) 
+
+```
+
+```{r - plot}
+
+ggplot(meta_df, aes(x = `Design (Control/Burn; Pre/Post)`, fill = `Design (Control/Burn; Pre/Post)`)) +
+  geom_bar() +
+  scale_fill_manual(values = c("darksalmon", "darkslategray4", "cornflowerblue")) +
+  theme_bw() +
+  theme(legend.position = "none")
+
+
+# Time since Fire 
+# Reorder the categories 
+meta_df$Time_Since_Fire <- factor(meta_df$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "13", "15", "80", "90", "110", "Pre", "Post"))
+
+ggplot(meta_df, aes(x = Time_Since_Fire, fill = Time_Since_Fire)) +
+  geom_bar() +
+  xlab("Time Since Fire") +
+  ylab("Frequency") +
+  theme_bw() +
+  theme(legend.position = "none")
+
+
+
+
+
+
+```
+
+
+```{r filtered data}
+final_dataset <- read_csv(here("Output_for_analysis", "Effect_Size_Geospatial_Fire_Lat_Long.csv"))
+
+```
+
+```{r - plotting}
+### TSF ####
+ggplot(final_dataset, aes(x = Time_Since_Fire, fill = Time_Since_Fire)) +
+  geom_bar() +
+  xlab("Time Since Fire") +
+  ylab("Frequency") +
+  theme_bw() +
+  theme(legend.position = "none")
+
+### stream order  ####
+ggplot(final_dataset, aes(x = streamorde, fill = streamorde)) +
+  geom_bar() +
+  xlab("Stream Order") +
+  ylab("Frequency") +
+  theme_bw() +
+  theme(legend.position = "none")
+
+### burn percentage ####
+ggplot(final_dataset, aes(x = burn_percentage)) + 
+  geom_histogram(binwidth = 10) +
+  xlab("Burn Percentage") +
+  ylab("Frequency") +
+  theme_bw()
+
+### Slope ####
+ggplot(final_dataset, aes(x = slope)) + 
+  geom_histogram(binwidth = 0.01) +
+  xlab("Slope") +
+  ylab("Frequency") +
+  theme_bw()
+
+### watershed area ####
+ggplot(final_dataset, aes(x = totdasqkm)) + 
+  geom_histogram(binwidth = 50) +
+  xlab("Watershed Area") +
+  ylab("Frequency") +
+  theme_bw()
+```
+
+```{r - how many studies}
+unique(final_dataset$Study_ID) # 18
+```
+```{r - correlation matrix - catchment characteristics}
+### DOC #### 
+final_dataset <- final_dataset %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire)) %>% 
+  mutate(Time_Since_Fire = case_when(Study_ID == "Abbott et al. 2021" ~ 10,
+                                     Study_ID == "Rhea et al. 2021" ~ 15,
+                                     TRUE ~ Time_Since_Fire)) # changing the time since fire to a numeric structure and changing the abbott and rhea time since fire to the exact time since fire 
+doc <- final_dataset %>% 
+  filter(response_var == "DOC_Interp") %>% # filtering out DOC 
+  select(Effect_size, totdasqkm, streamorde, slope, burn_percentage, Time_Since_Fire) %>% # Only want to do the catchment characteristics
+  na.omit()
+  
+# Simple correlation matrix between effect size and all the other catchment characteristics
+res <- cor(doc)
+round(res, 2) 
+
+
+# Correlation matrix with significance levels (p-value)
+res2 <- rcorr(as.matrix(doc))
+res2 # the only significant p-value with effect size is watershed area
+
+
+
+corrplot(res, type = "upper", order = "FPC", 
+         tl.col = "black", tl.srt = 45)
+
+
+corrplot(res2$r, type="upper", order="hclust", 
+         p.mat = res2$P, sig.level = 0.05, insig = "blank")
+
+ggpairs(doc, columns = c("Effect_size", "totdasqkm", "streamorde", "slope", "burn_percentage", "Time_Since_Fire")) +
+  theme_bw()
+
+
+### NO3 #### 
+no3 <- final_dataset %>% 
+  filter(response_var == "NO3_Interp") %>% 
+  select(Effect_size, totdasqkm, streamorde, slope, burn_percentage, Time_Since_Fire) %>% 
+  na.omit()
+
+ggpairs(no3, columns = c("Effect_size", "totdasqkm", "streamorde", "slope", "burn_percentage", "Time_Since_Fire")) +
+  theme_bw()
+
+# Correlation matrix with significance levels (p-value)
+res <- cor(no3)
+round(res, 2) 
+
+res2 <- rcorr(as.matrix(no3))
+res2 # the only significant p-value with effect size is watershed area
+
+
+
+corrplot(res, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

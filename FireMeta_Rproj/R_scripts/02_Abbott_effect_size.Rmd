@@ -1,0 +1,211 @@
+---
+title: "Abbott_merged_burn"
+output: html_document
+date: "2023-11-22"
+editor_options: 
+  chunk_output_type: console
+---
+The purpose of this script is see if it is justified to merge all the burned and unburned sites in the Abbott study for the gap fill to calculate effect size so we dont have 22 sites and over represent this study in the stats
+
+Script Workflow:
+
+Step 1) Load in all the individual studies from "meta_final" located within inputs in the repository.  
+
+Step 2) Filter out studies that are Pre_Post -> we only want papers that are Control_vs_Impact
+
+Step 3) run script that fills in concentrations for missing days in between discrete sampling days and then takes an average by month. 
+
+
+## Temporal Normalization 
+```{r Jake/Mac Load Packages and}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+
+library(tidyverse)
+library(here)
+library(forecastML)
+library(zoo)
+library(hrbrthemes)
+library(viridis)
+
+```
+
+```{r data prepper}
+meta_df <- read_csv(here("inputs", "Studies", "Abbott_et_al_2021", "Abbott_et_al_2021.csv"))
+
+```
+
+```{r histogram of watershed size}
+ggplot(meta_df, aes(x = Area_watershed, fill = Burn_Unburn)) +
+  geom_histogram(binwidth = 20, color = "black") +
+  theme_bw()
+
+```
+
+
+```{r data prep}
+control_impact <- meta_df 
+
+# separate out the time columns 
+time_format <- control_impact %>% 
+  select(Study_ID, Sampling_Date) 
+
+# Make them all the same format and then merge back together in one column
+time_format <- time_format %>% 
+  mutate(DateTime = mdy(Sampling_Date),
+         DateTime2 = mdy_hm(Sampling_Date), 
+         DateTime2 = as.Date(DateTime2)) %>% 
+  select(-Sampling_Date) %>% 
+  mutate(Sampling_Date = coalesce(DateTime, DateTime2),
+         Sampling_Date = as.character(Sampling_Date)) %>% 
+  select(-DateTime, -DateTime2) 
+
+# merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
+control_impact <- control_impact %>% 
+  mutate(Sampling_Date = time_format$Sampling_Date)
+
+
+# changing the structure of the concentrations
+control_impact <- control_impact %>% 
+  mutate(DOC = as.numeric(DOC),
+         NO3 = as.numeric(NO3), 
+         Sampling_Date = ymd(Sampling_Date))
+
+# Changing the units to make sure everything is consistent in mg_N_L or mg_C_L
+control_impact_units <- control_impact %>% 
+  mutate(Area_watershed_km = case_when(Area_unit == 'ha' ~ Area_watershed * .01,
+                                       Area_unit == 'km' ~ print(Area_watershed)),
+         
+         DOC_mg_C_L = case_when(DOC_unit == 'mg_C_L' ~ print(DOC),
+                                DOC_unit == 'mg_L' ~ print(DOC),
+                                DOC_unit == 'um' ~ DOC * 0.01201),
+         
+         NO3_mg_N_L = case_when(NO3_unit == 'um' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_NO2_NO3_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'mg_N_L' ~ print(NO3),
+                                NO3_unit == 'ug_N_L' ~ NO3 * .001, 
+                                NO3_unit == 'mg_L' ~ NO3 * 0.225904780),
+         
+         DOC_uM_C = case_when(DOC_unit == 'um' ~ print(DOC),
+                              DOC_unit == 'mg_C_L' ~ DOC * 83.2639467,
+                              DOC_unit == 'mg_L' ~ DOC * 83.2639467),
+
+         NO3_uM_N = case_when(NO3_unit == 'um' ~ print(NO3),
+                              NO3_unit == 'umol_L' ~ print(NO3),
+                              NO3_unit == 'umol_NO2_NO3_L' ~ print(NO3),
+                              NO3_unit == 'mg_L' ~ NO3 * 16.127729,
+                              NO3_unit == 'mg_N_L' ~ NO3 * 3.64145101,
+                              NO3_unit == 'ug_N_L' ~ NO3 * 0.22594948))
+
+
+
+
+# Creating a site characteristics data frame that I will use to merge later to add in the proper data 
+site_data <- control_impact_units %>% 
+  select(Study_ID, Pair, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn)
+
+site_data_unique <- site_data %>% 
+  group_by(Study_ID, Pair, Area_watershed_km) %>% 
+  distinct(Area_watershed_km, .keep_all = TRUE)
+
+
+```
+
+```{r - Abbott}
+# filling in daily time series and interpolating by study and site
+control_impact_fill <-  control_impact_units %>% 
+  select("Study_ID", "Latitude", "Longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+  group_by(Study_ID, Site) %>%
+  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
+  fill(Study_ID:Time_Since_Fire) %>%
+  fill(Study_ID, Site) %>%
+  ungroup() %>%
+  group_by(Site) %>%
+  mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
+  fill(Study_ID:Time_Since_Fire)
+
+
+
+```
+
+```{r}
+# pivoting to make the responses in one column
+
+metadata_long <- control_impact_fill %>%
+  pivot_longer(
+    cols = NO3_Interp:DOC_Interp,
+    names_to = "response_var",
+    values_to = "concentration",
+    values_drop_na = TRUE
+  )
+
+metadata_long <- metadata_long %>% 
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+
+
+# aggregate by year 
+yearly_mean_site <-  metadata_long %>%
+  group_by(Study_ID, response_var, Burn_Unburn, year) %>% 
+  summarize(meanConc = mean(concentration)) %>% 
+  left_join(site_data) %>% 
+  group_by(Burn_Unburn, year) %>%
+  distinct(meanConc, .keep_all = TRUE) %>%
+  mutate(TempNorm = meanConc / Area_watershed_km)
+    
+yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
+
+write.csv(yearly_mean_site, here("Output_for_analysis", "Abbott_conc_fill.csv"))
+
+```
+
+#### EFFECT SIZE 
+```{r}
+# Bringing the columns back up to match to be able to calculate
+yearly_mean_site_test <- yearly_mean_site %>%
+  mutate(TempNorm = as.numeric(TempNorm))  # Taking out Hauer and Spencer and Hickenbottom because they have mutliple controls and that is different than the rest of these sites
+
+# This is doing the same thing as chunck before where we are creating a column header for each individual site but doing it for the studies that have multiple controls. 
+yearly_mean_abbott <- yearly_mean_site %>%
+  mutate(TempNorm = as.numeric(TempNorm))
+
+
+
+abbott_test <- yearly_mean_abbott %>%
+  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate) %>%
+  dplyr::summarize(Xe = sum(TempNorm[Burn_Unburn == "Burn"], na.rm = TRUE),
+                   Xc = sum(TempNorm[Burn_Unburn == "Unburn"], na.rm = TRUE)) # Creating a control and treatment column for the temporal normalization 
+
+yearly_multiple_control <- abbott_test %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
+            Xc = sum(Xc[Pair == "Control"], na.rm = TRUE)) 
+
+
+yearly_effect_multiple <- yearly_multiple_control %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  mutate(lnR1 = log(Xe1/Xc)) %>% 
+  ungroup()
+
+
+# pivoting to make the responses in one column
+# effect size 
+yearly_effect_size_combine_long <- yearly_effect_multiple %>% 
+  pivot_longer(
+    cols = lnR1:lnR1,
+    names_to = "Site",
+    values_to = "Effect_size",
+    values_drop_na = TRUE
+  ) %>% 
+  filter(is.finite(Effect_size))
+
+write.csv(yearly_effect_size_combine_long, here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_effect_size.csv"))
+
+
+```
+
