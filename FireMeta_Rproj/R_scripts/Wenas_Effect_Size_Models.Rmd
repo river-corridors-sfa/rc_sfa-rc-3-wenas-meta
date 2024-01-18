@@ -59,7 +59,7 @@ options(max.print = 200)
 
 # Geospatial csv from stream cat with only the sites and the total area + the burn percentages 
 geospatial <- read_csv(here("R_scripts", "Geospatial_data_2023-11-13.csv")) %>% 
-  dplyr::select(site, comid, totdasqkm, streamorde, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws)
+  dplyr::select(site, comid, totdasqkm, streamorde, slope, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws)
 
 # Site summary of each study and its respective fire and the year of that fire
 studies_data <- read_excel(here("inputs", "StudiesData_Table1.xlsx"),
@@ -202,7 +202,7 @@ studies_data$Study_ID <- studies_data$Study # making a new column header to matc
 effect_size_geospatial_fire <- full_join(effect_size_geospatial, studies_data)
 
 effect_size_geospatial_fire <- effect_size_geospatial_fire %>% 
-  dplyr::select(Study_ID, Fire_name, Fire_year, site, comid, totdasqkm, streamorde, burn_percentage, Climate, Biome, Time_Since_Fire, response_var, Effect_size)
+  dplyr::select(Study_ID, Fire_name, Fire_year, site, comid, totdasqkm, streamorde, slope, burn_percentage, Climate, Biome, Time_Since_Fire, response_var, Effect_size)
 
 write_csv(effect_size_geospatial_fire, here("Output_for_analysis", "effect_size_geospatial_fire.csv"))
 
