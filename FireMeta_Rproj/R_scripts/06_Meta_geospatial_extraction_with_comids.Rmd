@@ -1,0 +1,146 @@
+---
+title: "Wenas_meta_geospatial_extraction_with_comids"
+output: html_document
+date: "2023-10-30"
+---
+
+```{r setup, include=TRUE, echo = T, warning = F, comment = F, message = FALSE}
+rm(list=ls(all=T))
+library(sf)
+library(tidyverse)
+library(terra)
+library(nhdplusTools)
+library(mapview)
+library(here)
+library(dataRetrieval)
+library(lubridate)
+library(prism)
+library(ggspatial)
+library(nngeo)# Added from original code
+library(stars)# Added from original code
+# this gives you an error, but it can be ignored:
+try(plyr::ldply(list.files(path = here("R_scripts", "data", "src"),
+                           pattern="*.R",
+                           full.names=TRUE),
+                source))
+# Rmarkdown options
+knitr::opts_chunk$set(echo = T, warning = F, comment = F, message = F)
+
+# mapview options
+mapviewOptions(basemaps.color.shuffle=FALSE,basemaps='OpenTopoMap')
+```
+
+### Setting up your site data set.
+
+For this code to run properly, your site data must be configured as follows:
+
+1)  Each site is identified with a unique site name. In the data set, this column must be called `site`.
+2)  Each site has their known COMID, with column name `comid`. 
+4)  Site data table is a CSV, and stored in the `data/` folder. 
+
+
+#### Downloading necessary data sets
+
+Currently, this workflow requires downloading several data sets locally for much speedier run times. This includes: PRISM climate & aridity rasters, NHD flow direction data, and CONUS-wide NHD catchments. All data sets are found in the shared `data` folder.
+
+
+# National Hydrodraphy Dataset (NHD) data extraction
+
+Use COMID to allow site linkages with all datasets in this workflow. 
+
+```{r}
+sf_use_s2(FALSE)
+site_type = "comid" # This steps assumes you have checked your COMIDs
+
+sites <- read_csv(here("inputs", "catchment_characteristics", "meta_lat_long_comids.csv")) %>%
+  distinct(site, .keep_all = TRUE) %>%
+  dplyr::select('site','latitude','longitude', 'comid') %>% 
+  drop_na()
+
+```
+
+
+Pull all meta data associated with each site's COMID. 
+
+```{r}
+if(site_type == "comid"){
+  sites <- getNHDcomid(df = dplyr::select(sites, site, comid))
+}
+
+```
+
+Make NHD-based watershed shapefiles for all CONUS sites. To make this step MUCH faster, it is best to have a locally downloaded version on the National NHD catchment shapefile stored on your local system. I have already included this shapefile in the `data` folder. 
+
+```{r}
+site_watersheds <- getWatersheds(df = sites, make_pretty = TRUE) %>%
+  inner_join(., select(sf::st_drop_geometry(sites), site, comid), by = "comid")
+```
+
+
+Map all your sites. Maps are automatically stored in the `data/maps/` folder. It is highly recommended to review each map, particularly for known locations along BIG rivers and TINY streams.Note: COMIDs should have been checked before running this code. 
+
+```{r map2,echo = T, warning = FALSE, comment = F, message = FALSE, results='hide'}
+suppressWarnings(map2(sites$site, sites$comid, getMaps)) 
+```
+
+Interactive map showing all sites and their delineated watersheds:
+
+```{r}
+mapview(site_watersheds, col.regions = "#56B4E9", alpha.regions = 0.2, lwd = 3, layer.name = "Watershed") +
+  mapview(sites, cex = 5, col.regions = "black", layer.name = "Points") + 
+  mapview(st_read('data/site_flowlines.gpkg', quiet = T), lwd = 3, color = "red", layer.name = "Flowline")
+```
+
+
+# StreamCat data extractions
+
+This `getStreamCat()` function is adapted from [Simon Topp's Lakecat extraction](https://github.com/SimonTopp/USLakeClarityTrendr/blob/master/1_nhd_join_and_munge.Rmd). StreamCat is *huge* (\~600 possible variables). And while EPA has since made an [API that interacts with StreamCat](https://www.epa.gov/national-aquatic-resource-surveys/streamcat-metrics-rest-api) (which would make this code 1 billion times faster), it wasn't public when this code was written. So! We made a function that:
+
+1)  Downloads StreamCat categories of data (e.g. dam density, urbanization, etc.) for all regions of CONUS.
+2)  Joins that data to our sites by their NHD COMID.
+3)  Then, hilariously, deletes (or not, depending on if you want to keep it) the large gigabytes of data we don't use and only keeps the data that matches our sites' NHD comids.
+
+To download the data that you want, be sure to update the `epa_categories` vector argument in `getStreamCat()` with the names of the categorized data sets you are interested in downloading. A list of those data sets can be found [here](https://gaftp.epa.gov/epadatacommons/ORD/NHDPlusLandscapeAttributes/StreamCat/HydroRegions/). Change `save = TRUE` to `save = FALSE` if you do not want to keep all CONUS-level StreamCat data that you downloaded.
+
+```{r cat,echo = T, warning = FALSE, comment = F, message = FALSE, results='hide'}
+sites <- getStreamCat(sites = sites,
+                      # Choose EPA categories to download here. These example two categories took a few minutes to download. 
+                      epa_categories = c("MTBS", "FirePerimeters"),
+                      save = FALSE)
+
+#NOTE: the getStreamCat is setup to extract ALL of the variables available on StreamCat, the user will have to modify the epa_categories function input to extract all the variables of interest. 
+
+```
+
+# Pulling additional geospatial data not in StreamCat
+
+Lastly, we pull in additional data that is not found in StreamCat. This includes [PRISM climate data](<https://prism.oregonstate.edu/normals/>), [aridity data](<https://figshare.com/articles/dataset/Global_Aridity_Index_and_Potential_Evapotranspiration_ET0_Climate_Database_v2/7504448/6>), and [Omernik Ecoregion data](<https://www.epa.gov/eco-research/level-iii-and-iv-ecoregions-continental-united-states>) for each site's coordinates (i.e., at the site location, NOT aggregated across its watershed). We also calculate mean aridity and dominant Ecoregion across site watersheds. Our [net primary production](https://lpdaac.usgs.gov/products/mod17a3hgfv006/) layer is no longer available from NASA so this data set has been excluded from this data pull. I plan to update this workflow to include it again once it becomes available.
+
+```{r noncat,echo = T, warning = FALSE, comment = F, message = FALSE, results='hide'}
+# Extract the mean aridity index within each site's watershed as well as each site's location
+sites <- getAridity(df = sites, sf = site_watersheds)
+
+# Extract Omernik ecoregion for each site's location
+sites <- getOmernikSite(df = sites)
+
+# Extract dominant Omernik ecoregion within each site's watershed
+sites <- getOmernikWs(df = sites, sf = site_watersheds)
+
+# Extract PRSIM ppt, tmean, tmax, and tmin data for each site's location
+sites <- getPRISM(df = sites)
+
+# Extract mean chemistry values within each site's watershed as well as each site's locationa
+sites <- getChemistry(df = sites, sf = site_watersheds)
+
+# Link to original NPP data set:
+# https://lpdaac.usgs.gov/products/mod17a3hgfv006/ "Terra MODIS Net Primary Production Yearly L4 Global 500 m SIN Grid products are currently unavailable due to unexpected errors in the input data. Please note that a newer version of MODIS land products is available and plans are being developed for the retirement of Version 6 MODIS data products. Users are advised to transition to the improved Version 6.1 products as soon as possible."
+```
+
+Export all the data.
+
+```{r}
+
+write.csv(sites,paste0("Geospatial_data_",Sys.Date(),".csv"), row.names = F)
+
+```
+

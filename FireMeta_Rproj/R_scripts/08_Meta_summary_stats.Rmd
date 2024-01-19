@@ -28,62 +28,22 @@ library(GGally)
 
 #### NHD Catchment characteristics ####
 ```{r}
-geospatial_data<- read_csv(here("R_scripts", "Geospatial_data_2023-11-13.csv"))
+geospatial_data<- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2024-01-18.csv"))
 names(geospatial_data)
 # It doesnt look like they have any vegetation data. 
-#T hey have size of watershed, elevation, slope 
-```
-
-
-```{r data prepper - raw all data}
-studies_file_list <- list.files(path = "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/inputs/Studies/meta_final/", 
-                                  recursive=F, 
-                                  pattern=".csv", 
-                                  full.names=TRUE)
-
-storm_list_beta<-do.call("list", lapply(studies_file_list, 
-                                        read.csv, 
-                                        stringsAsFactors=FALSE, 
-                                        header=T))
-
-meta_df <-do.call("rbind", lapply(studies_file_list, 
-                                     read.csv, 
-                                     check.names = FALSE,
-                                     stringsAsFactors=FALSE, 
-                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) 
-
-```
-
-```{r - plot}
-
-ggplot(meta_df, aes(x = `Design (Control/Burn; Pre/Post)`, fill = `Design (Control/Burn; Pre/Post)`)) +
-  geom_bar() +
-  scale_fill_manual(values = c("darksalmon", "darkslategray4", "cornflowerblue")) +
-  theme_bw() +
-  theme(legend.position = "none")
-
-
-# Time since Fire 
-# Reorder the categories 
-meta_df$Time_Since_Fire <- factor(meta_df$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "13", "15", "80", "90", "110", "Pre", "Post"))
-
-ggplot(meta_df, aes(x = Time_Since_Fire, fill = Time_Since_Fire)) +
-  geom_bar() +
-  xlab("Time Since Fire") +
-  ylab("Frequency") +
-  theme_bw() +
-  theme(legend.position = "none")
-
-
-
-
-
-
+#They have size of watershed, elevation, slope 
 ```
 
 
 ```{r filtered data}
-final_dataset <- read_csv(here("Output_for_analysis", "archive", "Effect_Size_Geospatial_Fire_Lat_Long.csv"))
+final_dataset <- read_csv(here("Output_for_analysis", "07_Meta_effect_size_models", "effect_size_geospatial_fire_lat_long.csv"))
+
+# might want to include maxelevraw from the geospatial 
+# stream order - probably sample in the more accessible portion of the catchment 
+# stream order and effect size - in the bigger streams
+# smaller stream - the bigger effect for nitrate, in bigger systems we are seeing a dilution of the impact. Stream order and watershed area are redundant because they can be used for a proxy for each other. 
+# we want to choose area over stream order that is more informative. 
+# add in maxelevraw for the correlation matrix.
 
 ```
 
@@ -138,8 +98,11 @@ final_dataset <- final_dataset %>%
                                      TRUE ~ Time_Since_Fire)) # changing the time since fire to a numeric structure and changing the abbott and rhea time since fire to the exact time since fire 
 doc <- final_dataset %>% 
   filter(response_var == "DOC_Interp") %>% # filtering out DOC 
-  select(Effect_size, totdasqkm, streamorde, slope, burn_percentage, Time_Since_Fire) %>% # Only want to do the catchment characteristics
+  select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire) %>% # Only want to do the catchment characteristics
   na.omit()
+
+write_csv(doc, here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"))
+
   
 # Simple correlation matrix between effect size and all the other catchment characteristics
 res <- cor(doc)
@@ -159,15 +122,17 @@ corrplot(res, type = "upper", order = "FPC",
 corrplot(res2$r, type="upper", order="hclust", 
          p.mat = res2$P, sig.level = 0.05, insig = "blank")
 
-ggpairs(doc, columns = c("Effect_size", "totdasqkm", "streamorde", "slope", "burn_percentage", "Time_Since_Fire")) +
+ggpairs(doc, columns = c("Effect_size", "totdasqkm", "minelevraw", "maxelevsmo","minelevsmo", "elevfixed", "slope", "burn_percentage", "Time_Since_Fire")) +
   theme_bw()
 
 
 ### NO3 #### 
 no3 <- final_dataset %>% 
   filter(response_var == "NO3_Interp") %>% 
-  select(Effect_size, totdasqkm, streamorde, slope, burn_percentage, Time_Since_Fire) %>% 
+  select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire) %>% 
   na.omit()
+
+write_csv(no3, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"))
 
 ggpairs(no3, columns = c("Effect_size", "totdasqkm", "streamorde", "slope", "burn_percentage", "Time_Since_Fire")) +
   theme_bw()

@@ -1,0 +1,1229 @@
+---
+title: "Wenas_Effect_Size_Models"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+date: "2023-11-16"
+editor_options:
+  chunk_output_type: console
+---
+
+The purpose of this script is to perform models for effect size against burn characterizations 
+
+Script Workflow:
+
+Step 1) Load in the geospatial csv that is generated from pulling in stream cat data
+
+Step 2) Load in the fire name and year summary csv
+
+Step 3) Load in the effect size sheet that comes from the All_Studies_Temporal_Normalization script that includes effect size for each watershed. 
+
+Our model:Effect_size ~ burn_percentage*TSF + (1|Site)
+
+
+# Status: in progress
+
+# ==============================================================================
+# Author: Jake Cavaiani 
+# 16 November 2023
+# ==============================================================================
+
+## Geospatial data
+```{r Jake/Mac Load Packages}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+
+library(tidyverse)
+library(here)
+library(forecastML)
+library(zoo)
+library(hrbrthemes)
+library(viridis)
+library(readxl)
+library(lme4)
+library(GGally)
+library(merTools)
+library(ggcorrplot)
+library(ggpmisc)
+library(RColorBrewer)
+library(ggbreak)
+library(lmerTest)
+library(car)
+```
+
+```{r load in csv's}
+options(max.print = 200)
+
+# Geospatial csv from stream cat with only the sites and the total area + the burn percentages 
+geospatial <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2023-11-13.csv"))
+
+geospatial <- geospatial %>% 
+  dplyr::select(site, comid, totdasqkm, streamorde, maxelevraw, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws)
+
+# Site summary of each study and its respective fire and the year of that fire
+studies_data <- read_excel(here("inputs", "StudiesData_Table1.xlsx"),
+    sheet = "Study_info_filtered_V3_Q") %>% 
+  dplyr::select(Study, Fire_name, Fire_year)
+
+# The effect sizes of each study's watershed
+effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv")) %>% 
+  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Site, Time_Since_Fire)
+
+effect_size_doc <- effect_size %>% 
+  filter(response_var == "DOC_Interp")
+
+effect_size_no3 <- effect_size %>% 
+  filter(response_var == "NO3_Interp")
+
+# Read in the study and site csv 
+study_site_data <- read_excel(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.xlsx")) %>% 
+  dplyr::select(Study, Site, Fire_year, Effect_size_site) %>% 
+  rename(site = Site, 
+         Study_ID = Study, 
+         year = Fire_year, 
+         Site = Effect_size_site) %>% 
+  na.omit()
+
+# pivoting to make the responses in one column
+geospatial_long <- geospatial %>%
+  pivot_longer(
+    cols = MTBS_1986Ws:MTBS_2017Ws,
+    names_to = "year",
+    values_to = "burn_percentage",
+    values_drop_na = TRUE
+  )
+
+```
+
+
+```{r - plotting MTBS fire years }
+ggplot(geospatial_long, aes(x = seq_along(year), y = burn_percentage)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~site, scales = "free") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+```
+
+
+```{r - manually check fire years vs. MTBS data}
+
+fire_clip <- right_join(geospatial_long, study_site_data) 
+
+# fire_clip <- fire_clip %>% 
+#   na.omit() 
+# The na.omit function is removing sites that dont have MTBS data which is due to out of country/too old or too recent!
+# 51 watersheds now. 
+
+######################### I am gonna manually check each one! 
+# Akokala_Creek: 13.8379 is correct 
+# Arroyo Hondo: 16.4842 is correct 
+# Benjamin Slough: doesnt have the correct burn year from the study to the MTBS year
+# Bowman Creek: 5.7229 is correct 
+# Camas Creek is from Tidemann paper which was in 1973 with a burn from 1970 so there is not MTBS data 
+# Coal: 55.8481 is correct 
+# Coal_Creek: 0 is correct; from Hauer & Spencer from a burn in 1988. 
+# Cold Creek is from Hickenbottom at is from too recent of a burn to have MTBS data 
+# Control: The paper lists 74 % but ours says 42.78. 
+# Crane Creek is from the Neary & Currier paper which investigates a burn from 1978. No MTBS data 
+# Crow creek: 9.1827 is correct. 
+# Dry Creek: 0 is correct
+# DS1: 16.3095 is correct 
+# DS2: 27.1144 is correct 
+# DS3: 27.1121 is correct 
+# East Fork: doesnt exist in here because its in Canada
+# Fish Creek: 72.8600.....is the only MTBS data and is correct
+# Gaviota: 12.9690....is the only MTBS data and is correct 
+# Grade creek is from Tiedemann paper which investigates a 1970 fire so there will be no MTBS data
+# Hobble Creek Upper: 0 is correct; doesnt have the correct burn year from the study (2018) to the MTBS years given
+# Hobble Creek Lower: 0 is correct; doesnt have the correct burn year from the study (2018) to the MTBS years given
+# Jones creek: 96.1969 is correct
+# Logging Creek: 1.5154 is correct
+# Lower Mcdonald Creek: 31.3921 is correct
+# Middle_Fork is from the Hickenbottom paper which investigates a burn from 2021. Dont think we have that updated MTBS data yet
+# Mill Race: 0 is correct; doesnt have the correect burn year from the study (2018) to the MTBS year given 
+# Mitsubishi Race: 0 is correct; doesnt have the correect burn year from the study (2018) to the MTBS year given
+# North Fork is from the Hickenbottom paper which investigates a burn from 2021. Dont think we have that updated MTBS data yet
+# Notawohka Creek: doesnt have MTBS data because the site is located within Canada
+# Payson doesnt have the correect burn year from the study (2018) to the MTBS year given 
+# PBR: 0 is correct 
+# Pinchot: 0.2982....is the only MTBS data and it is correct 
+# PNF: 16.7187 is correct
+# Provo river: 0 is correct; doesnt have the correect burn year from the study (2018) to the MTBS year given 
+# PSF: 1.5243...is the only MTBS data and it is correct 
+# Quartz Creek: 27.0952....is the only MTBS data and it is correct 
+# Rattlesnake is a control site so should be 0 *
+# Red_Bench_Creek: 100....is the only MTBS data and it is correct
+# Red_Meadow_Creek: 24.0870....is the only MTBS data and it is correct 
+# Reference: Supposed to be 0....but it lists it as 70.0648 which is the same as the Wragg which is not correct *
+# Rocky Fire: 12.8141 is correct 
+# San Onofre: 98.9419 is correct
+# Site 1: 76.4673 is correct 
+# Site 2: 76.4673 is correct 
+# Site 3: 6.7889 is correct
+# Spanish Fork Lower: 0 is correct
+# Spanish Fork Upper: 0 is correct 
+# Trout Creek: In the Hickenbottom paper so its too new for MTBS data 
+# US1: 0 is correct;
+# US2: Doesnt have the correct MTBS data 
+# Upper MacDonald Creek: 24.9105 is correct 
+# Wally Creek: 93.5391 is correct 
+# Wash Branch is in the Neary & Currier paper which investigates a 1978 fire so there is no MTBS data 
+# Wragg Fire: 70.0648 is correct 
+
+
+fire_clip <- fire_clip %>% 
+  mutate(burn_percentage = case_when(site == 'Benjamin Slough' ~ 67,
+                                     site == 'Payson' ~ 90,
+                                     site == 'Spanish Fork Lower' ~ 24,
+                                     site == 'Spanish Fork Upper' ~ 25,
+                                     site == 'Reference' ~ 0,
+                                     TRUE ~ burn_percentage))
+# These papers report the burn percentages so I manually put them in because the Streamcat data did not pull the proper data. 
+
+# Merge fire_clip, effect_size, studies_data
+effect_size_geospatial <- full_join(effect_size, fire_clip) # merging the effect size and the geospatial dataframes
+
+studies_data$Study_ID <- studies_data$Study # making a new column header to match the effect_size_geospatial dataframe
+
+effect_size_geospatial_fire <- full_join(effect_size_geospatial, studies_data)
+
+effect_size_geospatial_fire <- effect_size_geospatial_fire %>% 
+  dplyr::select(Study_ID, Fire_name, Fire_year, site, comid, totdasqkm, streamorde, maxelevraw, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Climate, Biome, Time_Since_Fire, response_var, Effect_size)
+
+write_csv(effect_size_geospatial_fire, here("Output_for_analysis", "07_meta_effect_size_models", "effect_size_geospatial_fire.csv"))
+
+meta <- read_csv(here("inputs", "Studies_Summary", "Studies_included_in_climate_figure.csv")) # reading in filtered meta data sheet
+
+meta <- meta %>%
+  rename(Study_ID = Study) # rename Study to Study_ID to match the effect size dataframe
+
+
+coords <- meta %>%
+  dplyr::select(Study_ID, Fire_Name, Lat, Long, number_of_burn, State, group) %>%  # Picking only the columns I want
+  rename(Fire_name = Fire_Name) # rename Fire_Name in the meta df to Fire_name to match the effect size df to merge
+
+effect_size_fire <- full_join(effect_size_geospatial_fire, coords) # this merges the df with lat/longs
+
+# effect_size_fire <- effect_size_fire %>% 
+#    drop_na(Effect_size) # This is dropping any row that doesn't have an effect size calculated for a specific site which means these are the sites that have a pre/post study design that we arent analyzing for the final product 
+  
+
+# Anaktuvuk River wildfire coordinates: 68.932756,	-150.7
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Lat = case_when(Study_ID == 'Abbott et al. 2021' ~ 68.932756,
+                                     TRUE ~ Lat),
+         Long = case_when(Study_ID == 'Abbott et al. 2021' ~ -150.7,
+                                     TRUE ~ Long))
+
+# Northwest Territories Fire coordinates: 61.4	-121.433
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Lat = case_when(Study_ID == 'Burd et al 2018' ~ 61.4,
+                                     TRUE ~ Lat),
+         Long = case_when(Study_ID == 'Burd et al 2018' ~ -121.433,
+                                     TRUE ~ Long))
+# Caldor Fire: 38.88376	-119.978005
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Hickenbottom et al. 2023' &
+                               Time_Since_Fire == 1 ~ 'Caldor Fire',
+                                        TRUE ~ Fire_name))
+
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_year = case_when(Study_ID == 'Hickenbottom et al. 2023' &
+                               Fire_name == 'Caldor Fire' ~ '2021',
+                                        TRUE ~ Fire_year))
+
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Lat = case_when(Fire_name == 'Caldor Fire' ~ 38.88376,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Caldor Fire' ~ -119.978005,
+                                     TRUE ~ Long))
+                          
+# Mosquito Fire: 38.958701	-120.920501
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Hickenbottom et al. 2023' &
+                               Time_Since_Fire == 0 ~ 'Mosquito Fire',
+                                        TRUE ~ Fire_name))
+
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_year = case_when(Study_ID == 'Hickenbottom et al. 2023' &
+                               Fire_name == 'Mosquito Fire' ~ '2022',
+                                        TRUE ~ Fire_year))
+
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Lat = case_when(Fire_name == 'Mosquito Fire' ~ 38.958701,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Mosquito Fire' ~ -120.920501,
+                                     TRUE ~ Long))
+
+# Rampage Fire Coordinates 48.418961	-113.696178: 
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Lat = case_when(Study_ID == 'Mast & Clow, 2008' ~ 48.418961,
+                                     TRUE ~ Lat),
+         Long = case_when(Study_ID == 'Mast & Clow, 2008' ~ -113.696178,
+                                     TRUE ~ Long))
+
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Mast & Clow, 2008' ~ 'Rampage Fire',
+                                     TRUE ~ Fire_name))
+
+# Fourmile canyon coordinates: 40.03333 -105.4167
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Lat = case_when(Fire_name == 'Fourmile Canyon Fire' ~ 40.03333,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Fourmile Canyon Fire' ~ -105.4167,
+                                     TRUE ~ Long))
+
+# Hayman Fire coordinates: 
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Rhea et al. 2021' ~ 'Hayman Fire',
+                                     TRUE ~ Fire_name),
+         Fire_year = case_when(Study_ID == 'Rhea et al. 2021' ~ '2002',
+                                     TRUE ~ Fire_year),
+         Lat = case_when(Fire_name == 'Hayman Fire' ~ 39.2,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Hayman Fire' ~ -105.3,
+                                     TRUE ~ Long))
+
+# Tiedemann, 1997 Safety Harbor Fire 48.10267, -120.3523
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Tiedemann, 1997' ~ 'Safety Harbor Fire',
+                                     TRUE ~ Fire_name),
+         Fire_year = case_when(Study_ID == 'Tiedemann, 1997' ~ '1980',
+                                     TRUE ~ Fire_year),
+         Lat = case_when(Fire_name == 'Safety Harbor Fire' ~ 48.10267,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Safety Harbor Fire' ~ -120.3523,
+                                     TRUE ~ Long))
+
+# Uzun Rocky Fire coordinates: 38.923564	-122.326478
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Uzun et al. 2020' &
+                               site == 'Rocky Fire' ~ 'Rocky Fire',
+                                     TRUE ~ Fire_name),
+         Lat = case_when(Fire_name == 'Rocky Fire' ~ 38.923564,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Rocky Fire' ~ -122.326478,
+                                     TRUE ~ Long))
+# Uzun Wragg Fire coordinates: 38.512031	-122.097228
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Uzun et al. 2020' &
+                               site == 'Wragg Fire' ~ 'Wragg Fire',
+                                     TRUE ~ Fire_name),
+         Lat = case_when(Fire_name == 'Wragg Fire' ~ 38.512031,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'Wragg Fire' ~ -122.097228,
+                                     TRUE ~ Long))
+
+# Writer et al. 2014 # High Park Fire 40.71600 -105.2330
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_name = case_when(Study_ID == 'Writer et al. 2014' ~ 'High Park Fire',
+                                     TRUE ~ Fire_name),
+         Fire_year = case_when(Study_ID == 'Writer et al. 2014' ~ '2012',
+                                     TRUE ~ Fire_year),
+         Lat = case_when(Fire_name == 'High Park Fire' ~ 40.71600,
+                                     TRUE ~ Lat),
+         Long = case_when(Fire_name == 'High Park Fire' ~ -105.2330,
+                                     TRUE ~ Long))
+
+# Neary fire year - 1978 
+effect_size_fire <- effect_size_fire %>% 
+  mutate(Fire_year = case_when(Study_ID == 'Neary & Currier, 1982' ~ '1978',
+                                     TRUE ~ Fire_year))
+
+write_csv(effect_size_fire, here("Output_for_analysis", "07_meta_effect_size_models", "effect_size_geospatial_fire_lat_long.csv"))
+
+```
+
+### Burn percentage plots 
+```{r plot DOC}
+doc_effect_size_burn_merged <- right_join(effect_size_doc, fire_clip) %>% 
+  na.omit() 
+
+give.n <- function(x){
+  return(c(y = median(x)*1.05, label = length(x))) 
+  # experiment with the multiplier to find the perfect position
+}
+
+ggpairs(doc_effect_size_burn_merged, 
+        columns = c("Effect_size", "burn_percentage", "Time_Since_Fire")) +
+  theme_bw() +
+  ggtitle("Effect Size - DOC")
+  
+  
+brewer.pal(n = 9, name = "YlOrRd")
+brewer.pal(n = 9, name = "YlGn")
+brewer.pal(n = 8, name = "Dark2")
+
+ggpairs(doc_effect_size_burn_merged,
+        columns = c("Effect_size", "burn_percentage"), 
+        ggplot2::aes(color = Time_Since_Fire, alpha = 0.5)) +
+  scale_color_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
+  scale_fill_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
+  theme_bw() +
+  ggtitle("Effect Size - DOC")
+
+ggsave("Effect_Size_Burn_Percentage_DOC.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
+
+
+# Burn percentage
+ggplot(data = doc_effect_size_burn_merged, aes(x = burn_percentage, y = Effect_size)) +
+  stat_poly_line() +
+  stat_poly_eq() +
+  geom_boxplot() +
+  theme_bw()
+
+ggplot(data = doc_effect_size_burn_merged, aes(x = burn_percentage, y = Effect_size, color = Time_Since_Fire)) +
+  stat_poly_line() +
+  stat_poly_eq() +
+  geom_point() +
+  scale_color_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
+  theme_bw() +
+  theme(legend.position = "none")
+
+
+
+
+
+```
+
+### Burn percentage models
+```{r Effect size models-DOC}
+# DOC #
+# Effect_size ~ burn_percentage*TSF + (1|Site)
+
+ggpairs(doc_effect_size_burn_merged,
+        columns = c("burn_percentage", "Time_Since_Fire"))
+
+doc_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = doc_effect_size_burn_merged)
+
+doc_burn_mixed
+
+summary(doc_burn_mixed)
+fixef(doc_burn_mixed)
+confint(doc_burn_mixed)
+
+ranef(doc_burn_mixed)$site %>% 
+  head(5)
+
+coef(doc_burn_mixed)$site %>% 
+  head(5)
+
+predictInterval(doc_burn_mixed)
+
+REsim(doc_burn_mixed) 
+
+plotREsim(REsim(doc_burn_mixed))
+
+# anova #
+doc_aov = aov(Effect_size ~ burn_percentage + Climate, data = doc_effect_size_burn_merged)
+plot(doc_aov)
+
+summary(doc_aov)
+TukeyHSD(doc_aov, which = "Climate")
+
+
+```
+
+
+```{r Effect size models-NO3}
+# NO3 #
+# Effect_size ~ burn_percentage*TSF + (1|Site)
+no3_effect_size_burn_merged <- right_join(effect_size_no3, fire_clip) %>% 
+  na.omit() 
+
+doc_no3_effect_size <- rbind(no3_effect_size_burn_merged, doc_effect_size_burn_merged)  # merging nitrate and DOC 
+
+write.csv(no3_effect_size_burn_merged, "")
+
+
+ggpairs(no3_effect_size_burn_merged,
+        columns = c("burn_percentage", "Time_Since_Fire"))
+
+no3_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = no3_effect_size_burn_merged)
+
+summary(no3_burn_mixed)
+confint(no3_burn_mixed)
+
+ranef(no3_burn_mixed)$site %>% 
+  head(5)
+
+coef(no3_burn_mixed)$site %>% 
+  head(5)
+
+predictInterval(no3_burn_mixed)
+
+REsim(no3_burn_mixed) 
+
+plotREsim(REsim(no3_burn_mixed))
+
+ggpairs(no3_effect_size_burn_merged,
+        columns = c("Effect_size", "burn_percentage"), 
+        ggplot2::aes(color = Time_Since_Fire, alpha = 0.5)) +
+  scale_color_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
+  scale_fill_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
+  theme_bw() +
+  ggtitle("Effect Size - Nitrate")
+
+ggsave("Effect_Size_Burn_Percentage_NO3.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
+
+
+
+
+```
+
+
+### Climate models
+```{r DOC climate models}
+doc_climate_mixed <-  lmer(Effect_size ~ Climate + (1 | site), data = doc_effect_size_burn_merged)
+
+doc_climate_mixed
+
+summary(doc_climate_mixed)
+fixef(doc_climate_mixed)
+confint(doc_climate_mixed)
+
+predictInterval(doc_climate_mixed)
+
+REsim(doc_climate_mixed) 
+
+plotREsim(REsim(doc_climate_mixed))
+
+```
+
+```{r DOC levenes test}
+doc_climate_levene <- effect_size_doc %>% 
+  filter(Study_ID != "Abbott et al. 2021",
+         Study_ID != "Rhea et al. 2021") # Eliminating studies that monitor sites that are greater than 10 years post-fire
+
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ Climate, data = doc_climate_levene) #F-value: 66.819, p-value: <2.2e-16, Df: 4, 44
+
+# plot 
+
+boxplot(Effect_size ~ Climate,
+  data = doc_climate_levene,
+  main = "Effect size Distribution by Climate - DOC",
+  xlab = "Climate",
+  ylab = "Effect Size",
+  col = "steelblue",
+  border = "black")
+```
+The p-value of the test is <2.2e-16, which is less than our significance level of 0.05. 
+Thus, we reject the null hypothesis and conclude that the variance among the climate groups is NOT equal. 
+
+From the plot, Csa (Hot-Mediterranean) is the most variable. Now we have to think about why?
+
+```{r NO3 climate models}
+no3_climate_mixed <-  lmer(Effect_size ~ Climate + (1 | site), data = no3_effect_size_burn_merged)
+
+no3_climate_mixed
+
+summary(no3_climate_mixed)
+fixef(no3_climate_mixed)
+confint(no3_climate_mixed)
+
+predictInterval(no3_climate_mixed)
+
+REsim(no3_climate_mixed) 
+
+plotREsim(REsim(no3_climate_mixed))
+
+```
+
+```{r NO3 levenes test}
+no3_climate_levene <- effect_size_no3 %>% 
+  filter(Study_ID != "Abbott et al. 2021",
+         Study_ID != "Rhea et al. 2021") # Eliminating studies that monitor sites that are greater than 10 years post-fire
+
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ Climate, data = no3_climate_levene) #F-value: 2.8984, p-value: 0.008966, Df: 7,88
+
+# plot 
+
+boxplot(Effect_size ~ Climate,
+  data = no3_climate_levene,
+  main = "Effect size Distribution by Climate - NO3",
+  xlab = "Climate",
+  ylab = "Effect Size",
+  col = "steelblue",
+  border = "black")
+
+```
+The p-value of the test is 0.008966, which is less than our significance level of 0.05. 
+Thus, we reject the null hypothesis and conclude that the variance among the climate groups is NOT equal. 
+
+"BSk" = "Cold semi-arid"
+"Cfb" = "Subtropical highland",
+"Csa" = "Hot-Mediterranean",
+"Csb" = "Warm-Mediterranean",
+"Dfb" = "Warm-humid",
+"Dfc" = "Subarctic",
+
+"Dsb" = "Mediterranean", 
+"Cfa" = "Humid subtropical",
+
+
+### TSF models
+```{r DOC TSF models}
+doc_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | site), data = doc_effect_size_burn_merged)
+
+doc_tsf_mixed
+
+summary(doc_tsf_mixed)
+fixef(doc_tsf_mixed)
+confint(doc_tsf_mixed)
+
+predictInterval(doc_tsf_mixed)
+
+REsim(doc_tsf_mixed) 
+
+plotREsim(REsim(doc_tsf_mixed))
+
+```
+
+```{r DOC levenes test}
+effect_size_doc$Time_Since_Fire <- factor(effect_size_doc$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", ">10")) # reordering to make sure that the >10 year bin is at the end of the plot to visualize through time. 
+
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ Time_Since_Fire, data = effect_size_doc) #F-value: 0.73 p-value: 0.6277, Df: 6, 48
+
+# plot 
+
+boxplot(Effect_size ~ Time_Since_Fire,
+  data = effect_size_doc,
+  main = "Effect size Distribution by Time Since Fire - DOC",
+  xlab = "Time Since Fire",
+  ylab = "Effect Size",
+  col = "steelblue",
+  border = "black") 
+
+```
+The p-value of the test is 0.73, which is greater than our significance level of 0.05. 
+Thus, we do not reject the null hypothesis and conclude that the variance among the climate groups is equal. 
+
+
+```{r NO3 TSF models}
+no3_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | site), data = no3_effect_size_burn_merged)
+
+no3_tsf_mixed
+
+summary(no3_tsf_mixed)
+fixef(no3_tsf_mixed)
+confint(no3_tsf_mixed)
+
+predictInterval(no3_tsf_mixed)
+
+REsim(no3_tsf_mixed) 
+
+plotREsim(REsim(no3_tsf_mixed))
+
+```
+
+```{r NO3 levenes test}
+effect_size_no3$Time_Since_Fire <- factor(effect_size_no3$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", ">10")) # reordering to make sure that the >10 year bin is at the end of the plot to visualize through time. 
+
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ Time_Since_Fire, data = effect_size_no3) #F-value: 2.4422, p-value: 0.03067, Df: 6,95
+
+# plot 
+
+boxplot(Effect_size ~ Time_Since_Fire,
+  data = effect_size_no3,
+  main = "Effect size Distribution by Time Since Fire - NO3",
+  xlab = "Time Since Fire",
+  ylab = "Effect Size",
+  col = "steelblue",
+  border = "black")
+
+
+```
+The p-value of the test is 0.03067, which is less than our significance level of 0.05. 
+Thus, we reject the null hypothesis and conclude that the variance among the time since fire groups is NOT equal. 
+
+
+# Make the same TSF plot but with Burn percentage #
+
+```{r}
+effect_both_doc_no3 <- rbind(no3_effect_size_burn_merged, doc_effect_size_burn_merged)
+
+# Test for grouping 
+df <- effect_both_doc_no3 %>%
+  mutate(grouped_percentage = cut(burn_percentage, breaks = seq(0, 100, by = 5), include.lowest = TRUE, labels = FALSE))
+
+df <- df %>% 
+  mutate(grouped_percentage = as.character(grouped_percentage))
+
+effect_both_doc_no3 <- df %>% 
+  mutate(burn_percentage_group = case_when(grouped_percentage == "1" ~ "0-5",
+                                           grouped_percentage == "2" ~ "6-10",
+                                           grouped_percentage == "3" ~ "11-15",
+                                           grouped_percentage == "4" ~ "16-20",
+                                           grouped_percentage == "5" ~ "21-25",
+                                           grouped_percentage == "6" ~ "26-30",
+                                           grouped_percentage == "12" ~ "56-60",
+                                           grouped_percentage == "14" ~ "66-70",
+                                           grouped_percentage == "15" ~ "71-75",
+                                           grouped_percentage == "16" ~ "76-80",
+                                           grouped_percentage == "18" ~ "86-90",
+                                           grouped_percentage == "20" ~ "96-100"))
+                                           
+
+#
+
+effect_both_doc_no3$burn_percentage_group <- factor(effect_both_doc_no3$burn_percentage_group, levels = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "56-60", "66-70", "71-75", "76-80", "86-90", "96-100"))
+
+
+# calculating the mean percent_difference by climate
+burn_percentage_effect <- effect_both_doc_no3 %>% 
+  group_by(response_var, burn_percentage_group) %>% 
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
+   mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
+
+
+# Plot #
+vn = expression(paste(""*N*O[3]^"-"))
+
+ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = burn_percentage_effect) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("Burn Percentage") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Analyte"),
+                     labels = c('DOC', vn)) +
+  stat_summary(fun.data = give.n, geom = "text", fun.y = median,
+                  position = position_nudge(x = -0.4)) +
+  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
+                                                   "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
+                                                    "91-95", "96-100")) +
+  ylim(-5, 5) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 30, angle = -90),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.5, 0.86))
+
+ggsave("Effect_Size_Burn_Percentage.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
+
+### ALANs comments of no gridlines/every other burn percentage ####
+ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = burn_percentage_effect) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("Burn Percentage") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Analyte"),
+                     labels = c('DOC', vn)) +
+  stat_summary(fun.data = give.n, geom = "text", fun.y = median,
+                  position = position_nudge(x = -0.4)) +
+  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40","41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80", "81-85", "86-90","91-95", "96-100")) +
+  ylim(-5, 5) +
+  theme_classic() +
+  theme(axis.text.x = element_text(size = 30, angle = -90),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.5, 0.86))
+
+ggsave("Effect_Size_Burn_Percentage_everyothe.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
+
+
+
+
+# Break this down line by line #
+
+burn_percentage_effect <- effect_both_doc_no3 %>% 
+  group_by(response_var, burn_percentage_group) %>% 
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
+   mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
+
+
+ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
+  theme(legend.position = "none") +
+
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = burn_percentage_effect) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("Burn Percentage") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = ""),
+                     labels = c('DOC', vn)) +
+  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
+                                                   "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
+                                                    "91-95", "96-100")) +
+  ylim(-5, 5) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 20, angle = -90),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.5, 0.86))
+
+ggsave("AGU_Effect_Size_burn_percentage.pdf",
+       path = here("initial_plots", "AGU"),
+       width = 10, height = 8,  units = "in")
+
+# Fade DOC
+test <- burn_percentage_effect[c(10:21, 1:9), ]
+
+test2 <- effect_both_doc_no3[c(79:123, 1:78), ]
+
+ggplot(test2, aes(burn_percentage_group, Effect_size, alpha = response_var, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
+  theme(legend.position = "none") +
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var
+                      ),
+                  position = position_dodge(width = -0.5), size = 1.5, data = test) +
+  scale_alpha_manual(values = c(0.25, 1)) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("Burn Percentage") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = ""),
+                     labels = c('DOC', vn)) +
+  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
+                                                   "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
+                                                    "91-95", "96-100")) +
+  ylim(-5, 5) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 20, angle = -90),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = "none")
+
+ggsave("Fade_DOC_AGU_Effect_Size_burn_percentage.pdf",
+       path = here("initial_plots", "AGU"),
+       width = 10, height = 8,  units = "in")
+
+
+# Fade NO3
+ggplot(test2, aes(burn_percentage_group, Effect_size, alpha = response_var, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
+  theme(legend.position = "none") +
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var
+                      ),
+                  position = position_dodge(width = -0.5), size = 1.5, data = test) +
+  scale_alpha_manual(values = c(1, 0.25)) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("Burn Percentage") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = ""),
+                     labels = c('DOC', vn)) +
+  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
+                                                   "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
+                                                    "91-95", "96-100")) +
+  ylim(-5, 5) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 20, angle = -90),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = "none")
+
+ggsave("Fade_NO3_AGU_Effect_Size_burn_percentage.pdf",
+       path = here("initial_plots", "AGU"),
+       width = 10, height = 8,  units = "in")
+
+
+
+
+
+
+# nitrate only
+no3_effect_size_burn_merged <- effect_both_doc_no3 %>% 
+  filter(response_var == "NO3_Interp")
+
+no3_burn_percentage <- burn_percentage_effect %>% 
+  filter(response_var == "NO3_Interp")
+
+ggplot(no3_effect_size_burn_merged, aes(burn_percentage_group, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, alpha = 0.25, data = no3_burn_percentage) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("Burn Percentage") +
+  scale_color_manual(values = c("#E7B800"),
+                     guide = guide_legend(title = ""),
+                     labels = c(vn)) +
+  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
+                                                   "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
+                                                    "91-95", "96-100")) +
+  ylim(-5, 5) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 30, angle = -90),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.5, 0.86))
+
+ggsave("NO3_Effect_Size_Burn_Percentage.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
+
+# DOC only
+doc_effect_size_burn_merged <- effect_both_doc_no3 %>% 
+  filter(response_var == "DOC_Interp")
+
+doc_burn_percentage <- burn_percentage_effect %>% 
+  filter(response_var == "DOC_Interp")
+
+ggplot(doc_effect_size_burn_merged, aes(burn_percentage_group, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = doc_burn_percentage) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("Burn Percentage") +
+  scale_color_manual(values = c("#00AFBB"),
+                     guide = guide_legend(title = ""),
+                     labels = c("DOC")) +
+  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
+                                                   "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
+                                                    "91-95", "96-100")) +
+  ylim(-5, 5) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 30, angle = -90),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.5, 0.86))
+
+ggsave("DOC_Effect_Size_Burn_Percentage.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
+
+  
+
+```
+
+### Peter's comment for binning burn percent into different percentage intervals 
+```{r percentage intervals}
+#### 10 % grouping ####
+# Test for grouping 
+df <- effect_both_doc_no3 %>%
+  mutate(grouped_percentage = cut(burn_percentage, breaks = seq(0, 100, by = 10), include.lowest = TRUE, labels = FALSE))
+
+df <- df %>% 
+  mutate(grouped_percentage = as.character(grouped_percentage))
+
+effect_both_doc_no3 <- df %>% 
+  mutate(burn_percentage_group = case_when(grouped_percentage == "1" ~ "0-10",
+                                           grouped_percentage == "2" ~ "11-20",
+                                           grouped_percentage == "3" ~ "21-30",
+                                           grouped_percentage == "4" ~ "31-40",
+                                           grouped_percentage == "5" ~ "41-50",
+                                           grouped_percentage == "6" ~ "51-60",
+                                           grouped_percentage == "7" ~ "61-70",
+                                           grouped_percentage == "8" ~ "71-80",
+                                           grouped_percentage == "9" ~ "81-90",
+                                           grouped_percentage == "10" ~ "91-100"))
+                                           
+
+#
+
+effect_both_doc_no3$burn_percentage_group <- factor(effect_both_doc_no3$burn_percentage_group, levels = c("0-10", "11-20", "21-30", "31-40", "41-50", "51-60", "61-70", "71-80", "81-90", "91-100"))
+
+
+# calculating the mean percent_difference by climate
+burn_percentage_effect <- effect_both_doc_no3 %>% 
+  group_by(response_var, burn_percentage_group) %>% 
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
+   mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
+
+
+# Plot #
+vn = expression(paste(""*N*O[3]^"-"))
+
+ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = burn_percentage_effect) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("Burn Percentage") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Analyte"),
+                     labels = c('DOC', vn)) +
+  stat_summary(fun.data = give.n, geom = "text", fun.y = median,
+                  position = position_nudge(x = -0.4)) +
+  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-10", "11-20", "21-30", "31-40", "41-50", "51-60", "61-70", "71-80", "81-90", "91-100")) +
+  ylim(-5, 5) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 30, angle = -90),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.5, 0.86))
+
+ggsave("Effect_Size_Burn_Percentage_10s.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
+
+```
+
+### Burn percentage models for 10% intervals
+```{r Effect size models-DOC}
+# DOC #
+# Effect_size ~ burn_percentage*TSF + (1|Site)
+
+doc_10_burn <- effect_both_doc_no3 %>% 
+  filter(response_var == "DOC_Interp")
+
+doc_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = doc_10_burn)
+
+doc_burn_mixed
+
+summary(doc_burn_mixed) # p-value: 0.973 - > 0.05
+
+# now making this by the burn percentage groupings 
+doc_burn_mixed = lmer(Effect_size ~ burn_percentage_group + (1 | site), data = doc_10_burn)
+
+doc_burn_mixed
+
+summary(doc_burn_mixed) # p-value: for all groupings are > 0.05
+# burn_percentage_group11-20 -1.02189    1.45939  4.98650  -0.700    0.515
+# burn_percentage_group21-30  0.54756    1.41353  4.99319   0.387    0.714
+# burn_percentage_group51-60  0.27944    1.78662  4.97804   0.156    0.882
+# burn_percentage_group61-70  1.23719    1.79152  5.03288   0.691    0.520
+# burn_percentage_group71-80 -2.39369    1.78846  4.99857  -1.338    0.238
+# burn_percentage_group81-90 -0.07337    1.79152  5.03288  -0.041    0.969
+
+fixef(doc_burn_mixed)
+confint(doc_burn_mixed)
+
+ranef(doc_burn_mixed)$site %>% 
+  head(5)
+
+coef(doc_burn_mixed)$site %>% 
+  head(5)
+
+predictInterval(doc_burn_mixed)
+
+REsim(doc_burn_mixed) 
+
+plotREsim(REsim(doc_burn_mixed))
+
+```
+
+```{r DOC levenes test}
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ burn_percentage_group, data = doc_10_burn) #F-value: 0.621, p-value: 0.7122, Df: 6, 38
+
+# plot 
+
+boxplot(Effect_size ~ burn_percentage_group,
+  data = doc_10_burn,
+  main = "Effect size Distribution by burn percentage - DOC",
+  xlab = "Burn Percentage",
+  ylab = "Effect Size",
+  col = "steelblue",
+  border = "black")
+```
+The p-value of the test is 0.7122, which is greater than our significance level of 0.05. 
+Thus, we do not reject the null hypothesis and conclude that the variance among the climate groups is equal. 
+
+```{r Effect size models-NO3}
+# NO3 #
+# Effect_size ~ burn_percentage*TSF + (1|Site)
+
+no3_10_burn <- effect_both_doc_no3 %>% 
+  filter(response_var == "NO3_Interp")
+
+no3_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = no3_10_burn)
+
+no3_burn_mixed
+
+summary(no3_burn_mixed) # p-value: 0.949 - > 0.05
+
+# now making this by the burn percentage groupings 
+no3_burn_mixed = lmer(Effect_size ~ burn_percentage_group + (1 | site), data = no3_10_burn)
+
+no3_burn_mixed
+
+summary(no3_burn_mixed) # p-value: All groupings except 81-90 are insignificant (>0.05)
+#burn_percentage_group11-20   -0.5275     0.8514 14.8742  -0.620  0.54495   
+#burn_percentage_group21-30    0.7697     0.8533 14.9168   0.902  0.38136   
+#burn_percentage_group51-60    0.5647     1.3650 13.8405   0.414  0.68542   
+#burn_percentage_group61-70    1.1795     1.4779 18.9576   0.798  0.43471   
+#burn_percentage_group71-80   -0.8912     1.1083 15.4049  -0.804  0.43359   
+#burn_percentage_group81-90   -4.3541     1.4779 18.9576  -2.946  0.00831 **
+#burn_percentage_group91-100   0.9352     0.9755 14.4181   0.959  0.35351 
+
+fixef(no3_burn_mixed)
+confint(no3_burn_mixed)
+
+ranef(no3_burn_mixed)$site %>% 
+  head(5)
+
+coef(no3_burn_mixed)$site %>% 
+  head(5)
+
+predictInterval(no3_burn_mixed)
+
+REsim(no3_burn_mixed) 
+
+plotREsim(REsim(no3_burn_mixed))
+
+
+
+```
+
+```{r NO3 levenes test}
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ burn_percentage_group, data = no3_10_burn) #F-value: 1.643, p-value: 0.1377, Df: 7, 70
+
+# plot 
+
+boxplot(Effect_size ~ burn_percentage_group,
+  data = no3_10_burn,
+  main = "Effect size Distribution by burn percentage - NO3",
+  xlab = "Burn Percentage",
+  ylab = "Effect Size",
+  col = "#E7B800",
+  border = "black")
+```
+The p-value of the test is 0.1377, which is greater than our significance level of 0.05. 
+Thus, we do not reject the null hypothesis and conclude that the variance among the climate groups ARE equal. 
+
+### 20 % grouping ###
+```{r 20 % grouping}
+# Test for grouping 
+df <- effect_both_doc_no3 %>%
+  mutate(grouped_percentage = cut(burn_percentage, breaks = seq(0, 100, by = 20), include.lowest = TRUE, labels = FALSE))
+
+df <- df %>% 
+  mutate(grouped_percentage = as.character(grouped_percentage))
+
+effect_both_doc_no3 <- df %>% 
+  mutate(burn_percentage_group = case_when(grouped_percentage == "1" ~ "0-20",
+                                           grouped_percentage == "2" ~ "21-40",
+                                           grouped_percentage == "3" ~ "41-60",
+                                           grouped_percentage == "4" ~ "61-80",
+                                           grouped_percentage == "5" ~ "81-100"))
+                                           
+
+#
+
+effect_both_doc_no3$burn_percentage_group <- factor(effect_both_doc_no3$burn_percentage_group, levels = c("0-20", "21-40", "41-60", "61-80", "81-100"))
+
+
+# calculating the mean percent_difference by climate
+burn_percentage_effect <- effect_both_doc_no3 %>% 
+  group_by(response_var, burn_percentage_group) %>% 
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
+   mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
+
+
+# Plot #
+vn = expression(paste(""*N*O[3]^"-"))
+
+ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = burn_percentage_effect) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("Burn Percentage") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Analyte"),
+                     labels = c('DOC', vn)) +
+  stat_summary(fun.data = give.n, geom = "text", fun.y = median,
+                  position = position_nudge(x = -0.4)) +
+  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-20", "21-40", "41-60", "61-80", "81-100")) +
+  ylim(-5, 5) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 30, angle = -90),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.position = c(0.5, 0.86))
+
+ggsave("Effect_Size_Burn_Percentage_20s.pdf",
+       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       width = 10, height = 8, units = "in")
+
+
+```
+
+
+
+
+
+
+
