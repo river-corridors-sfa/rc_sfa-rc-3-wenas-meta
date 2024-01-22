@@ -32,6 +32,9 @@ geospatial_data<- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extra
 names(geospatial_data)
 # It doesnt look like they have any vegetation data. 
 #They have size of watershed, elevation, slope 
+
+q <- geospatial_data %>% 
+  select(site, qa_ma, qc_ma)
 ```
 
 

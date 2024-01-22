@@ -339,60 +339,6 @@ write_csv(effect_size_fire, here("Output_for_analysis", "07_meta_effect_size_mod
 
 ```
 
-### Burn percentage plots 
-```{r plot DOC}
-doc_effect_size_burn_merged <- right_join(effect_size_doc, fire_clip) %>% 
-  na.omit() 
-
-give.n <- function(x){
-  return(c(y = median(x)*1.05, label = length(x))) 
-  # experiment with the multiplier to find the perfect position
-}
-
-ggpairs(doc_effect_size_burn_merged, 
-        columns = c("Effect_size", "burn_percentage", "Time_Since_Fire")) +
-  theme_bw() +
-  ggtitle("Effect Size - DOC")
-  
-  
-brewer.pal(n = 9, name = "YlOrRd")
-brewer.pal(n = 9, name = "YlGn")
-brewer.pal(n = 8, name = "Dark2")
-
-ggpairs(doc_effect_size_burn_merged,
-        columns = c("Effect_size", "burn_percentage"), 
-        ggplot2::aes(color = Time_Since_Fire, alpha = 0.5)) +
-  scale_color_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
-  scale_fill_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
-  theme_bw() +
-  ggtitle("Effect Size - DOC")
-
-ggsave("Effect_Size_Burn_Percentage_DOC.pdf",
-       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
-       width = 10, height = 8, units = "in")
-
-
-# Burn percentage
-ggplot(data = doc_effect_size_burn_merged, aes(x = burn_percentage, y = Effect_size)) +
-  stat_poly_line() +
-  stat_poly_eq() +
-  geom_boxplot() +
-  theme_bw()
-
-ggplot(data = doc_effect_size_burn_merged, aes(x = burn_percentage, y = Effect_size, color = Time_Since_Fire)) +
-  stat_poly_line() +
-  stat_poly_eq() +
-  geom_point() +
-  scale_color_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
-  theme_bw() +
-  theme(legend.position = "none")
-
-
-
-
-
-```
-
 ### Burn percentage models
 ```{r Effect size models-DOC}
 # DOC #
@@ -462,21 +408,6 @@ predictInterval(no3_burn_mixed)
 REsim(no3_burn_mixed) 
 
 plotREsim(REsim(no3_burn_mixed))
-
-ggpairs(no3_effect_size_burn_merged,
-        columns = c("Effect_size", "burn_percentage"), 
-        ggplot2::aes(color = Time_Since_Fire, alpha = 0.5)) +
-  scale_color_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
-  scale_fill_manual(values = c("#800026", "#FC4E2A",  "#FF7F00", "#A6761D", "#78C679", "#006837")) +
-  theme_bw() +
-  ggtitle("Effect Size - Nitrate")
-
-ggsave("Effect_Size_Burn_Percentage_NO3.pdf",
-       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
-       width = 10, height = 8, units = "in")
-
-
-
 
 ```
 
@@ -697,6 +628,9 @@ burn_percentage_effect <- effect_both_doc_no3 %>%
          lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
          upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
 
+write_csv(burn_percentage_effect, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_CIs"))
+
+write_csv(effect_both_doc_no3, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_fig_data"))
 
 # Plot #
 vn = expression(paste(""*N*O[3]^"-"))
@@ -728,230 +662,8 @@ ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = resp
         legend.position = c(0.5, 0.86))
 
 ggsave("Effect_Size_Burn_Percentage.pdf",
-       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+       path = here("initial_plots", "07_Meta_effect_size_models"),
        width = 10, height = 8, units = "in")
-
-### ALANs comments of no gridlines/every other burn percentage ####
-ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = response_var),
-       position = position_dodge(width = -0.5)) +
-  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
-  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
-                      color = response_var),
-                  position = position_dodge(width = -0.5), size = 1.5, data = burn_percentage_effect) +
-  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
-  ylab("Effect Size") +
-  xlab("Burn Percentage") +
-  scale_color_manual(values = c("#00AFBB", "#E7B800"),
-                     guide = guide_legend(title = "Analyte"),
-                     labels = c('DOC', vn)) +
-  stat_summary(fun.data = give.n, geom = "text", fun.y = median,
-                  position = position_nudge(x = -0.4)) +
-  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40","41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80", "81-85", "86-90","91-95", "96-100")) +
-  ylim(-5, 5) +
-  theme_classic() +
-  theme(axis.text.x = element_text(size = 30, angle = -90),
-        axis.text.y = element_text(size = 30),
-        axis.title.x = element_text(size = 40),
-        axis.title.y = element_text(size = 35),
-        legend.text = element_text(size = 30),
-        legend.position = c(0.5, 0.86))
-
-ggsave("Effect_Size_Burn_Percentage_everyothe.pdf",
-       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
-       width = 10, height = 8, units = "in")
-
-
-
-
-# Break this down line by line #
-
-burn_percentage_effect <- effect_both_doc_no3 %>% 
-  group_by(response_var, burn_percentage_group) %>% 
-  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
-            sd_effect = sd(Effect_size, na.rm = TRUE),
-            n_effect = n(),
-            Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
-   mutate(se_effect = sd_effect / sqrt(n_effect),
-         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
-         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
-
-
-ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = response_var),
-       position = position_dodge(width = -0.5)) +
-  geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
-  theme(legend.position = "none") +
-
-  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
-                      color = response_var),
-                  position = position_dodge(width = -0.5), size = 1.5, data = burn_percentage_effect) +
-  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
-  ylab("Effect Size") +
-  xlab("Burn Percentage") +
-  scale_color_manual(values = c("#00AFBB", "#E7B800"),
-                     guide = guide_legend(title = ""),
-                     labels = c('DOC', vn)) +
-  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
-                                                   "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
-                                                    "91-95", "96-100")) +
-  ylim(-5, 5) +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 20, angle = -90),
-        axis.text.y = element_text(size = 30),
-        axis.title.x = element_text(size = 40),
-        axis.title.y = element_text(size = 35),
-        legend.text = element_text(size = 30),
-        legend.position = c(0.5, 0.86))
-
-ggsave("AGU_Effect_Size_burn_percentage.pdf",
-       path = here("initial_plots", "AGU"),
-       width = 10, height = 8,  units = "in")
-
-# Fade DOC
-test <- burn_percentage_effect[c(10:21, 1:9), ]
-
-test2 <- effect_both_doc_no3[c(79:123, 1:78), ]
-
-ggplot(test2, aes(burn_percentage_group, Effect_size, alpha = response_var, color = response_var),
-       position = position_dodge(width = -0.5)) +
-  geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
-  theme(legend.position = "none") +
-  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
-                      color = response_var
-                      ),
-                  position = position_dodge(width = -0.5), size = 1.5, data = test) +
-  scale_alpha_manual(values = c(0.25, 1)) +
-  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
-  ylab("Effect Size") +
-  xlab("Burn Percentage") +
-  scale_color_manual(values = c("#00AFBB", "#E7B800"),
-                     guide = guide_legend(title = ""),
-                     labels = c('DOC', vn)) +
-  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
-                                                   "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
-                                                    "91-95", "96-100")) +
-  ylim(-5, 5) +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 20, angle = -90),
-        axis.text.y = element_text(size = 30),
-        axis.title.x = element_text(size = 40),
-        axis.title.y = element_text(size = 35),
-        legend.text = element_text(size = 30),
-        legend.position = "none")
-
-ggsave("Fade_DOC_AGU_Effect_Size_burn_percentage.pdf",
-       path = here("initial_plots", "AGU"),
-       width = 10, height = 8,  units = "in")
-
-
-# Fade NO3
-ggplot(test2, aes(burn_percentage_group, Effect_size, alpha = response_var, color = response_var),
-       position = position_dodge(width = -0.5)) +
-  geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
-  theme(legend.position = "none") +
-  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
-                      color = response_var
-                      ),
-                  position = position_dodge(width = -0.5), size = 1.5, data = test) +
-  scale_alpha_manual(values = c(1, 0.25)) +
-  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
-  ylab("Effect Size") +
-  xlab("Burn Percentage") +
-  scale_color_manual(values = c("#00AFBB", "#E7B800"),
-                     guide = guide_legend(title = ""),
-                     labels = c('DOC', vn)) +
-  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
-                                                   "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
-                                                    "91-95", "96-100")) +
-  ylim(-5, 5) +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 20, angle = -90),
-        axis.text.y = element_text(size = 30),
-        axis.title.x = element_text(size = 40),
-        axis.title.y = element_text(size = 35),
-        legend.text = element_text(size = 30),
-        legend.position = "none")
-
-ggsave("Fade_NO3_AGU_Effect_Size_burn_percentage.pdf",
-       path = here("initial_plots", "AGU"),
-       width = 10, height = 8,  units = "in")
-
-
-
-
-
-
-# nitrate only
-no3_effect_size_burn_merged <- effect_both_doc_no3 %>% 
-  filter(response_var == "NO3_Interp")
-
-no3_burn_percentage <- burn_percentage_effect %>% 
-  filter(response_var == "NO3_Interp")
-
-ggplot(no3_effect_size_burn_merged, aes(burn_percentage_group, Effect_size, color = response_var),
-       position = position_dodge(width = -0.5)) +
-  geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
-  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
-                      color = response_var),
-                  position = position_dodge(width = -0.5), size = 1.5, alpha = 0.25, data = no3_burn_percentage) +
-  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
-  ylab("Effect Size") +
-  xlab("Burn Percentage") +
-  scale_color_manual(values = c("#E7B800"),
-                     guide = guide_legend(title = ""),
-                     labels = c(vn)) +
-  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
-                                                   "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
-                                                    "91-95", "96-100")) +
-  ylim(-5, 5) +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 30, angle = -90),
-        axis.text.y = element_text(size = 30),
-        axis.title.x = element_text(size = 40),
-        axis.title.y = element_text(size = 35),
-        legend.text = element_text(size = 30),
-        legend.position = c(0.5, 0.86))
-
-ggsave("NO3_Effect_Size_Burn_Percentage.pdf",
-       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
-       width = 10, height = 8, units = "in")
-
-# DOC only
-doc_effect_size_burn_merged <- effect_both_doc_no3 %>% 
-  filter(response_var == "DOC_Interp")
-
-doc_burn_percentage <- burn_percentage_effect %>% 
-  filter(response_var == "DOC_Interp")
-
-ggplot(doc_effect_size_burn_merged, aes(burn_percentage_group, Effect_size, color = response_var),
-       position = position_dodge(width = -0.5)) +
-  geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
-  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
-                      color = response_var),
-                  position = position_dodge(width = -0.5), size = 1.5, data = doc_burn_percentage) +
-  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
-  ylab("Effect Size") +
-  xlab("Burn Percentage") +
-  scale_color_manual(values = c("#00AFBB"),
-                     guide = guide_legend(title = ""),
-                     labels = c("DOC")) +
-  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
-                                                   "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
-                                                    "91-95", "96-100")) +
-  ylim(-5, 5) +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 30, angle = -90),
-        axis.text.y = element_text(size = 30),
-        axis.title.x = element_text(size = 40),
-        axis.title.y = element_text(size = 35),
-        legend.text = element_text(size = 30),
-        legend.position = c(0.5, 0.86))
-
-ggsave("DOC_Effect_Size_Burn_Percentage.pdf",
-       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
-       width = 10, height = 8, units = "in")
-
-  
-
 ```
 
 ### Peter's comment for binning burn percent into different percentage intervals 
@@ -993,6 +705,9 @@ burn_percentage_effect <- effect_both_doc_no3 %>%
          lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
          upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
 
+write_csv(burn_percentage_effect, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_CIs"))
+
+write_csv(effect_both_doc_no3, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_fig_data"))
 
 # Plot #
 vn = expression(paste(""*N*O[3]^"-"))
@@ -1021,8 +736,8 @@ ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = resp
         legend.text = element_text(size = 30),
         legend.position = c(0.5, 0.86))
 
-ggsave("Effect_Size_Burn_Percentage_10s.pdf",
-       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+ggsave("Effect_Size_Burn_Percentage.pdf",
+       path = here("initial_plots", "07_Meta_effect_size_models"),
        width = 10, height = 8, units = "in")
 
 ```
@@ -1153,77 +868,234 @@ boxplot(Effect_size ~ burn_percentage_group,
 The p-value of the test is 0.1377, which is greater than our significance level of 0.05. 
 Thus, we do not reject the null hypothesis and conclude that the variance among the climate groups ARE equal. 
 
-### 20 % grouping ###
-```{r 20 % grouping}
-# Test for grouping 
-df <- effect_both_doc_no3 %>%
-  mutate(grouped_percentage = cut(burn_percentage, breaks = seq(0, 100, by = 20), include.lowest = TRUE, labels = FALSE))
-
-df <- df %>% 
-  mutate(grouped_percentage = as.character(grouped_percentage))
-
-effect_both_doc_no3 <- df %>% 
-  mutate(burn_percentage_group = case_when(grouped_percentage == "1" ~ "0-20",
-                                           grouped_percentage == "2" ~ "21-40",
-                                           grouped_percentage == "3" ~ "41-60",
-                                           grouped_percentage == "4" ~ "61-80",
-                                           grouped_percentage == "5" ~ "81-100"))
-                                           
-
-#
-
-effect_both_doc_no3$burn_percentage_group <- factor(effect_both_doc_no3$burn_percentage_group, levels = c("0-20", "21-40", "41-60", "61-80", "81-100"))
 
 
-# calculating the mean percent_difference by climate
-burn_percentage_effect <- effect_both_doc_no3 %>% 
-  group_by(response_var, burn_percentage_group) %>% 
-  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
-            sd_effect = sd(Effect_size, na.rm = TRUE),
-            n_effect = n(),
-            Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
-   mutate(se_effect = sd_effect / sqrt(n_effect),
-         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
-         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
 
 
-# Plot #
-vn = expression(paste(""*N*O[3]^"-"))
 
-ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = response_var),
-       position = position_dodge(width = -0.5)) +
-  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
-  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
-                      color = response_var),
-                  position = position_dodge(width = -0.5), size = 1.5, data = burn_percentage_effect) +
-  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
-  ylab("Effect Size") +
-  xlab("Burn Percentage") +
-  scale_color_manual(values = c("#00AFBB", "#E7B800"),
-                     guide = guide_legend(title = "Analyte"),
-                     labels = c('DOC', vn)) +
-  stat_summary(fun.data = give.n, geom = "text", fun.y = median,
-                  position = position_nudge(x = -0.4)) +
-  scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-20", "21-40", "41-60", "61-80", "81-100")) +
-  ylim(-5, 5) +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 30, angle = -90),
-        axis.text.y = element_text(size = 30),
-        axis.title.x = element_text(size = 40),
-        axis.title.y = element_text(size = 35),
-        legend.text = element_text(size = 30),
-        legend.position = c(0.5, 0.86))
+```{r - code graveyard}
 
-ggsave("Effect_Size_Burn_Percentage_20s.pdf",
-       path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
-       width = 10, height = 8, units = "in")
+# ### ALANs comments of no gridlines/every other burn percentage ###
+# ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = response_var),
+#        position = position_dodge(width = -0.5)) +
+#   geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+#   geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+#                       color = response_var),
+#                   position = position_dodge(width = -0.5), size = 1.5, data = burn_percentage_effect) +
+#   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+#   ylab("Effect Size") +
+#   xlab("Burn Percentage") +
+#   scale_color_manual(values = c("#00AFBB", "#E7B800"),
+#                      guide = guide_legend(title = "Analyte"),
+#                      labels = c('DOC', vn)) +
+#   stat_summary(fun.data = give.n, geom = "text", fun.y = median,
+#                   position = position_nudge(x = -0.4)) +
+#   scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40","41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80", "81-85", "86-90","91-95", "96-100")) +
+#   ylim(-5, 5) +
+#   theme_classic() +
+#   theme(axis.text.x = element_text(size = 30, angle = -90),
+#         axis.text.y = element_text(size = 30),
+#         axis.title.x = element_text(size = 40),
+#         axis.title.y = element_text(size = 35),
+#         legend.text = element_text(size = 30),
+#         legend.position = c(0.5, 0.86))
+# 
+# ggsave("Effect_Size_Burn_Percentage_everyothe.pdf",
+#        path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+#        width = 10, height = 8, units = "in")
+# 
+# 
+# 
+# 
+# # Break this down line by line #
+# 
+# burn_percentage_effect <- effect_both_doc_no3 %>% 
+#   group_by(response_var, burn_percentage_group) %>% 
+#   summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+#             sd_effect = sd(Effect_size, na.rm = TRUE),
+#             n_effect = n(),
+#             Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
+#    mutate(se_effect = sd_effect / sqrt(n_effect),
+#          lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+#          upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
+# 
+# 
+# ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = response_var),
+#        position = position_dodge(width = -0.5)) +
+#   geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
+#   theme(legend.position = "none") +
+# 
+#   geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+#                       color = response_var),
+#                   position = position_dodge(width = -0.5), size = 1.5, data = burn_percentage_effect) +
+#   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+#   ylab("Effect Size") +
+#   xlab("Burn Percentage") +
+#   scale_color_manual(values = c("#00AFBB", "#E7B800"),
+#                      guide = guide_legend(title = ""),
+#                      labels = c('DOC', vn)) +
+#   scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
+#                                                    "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
+#                                                     "91-95", "96-100")) +
+#   ylim(-5, 5) +
+#   theme_bw() +
+#   theme(axis.text.x = element_text(size = 20, angle = -90),
+#         axis.text.y = element_text(size = 30),
+#         axis.title.x = element_text(size = 40),
+#         axis.title.y = element_text(size = 35),
+#         legend.text = element_text(size = 30),
+#         legend.position = c(0.5, 0.86))
+# 
+# ggsave("AGU_Effect_Size_burn_percentage.pdf",
+#        path = here("initial_plots", "AGU"),
+#        width = 10, height = 8,  units = "in")
+# 
+# # Fade DOC
+# test <- burn_percentage_effect[c(10:21, 1:9), ]
+# 
+# test2 <- effect_both_doc_no3[c(79:123, 1:78), ]
+# 
+# ggplot(test2, aes(burn_percentage_group, Effect_size, alpha = response_var, color = response_var),
+#        position = position_dodge(width = -0.5)) +
+#   geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
+#   theme(legend.position = "none") +
+#   geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+#                       color = response_var
+#                       ),
+#                   position = position_dodge(width = -0.5), size = 1.5, data = test) +
+#   scale_alpha_manual(values = c(0.25, 1)) +
+#   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+#   ylab("Effect Size") +
+#   xlab("Burn Percentage") +
+#   scale_color_manual(values = c("#00AFBB", "#E7B800"),
+#                      guide = guide_legend(title = ""),
+#                      labels = c('DOC', vn)) +
+#   scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
+#                                                    "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
+#                                                     "91-95", "96-100")) +
+#   ylim(-5, 5) +
+#   theme_bw() +
+#   theme(axis.text.x = element_text(size = 20, angle = -90),
+#         axis.text.y = element_text(size = 30),
+#         axis.title.x = element_text(size = 40),
+#         axis.title.y = element_text(size = 35),
+#         legend.text = element_text(size = 30),
+#         legend.position = "none")
+# 
+# ggsave("Fade_DOC_AGU_Effect_Size_burn_percentage.pdf",
+#        path = here("initial_plots", "AGU"),
+#        width = 10, height = 8,  units = "in")
+# 
+# 
+# # Fade NO3
+# ggplot(test2, aes(burn_percentage_group, Effect_size, alpha = response_var, color = response_var),
+#        position = position_dodge(width = -0.5)) +
+#   geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
+#   theme(legend.position = "none") +
+#   geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+#                       color = response_var
+#                       ),
+#                   position = position_dodge(width = -0.5), size = 1.5, data = test) +
+#   scale_alpha_manual(values = c(1, 0.25)) +
+#   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+#   ylab("Effect Size") +
+#   xlab("Burn Percentage") +
+#   scale_color_manual(values = c("#00AFBB", "#E7B800"),
+#                      guide = guide_legend(title = ""),
+#                      labels = c('DOC', vn)) +
+#   scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
+#                                                    "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
+#                                                     "91-95", "96-100")) +
+#   ylim(-5, 5) +
+#   theme_bw() +
+#   theme(axis.text.x = element_text(size = 20, angle = -90),
+#         axis.text.y = element_text(size = 30),
+#         axis.title.x = element_text(size = 40),
+#         axis.title.y = element_text(size = 35),
+#         legend.text = element_text(size = 30),
+#         legend.position = "none")
+# 
+# ggsave("Fade_NO3_AGU_Effect_Size_burn_percentage.pdf",
+#        path = here("initial_plots", "AGU"),
+#        width = 10, height = 8,  units = "in")
+# 
+# 
+# 
+# 
+# 
+# 
+# # nitrate only
+# no3_effect_size_burn_merged <- effect_both_doc_no3 %>% 
+#   filter(response_var == "NO3_Interp")
+# 
+# no3_burn_percentage <- burn_percentage_effect %>% 
+#   filter(response_var == "NO3_Interp")
+# 
+# ggplot(no3_effect_size_burn_merged, aes(burn_percentage_group, Effect_size, color = response_var),
+#        position = position_dodge(width = -0.5)) +
+#   geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
+#   geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+#                       color = response_var),
+#                   position = position_dodge(width = -0.5), size = 1.5, alpha = 0.25, data = no3_burn_percentage) +
+#   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+#   ylab("Effect Size") +
+#   xlab("Burn Percentage") +
+#   scale_color_manual(values = c("#E7B800"),
+#                      guide = guide_legend(title = ""),
+#                      labels = c(vn)) +
+#   scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
+#                                                    "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
+#                                                     "91-95", "96-100")) +
+#   ylim(-5, 5) +
+#   theme_bw() +
+#   theme(axis.text.x = element_text(size = 30, angle = -90),
+#         axis.text.y = element_text(size = 30),
+#         axis.title.x = element_text(size = 40),
+#         axis.title.y = element_text(size = 35),
+#         legend.text = element_text(size = 30),
+#         legend.position = c(0.5, 0.86))
+# 
+# ggsave("NO3_Effect_Size_Burn_Percentage.pdf",
+#        path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+#        width = 10, height = 8, units = "in")
+# 
+# # DOC only
+# doc_effect_size_burn_merged <- effect_both_doc_no3 %>% 
+#   filter(response_var == "DOC_Interp")
+# 
+# doc_burn_percentage <- burn_percentage_effect %>% 
+#   filter(response_var == "DOC_Interp")
+# 
+# ggplot(doc_effect_size_burn_merged, aes(burn_percentage_group, Effect_size, color = response_var),
+#        position = position_dodge(width = -0.5)) +
+#   geom_jitter(position = position_jitter(0.1), alpha = 0, size = 3) +
+#   geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+#                       color = response_var),
+#                   position = position_dodge(width = -0.5), size = 1.5, data = doc_burn_percentage) +
+#   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+#   ylab("Effect Size") +
+#   xlab("Burn Percentage") +
+#   scale_color_manual(values = c("#00AFBB"),
+#                      guide = guide_legend(title = ""),
+#                      labels = c("DOC")) +
+#   scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40",
+#                                                    "41-45", "46-50", "51-55", "56-60", "61-65", "66-70", "71-75", "76-80",                                                      "81-85", "86-90",
+#                                                     "91-95", "96-100")) +
+#   ylim(-5, 5) +
+#   theme_bw() +
+#   theme(axis.text.x = element_text(size = 30, angle = -90),
+#         axis.text.y = element_text(size = 30),
+#         axis.title.x = element_text(size = 40),
+#         axis.title.y = element_text(size = 35),
+#         legend.text = element_text(size = 30),
+#         legend.position = c(0.5, 0.86))
+# 
+# ggsave("DOC_Effect_Size_Burn_Percentage.pdf",
+#        path = ("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/03_Wenas_effect_size"),
+#        width = 10, height = 8, units = "in")
+
 
 
 ```
-
-
-
-
-
 
 

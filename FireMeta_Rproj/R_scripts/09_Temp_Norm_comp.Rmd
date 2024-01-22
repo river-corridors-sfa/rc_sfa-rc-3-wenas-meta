@@ -1,0 +1,418 @@
+---
+title: "AGU_2023_Burn_Unburn_comp"
+output: html_document
+date: "2023-12-01"
+editor_options: 
+  chunk_output_type: console
+---
+
+The purpose of this script is to read in the studies from the final meta data list and to normalize daily stream concentrations by time and plot burn vs. unburned concentrations for a figure for my presentation
+
+# Status: in progress
+
+# ==============================================================================
+# Author: Jake Cavaiani 
+# 18 October 2023
+# ==============================================================================
+
+## Temporal Normalization 
+```{r Jake/Mac Load Packages and}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+
+library(tidyverse)
+library(here)
+library(forecastML)
+library(zoo)
+library(hrbrthemes)
+library(viridis)
+library(car)
+
+```
+
+```{r load in publications}
+studies_file_list <- list.files(path = "inputs/Studies/meta_final/", 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv, 
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) 
+
+```
+
+
+```{r format date and units}
+options(max.print = 40)
+# Filtering by only the control vs.impact studies to make sure we have no paper that is included that is any other study design. 
+
+# Crandall is filtered out because the burned and reference sites are not paired so I do that is a separate script and will read that csv in later to merge to this dataframe to get the more accurate effect size calculations 
+
+# The studies that monitor streams more than 5 years following a wildfire are also excluded for this initial code and will be added in later.  
+
+control_impact <- meta_df %>% 
+  filter(`Design (Control/Burn; Pre/Post)` == "Control_Reference_vs_Impact",
+         Study_ID != "Crandall et al. 2021",
+         Mean_Median_or_IndividualSample == "Individual",
+         as.numeric(Time_Since_Fire) < 6)
+
+# separate out the time columns 
+time_format <- control_impact %>% 
+  select(Study_ID, Sampling_Date) 
+
+# Make them all the same format and then merge back together in one column
+time_format <- time_format %>% 
+  mutate(DateTime = mdy(Sampling_Date),
+         DateTime2 = mdy_hm(Sampling_Date), 
+         DateTime2 = as.Date(DateTime2)) %>% 
+  select(-Sampling_Date) %>% 
+  mutate(Sampling_Date = coalesce(DateTime, DateTime2),
+         Sampling_Date = as.character(Sampling_Date)) %>% 
+  select(-DateTime, -DateTime2) 
+
+# merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
+control_impact <- control_impact %>% 
+  mutate(Sampling_Date = time_format$Sampling_Date)
+
+
+# changing the structure of the concentrations
+control_impact <- control_impact %>% 
+  mutate(DOC = as.numeric(DOC),
+         NO3 = as.numeric(NO3), 
+         Sampling_Date = ymd(Sampling_Date))
+
+# Changing the units to make sure everything is consistent in mg_N_L or mg_C_L
+control_impact_units <- control_impact %>% 
+  mutate(Area_watershed_km = case_when(Area_unit == 'ha' ~ Area_watershed * .01,
+                                       Area_unit == 'km' ~ print(Area_watershed)),
+         
+         DOC_mg_C_L = case_when(DOC_unit == 'mg_C_L' ~ print(DOC),
+                                DOC_unit == 'mg_L' ~ print(DOC),
+                                DOC_unit == 'um' ~ DOC * 0.01201),
+         
+         NO3_mg_N_L = case_when(NO3_unit == 'um' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_NO2_NO3_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'mg_N_L' ~ print(NO3),
+                                NO3_unit == 'ug_N_L' ~ NO3 * .001, 
+                                NO3_unit == 'mg_L' ~ NO3 * 0.225904780),
+         
+         DOC_uM_C = case_when(DOC_unit == 'um' ~ print(DOC),
+                              DOC_unit == 'mg_C_L' ~ DOC * 83.2639467,
+                              DOC_unit == 'mg_L' ~ DOC * 83.2639467),
+
+         NO3_uM_N = case_when(NO3_unit == 'um' ~ print(NO3),
+                              NO3_unit == 'umol_L' ~ print(NO3),
+                              NO3_unit == 'umol_NO2_NO3_L' ~ print(NO3),
+                              NO3_unit == 'mg_L' ~ NO3 * 16.127729,
+                              NO3_unit == 'mg_N_L' ~ NO3 * 3.64145101,
+                              NO3_unit == 'ug_N_L' ~ NO3 * 0.22594948))
+
+# Creating a site characteristics data frame that I will use to merge later to add in the proper data 
+site_data <- control_impact_units %>% 
+  select(Study_ID, Pair, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn)
+
+site_data_unique <- site_data %>% 
+  group_by(Study_ID, Pair, Area_watershed_km) %>% 
+  distinct(Area_watershed_km, .keep_all = TRUE)
+
+```
+
+
+```{r - gap fill}
+# filling in daily time series and interpolating by study and site
+control_impact_fill <-  control_impact_units %>% 
+  select("Study_ID", "Latitude", "Longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+  group_by(Study_ID, Site) %>%
+  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
+  fill(Study_ID:Burn_Unburn) %>%
+  fill(Study_ID, Site) %>%
+  ungroup() %>%
+  group_by(Site) %>%
+  mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
+  fill(Study_ID:Burn_Unburn)
+
+
+control_impact_fill <- control_impact_fill %>% 
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+  
+
+```
+
+
+```{r calculating the temporal normalized data}
+# pivoting to make the responses in one column
+metadata_long <- control_impact_fill %>%
+  pivot_longer(
+    cols = NO3_Interp:DOC_Interp,
+    names_to = "response_var",
+    values_to = "concentration",
+    values_drop_na = TRUE
+  )
+
+
+# aggregate by year 
+yearly_mean_site <-  metadata_long %>%
+  group_by(Study_ID, response_var, Pair, year) %>% 
+  summarize(meanConc = mean(concentration)) %>% 
+  left_join(site_data) %>% 
+  group_by(year) %>% 
+  distinct(meanConc, .keep_all = TRUE) %>% 
+  mutate(TempNorm = meanConc / Area_watershed_km) 
+
+yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
+
+yearly_mean_site <-  yearly_mean_site %>%
+  mutate(TempNorm = as.numeric(TempNorm))
+
+
+```
+
+
+# Add in corrected Crandall and papers that are greater than 5 years to this list 
+```{r}
+# combine the conc. fill of Crandall, Abbott, and Rhea with the rest of it 
+
+crandall_conc_fill <- read_csv(here("Output_for_analysis", "01_Crandall_effect_size", "crandall_conc_fill.csv")) %>% 
+  select(-...1)
+
+abbott_conc_fill <- read_csv(here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_conc_fill.csv")) %>% 
+  select(-...1)
+
+rhea_conc_fill <- read_csv(here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_conc_fill.csv")) %>% 
+  select(-...1)
+
+
+yearly_mean_site <- rbind(yearly_mean_site, crandall_conc_fill, abbott_conc_fill, rhea_conc_fill)
+
+```
+
+
+```{r Calculate CV}
+metadata_cv <- yearly_mean_site %>% 
+  group_by(Study_ID, response_var, Burn_Unburn) %>% 
+  summarise(meanconc = mean(TempNorm, na.rm = TRUE),
+            sdconc = sd(TempNorm, na.rm = TRUE),
+            CVconc = sdconc/meanconc) # generating CVs
+
+doc_cv <- metadata_cv %>% 
+  filter(response_var == "DOC_Interp")
+
+# DOC 
+doc_yearly <- yearly_mean_site %>% 
+  filter(response_var == "DOC_Interp")
+
+# conduct anova test to see if the mean concentrations were different between burn and unbunr
+one.way.doc <- aov(TempNorm ~ Burn_Unburn, data = doc_yearly)
+
+plot(one.way.doc)
+# QQ plot is not great. Looks like I should log transform. Lets try that. 
+
+doc_yearly <- doc_yearly %>% 
+  mutate(logTempNorm = log(TempNorm))
+
+log.one.way.doc <- aov(logTempNorm ~ Burn_Unburn, data = doc_yearly)
+plot(log.one.way.doc)
+
+summary(log.one.way.doc) # F-value: 1.113, p-value: 0.294
+
+# conduct Levene's Test for equality of variances
+leveneTest(TempNorm ~ Burn_Unburn, data = doc_yearly) #F-value: 0.6377, p-value: 0.4266,
+
+
+# NO3 
+no3_yearly <- yearly_mean_site %>% 
+  filter(response_var == "NO3_Interp")
+
+no3_cv <- metadata_cv %>% 
+  filter(response_var == "NO3_Interp")
+
+
+# conduct anova test to see if the mean concentrations were different between burn and unbunr
+one.way.no3 <- aov(TempNorm ~ Burn_Unburn, data = no3_yearly)
+
+plot(one.way.no3)
+
+# QQ plot is not great. Looks like I should log transform. Lets try that. 
+
+no3_yearly <- no3_yearly %>% 
+  mutate(logTempNorm = log(TempNorm))
+
+log.one.way.no3 <- aov(logTempNorm ~ Burn_Unburn, data = no3_yearly)
+plot(log.one.way.no3)
+
+summary(log.one.way.no3) # df: 1,181, F-value: 0.152, p-value: 0.697
+
+
+
+# conduct Levene's Test for equality of variances
+leveneTest(TempNorm ~ Burn_Unburn, data = no3_yearly) # df: 1,181, F-value: 0.7465,  p-value: 0.38 
+
+# Write csv's
+write_csv(doc_yearly, here("Output_for_analysis", "09_Temp_Norm_comp", "DOC_temp_norm_fig_data.csv"))
+
+write_csv(doc_cv, here("Output_for_analysis", "09_Temp_Norm_comp", "DOC_CV_temp_norm_fig_data.csv"))
+
+write_csv(no3_yearly, here("Output_for_analysis", "09_Temp_Norm_comp", "NO3_temp_norm_fig_data.csv"))
+
+write_csv(no3_cv, here("Output_for_analysis", "09_Temp_Norm_comp", "NO3_CV_temp_norm_fig_data.csv"))
+
+```
+
+### PLOT Burn vs. Unburn ###
+
+```{r}
+# DOC 
+# simple box plot 
+ggplot(doc_yearly, aes(Burn_Unburn, TempNorm, fill = Burn_Unburn)) +
+  geom_boxplot() +
+  theme_bw()
+  
+# Boxplot with density plot   
+ggplot(doc_yearly, aes(x = Burn_Unburn, y = TempNorm, fill = Burn_Unburn)) +
+  scale_fill_manual(values = c("darkred", "#69b3a2")) +
+  labs(x =  " ", y = expression(paste("mg  ", DOC ," ", L^-1, km^-2, ""))) +
+  ggdist::stat_halfeye(adjust = 0.5, 
+                       justification = -.3,
+                       .width = 0,
+                       point_colour = NA,
+                       scale = 0.5) +
+  geom_boxplot(width = .25,
+                 outlier.colour = NA,
+                 alpha = 0.5) +
+  scale_y_continuous(trans='log10') +
+  ggtitle("") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 20),
+        axis.title.y = element_text(size = 25))
+
+ggsave("DOC_yield.pdf",
+       path = here("initial_plots", "09_Temp_Norm_comp"),
+       width = 6, height = 6,  units = "in")
+
+# Box plot with CV
+ggplot(doc_cv, aes(x = Burn_Unburn, y = CVconc, fill = Burn_Unburn)) +
+  scale_fill_manual(values = c("darkred", "#69b3a2")) +
+  labs(y = "CV", x = "") +
+  ggdist::stat_halfeye(adjust = 0.5, 
+                       justification = -.2,
+                       .width = 0,
+                       point_colour = NA) +
+  geom_boxplot(width = .25,
+                 outlier.colour = NA,
+                 alpha = 0.5) +
+  ggtitle("Coefficient of Variation for DOC") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25),
+        axis.title.y = element_text(size = 25))
+
+ggsave("DOC_CV_yield.pdf",
+       path = here("initial_plots", "09_Temp_Norm_comp"),
+       width = 6, height = 6,  units = "in")        
+
+# NO3
+vn = expression(paste("mg " *N*O[3]^"-",  L^-1, km^-2, ""))
+
+# Boxplot with density plot   
+ggplot(no3_yearly, aes(x = Burn_Unburn, y = TempNorm, fill = Burn_Unburn)) +
+  scale_fill_manual(values = c("darkred", "#69b3a2")) +
+  ggdist::stat_halfeye(adjust = 0.5, 
+                       justification = -.3,
+                       .width = 0,
+                       point_colour = NA,
+                       scale = 0.5) +
+  geom_boxplot(width = .25,
+                 outlier.colour = NA,
+                 alpha = 0.5) +
+  scale_y_continuous(trans='log10') +
+  ylab(vn) +
+  xlab("") +
+  ggtitle("") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 20),
+        axis.title.y = element_text(size = 25))
+
+ggsave("NO3_yield.pdf",
+       path = here("initial_plots", "09_Temp_Norm_comp"),
+       width = 6, height = 6,  units = "in")
+
+# Box plot with CV
+ggplot(no3_cv, aes(x = Burn_Unburn, y = CVconc, fill = Burn_Unburn)) +
+  scale_fill_manual(values = c("darkred", "#69b3a2")) +
+  labs(y = "CV", x = "") +
+  ggdist::stat_halfeye(adjust = 0.5, 
+                       justification = -.2,
+                       .width = 0,
+                       point_colour = NA) +
+  geom_boxplot(width = .25,
+                 outlier.colour = NA,
+                 alpha = 0.5) +
+  ggtitle("Coefficient of Variation for Nitrate") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25),
+        axis.title.y = element_text(size = 25))
+
+ggsave("NO3_CV_yield.pdf",
+       path = here("initial_plots", "09_Temp_Norm_comp"),
+       width = 6, height = 6,  units = "in")
+
+
+
+
+
+```
+
+
+```{r - report summary stats}
+# DOC
+doc_summary <- doc_yearly %>%
+  group_by(Burn_Unburn) %>% 
+  summarise(meanDOC = mean(TempNorm),
+            sdDOC = sd(TempNorm),
+            range = range(TempNorm))
+# Burn mean: 4.661536
+# Burn sd: 11.02459
+# Burn range: [0.010632809:79.805081141]
+
+# Unburn mean: 6.511373
+# Unburn sd: 12.59621
+# Unburn range: [0.005674765:52.736711286]
+
+# NO3
+no3_summary <- no3_yearly %>%
+  group_by(Burn_Unburn) %>% 
+  summarise(meanDOC = mean(TempNorm),
+            sdDOC = sd(TempNorm),
+            range = range(TempNorm, scientific = F))
+
+# Burn mean: 2.527080
+# Burn sd: 10.383352
+# Burn range: [0:87.40485]
+
+# Unburn mean: 1.339846
+# Unburn sd: 3.505517
+# Unburn range: [0:15.14391]
+
+
+```
