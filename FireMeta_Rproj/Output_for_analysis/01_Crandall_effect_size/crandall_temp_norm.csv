@@ -1,0 +1,15 @@
+"","Study_ID","response_var","Pair","year","meanConc","Site","Latitude","Longitude","Area_watershed_km","Climate","Burn_Unburn","TempNorm"
+"1","Crandall et al. 2021","DOC_Interp","Control_1",2018,12.9750769230769,"Hobble Creek Lower",40.191035,-111.659939,324,"Csa","Unburn",0.0400465337132004
+"2","Crandall et al. 2021","DOC_Interp","Control_2",2018,24.5090774647887,"Dry Creek",40.180647,-111.671664,30,"Csa","Unburn",0.816969248826291
+"3","Crandall et al. 2021","DOC_Interp","Control_3_4",2018,10.03866,"Provo River",40.234889,-111.724869,1769,"Csa","Unburn",0.00567476540418315
+"4","Crandall et al. 2021","DOC_Interp","Site_1",2018,28.6974038461538,"Benjamin Slough",40.133514,-111.771241,319,"Csa","Burn",0.0899605136243067
+"5","Crandall et al. 2021","DOC_Interp","Site_2",2018,26.7249545454545,"Payson",39.987804,-111.729891,54,"Csa","Burn",0.494906565656566
+"6","Crandall et al. 2021","DOC_Interp","Site_3",2018,18.2033695652174,"Spanish Fork Lower",40.162204,-111.732766,1712,"Csa","Burn",0.0106328093254774
+"7","Crandall et al. 2021","DOC_Interp","Site_4",2018,20.8984299363057,"Spanish Fork Upper",40.071704,-111.57715,1650,"Csa","Burn",0.0126657151129126
+"8","Crandall et al. 2021","NO3_Interp","Control_1",2018,0.532876038186046,"Hobble Creek Lower",40.191035,-111.659939,324,"Csa","Unburn",0.00164467913020385
+"9","Crandall et al. 2021","NO3_Interp","Control_2",2018,4.03871267944667,"Dry Creek",40.180647,-111.671664,30,"Csa","Unburn",0.134623755981556
+"10","Crandall et al. 2021","NO3_Interp","Control_3_4",2018,0.2125936284,"Provo River",40.234889,-111.724869,1769,"Csa","Unburn",0.000120177291351046
+"11","Crandall et al. 2021","NO3_Interp","Site_1",2018,1.90107658651923,"Benjamin Slough",40.133514,-111.771241,319,"Csa","Burn",0.00595948773203521
+"12","Crandall et al. 2021","NO3_Interp","Site_2",2018,0.10410301875,"Payson",39.987804,-111.729891,54,"Csa","Burn",0.00192783368055556
+"13","Crandall et al. 2021","NO3_Interp","Site_3",2018,0.295407144942308,"Spanish Fork Lower",40.162204,-111.732766,1712,"Csa","Burn",0.000172550902419572
+"14","Crandall et al. 2021","NO3_Interp","Site_4",2018,0.0719337433670886,"Spanish Fork Upper",40.071704,-111.57715,1650,"Csa","Burn",4.35962081012658e-05

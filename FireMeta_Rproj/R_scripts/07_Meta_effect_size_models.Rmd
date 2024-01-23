@@ -52,6 +52,7 @@ library(RColorBrewer)
 library(ggbreak)
 library(lmerTest)
 library(car)
+library(ggpubr)
 ```
 
 ```{r load in csv's}
@@ -343,6 +344,8 @@ write_csv(effect_size_fire, here("Output_for_analysis", "07_meta_effect_size_mod
 ```{r Effect size models-DOC}
 # DOC #
 # Effect_size ~ burn_percentage*TSF + (1|Site)
+doc_effect_size_burn_merged <- right_join(effect_size_doc, fire_clip) %>% 
+  na.omit() 
 
 ggpairs(doc_effect_size_burn_merged,
         columns = c("burn_percentage", "Time_Since_Fire"))
@@ -373,9 +376,116 @@ plot(doc_aov)
 
 summary(doc_aov)
 TukeyHSD(doc_aov, which = "Climate")
+```
 
+```{r DOC ANOVA assumptions, echo=TRUE}
+# AMP code for model assumptions #
+# For ANOVAs, the assumptions are: 
+
+#Normality: The responses for each factor level have a normal population distribution.
+#Equal Variances: These distributions have the same variance.
+#Independence: The data are independent.
+
+# Normality
+
+shapiro.test(doc_effect_size_burn_merged$burn_percentage) # p-value is <<< 0.05
+
+hist(doc_effect_size_burn_merged$burn_percentage)
+
+# when p > 0.05 can assume normality 
+  # The p-value is <<< 0.05, suggesting that the data is not normally distributed 
+
+# Equal Variance
+
+bartlett.test(Effect_size ~ Climate, data = doc_effect_size_burn_merged) # p-value is <<< 0.05
+bartlett.test(Effect_size ~ burn_percentage, data = doc_effect_size_burn_merged) # I cant do this because there must be at least 2 observations in each group. 
+
+# when p > 0.05 can assume equal variance 
+  # The p-value for climate is <<< 0.05, suggesting that the data does NOT have equal variance.
 
 ```
+
+Fails both of these assumptions, so either need to do a non-parametric test or normalize the datasets... 
+
+Can't do non-parametric on interaction terms. 
+So, need to normalize. 
+
+One method that is not unduly affected by violations of the normality and homoscedasticity assumptions of parametric ANOVA is to transform the data values to their ranks, and then compute a parametric two-way ANOVA on the data ranks. This rank transformation procedure can be used to determine whether the ranks differ from group to group. Post-hoc comparisons can be performed on the data ranks to determine which groups are different from each other. An alternative approach is to use ordinal logistic regression to provide general contrasts on the log odds ratio scale (Harrell 2015).
+Conover and Iman (1981) provided a review of the four main types of rank transformations. One method replaces each original data value by its rank (from 1 for the smallest to N for the largest, where N is the combined data sample size). 
+
+Check out this blog post for methods followed loosely here: https://www.cfholbert.com/blog/nonparametric_two_way_anova/ 
+
+Also, check out chapter 2.3 in Mixed Effects Models and Extensions in Ecology https://link.springer.com/book/10.1007/978-0-387-87458-6
+
+```{r rank transformed, echo =TRUE}
+
+#when p > 0.05 can assume equal variance 
+
+tc_anova = aov(rank(Effect_size) ~ Climate * burn_percentage, data = doc_effect_size_burn_merged)
+summary.aov(tc_anova)
+
+#check again for normality 
+ggqqplot(tc_anova$residuals)
+
+#check again for homogeneity 
+
+plot(tc_anova, 1, main = "Rank-Transformed")
+
+bartlett.test(rank(Effect_size) ~ Climate, data = doc_effect_size_burn_merged) # p-value is 0.009
+bartlett.test(rank(Effect_size) ~ burn_percentage, data = doc_effect_size_burn_merged)
+```
+
+```{r posthoc ranks, echo=TRUE} 
+#now lets look at the interaction effect more closely
+
+#Land cover category for each burn severity; least-squares means
+post_hoc_emmeans <- emmeans::emmeans(tc_anova, pairwise ~ Land_Coverage_Category | Burn_Severity)
+
+post_hoc_emmeans
+
+#Look into the effect of Land Cover Type on Burn Severity and visa versa 
+em_out_category <- emmeans::emmeans(tc_anova,  ~ Land_Coverage_Category| Burn_Severity) 
+em_out_category
+
+em_out_category %>% 
+  pairs() %>% 
+  emmeans::test(joint = TRUE)
+
+pairs(em_out_category)
+
+em_out_severity <- emmeans::emmeans(tc_anova,  ~ Burn_Severity| Land_Coverage_Category) 
+em_out_severity
+
+em_out_severity %>% 
+  pairs() %>% 
+  emmeans::test(joint = TRUE)
+
+pairs(em_out_severity)
+
+em_out_category %>% 
+  pairs() %>% 
+  emmeans::test(joint = TRUE)
+
+pairs(em_out_category)
+
+# We see that differences in Land Cover Type is significant for muffle and open air burns, but not unburned materials for carbon 
+
+em_out_severity %>% 
+  pairs() %>% 
+  emmeans::test(joint = TRUE)
+
+pairs(em_out_severity)
+
+# We see that Burn Severity is significantly different for unburned and muffle from open air burns but not between muffle and unburned materials for each land cover category for carbon
+
+# multiple comparisons
+summary(glht(tc_anova, linfct = mcp(Burn_Severity = "Tukey", interaction_average = TRUE)))
+
+summary(glht(tc_anova, linfct = mcp(Land_Coverage_Category = "Tukey", interaction_average = TRUE)))
+```
+
+
+
 
 
 ```{r Effect size models-NO3}

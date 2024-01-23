@@ -101,8 +101,9 @@ final_dataset <- final_dataset %>%
                                      TRUE ~ Time_Since_Fire)) # changing the time since fire to a numeric structure and changing the abbott and rhea time since fire to the exact time since fire 
 doc <- final_dataset %>% 
   filter(response_var == "DOC_Interp") %>% # filtering out DOC 
-  select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire) %>% # Only want to do the catchment characteristics
+  dplyr::select(Effect_size, Climate, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire) %>% # Only want to do the catchment characteristics
   na.omit()
+
 
 write_csv(doc, here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"))
 
@@ -132,7 +133,7 @@ ggpairs(doc, columns = c("Effect_size", "totdasqkm", "minelevraw", "maxelevsmo",
 ### NO3 #### 
 no3 <- final_dataset %>% 
   filter(response_var == "NO3_Interp") %>% 
-  select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire) %>% 
+  dplyr::select(Effect_size, Climate, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire) %>% 
   na.omit()
 
 write_csv(no3, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"))

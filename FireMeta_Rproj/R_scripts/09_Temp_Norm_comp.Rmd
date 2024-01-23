@@ -120,7 +120,7 @@ control_impact_units <- control_impact %>%
 
 # Creating a site characteristics data frame that I will use to merge later to add in the proper data 
 site_data <- control_impact_units %>% 
-  select(Study_ID, Pair, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn)
+  select(Study_ID, Pair, Site, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn)
 
 site_data_unique <- site_data %>% 
   group_by(Study_ID, Pair, Area_watershed_km) %>% 
@@ -186,19 +186,20 @@ yearly_mean_site <-  yearly_mean_site %>%
 ```{r}
 # combine the conc. fill of Crandall, Abbott, and Rhea with the rest of it 
 
-crandall_conc_fill <- read_csv(here("Output_for_analysis", "01_Crandall_effect_size", "crandall_conc_fill.csv")) %>% 
+crandall_conc_fill <- read_csv(here("Output_for_analysis", "01_Crandall_effect_size", "crandall_temp_norm.csv")) %>% 
   select(-...1)
 
-abbott_conc_fill <- read_csv(here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_conc_fill.csv")) %>% 
+abbott_conc_fill <- read_csv(here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_temp_norm.csv")) %>% 
   select(-...1)
 
-rhea_conc_fill <- read_csv(here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_conc_fill.csv")) %>% 
+rhea_conc_fill <- read_csv(here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_temp_norm.csv")) %>% 
   select(-...1)
 
 
 yearly_mean_site <- rbind(yearly_mean_site, crandall_conc_fill, abbott_conc_fill, rhea_conc_fill)
 
 ```
+
 
 
 ```{r Calculate CV}
@@ -416,3 +417,77 @@ no3_summary <- no3_yearly %>%
 
 
 ```
+
+#### Random forest with psuedo yield metric with Geospatial data for Peter ####
+```{r - merge geospatial with yield metric}
+# geospatial dataset #
+geospatial_data<- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2024-01-18.csv"))
+
+# select the columns that I want 
+filter_geospatial <- geospatial_data %>% 
+  select(site, totdasqkm, maxelevsmo, minelevsmo, slope)
+
+# effect size dataset 
+effect_dataset <- read_csv(here("Output_for_analysis", "07_Meta_effect_size_models", "effect_size_geospatial_fire_lat_long.csv"))
+
+# select the columns that I want 
+filter_effect <- effect_dataset %>% 
+  select(site, totdasqkm, maxelevsmo, minelevsmo, slope:response_var)
+
+# merge the geospatial dataframe with the effect size data frame 
+effect_geospatial <- left_join(filter_geospatial, filter_effect)
+
+# making reference sites with no burn percentage 0!
+effect_geospatial <- effect_geospatial %>%
+  mutate(burn_percentage = ifelse(is.na(burn_percentage), 0, burn_percentage))
+
+
+# select the columns that I want from the yield metric 
+filter_temp_norm <- yearly_mean_site %>% 
+  select(Site, Climate, Area_watershed_km, response_var, year, Burn_Unburn, TempNorm) %>% 
+  rename(site = Site)
+
+# merging the geospatial with the yield dataframe
+temp_norm_geospatial <- full_join(effect_geospatial, filter_temp_norm, by = c("site", "Climate", "response_var")) %>% 
+  distinct(TempNorm, .keep_all = T)
+
+doc <- temp_norm_geospatial %>% 
+  filter(response_var == "DOC_Interp") %>% # filtering out DOC
+  select(TempNorm, Climate, site, Burn_Unburn, totdasqkm, minelevsmo, maxelevsmo, slope, burn_percentage, Time_Since_Fire) %>% 
+  na.omit()
+
+
+write_csv(doc, here("Output_for_analysis", "09_Temp_Norm_comp", "doc_yield_meta_random_forest.csv"))
+
+no3 <- temp_norm_geospatial %>% 
+  filter(response_var == "NO3_Interp") %>% # filtering out DOC
+  select(TempNorm, Climate, site, Burn_Unburn, totdasqkm, minelevsmo, maxelevsmo, slope, burn_percentage, Time_Since_Fire) %>% 
+  na.omit()
+ 
+
+write_csv(no3, here("Output_for_analysis", "09_Temp_Norm_comp", "no3_yield_meta_random_forest.csv"))
+
+
+```
+
+```{r compare effect size and yield metric}
+doc_rf_effect <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"))
+
+no3_rf_effect <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"))
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

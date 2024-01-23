@@ -105,7 +105,7 @@ control_impact_units <- control_impact %>%
 
 # Creating a site characteristics data frame that I will use to merge later to add in the proper data 
 site_data <- control_impact_units %>% 
-  select(Study_ID, Pair, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn)
+  select(Study_ID, Pair, Site, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn)
 
 site_data_unique <- site_data %>% 
   group_by(Study_ID, Pair, Area_watershed_km) %>% 
@@ -160,7 +160,7 @@ yearly_mean_site <-  metadata_long %>%
     
 yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
 
-write.csv(yearly_mean_site, here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_conc_fill.csv"))
+write.csv(yearly_mean_site, here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_temp_norm.csv"))
 
 ```
 
