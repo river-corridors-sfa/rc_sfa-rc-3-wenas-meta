@@ -336,7 +336,19 @@ effect_size_fire <- effect_size_fire %>%
   mutate(Fire_year = case_when(Study_ID == 'Neary & Currier, 1982' ~ '1978',
                                      TRUE ~ Fire_year))
 
-write_csv(effect_size_fire, here("Output_for_analysis", "07_meta_effect_size_models", "effect_size_geospatial_fire_lat_long.csv"))
+# merge effect size fire with unique lat/longs for each watershed site. #
+# load in the sites with the unique lat/longs 
+watershed_lat_long <- read_csv(here("inputs", "catchment_characteristics", "watershed_lat_long.csv")) %>% 
+  dplyr::select(site, latitude, longitude)
+
+xia_effect <- effect_size_fire %>% 
+  dplyr::select(!(Lat:Long))
+
+xia_effect <- full_join(xia_effect, watershed_lat_long, by = "site") %>% 
+  distinct(Effect_size, .keep_all = TRUE)
+
+
+write_csv(xia_effect, here("Output_for_analysis", "07_meta_effect_size_models", "effect_size_geospatial_fire_lat_long.csv"))
 
 ```
 
