@@ -75,7 +75,7 @@ options(max.print = 40)
 # The studies that monitor streams more than 5 years following a wildfire are also excluded for this initial code and will be added in later.  
 
 control_impact <- meta_df %>% 
-  filter(`Design (Control/Burn; Pre/Post)` == "Control_Reference_vs_Impact",
+  filter(Design_Control_Burn_Pre_Post == "Control_Reference_vs_Impact",
          Study_ID != "Crandall et al. 2021",
          Mean_Median_or_IndividualSample == "Individual",
          as.numeric(Time_Since_Fire) < 6)
@@ -194,7 +194,7 @@ yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
 
 
 
-```{r - plots}
+```{r - plotting functions}
 # Plotting #
 vn = expression(paste(""*N*O[3]^"-"))
 # um = expression(paste(""*N*O[3]^"-"))
@@ -458,7 +458,7 @@ write_csv(TSF_summary_effect, here("Output_for_analysis", "04_Meta_merge_all_stu
 
 
 # Plotting
-```{r - plotting effect size }
+```{r - plotting effect size}
 # Ploting #
 vn = expression(paste(""*N*O[3]^"-"))
 

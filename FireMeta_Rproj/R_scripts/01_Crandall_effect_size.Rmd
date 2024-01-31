@@ -31,7 +31,7 @@ library(viridis)
 ```
 
 ```{r data prepper}
-meta_df <- read_csv(here("inputs", "Studies", "Crandall_et_al_2021", "Crandall_paired_test_et_al_2021.csv"))
+meta_df <- read_csv(here("inputs", "Studies", "Crandall_et_al_2021", "Crandall_et_al_2021.csv"))
 
 
 ```
@@ -212,19 +212,5 @@ write.csv(yearly_effect_size_combine_long, here("Output_for_analysis", "01_Crand
 
 ```
 
-```{r - plot to compare}
-aggregated_crandall <- read_csv("~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/Output_for_analysis/aggregated_effect_crandall_4sites.csv")
 
-
-p <- ggplot(yearly_effect_size_combine_long, aes(Site, Effect_size, shape = response_var, color = "red")) +
-  geom_point()
-  
-p2 <- p +
-  geom_point(data = aggregated_crandall, aes(x = Site, y = Effect_size, shape = response_var), color = "blue") +
-  theme_bw() +
-  geom_hline(yintercept = 0, linewidth = 0.5, color = "black") +
-  labs(title = "Red is the paired (new) approach and Blue is the aggregated (old) approach") +
-  theme(legend.position = "none")
-
-```
 

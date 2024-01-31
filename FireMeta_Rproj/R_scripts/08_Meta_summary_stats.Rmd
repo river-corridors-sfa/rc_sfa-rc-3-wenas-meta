@@ -92,6 +92,7 @@ ggplot(final_dataset, aes(x = totdasqkm)) +
 ```{r - how many studies}
 unique(final_dataset$Study_ID) # 18
 ```
+
 ```{r - correlation matrix - catchment characteristics}
 ### DOC #### 
 final_dataset <- final_dataset %>% 
@@ -109,6 +110,9 @@ write_csv(doc, here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_ra
 
   
 # Simple correlation matrix between effect size and all the other catchment characteristics
+doc <- doc %>% 
+  select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire)
+
 res <- cor(doc)
 round(res, 2) 
 
@@ -138,7 +142,7 @@ no3 <- final_dataset %>%
 
 write_csv(no3, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"))
 
-ggpairs(no3, columns = c("Effect_size", "totdasqkm", "streamorde", "slope", "burn_percentage", "Time_Since_Fire")) +
+ggpairs(no3, columns = c("Effect_size", "totdasqkm", "minelevraw", "maxelevsmo","minelevsmo", "elevfixed", "slope", "burn_percentage", "Time_Since_Fire")) +
   theme_bw()
 
 # Correlation matrix with significance levels (p-value)

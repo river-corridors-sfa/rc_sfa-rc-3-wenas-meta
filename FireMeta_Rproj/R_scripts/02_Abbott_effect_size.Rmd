@@ -37,13 +37,6 @@ meta_df <- read_csv(here("inputs", "Studies", "Abbott_et_al_2021", "Abbott_et_al
 
 ```
 
-```{r histogram of watershed size}
-ggplot(meta_df, aes(x = Area_watershed, fill = Burn_Unburn)) +
-  geom_histogram(binwidth = 20, color = "black") +
-  theme_bw()
-
-```
-
 
 ```{r data prep}
 control_impact <- meta_df 
