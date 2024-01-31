@@ -1,4 +1,4 @@
-Study_ID,DOI,Design (Control/Burn; Pre/Post),Latitude,Longitude,Area_watershed,Area_unit,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
+Study_ID,DOI,Design_Control_Burn_Pre_Post,Latitude,Longitude,Area_watershed,Area_unit,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
 Abbott et al. 2021,10.1111/gcb.15507,Control_Reference_vs_Impact,68.932756,-150.7,16.01788092,km,Site_1,Dwc,BS.10,7/30/17,Burn,10,Individual,1591.081286,um,,,0.0617,um,,,,
 Abbott et al. 2021,10.1111/gcb.15507,Control_Reference_vs_Impact,68.932756,-150.7,16.01788092,km,Site_1,Dwc,BS.10,8/31/17,Burn,10,Individual,1384.598733,um,,,0.084,um,,,,
 Abbott et al. 2021,10.1111/gcb.15507,Control_Reference_vs_Impact,68.932756,-150.7,16.01788092,km,Site_1,Dwc,BS.10,6/5/18,Burn,11,Individual,644.5913782,um,,,1.9056,um,,,,

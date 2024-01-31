@@ -1,4 +1,4 @@
-Study_ID,DOI,Design (Control/Burn; Pre/Post),Latitude,Longitude,Area_watershed,Area_unit,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
+Study_ID,DOI,Design_Control_Burn_Pre_Post,Latitude,Longitude,Area_watershed,Area_unit,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
 "Betts & Jones, 2009",10.1657/1938-4246-41.4.407,Pre_Post,65.15,-147.5,6.7,km,,Dsc,C1,,,Pre,Mean,4.7,mg_C_L,,0.2,0.24,mg_N_L,,0.01,Table_2,Talk to AMP about the pre_post vs. the reference impact because we have both technically!
 "Betts & Jones, 2009",10.1657/1938-4246-41.4.407,Pre_Post,,,6.7,km,,Dsc,C1,,,Post,Mean,5,mg_C_L,,0.1,0.34,mg_N_L,,0.01,Table_2,
 "Betts & Jones, 2009",10.1657/1938-4246-41.4.407,Pre_Post,,,5.2,km,,Dsc,C2,,,Pre,Mean,3.3,mg_C_L,,0.1,0.51,mg_N_L,,0.01,Table_2,

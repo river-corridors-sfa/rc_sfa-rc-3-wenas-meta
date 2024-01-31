@@ -1,5 +1,5 @@
-Study_ID,DOI,Design (Control/Burn; Pre/Post),Latitude,Longitude,Area_watershed,Area_unit,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
-Caldwell et al. 2020,10.1002/hyp.13922,Control_Reference_vs_Impact,35,-83,228.4,ha,Control_1,Cfa,AR,,Unburn,1,Mean,0.49,mg_L,0.25,,0.0,mg_N_L,,,Table 4,Only during baseflow. I don’t have coordinates for individual watersheds but table 1 has a lot of watershed characteristics
+Study_ID,DOI,Design_Control_Burn_Pre_Post,Latitude,Longitude,Area_watershed,Area_unit,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
+Caldwell et al. 2020,10.1002/hyp.13922,Control_Reference_vs_Impact,35,-83,228.4,ha,Control_1,Cfa,AR,,Unburn,1,Mean,0.49,mg_L,0.25,,0,mg_N_L,,,Table 4,Only during baseflow. I don’t have coordinates for individual watersheds but table 1 has a lot of watershed characteristics
 Caldwell et al. 2020,10.1002/hyp.13922,Control_Reference_vs_Impact,,,343.5,ha,Site_1,Cfa,CA,,Burn,1,Mean,0.62,mg_L,0.45,,0.1,mg_N_L,,,Table 4,
 Caldwell et al. 2020,10.1002/hyp.13922,Control_Reference_vs_Impact,,,28.4,ha,Control_2,Cfa,AR-UP,,Unburn,1,Mean,0.58,mg_L,0.25,,0.1,mg_N_L,,,Table 4,
 Caldwell et al. 2020,10.1002/hyp.13922,Control_Reference_vs_Impact,,,35.1,ha,Site_2,Cfa,CA-TO,,Burn,1,Mean,0.48,mg_L,0.37,,0.2,mg_N_L,,,Table 4,
