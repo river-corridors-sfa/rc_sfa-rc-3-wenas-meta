@@ -135,16 +135,28 @@ unzip("us_states.zip", exdir = "us_states")
 # Read the shapefile
 us_states <- st_read("us_states/cb_2021_us_state_20m.shp")
 
-# Plot the map with points
+# Add columns to dataframe for map
+
+map_sf$Effect_size_direction <- with(map_sf, ifelse(Effect_size > 0, 'positive','negative'))
+
+map_sf$Effect_size_magnitude <- with(map_sf, abs(Effect_size))
+
+# Make colors
+myblue <- rgb(173, 216, 230, max=255, alpha=125, names = "blue50")
+
+myred <- rgb(230, 144, 203, max = 255, alpha = 125, names = "red50")
+
+# Plot the map with points, filter map_sf for nitrate effect size and 0 years since fire
+
 ggplot() +
   geom_sf(data = us_states, fill = "white", color = "black") +
-  geom_sf(data = map_sf, aes(color = Fire_name)) +
+  geom_sf(data = map_sf %>% filter(Time_Since_Fire == 0, response_var == "NO3_Interp") %>% arrange(desc(Effect_size_magnitude)), aes(size = Effect_size_magnitude, fill = Effect_size_direction), shape = 21) +
+  scale_fill_manual(values = c("#ADD8E67D","#E690CB7D")) +
+  scale_size(range = c(1, 12), name = "Effect Size") +
   xlim(-125, -68) +
-  scale_size_continuous(range = c(1, 10)) +
-  labs(title = "Points on US Map with Conditional Variable") +
+  ylim(-25,-53) +
+  labs(title = "Nitrate effect size 0 years since fire") +
   theme_minimal()
-
-
 ```
 
 
