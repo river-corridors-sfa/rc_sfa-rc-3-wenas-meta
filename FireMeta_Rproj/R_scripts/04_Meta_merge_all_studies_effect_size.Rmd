@@ -705,10 +705,10 @@ model <- theil_sen_regression(pd ~ Time_Since_Fire, data = doc_filter)
 summary(model) # slope = -6.991
 
 model_full <- theil_sen_regression(pd ~ Time_Since_Fire, data = doc)
-summary(model_full) # slope = -3.748
+summary(model_full) # slope = -3.153
 
 # plot for supplemental # 
-ggplot(doc, aes(Time_Since_Fire, pd, color = response_var)) +
+ggplot(doc_filter, aes(Time_Since_Fire, pd, color = response_var)) +
   geom_point() +
   stat_poly_line() +
   stat_poly_eq(use_label(c("eq", "R2"))) +
@@ -745,7 +745,7 @@ no3 <- percent_difference_test%>%
 write_csv(no3, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "TSF_PD_NO3_Fig_data.csv"))
 
 no3_theil <- theil_sen_regression(pd ~ Time_Since_Fire, data = no3)
-summary(no3_theil) # Slope: 26.31
+summary(no3_theil) # Slope: 29.43
 
 # plot for supplemental # 
 ggplot(no3, aes(Time_Since_Fire, pd, color = response_var)) +

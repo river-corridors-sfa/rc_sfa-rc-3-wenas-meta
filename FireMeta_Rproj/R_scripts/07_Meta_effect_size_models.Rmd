@@ -56,7 +56,7 @@ library(ggpubr)
 ```
 
 ```{r load in csv's}
-options(max.print = 200)
+options(max.print = 40)
 
 # Geospatial csv from stream cat with only the sites and the total area + the burn percentages 
 geospatial <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2023-11-13.csv"))
@@ -497,9 +497,6 @@ summary(glht(tc_anova, linfct = mcp(Land_Coverage_Category = "Tukey", interactio
 ```
 
 
-
-
-
 ```{r Effect size models-NO3}
 # NO3 #
 # Effect_size ~ burn_percentage*TSF + (1|Site)
@@ -508,7 +505,7 @@ no3_effect_size_burn_merged <- right_join(effect_size_no3, fire_clip) %>%
 
 doc_no3_effect_size <- rbind(no3_effect_size_burn_merged, doc_effect_size_burn_merged)  # merging nitrate and DOC 
 
-write.csv(no3_effect_size_burn_merged, "")
+# write.csv(no3_effect_size_burn_merged, "")
 
 
 ggpairs(no3_effect_size_burn_merged,
@@ -568,7 +565,7 @@ boxplot(Effect_size ~ Climate,
   main = "Effect size Distribution by Climate - DOC",
   xlab = "Climate",
   ylab = "Effect Size",
-  col = "steelblue",
+  col = "#00AFBB",
   border = "black")
 ```
 The p-value of the test is <2.2e-16, which is less than our significance level of 0.05. 
@@ -609,7 +606,7 @@ boxplot(Effect_size ~ Climate,
   main = "Effect size Distribution by Climate - NO3",
   xlab = "Climate",
   ylab = "Effect Size",
-  col = "steelblue",
+  col = "#E7B800",
   border = "black")
 
 ```
@@ -659,12 +656,12 @@ boxplot(Effect_size ~ Time_Since_Fire,
   main = "Effect size Distribution by Time Since Fire - DOC",
   xlab = "Time Since Fire",
   ylab = "Effect Size",
-  col = "steelblue",
+  col = "#00AFBB",
   border = "black") 
 
 ```
-The p-value of the test is 0.73, which is greater than our significance level of 0.05. 
-Thus, we do not reject the null hypothesis and conclude that the variance among the climate groups is equal. 
+The p-value of the test is 0.69, which is greater than our significance level of 0.05. 
+Thus, we do not reject the null hypothesis and conclude that the variance among the time since fire groups is equal. 
 
 
 ```{r NO3 TSF models}
@@ -698,7 +695,7 @@ boxplot(Effect_size ~ Time_Since_Fire,
   main = "Effect size Distribution by Time Since Fire - NO3",
   xlab = "Time Since Fire",
   ylab = "Effect Size",
-  col = "steelblue",
+  col = "#E7B800",
   border = "black")
 
 
