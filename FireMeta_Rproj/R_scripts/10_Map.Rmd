@@ -29,7 +29,7 @@ Step 3) Plot
 
 rm(list=ls(all=T)) #this clears your Environment
 
-
+library(ggplot2)
 library(tidyverse)
 library(here)
 library(readxl)
@@ -43,18 +43,18 @@ library(mapdata)
 library(cowplot)
 library(sf)
 library(RColorBrewer)
+library(patchwork)
 ```
 
 This is the workflow to read in the meta analysis studies and the fires they are studying and then loading in a CONUS map and plotting our data on top of that
 ```{r load in fire names and associated study}
-
-meta <- read_csv(here("inputs", "Studies_Summary", "Studies_included_in_climate_figure.csv")) # reading in filtered meta data sheet
+meta <- read_csv(here("inputs", "Studies_Summary", "Map_input.csv")) # reading in the finalized filtered meta-analysis papers. 
 
 coords <- meta %>% 
   select(Fire_Name, Lat, Long, number_of_burn, State, group) # Picking only the columns I want 
 
 coords_noNA <- coords %>% 
-    drop_na(Fire_Name)
+    drop_na(Fire_Name) # eliminating rows that are NAs if they dont have an associated fire name with it. 
  
 # Create an sf object from the data
 coordinates_sf <- st_as_sf(coords_noNA, coords = c("Long", "Lat"), crs = 4326)
@@ -72,7 +72,7 @@ us_states <- st_read("us_states/cb_2021_us_state_20m.shp")
 ggplot() +
   geom_sf(data = us_states, fill = "white", color = "black") +
   geom_sf(data = coordinates_sf, aes(color = Fire_Name)) +
-  xlim(-125, -68) +
+  xlim(-150, -68) +
   scale_size_continuous(range = c(1, 10)) +
   labs(title = "Points on US Map with Conditional Variable") +
   theme_minimal()
@@ -113,6 +113,125 @@ ggsave("climate_figure_map.pdf",
 
 ```
 
+```{r - Chat GPT trying to make AK an inset map}
+# Download the US states shapefile from the Census Bureau
+url_us_states <- "https://www2.census.gov/geo/tiger/GENZ2021/shp/cb_2021_us_state_20m.zip"
+download.file(url_us_states, "inputs/map_shape_files/us_states.zip", mode = "wb")
+unzip("inputs/map_shape_files/us_states.zip", exdir = "inputs/map_shape_files/us_states")
+
+# Download the Alaska shapefile
+url_alaska <- "https://www2.census.gov/geo/tiger/GENZ2021/shp/cb_2021_us_state_20m.zip"
+download.file(url_alaska, "inputs/map_shape_files/alaska.zip", mode = "wb")
+unzip("inputs/map_shape_files/alaska.zip", exdir = "inputs/map_shape_files/alaska")
+
+# Read the US states shapefile
+us_states <- st_read("inputs/map_shape_files/us_states/cb_2021_us_state_20m.shp")
+
+# Read the Alaska shapefile
+alaska <- st_read("inputs/map_shape_files/alaska/cb_2021_us_state_20m.shp")
+
+# Create a base US map
+us_map <- ggplot() +
+  geom_sf(data = us_states, fill = "white", color = "black") +
+  xlim(-125, -68) +
+  ylim(20, 52) +
+  theme_void()
+print(us_map)
+
+# Create Alaska inset map
+alaska_map <- ggplot() +
+  geom_sf(data = alaska, fill = "white", color = "black") +
+   xlim(-180, -128) +
+   ylim(50, 72) +
+   theme_void()
+
+
+print(alaska_map)
+
+us_map + inset_element(alaska_map, 0, -0.8, 0.4, 1, align_to = 'full')
+
+# Now lets figure out how to get the points on the map and create an insert that way #
+
+# continuous US with points 
+us <- ggplot() +
+  geom_sf(data = us_states, fill = "white", color = "black") +
+  geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_Name)) +
+  scale_size_continuous(guide = guide_legend(title = "Number of Watersheds")) +
+  scale_color_manual(values = c("#666666", "#A6CEE3", "#00AFBB", "#1B9E77",
+                                "#7570B3", "#E7298A", "darkred", "black", 
+                                "#1F78B4", "#E31A1C", "#33A02C", "#FB9A99",
+                                "darkblue", "darkgreen", "blue", "yellow", "red"), 
+                     guide = guide_legend(title = "Fire Name")) +
+  xlim(-125, -68) +
+  ylim(25, 52) +
+  theme_map() +
+  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),
+        legend.position = "top")
+
+print(us)
+
+# Alaska with points 
+ak <- ggplot() +
+  geom_sf(data = alaska, fill = "white", color = "black") +
+  geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_Name)) +
+   xlim(-180, -128) +
+   ylim(50, 72) +
+   theme_void() +
+   theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),
+        legend.position = "none")
+
+print(ak)
+
+
+# merge the two maps with points as an insert
+us + inset_element(ak, 0, -1.0, 0.4, 1, align_to = 'full')
+
+ggsave("number_watersheds_map.pdf",
+       path = here("initial_plots", "10_Map"),
+       width = 10, height = 8,  units = "in")
+
+
+# I want to include Canada # 
+# Download shapefile for world countries
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Filter for Canada
+canada <- world[world$iso_a2 == "CA", ]
+
+# Filter for British Columbia
+bc <- world[world$name == "Canada" & world$admin == "British Columbia", ]
+
+# take 2 #
+bc_shapefile <- st_read("path_to_shapefile/canada_provinces.shp")
+
+ggplot() +
+  geom_sf(data = world, fill = "lightgray", color = "white", size = 0.2) +
+  geom_sf(data = bc, fill = "blue", color = "white", size = 0.8) +
+  theme_minimal()
+
+
+us_ca <- ggplot() +
+  geom_sf(data = canada, fill = "white", color = "black", size = 0.8) +
+  geom_sf(data = us_states, fill = "white", color = "black") +
+  geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_Name)) +
+  xlim(-135, -68) +
+  ylim(25, 67) +
+  theme_void() +
+  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),
+        legend.position = "none")
+
+us_ca + inset_element(ak, 0, -1.0, 0.4, 1, align_to = 'full')
+  
+ggsave("number_watersheds_map.pdf",
+       path = here("initial_plots", "10_Map"),
+       width = 10, height = 8,  units = "in")
+
+
+```
+
 
 ### Xia map making ###
 ```{r workflow for a map Xia}
@@ -124,7 +243,7 @@ effect_size_fire <- read_csv(here("Output_for_analysis", "07_Meta_effect_size_mo
 # There is a subset of papers that were used for the Climate analysis and a subset of papers that were used for the burn percentage analysis due to these factors. So unfortunately this is what we got to work with. 
 
 # Create an sf object from the data
-map_sf <- st_as_sf(effect_size_fire, coords = c("Long", "Lat"), crs = 4326)
+map_sf <- st_as_sf(effect_size_fire, coords = c("longitude", "latitude"), crs = 4326)
 
 # Download the United States map shapefile from the US Census Bureau
 # Replace "cb_2019_us_state_20m.zip" with the most recent shapefile available

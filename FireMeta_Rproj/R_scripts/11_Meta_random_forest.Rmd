@@ -1,0 +1,146 @@
+---
+title: "11_Random_forest"
+output: html_document
+date: "2024-02-07"
+editor_options: 
+  chunk_output_type: console
+---
+
+The purpose of this script is to run random forests for DOC and NO3 effect sizes using catchment characteristics
+
+Script Workflow:
+
+Step 1) Load in the geospatial csv that is generated from pulling in stream cat data
+
+Step 2) Load in the fire name and year summary csv
+
+Step 3) Load in the effect size sheet that comes from the All_Studies_Temporal_Normalization script that includes effect size for each watershed. 
+
+
+
+
+# Status: in progress
+
+# ==============================================================================
+# Author: Peter Regier
+#  February 2024
+# ==============================================================================
+
+# Library download # 
+```{r Load packages}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+require(pacman)
+library(tidyverse)
+library(janitor)
+library(PNWColors)
+library(ranger)
+library(here)
+
+```
+
+# random forest dataframes # 
+```{r read in csv's}
+
+## Read in effect datasets
+no3 <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv")) %>% 
+  clean_names() %>% 
+  rename("dependent" = effect_size) %>% 
+  select(-c(minelevraw, elevfixed))
+
+doc <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv")) %>% 
+  clean_names() %>% 
+  rename("dependent" = effect_size) %>% 
+  select(-c(minelevraw, elevfixed))
+
+## Set ggplot theme
+theme_set(theme_bw())
+
+```
+
+# 2. Random Forest models 
+```{r function to calculate variable importance}
+## Function to calculate variable importance for a default ranger() model
+plot_fi <- function(data){
+  
+  ## Make model
+  rf_model <- ranger(dependent ~ ., data = data, importance = "impurity")
+  
+  ## Visualize model output
+  print(rf_model)
+  
+  ## Set vectors for renaming stuff
+  var_names <- rf_model$variable.importance
+  col_names <- c("predictor", "raw_fi")
+  
+  ## Convert feature importance to a tibble with variables as a column
+  fi0 <- as.data.frame(var_names) %>% 
+    tibble::rownames_to_column() %>% 
+    as_tibble()
+  
+  ## Rename columns
+  colnames(fi0) = col_names
+  
+  ## Output variable importance (or feature importance)
+  fi0
+}
+
+```
+
+# Plot FI for effect sizes
+```{r plot Feature importance}
+## Create a dataset of variable importance
+df <- bind_rows(plot_fi(no3) %>% mutate(analyte = "no3"), 
+          plot_fi(doc) %>% mutate(analyte = "doc")) %>% 
+  group_by(analyte) %>% 
+  mutate(fi = raw_fi / max(raw_fi))
+
+write_csv(df, here("Output_for_analysis", "11_Random_forest", "Random_Forest_Effect_Size_Fig_data.csv"))
+
+
+## Set up a color palette
+var_colors <- PNWColors::pnw_palette("Bay", n = length(unique(df$predictor)))
+
+## Make plots
+# burn_percentage - Burn percentage 
+# Climate - Climate classification 
+# maxelevsmo - Maximum elevation (smoothed) in centimeters
+# minelevsmo - Minimum elevation (smoothed) in centimeters
+# slope - Slope of flowline (meters/meters) based on smoothed elevations
+# time_since_fire - time since fire 
+# totdasqkm -Total upstream catchment area from downstream end of flowline.
+
+dose.labs <- c("DOC", "Nitrate")
+names(dose.labs) <- c("doc", "no3")
+
+ggplot(df, aes(fi, 
+               reorder(predictor, fi), fill = predictor)) + 
+  geom_col(alpha = 0.8, show.legend = F, width = 0.7) + 
+  facet_wrap(~analyte, nrow = 1, labeller = labeller(analyte = dose.labs)) + 
+  scale_fill_manual(values = var_colors) + 
+  labs(x = "Feature Importance", 
+       y = "", fill = "") +
+  scale_y_discrete(labels=c("burn_percentage" = "Burn Percentage", 
+                            "climate" = "Climate",
+                            "maxelevsmo" = "Max Elevation",
+                            "minelevsmo" = "Minimum Elevation",
+                            "slope" = "Average Slope",
+                            "time_since_fire" = "Time Since Fire",
+                            "totdasqkm" = "Catchment Area"))
+                            
+
+ggsave("Effect_Size_Random_Forest.pdf",
+       path = here("initial_plots", "11_Meta_random_forest"),
+       width = 5.5, height = 3,  units = "in")
+
+
+```
+
+
+
+
+
+
+
