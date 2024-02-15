@@ -104,6 +104,11 @@ site_data_unique <- site_data %>%
   group_by(Study_ID, Pair, Area_watershed_km) %>% 
   distinct(Area_watershed_km, .keep_all = TRUE)
 
+abbott_average_watershed_area <- site_data_unique %>% 
+  group_by(Burn_Unburn) %>% 
+  summarise(Area_watershed_km = mean(Area_watershed_km))
+
+
 
 ```
 
@@ -127,7 +132,6 @@ control_impact_fill <-  control_impact_units %>%
 
 ```{r}
 # pivoting to make the responses in one column
-
 metadata_long <- control_impact_fill %>%
   pivot_longer(
     cols = NO3_Interp:DOC_Interp,
@@ -151,6 +155,17 @@ yearly_mean_site <-  metadata_long %>%
   distinct(meanConc, .keep_all = TRUE) %>%
   mutate(TempNorm = meanConc / Area_watershed_km)
     
+# Caclulating the temporal normalization with the average watershed area for burn and unburn # 
+yearly_mean_site_test <-  metadata_long %>%
+  group_by(Study_ID, response_var, Burn_Unburn, year) %>% 
+  summarize(meanConc = mean(concentration)) %>% 
+  left_join(abbott_average_watershed_area) %>% 
+  group_by(Burn_Unburn, year) %>%
+  distinct(meanConc, .keep_all = TRUE) %>%
+  mutate(TempNorm = meanConc / Area_watershed_km)
+
+yearly_mean_site$TempNorm <- yearly_mean_site_test$TempNorm # replacing the temporal normalization values with the proper watershed area which is an average of all the burns and the unburned
+
 yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
 
 write.csv(yearly_mean_site, here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_temp_norm.csv"))

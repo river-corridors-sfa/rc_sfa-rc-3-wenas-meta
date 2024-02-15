@@ -162,7 +162,35 @@ corrplot(res, type = "upper", order = "hclust",
 ```
 
 
+```{r ratio between burned and unburned watersheds}
+library(tidyverse)
+library(hrbrthemes)
+watershed_area <- read_csv("~/OneDrive - PNNL/Documents/RC_3/Wenas_Watershed_project/Manuscript/Watershed_area.csv") 
 
+burn_ratio <- watershed_area %>%
+  group_by(Study) %>%
+  summarise(BR = sum(Watershed_Size_km[Burn_Unburn == "Burn"]) / sum(Watershed_Size_km[Burn_Unburn == "Unburn"]))
+
+ggplot(burn_ratio, aes(x = BR)) +
+  geom_histogram(binwidth = 1, fill = "#69b3a2", color = "#e9ecef", alpha = 0.9) +
+  scale_x_continuous(breaks = seq(0, 40, by = 5), labels = seq(0, 40, by = 5)) +
+  theme_bw() +
+  ggtitle("Watershed Area (Burn) / Watershed Area (Unburn)")
+
+
+p <- data %>%
+  filter( price<300 ) %>%
+  ggplot( aes(x=price)) +
+    geom_histogram( binwidth=3, fill="#69b3a2", color="#e9ecef", alpha=0.9) +
+    ggtitle("Bin size = 3") +
+    theme_ipsum() +
+    theme(
+      plot.title = element_text(size=15)
+    )
+
+
+
+```
 
 
 

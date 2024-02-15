@@ -48,12 +48,12 @@ library(here)
 no3 <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv")) %>% 
   clean_names() %>% 
   rename("dependent" = effect_size) %>% 
-  select(-c(minelevraw, elevfixed))
+  select(-c(minelevraw, elevfixed, minelevsmo))
 
 doc <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv")) %>% 
   clean_names() %>% 
   rename("dependent" = effect_size) %>% 
-  select(-c(minelevraw, elevfixed))
+  select(-c(minelevraw, elevfixed, minelevsmo))
 
 ## Set ggplot theme
 theme_set(theme_bw())
@@ -86,6 +86,7 @@ plot_fi <- function(data){
   ## Output variable importance (or feature importance)
   fi0
 }
+
 
 ```
 
@@ -125,7 +126,7 @@ ggplot(df, aes(fi,
   scale_y_discrete(labels=c("burn_percentage" = "Burn Percentage", 
                             "climate" = "Climate",
                             "maxelevsmo" = "Max Elevation",
-                            "minelevsmo" = "Minimum Elevation",
+                            # "minelevsmo" = "Minimum Elevation",
                             "slope" = "Average Slope",
                             "time_since_fire" = "Time Since Fire",
                             "totdasqkm" = "Catchment Area"))
