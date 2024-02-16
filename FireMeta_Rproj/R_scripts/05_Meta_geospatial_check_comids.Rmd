@@ -159,6 +159,9 @@ sites <- updated_sites %>%
   bind_rows(filter(sites, site %in% sus_points$site)) %>% 
   distinct(site, .keep_all = TRUE)
 
+sites <- sites %>% 
+  dplyr::select(site, comid, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope)
+
 site_watersheds <- getWatersheds(df = sites, make_pretty = TRUE) %>%
   inner_join(., dplyr::select(sf::st_drop_geometry(sites), site, comid), by = "comid")
 

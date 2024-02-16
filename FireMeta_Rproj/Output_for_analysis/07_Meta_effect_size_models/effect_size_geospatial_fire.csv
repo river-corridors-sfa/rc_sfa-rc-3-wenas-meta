@@ -146,10 +146,10 @@ Crandall et al. 2021,Pole Creek Fire Complex,2018,Benjamin Slough,10349048,337.3
 Crandall et al. 2021,Pole Creek Fire Complex,2018,Payson,10350360,70.5753,3,-9998,156372,163694,156372,0,0.03599803,90,Csa,Temperate,0,NO3_Interp,-4.24608696789537
 Crandall et al. 2021,Pole Creek Fire Complex,2018,Spanish Fork Lower,10349108,2010.5073,5,-9998,138783,139310,138783,0,0.00219949,24,Csa,Temperate,0,NO3_Interp,0.361724196267397
 Crandall et al. 2021,Pole Creek Fire Complex,2018,Spanish Fork Upper,10349244,1642.5162,5,-9998,145674,146394,145674,0,0.01123244,25,Csa,Temperate,0,NO3_Interp,-1.01399784917132
-Abbott et al. 2021,Anaktuvuk River wildfire,2007,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Dwc,Cold,>10,DOC_Interp,0.428539313567996
-Abbott et al. 2021,Anaktuvuk River wildfire,2007,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Dwc,Cold,>10,DOC_Interp,0.404794545407272
-Abbott et al. 2021,Anaktuvuk River wildfire,2007,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Dwc,Cold,>10,NO3_Interp,0.61270234501971
-Abbott et al. 2021,Anaktuvuk River wildfire,2007,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Dwc,Cold,>10,NO3_Interp,0.730540647216058
+Abbott et al. 2021,Anaktuvuk River wildfire,2007,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Dwc,Cold,>10,DOC_Interp,0.0712234131613858
+Abbott et al. 2021,Anaktuvuk River wildfire,2007,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Dwc,Cold,>10,DOC_Interp,0.0474786447809281
+Abbott et al. 2021,Anaktuvuk River wildfire,2007,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Dwc,Cold,>10,NO3_Interp,0.255386609591499
+Abbott et al. 2021,Anaktuvuk River wildfire,2007,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Dwc,Cold,>10,NO3_Interp,0.373224799631864
 Rhea et al. 2021,Hayman Fire_High Park Fire,2002_2012,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Dfc,Cold,>10,DOC_Interp,0.67513692475464
 Rhea et al. 2021,Hayman Fire_High Park Fire,2002_2012,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Dfc,Cold,>10,DOC_Interp,-0.774248595960927
 Rhea et al. 2021,Hayman Fire_High Park Fire,2002_2012,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Dfc,Cold,>10,DOC_Interp,-0.786783811960335
