@@ -830,6 +830,11 @@ write_csv(effect_both_doc_no3, here("Output_for_analysis", "07_Meta_effect_size_
 # Plot #
 vn = expression(paste(""*N*O[3]^"-"))
 
+give.n <- function(x){
+  return(c(y = median(x)*1.5, label = length(x))) 
+  # experiment with the multiplier to find the perfect position
+}
+
 ggplot(effect_both_doc_no3, aes(burn_percentage_group, Effect_size, color = response_var),
        position = position_dodge(width = -0.5)) +
   geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +

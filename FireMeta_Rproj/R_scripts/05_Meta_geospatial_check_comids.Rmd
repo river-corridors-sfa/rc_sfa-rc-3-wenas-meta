@@ -145,7 +145,7 @@ mapview(sus_nhd[[2]], col.regions = "#56B4E9", alpha.regions = 0.4, legend = FAL
 ```{r}
 # # Based on the map, it appears that this site should be linked to comid a different comid
 
-updated_sites <- tibble(site = c("Site 3", "Reference", "Payson", "Dry Creek"),comid = c(8943613, 15032969, 10350360, 10329181)) 
+updated_sites <- tibble(site = c("Site_3", "Reference", "Payson", "Dry_Creek"),comid = c(8943613, 15032969, 10350360, 10329181)) 
 # Site 3 in the Oliver paper is supposed to be this COMID: 8943613 
 
 # Reference from the Uzun paper is supposed to be COMID 15032969
@@ -165,10 +165,10 @@ sites <- sites %>%
 site_watersheds <- getWatersheds(df = sites, make_pretty = TRUE) %>%
   inner_join(., dplyr::select(sf::st_drop_geometry(sites), site, comid), by = "comid")
 
-write.csv(sites, here("Output_for_analysis", "05_Meta_geospatial_check_comids", "geospatial_data.csv"))
+write_csv(sites, here("Output_for_analysis", "05_Meta_geospatial_check_comids", "geospatial_data.csv"))
 
 
-write.csv(site_watersheds, here("Output_for_analysis", "05_Meta_geospatial_check_comids", "meta_comids.csv"))
+write_csv(site_watersheds, here("Output_for_analysis", "05_Meta_geospatial_check_comids", "meta_comids.csv"))
 
 
 ```
@@ -191,29 +191,11 @@ if(site_type == "comid"){
 sites_export <- sites %>%
   select(site, latitude, longitude, comid)
 
-write.csv(sites_export, here("inputs", "catchment_characteristics", "meta_lat_long_comids.csv"))
+write_csv(sites_export, here("inputs", "catchment_characteristics", "meta_lat_long_comids.csv"))
 
 
 
 ```
-
-
-If after reviewing the delineated watersheds you have found that some locations are in fact not appropriate for this analysis, remove them now:
-
-```{r}
-small_sites <- c("site9")
-
-# site 9 appears to be a headwater stream too small for analysis with NHDPlus V2:
-sites <- sites %>%
-  filter(!site %in% small_sites)
-
-site_watersheds <- site_watersheds %>%
-  filter(!site %in% small_sites)
-```
-
-
-
-
 
 #### Fire Permiter behind the watershed Figure for AGU_2023 ####
 ```{r}
