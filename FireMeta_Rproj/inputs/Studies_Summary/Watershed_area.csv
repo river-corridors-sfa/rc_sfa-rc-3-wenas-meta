@@ -1,4 +1,4 @@
-Study,Site,Burn_Unburn,Fire_name,Watershed_Size_km,Burn_Percentage
+Study_ID,Site,Burn_Unburn,Fire_name,Watershed_Size_km,burn_percentage
 Abbott et al. 2021,BS.11,Unburn,Anaktuvuk River (2007),33.99003,
 Abbott et al. 2021,BS.10,Burn,Anaktuvuk River (2007),36.46035,
 Burd et al 2018,Notawohka Creek,Unburn,Northwest Territories Fire ,321,90

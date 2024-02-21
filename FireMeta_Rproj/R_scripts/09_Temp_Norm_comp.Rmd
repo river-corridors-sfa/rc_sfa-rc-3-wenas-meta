@@ -262,9 +262,15 @@ leveneTest(TempNorm ~ Burn_Unburn, data = no3_yearly) # df: 1,181, F-value: 0.74
 # Write csv's
 write_csv(doc_yearly, here("Output_for_analysis", "09_Temp_Norm_comp", "DOC_temp_norm_fig_data.csv"))
 
+dov_cv <- doc_cv %>% 
+  rename(meanConc = meanconc)
+
 write_csv(doc_cv, here("Output_for_analysis", "09_Temp_Norm_comp", "DOC_CV_temp_norm_fig_data.csv"))
 
 write_csv(no3_yearly, here("Output_for_analysis", "09_Temp_Norm_comp", "NO3_temp_norm_fig_data.csv"))
+
+no3_cv <- no3_cv %>% 
+  rename(meanConc = meanconc)
 
 write_csv(no3_cv, here("Output_for_analysis", "09_Temp_Norm_comp", "NO3_CV_temp_norm_fig_data.csv"))
 

@@ -1,4 +1,4 @@
-Study_ID,response_var,Burn_Unburn,meanconc,sdconc,CVconc
+Study_ID,response_var,Burn_Unburn,meanConc,sdconc,CVconc
 Abbott et al. 2021,NO3_Interp,Burn,1.6723649999999998e-4,2.7413398535752553e-5,0.1639199489091948
 Abbott et al. 2021,NO3_Interp,Unburn,1.2150959999999999e-4,9.872200614857874e-6,0.08124626050005822
 "Coombs & Melack, 2013",NO3_Interp,Burn,0.40625225486166666,0.4964664207020838,1.2220644064391373
