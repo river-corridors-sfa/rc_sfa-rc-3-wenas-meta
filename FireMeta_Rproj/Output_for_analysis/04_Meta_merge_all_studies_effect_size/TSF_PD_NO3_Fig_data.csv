@@ -1,4 +1,4 @@
-Study_ID,response_var,Site,Climate,Biome,Time_Since_Fire,Effect_size,pd
+Study_ID,response_var,Effect_size_pair,Climate,Biome,Time_Since_Fire,Effect_size,Percent_Difference
 "Coombs & Melack, 2013",NO3_Interp,lnR1,BSk,Arid,1,1.75295228052377,477.1616980550105
 "Coombs & Melack, 2013",NO3_Interp,lnR2,BSk,Arid,1,-2.0473966314124756,-87.09295153770486
 "Coombs & Melack, 2013",NO3_Interp,lnR3,BSk,Arid,1,-0.2030079720285851,-18.37282659419256
@@ -93,11 +93,11 @@ Hickenbottom et al. 2023,NO3_Interp,lnR1,Csb,Temperate,1,0.5604775611436323,75.1
 Hickenbottom et al. 2023,NO3_Interp,lnR1,Csb,Temperate,2,0.4248453259394459,52.935384999825175
 Hickenbottom et al. 2023,NO3_Interp,lnR2,Csb,Temperate,2,-0.9198195703521421,-60.140904777798276
 Crandall et al. 2021,NO3_Interp,lnR1,Csa,Temperate,1,1.28743921860061,262.3495684535134
-Crandall et al. 2021,NO3_Interp,lnR2,Csa,Temperate,1,-4.24608696789537,-98.56798403374928
-Crandall et al. 2021,NO3_Interp,lnR3,Csa,Temperate,1,0.361724196267397,43.58028875505515
-Crandall et al. 2021,NO3_Interp,lnR4,Csa,Temperate,1,-1.01399784917132,-63.723420622981244
-Abbott et al. 2021,NO3_Interp,lnR1,Dwc,Cold,10,0.61270234501971,84.54116054939232
-Abbott et al. 2021,NO3_Interp,lnR1,Dwc,Cold,10,0.730540647216058,107.62027975548408
-Rhea et al. 2021,NO3_Interp,lnR1,Dfc,Cold,15,2.1593115537283,766.5170100478308
-Rhea et al. 2021,NO3_Interp,lnR2,Dfc,Cold,15,3.2167748383195,2394.7530474466835
-Rhea et al. 2021,NO3_Interp,lnR3,Dfc,Cold,15,2.65582826001489,1323.6772927117645
+Crandall et al. 2021,NO3_Interp,lnR2,Csa,Temperate,1,-4.246086967895374,-98.56798403374928
+Crandall et al. 2021,NO3_Interp,lnR3,Csa,Temperate,1,0.3617241962673968,43.58028875505513
+Crandall et al. 2021,NO3_Interp,lnR4,Csa,Temperate,1,-1.0139978491713204,-63.723420622981266
+Abbott et al. 2021,NO3_Interp,lnR1,Dwc,Cold,10,0.2553866095914989,29.09606221661083
+Abbott et al. 2021,NO3_Interp,lnR1,Dwc,Cold,10,0.3732247996318643,45.24108045510049
+Rhea et al. 2021,NO3_Interp,lnR1,Dfc,Cold,15,2.159311553728295,766.5170100478266
+Rhea et al. 2021,NO3_Interp,lnR2,Dfc,Cold,15,3.216774838319497,2394.7530474466757
+Rhea et al. 2021,NO3_Interp,lnR3,Dfc,Cold,15,2.6558282600148906,1323.677292711765

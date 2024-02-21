@@ -1,4 +1,4 @@
-Study,Site,Effect_size_site,Fire_name,Fire_year,Lat,Long,Watershed_Size,Burn_Percentage,Reports_Size,Reports_Burn_Percentage,Reports_Coords,Have_HUC
+Study_ID,Site,Effect_size_pair,Fire_name,Fire_year,latitude,longitude,Watershed_Size,burn_percentage,Reports_Size,Reports_Burn_Percentage,Reports_Coords,Have_HUC
 Burd et al 2018,,,Northwest Territories Fire ,MTBS_2013Ws,,,,,,,,
 Burd et al 2018,Scotty Creek,,Northwest Territories Fire ,MTBS_2013Ws,61.4,-121.433,134,0,Y,Y,Y,N_Canada
 Burd et al 2018,Notawohka Creek,lnR1,Northwest Territories Fire ,MTBS_2013Ws,61.133333,-120.283333,321,>90%,Y,Y,Y,N_Canada
@@ -28,7 +28,7 @@ Crandall et al. 2021,Spanish Fork Upper,lnR4,Pole Creek Fire Complex,MTBS_2008Ws
 Hauer & Spencer 1998,,,Red Bench Fire ,MTBS_1988Ws,,,,,,,,
 Hauer & Spencer 1998,Red_Bench_Creek,lnR1,Red Bench Fire ,MTBS_1988Ws,48.81409,-114.39971,1.83,95.6,Y,Y,N_Hampton,Y
 Hauer & Spencer 1998,Wally_Creek ,,Red Bench Fire ,MTBS_1988Ws,48.80153,-114.436506,2.38,0,Y,Y,N_Hampton,Y
-Hauer & Spencer 1998,Red_Meadow_Creek,lnR2,Red Bench Fire ,MTBS_1988Ws,48.802772,-114.32894,64.00,16.2,Y,Y,N_Hampton,Y
+Hauer & Spencer 1998,Red_Meadow_Creek,lnR2,Red Bench Fire ,MTBS_1988Ws,48.802772,-114.32894,64,16.2,Y,Y,N_Hampton,Y
 Hauer & Spencer 1998,Coal_Creek,,Red Bench Fire ,MTBS_1988Ws,48.688413,-114.199739,211.59,0,Y,Y,N_Hampton,Y
 Hauer & Spencer 1998,Logging_Creek,,Red Bench Fire ,MTBS_1988Ws,48.701412,-114.185106,238.08,0,Y,Y,N_Hampton,Y_size is pretty off_sus_points didn’t work
 Hauer & Spencer 1998,Akokala_Creek,lnR3,Red Bench Fire ,MTBS_1988Ws,48.797378,-114.286749,105.98,9.9,Y,Y,N_Hampton,Y

@@ -53,8 +53,9 @@ sf_use_s2(FALSE)
 site_type = "comid" # This steps assumes you have checked your COMIDs
 
 sites <- read_csv(here("inputs", "catchment_characteristics", "meta_lat_long_comids.csv")) %>%
-  distinct(site, .keep_all = TRUE) %>%
-  dplyr::select('site','latitude','longitude', 'comid') %>% 
+  distinct(Site, .keep_all = TRUE) %>%
+  dplyr::select('Site','latitude','longitude', 'comid') %>% 
+  rename(site = Site) %>% 
   drop_na()
 
 ```
@@ -140,7 +141,8 @@ Export all the data.
 
 ```{r}
 sites <- sites %>% 
-  dplyr::select(site, comid, totdasqkm, streamorde, maxelevraw, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws) 
+  dplyr::select(site, comid, totdasqkm, streamorde, maxelevraw, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws) %>% 
+  rename(Site = site)
 
 write_csv(sites, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2024-02-15.csv"))
 

@@ -1,4 +1,4 @@
-site,latitude,longitude,comid,geometry
+Site,latitude,longitude,comid,geometry
 Site_3,38.873743,-120.009019,8943613,"c(-120.009019, 38.873743)"
 Reference,38.499918,-122.10013,15032969,"c(-111.669222, 40.175336)"
 Payson,39.98249,-111.697245,10350360,"c(-111.697245, 39.98249)"

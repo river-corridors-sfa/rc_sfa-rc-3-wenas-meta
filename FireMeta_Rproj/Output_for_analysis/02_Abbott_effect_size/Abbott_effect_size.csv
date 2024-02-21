@@ -1,5 +1,5 @@
-"","Study_ID","response_var","Climate","year","Xe1","Xc","Site","Effect_size"
-"1","Abbott et al. 2021","DOC_Interp","Dwc",2017,0.4182647721,0.3895106645,"lnR1",0.0712234131613858
-"2","Abbott et al. 2021","DOC_Interp","Dwc",2018,0.3639749467,0.3470977334,"lnR1",0.0474786447809281
-"3","Abbott et al. 2021","NO3_Interp","Dwc",2017,0.0001478523,0.0001145289,"lnR1",0.255386609591499
-"4","Abbott et al. 2021","NO3_Interp","Dwc",2018,0.0001866207,0.0001284903,"lnR1",0.373224799631864
+Study_ID,response_var,Climate,year,Xe1,Xc,Effect_size_pair,Effect_size
+Abbott et al. 2021,DOC_Interp,Dwc,2017,0.4182647721,0.3895106645,lnR1,0.07122341316138577
+Abbott et al. 2021,DOC_Interp,Dwc,2018,0.3639749467,0.3470977334,lnR1,0.04747864478092809
+Abbott et al. 2021,NO3_Interp,Dwc,2017,1.478523e-4,1.145289e-4,lnR1,0.2553866095914989
+Abbott et al. 2021,NO3_Interp,Dwc,2018,1.866207e-4,1.284903e-4,lnR1,0.3732247996318643

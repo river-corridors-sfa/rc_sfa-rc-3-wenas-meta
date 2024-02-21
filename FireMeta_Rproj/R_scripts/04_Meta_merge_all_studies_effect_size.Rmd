@@ -134,7 +134,7 @@ control_impact_units <- control_impact %>%
 
 # Creating a site characteristics data frame that I will use to merge later to add in the proper data 
 site_data <- control_impact_units %>% 
-  select(Study_ID, Pair, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn)
+  select(Study_ID, Pair, latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
 
 site_data_unique <- site_data %>% 
   group_by(Study_ID, Pair, Area_watershed_km) %>% 
@@ -146,7 +146,7 @@ site_data_unique <- site_data %>%
 ```{r - gap fill}
 # filling in daily time series and interpolating by study and site
 control_impact_fill <-  control_impact_units %>% 
-  select("Study_ID", "Latitude", "Longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+  select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
   group_by(Study_ID, Site) %>%
   complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
   fill(Study_ID:Burn_Unburn) %>%
@@ -296,7 +296,7 @@ yearly_effect_size_combine <- yearly_effect_size_combine %>%
 yearly_effect_size_combine_long <- yearly_effect_size_combine %>% 
   pivot_longer(
     cols = lnR1:lnR5,
-    names_to = "Site",
+    names_to = "Effect_size_pair",
     values_to = "Effect_size",
     values_drop_na = TRUE
   ) %>% 
@@ -307,21 +307,18 @@ yearly_effect_size_combine_long <- yearly_effect_size_combine %>%
 ```{r - combining in studies that were formatted differently so they needed their own script}
 # combine the yearly_effect_size_combine_long with Crandall, Abbott, and Rhea. 
 
-Crandall_effect_size <- read_csv(here("Output_for_analysis", "01_Crandall_effect_size", "Crandall_effect_size.csv")) %>% 
-  select(-...1)
+Crandall_effect_size <- read_csv(here("Output_for_analysis", "01_Crandall_effect_size", "Crandall_effect_size.csv")) 
 
-abbott_effect_size <- read_csv(here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_effect_size.csv")) %>% 
-  select(-...1)
+abbott_effect_size <- read_csv(here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_effect_size.csv")) 
 
-rhea_effect_size <- read_csv(here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_effect_size.csv")) %>% 
-  select(-...1)
+rhea_effect_size <- read_csv(here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_effect_size.csv")) 
 
 
 # Adding columns to yearly_effect_size_combine_long to match Crandall_effect_size and above_five_effect_size 
 yearly_effect_size_combine_long <-yearly_effect_size_combine_long %>% 
   add_column(Xc34 = NA) %>% 
   ungroup() %>% 
-  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Site, Effect_size)
+  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size)
 
 # Adding columns to Crandall_effect_size to match yearly_effect_size_combine_long and above_five_effect_size 
 Crandall_effect_size <-Crandall_effect_size %>% 
@@ -330,7 +327,7 @@ Crandall_effect_size <-Crandall_effect_size %>%
              Xe5 = NA,
              Xc345 = NA) %>% 
   ungroup() %>% 
-  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Site, Effect_size) 
+  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size) 
 
 # Adding columns to abbott_effect_size to match yearly_effect_size_combine_long and Crandall_effect_size 
 abbott_effect_size <-abbott_effect_size %>% 
@@ -343,7 +340,7 @@ abbott_effect_size <-abbott_effect_size %>%
              Xc345 = NA, 
              Biome = NA) %>% 
   ungroup() %>% 
-  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Site, Effect_size) 
+  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size) 
 
 # Adding columns to rhea_effect_size to match abbott_effect_size, yearly_effect_size_combine_long and Crandall_effect_size 
 rhea_effect_size <-rhea_effect_size %>% 
@@ -354,7 +351,7 @@ rhea_effect_size <-rhea_effect_size %>%
              Xc345 = NA, 
              Biome = NA) %>% 
   ungroup() %>% 
-  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Site, Effect_size) 
+  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size) 
 
 
 # combining all of them back into the mix back into the mix 
@@ -571,7 +568,7 @@ TSF_long <- TSF_long %>%
 
 count_TSF <- TSF_long %>% 
   count(Study_ID)
-sum(count_TSF$n)# 59 watersheds are included in the climate analysis 
+sum(count_TSF$n)# 57 watersheds are included in the TSF analysis 
 
  
 ggplot(yearly_effect_size_combine_long, aes(Time_Since_Fire, Effect_size, color = response_var),
@@ -620,7 +617,8 @@ ggsave("Effect_Size_TSF_Horizontal.pdf",
 
 percent_difference <- yearly_effect_size_combine_long %>% 
   mutate(pd = (100*(1-exp(Effect_size)))*-1) %>% 
-  select(Study_ID, response_var, Site, Climate, Biome, Time_Since_Fire, Effect_size, pd) # creating percent difference 
+  select(Study_ID, response_var, Effect_size_pair, Climate, Biome, Time_Since_Fire, Effect_size, pd) %>% 
+  rename(Percent_Difference = pd)# creating percent difference 
 
 write_csv(percent_difference, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Percent_Difference.csv"))
 
@@ -628,19 +626,19 @@ write_csv(percent_difference, here("Output_for_analysis", "04_Meta_merge_all_stu
 
 TSF_summary_effect <- percent_difference %>%
   group_by(Time_Since_Fire, response_var) %>%
-  summarise(mean_effect = mean(pd, na.rm = TRUE),
-            sd_effect = sd(pd, na.rm = TRUE),
+  summarise(mean_effect = mean(Percent_Difference, na.rm = TRUE),
+            sd_effect = sd(Percent_Difference, na.rm = TRUE),
             n_effect = n(),
-            pd = mean(pd, na.rm = TRUE)) %>%
+            Percent_Difference = mean(Percent_Difference, na.rm = TRUE)) %>%
   mutate(se_effect = sd_effect / sqrt(n_effect),
          lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
          upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
 
-write_csv(percent_difference, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "TSF_PD_CIs.csv"))
+write_csv(TSF_summary_effect, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "TSF_PD_CIs.csv"))
 
 
 # TSF 
-ggplot(percent_difference, aes(Time_Since_Fire, pd, color = response_var),
+ggplot(percent_difference, aes(Time_Since_Fire, Percent_Difference, color = response_var),
        position = position_dodge(width = -0.5)) +
   geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
   geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
@@ -669,7 +667,7 @@ ggplot(percent_difference, aes(Time_Since_Fire, pd, color = response_var),
 
 
 # Scatter plot with linear regression for both DOC and nitrate 
-ggplot(percent_difference, aes(Time_Since_Fire, pd, color = response_var)) +
+ggplot(percent_difference, aes(Time_Since_Fire, Percent_Difference, color = response_var)) +
   geom_point() +
   geom_smooth(method = "lm")
 
@@ -682,7 +680,7 @@ percent_difference_test <- percent_difference %>%
 percent_difference_test %>% 
   filter(response_var == "DOC_Interp") %>% 
   filter(Time_Since_Fire < 7) %>% 
-  ggplot(aes(Time_Since_Fire, pd, color = response_var)) +
+  ggplot(aes(Time_Since_Fire, Percent_Difference, color = response_var)) +
   geom_point() +
   stat_poly_line() +
   stat_poly_eq(use_label(c("eq", "R2")))
@@ -698,17 +696,17 @@ write_csv(doc, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_siz
 
 
 
-lm.mod <- lm(pd ~ Time_Since_Fire, data = doc_filter)
+lm.mod <- lm(Percent_Difference ~ Time_Since_Fire, data = doc_filter)
 summary(lm.mod) # slope = -12.5
 
-model <- theil_sen_regression(pd ~ Time_Since_Fire, data = doc_filter)
+model <- theil_sen_regression(Percent_Difference ~ Time_Since_Fire, data = doc_filter)
 summary(model) # slope = -6.991
 
-model_full <- theil_sen_regression(pd ~ Time_Since_Fire, data = doc)
+model_full <- theil_sen_regression(Percent_Difference ~ Time_Since_Fire, data = doc)
 summary(model_full) # slope = -3.153
 
 # plot for supplemental # 
-ggplot(doc_filter, aes(Time_Since_Fire, pd, color = response_var)) +
+ggplot(doc_filter, aes(Time_Since_Fire, Percent_Difference, color = response_var)) +
   geom_point() +
   stat_poly_line() +
   stat_poly_eq(use_label(c("eq", "R2"))) +
@@ -733,7 +731,7 @@ ggsave("DOC_Percent_Difference_Scatter.pdf",
 # no3
 percent_difference_test %>% 
   filter(response_var == "NO3_Interp") %>% 
-  ggplot(aes(Time_Since_Fire, pd, color = response_var)) +
+  ggplot(aes(Time_Since_Fire, Percent_Difference, color = response_var)) +
   geom_point() +
   stat_poly_line() +
   stat_poly_eq(use_label(c("eq", "R2")))
@@ -744,11 +742,11 @@ no3 <- percent_difference_test%>%
 
 write_csv(no3, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "TSF_PD_NO3_Fig_data.csv"))
 
-no3_theil <- theil_sen_regression(pd ~ Time_Since_Fire, data = no3)
+no3_theil <- theil_sen_regression(Percent_Difference ~ Time_Since_Fire, data = no3)
 summary(no3_theil) # Slope: 29.43
 
 # plot for supplemental # 
-ggplot(no3, aes(Time_Since_Fire, pd, color = response_var)) +
+ggplot(no3, aes(Time_Since_Fire, Percent_Difference, color = response_var)) +
   geom_point() +
   stat_poly_line() +
   stat_poly_eq(use_label(c("eq", "R2"))) +

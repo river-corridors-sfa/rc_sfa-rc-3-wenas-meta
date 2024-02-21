@@ -62,15 +62,15 @@ options(max.print = 40)
 geospatial <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2024-02-15.csv"))
 
 geospatial <- geospatial %>% 
-  dplyr::select(site, comid, totdasqkm, streamorde, maxelevraw, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws)
+  dplyr::select(Site, comid, totdasqkm, streamorde, maxelevraw, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws)
 
 # Site summary of each study and its respective fire and the year of that fire
 studies_data <- read_csv(here("inputs", "Studies_Summary", "Sites_meta_data.csv")) %>% 
-  dplyr::select(Study, Fire_name, Fire_year)
+  dplyr::select(Study_ID, Fire_name, Fire_year)
 
 # The effect sizes of each study's watershed
 effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv")) %>% 
-  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Site, Time_Since_Fire)
+  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
 
 effect_size_doc <- effect_size %>% 
   filter(response_var == "DOC_Interp")
@@ -80,12 +80,14 @@ effect_size_no3 <- effect_size %>%
 
 # Read in the study and site csv 
 study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv")) %>% 
-  dplyr::select(Study, Site, Fire_year, Effect_size_site) %>% 
-  rename(site = Site, 
-         Study_ID = Study, 
-         year = Fire_year, 
-         Site = Effect_size_site) %>% 
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair) %>% 
+  rename(year = Fire_year) %>% 
   na.omit()
+# %>%
+#   rename(site = Site,
+#          year = Fire_year,
+#          Site = Effect_size_pair) %>%
+#   na.omit()
 
 # pivoting to make the responses in one column
 geospatial_long <- geospatial %>%
@@ -177,35 +179,29 @@ fire_clip <- right_join(geospatial_long, study_site_data)
 
 
 fire_clip <- fire_clip %>% 
-  mutate(burn_percentage = case_when(site == 'Benjamin Slough' ~ 67,
-                                     site == 'Payson' ~ 90,
-                                     site == 'Spanish Fork Lower' ~ 24,
-                                     site == 'Spanish Fork Upper' ~ 25,
-                                     site == 'Reference' ~ 0,
+  mutate(burn_percentage = case_when(Site == 'Benjamin Slough' ~ 67,
+                                     Site == 'Payson' ~ 90,
+                                     Site == 'Spanish Fork Lower' ~ 24,
+                                     Site == 'Spanish Fork Upper' ~ 25,
+                                     Site == 'Reference' ~ 0,
                                      TRUE ~ burn_percentage))
 # These papers report the burn percentages so I manually put them in because the Streamcat data did not pull the proper data. 
 
 # Merge fire_clip, effect_size, studies_data
 effect_size_geospatial <- full_join(effect_size, fire_clip) # merging the effect size and the geospatial dataframes
 
-studies_data$Study_ID <- studies_data$Study # making a new column header to match the effect_size_geospatial dataframe
-
 effect_size_geospatial_fire <- full_join(effect_size_geospatial, studies_data)
 
 effect_size_geospatial_fire <- effect_size_geospatial_fire %>% 
-  dplyr::select(Study_ID, Fire_name, Fire_year, site, comid, totdasqkm, streamorde, maxelevraw, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Climate, Biome, Time_Since_Fire, response_var, Effect_size)
+  dplyr::select(Study_ID, Fire_name, Fire_year, Site, comid, totdasqkm, streamorde, maxelevraw, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Climate, Biome, Time_Since_Fire, response_var, Effect_size)
 
 write_csv(effect_size_geospatial_fire, here("Output_for_analysis", "07_meta_effect_size_models", "effect_size_geospatial_fire.csv"))
 
 meta <- read_csv(here("inputs", "Studies_Summary", "Map_input.csv")) # reading in filtered meta data sheet
 
-meta <- meta %>%
-  rename(Study_ID = Study) # rename Study to Study_ID to match the effect size dataframe
-
 
 coords <- meta %>%
-  dplyr::select(Study_ID, Fire_Name, Lat, Long, number_of_burn, State, group) %>%  # Picking only the columns I want
-  rename(Fire_name = Fire_Name) # rename Fire_Name in the meta df to Fire_name to match the effect size df to merge
+  dplyr::select(Study_ID, Fire_name, latitude, longitude, number_of_burn, State, group)   # Picking only the columns I want
 
 effect_size_fire <- full_join(effect_size_geospatial_fire, coords) # this merges the df with lat/longs
 
@@ -215,17 +211,17 @@ effect_size_fire <- full_join(effect_size_geospatial_fire, coords) # this merges
 
 # Anaktuvuk River wildfire coordinates: 68.932756,	-150.7
 effect_size_fire <- effect_size_fire %>% 
-  mutate(Lat = case_when(Study_ID == 'Abbott et al. 2021' ~ 68.932756,
-                                     TRUE ~ Lat),
-         Long = case_when(Study_ID == 'Abbott et al. 2021' ~ -150.7,
-                                     TRUE ~ Long))
+  mutate(latitude = case_when(Study_ID == 'Abbott et al. 2021' ~ 68.932756,
+                                     TRUE ~ latitude),
+         longitude = case_when(Study_ID == 'Abbott et al. 2021' ~ -150.7,
+                                     TRUE ~ longitude))
 
 # Northwest Territories Fire coordinates: 61.4	-121.433
 effect_size_fire <- effect_size_fire %>% 
-  mutate(Lat = case_when(Study_ID == 'Burd et al 2018' ~ 61.4,
-                                     TRUE ~ Lat),
-         Long = case_when(Study_ID == 'Burd et al 2018' ~ -121.433,
-                                     TRUE ~ Long))
+  mutate(latitude = case_when(Study_ID == 'Burd et al 2018' ~ 61.4,
+                                     TRUE ~ latitude),
+         longitude = case_when(Study_ID == 'Burd et al 2018' ~ -121.433,
+                                     TRUE ~ longitude))
 # Caldor Fire: 38.88376	-119.978005
 effect_size_fire <- effect_size_fire %>% 
   mutate(Fire_name = case_when(Study_ID == 'Hickenbottom et al. 2023' &
@@ -238,10 +234,10 @@ effect_size_fire <- effect_size_fire %>%
                                         TRUE ~ Fire_year))
 
 effect_size_fire <- effect_size_fire %>% 
-  mutate(Lat = case_when(Fire_name == 'Caldor Fire' ~ 38.88376,
-                                     TRUE ~ Lat),
-         Long = case_when(Fire_name == 'Caldor Fire' ~ -119.978005,
-                                     TRUE ~ Long))
+  mutate(latitude = case_when(Fire_name == 'Caldor Fire' ~ 38.88376,
+                                     TRUE ~ latitude),
+         longitude = case_when(Fire_name == 'Caldor Fire' ~ -119.978005,
+                                     TRUE ~ longitude))
                           
 # Mosquito Fire: 38.958701	-120.920501
 effect_size_fire <- effect_size_fire %>% 
@@ -255,17 +251,17 @@ effect_size_fire <- effect_size_fire %>%
                                         TRUE ~ Fire_year))
 
 effect_size_fire <- effect_size_fire %>% 
-  mutate(Lat = case_when(Fire_name == 'Mosquito Fire' ~ 38.958701,
-                                     TRUE ~ Lat),
-         Long = case_when(Fire_name == 'Mosquito Fire' ~ -120.920501,
-                                     TRUE ~ Long))
+  mutate(latitude = case_when(Fire_name == 'Mosquito Fire' ~ 38.958701,
+                                     TRUE ~ latitude),
+         longitude = case_when(Fire_name == 'Mosquito Fire' ~ -120.920501,
+                                     TRUE ~ longitude))
 
 # Rampage Fire Coordinates 48.418961	-113.696178: 
 effect_size_fire <- effect_size_fire %>% 
-  mutate(Lat = case_when(Study_ID == 'Mast & Clow, 2008' ~ 48.418961,
-                                     TRUE ~ Lat),
-         Long = case_when(Study_ID == 'Mast & Clow, 2008' ~ -113.696178,
-                                     TRUE ~ Long))
+  mutate(latitude = case_when(Study_ID == 'Mast & Clow, 2008' ~ 48.418961,
+                                     TRUE ~ latitude),
+         longitude = case_when(Study_ID == 'Mast & Clow, 2008' ~ -113.696178,
+                                     TRUE ~ longitude))
 
 effect_size_fire <- effect_size_fire %>% 
   mutate(Fire_name = case_when(Study_ID == 'Mast & Clow, 2008' ~ 'Rampage Fire',
@@ -273,10 +269,10 @@ effect_size_fire <- effect_size_fire %>%
 
 # Fourmile canyon coordinates: 40.03333 -105.4167
 effect_size_fire <- effect_size_fire %>% 
-  mutate(Lat = case_when(Fire_name == 'Fourmile Canyon Fire' ~ 40.03333,
-                                     TRUE ~ Lat),
-         Long = case_when(Fire_name == 'Fourmile Canyon Fire' ~ -105.4167,
-                                     TRUE ~ Long))
+  mutate(latitude = case_when(Fire_name == 'Fourmile Canyon Fire' ~ 40.03333,
+                                     TRUE ~ latitude),
+         longitude = case_when(Fire_name == 'Fourmile Canyon Fire' ~ -105.4167,
+                                     TRUE ~ longitude))
 
 # Hayman Fire coordinates: 
 effect_size_fire <- effect_size_fire %>% 
@@ -284,10 +280,10 @@ effect_size_fire <- effect_size_fire %>%
                                      TRUE ~ Fire_name),
          Fire_year = case_when(Study_ID == 'Rhea et al. 2021' ~ '2002',
                                      TRUE ~ Fire_year),
-         Lat = case_when(Fire_name == 'Hayman Fire' ~ 39.2,
-                                     TRUE ~ Lat),
-         Long = case_when(Fire_name == 'Hayman Fire' ~ -105.3,
-                                     TRUE ~ Long))
+         latitude = case_when(Fire_name == 'Hayman Fire' ~ 39.2,
+                                     TRUE ~ latitude),
+         longitude = case_when(Fire_name == 'Hayman Fire' ~ -105.3,
+                                     TRUE ~ longitude))
 
 # Tiedemann, 1997 Safety Harbor Fire 48.10267, -120.3523
 effect_size_fire <- effect_size_fire %>% 
@@ -295,29 +291,29 @@ effect_size_fire <- effect_size_fire %>%
                                      TRUE ~ Fire_name),
          Fire_year = case_when(Study_ID == 'Tiedemann, 1997' ~ '1980',
                                      TRUE ~ Fire_year),
-         Lat = case_when(Fire_name == 'Safety Harbor Fire' ~ 48.10267,
-                                     TRUE ~ Lat),
-         Long = case_when(Fire_name == 'Safety Harbor Fire' ~ -120.3523,
-                                     TRUE ~ Long))
+         latitude = case_when(Fire_name == 'Safety Harbor Fire' ~ 48.10267,
+                                     TRUE ~ latitude),
+         longitude = case_when(Fire_name == 'Safety Harbor Fire' ~ -120.3523,
+                                     TRUE ~ longitude))
 
 # Uzun Rocky Fire coordinates: 38.923564	-122.326478
 effect_size_fire <- effect_size_fire %>% 
   mutate(Fire_name = case_when(Study_ID == 'Uzun et al. 2020' &
-                               site == 'Rocky Fire' ~ 'Rocky Fire',
+                               Site == 'Rocky Fire' ~ 'Rocky Fire',
                                      TRUE ~ Fire_name),
-         Lat = case_when(Fire_name == 'Rocky Fire' ~ 38.923564,
-                                     TRUE ~ Lat),
-         Long = case_when(Fire_name == 'Rocky Fire' ~ -122.326478,
-                                     TRUE ~ Long))
+         latitude = case_when(Fire_name == 'Rocky Fire' ~ 38.923564,
+                                     TRUE ~ latitude),
+         longitude = case_when(Fire_name == 'Rocky Fire' ~ -122.326478,
+                                     TRUE ~ longitude))
 # Uzun Wragg Fire coordinates: 38.512031	-122.097228
 effect_size_fire <- effect_size_fire %>% 
   mutate(Fire_name = case_when(Study_ID == 'Uzun et al. 2020' &
-                               site == 'Wragg Fire' ~ 'Wragg Fire',
+                               Site == 'Wragg Fire' ~ 'Wragg Fire',
                                      TRUE ~ Fire_name),
-         Lat = case_when(Fire_name == 'Wragg Fire' ~ 38.512031,
-                                     TRUE ~ Lat),
-         Long = case_when(Fire_name == 'Wragg Fire' ~ -122.097228,
-                                     TRUE ~ Long))
+         latitude = case_when(Fire_name == 'Wragg Fire' ~ 38.512031,
+                                     TRUE ~ latitude),
+         longitude = case_when(Fire_name == 'Wragg Fire' ~ -122.097228,
+                                     TRUE ~ longitude))
 
 # Writer et al. 2014 # High Park Fire 40.71600 -105.2330
 effect_size_fire <- effect_size_fire %>% 
@@ -325,10 +321,10 @@ effect_size_fire <- effect_size_fire %>%
                                      TRUE ~ Fire_name),
          Fire_year = case_when(Study_ID == 'Writer et al. 2014' ~ '2012',
                                      TRUE ~ Fire_year),
-         Lat = case_when(Fire_name == 'High Park Fire' ~ 40.71600,
-                                     TRUE ~ Lat),
-         Long = case_when(Fire_name == 'High Park Fire' ~ -105.2330,
-                                     TRUE ~ Long))
+         latitude = case_when(Fire_name == 'High Park Fire' ~ 40.71600,
+                                     TRUE ~ latitude),
+         longitude = case_when(Fire_name == 'High Park Fire' ~ -105.2330,
+                                     TRUE ~ longitude))
 
 # Neary fire year - 1978 
 effect_size_fire <- effect_size_fire %>% 
@@ -338,13 +334,13 @@ effect_size_fire <- effect_size_fire %>%
 # merge effect size fire with unique lat/longs for each watershed site. #
 # load in the sites with the unique lat/longs 
 watershed_lat_long <- read_csv(here("inputs", "catchment_characteristics", "watershed_lat_long.csv")) %>% 
-  dplyr::select(site, latitude, longitude)
+  dplyr::select(Site, latitude, longitude) 
 
-xia_effect <- effect_size_fire %>% 
-  dplyr::select(!(Lat:Long))
+xia_effect <- effect_size_fire %>%
+  dplyr::select(!(latitude:longitude))
 
-xia_effect <- full_join(xia_effect, watershed_lat_long, by = "site") %>% 
-  distinct(Effect_size, .keep_all = TRUE)
+xia_effect <- full_join(xia_effect, watershed_lat_long, by = "Site") %>% 
+  distinct(Effect_size, .keep_all = TRUE) 
 
 
 write_csv(xia_effect, here("Output_for_analysis", "07_meta_effect_size_models", "effect_size_geospatial_fire_lat_long.csv"))
@@ -361,7 +357,7 @@ doc_effect_size_burn_merged <- right_join(effect_size_doc, fire_clip) %>%
 ggpairs(doc_effect_size_burn_merged,
         columns = c("burn_percentage", "Time_Since_Fire"))
 
-doc_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = doc_effect_size_burn_merged)
+doc_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | Site), data = doc_effect_size_burn_merged)
 
 doc_burn_mixed
 
@@ -369,10 +365,10 @@ summary(doc_burn_mixed)
 fixef(doc_burn_mixed)
 confint(doc_burn_mixed)
 
-ranef(doc_burn_mixed)$site %>% 
+ranef(doc_burn_mixed)$Site %>% 
   head(5)
 
-coef(doc_burn_mixed)$site %>% 
+coef(doc_burn_mixed)$Site %>% 
   head(5)
 
 predictInterval(doc_burn_mixed)
@@ -510,15 +506,15 @@ doc_no3_effect_size <- rbind(no3_effect_size_burn_merged, doc_effect_size_burn_m
 ggpairs(no3_effect_size_burn_merged,
         columns = c("burn_percentage", "Time_Since_Fire"))
 
-no3_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = no3_effect_size_burn_merged)
+no3_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | Site), data = no3_effect_size_burn_merged)
 
 summary(no3_burn_mixed)
 confint(no3_burn_mixed)
 
-ranef(no3_burn_mixed)$site %>% 
+ranef(no3_burn_mixed)$Site %>% 
   head(5)
 
-coef(no3_burn_mixed)$site %>% 
+coef(no3_burn_mixed)$Site %>% 
   head(5)
 
 predictInterval(no3_burn_mixed)
@@ -532,7 +528,7 @@ plotREsim(REsim(no3_burn_mixed))
 
 ### Climate models
 ```{r DOC climate models}
-doc_climate_mixed <-  lmer(Effect_size ~ Climate + (1 | site), data = doc_effect_size_burn_merged)
+doc_climate_mixed <-  lmer(Effect_size ~ Climate + (1 | Site), data = doc_effect_size_burn_merged)
 
 doc_climate_mixed
 
@@ -573,7 +569,7 @@ Thus, we reject the null hypothesis and conclude that the variance among the cli
 From the plot, Csa (Hot-Mediterranean) is the most variable. Now we have to think about why?
 
 ```{r NO3 climate models}
-no3_climate_mixed <-  lmer(Effect_size ~ Climate + (1 | site), data = no3_effect_size_burn_merged)
+no3_climate_mixed <-  lmer(Effect_size ~ Climate + (1 | Site), data = no3_effect_size_burn_merged)
 
 no3_climate_mixed
 
@@ -625,7 +621,7 @@ Thus, we reject the null hypothesis and conclude that the variance among the cli
 
 ### TSF models
 ```{r DOC TSF models}
-doc_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | site), data = doc_effect_size_burn_merged)
+doc_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = doc_effect_size_burn_merged)
 
 doc_tsf_mixed
 
@@ -664,7 +660,7 @@ Thus, we do not reject the null hypothesis and conclude that the variance among 
 
 
 ```{r NO3 TSF models}
-no3_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | site), data = no3_effect_size_burn_merged)
+no3_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = no3_effect_size_burn_merged)
 
 no3_tsf_mixed
 
@@ -746,9 +742,9 @@ burn_percentage_effect <- effect_both_doc_no3 %>%
          lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
          upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
 
-write_csv(burn_percentage_effect, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_CIs"))
+write_csv(burn_percentage_effect, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_CIs.csv"))
 
-write_csv(effect_both_doc_no3, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_fig_data"))
+write_csv(effect_both_doc_no3, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_fig_data.csv"))
 
 # Plot #
 vn = expression(paste(""*N*O[3]^"-"))
@@ -823,9 +819,9 @@ burn_percentage_effect <- effect_both_doc_no3 %>%
          lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
          upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
 
-write_csv(burn_percentage_effect, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_CIs"))
+write_csv(burn_percentage_effect, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_CIs.csv"))
 
-write_csv(effect_both_doc_no3, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_fig_data"))
+write_csv(effect_both_doc_no3, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_fig_data.csv"))
 
 # Plot #
 vn = expression(paste(""*N*O[3]^"-"))
@@ -873,14 +869,14 @@ ggsave("Effect_Size_Burn_Percentage.pdf",
 doc_10_burn <- effect_both_doc_no3 %>% 
   filter(response_var == "DOC_Interp")
 
-doc_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = doc_10_burn)
+doc_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | Site), data = doc_10_burn)
 
 doc_burn_mixed
 
 summary(doc_burn_mixed) # p-value: 0.973 - > 0.05
 
 # now making this by the burn percentage groupings 
-doc_burn_mixed = lmer(Effect_size ~ burn_percentage_group + (1 | site), data = doc_10_burn)
+doc_burn_mixed = lmer(Effect_size ~ burn_percentage_group + (1 | Site), data = doc_10_burn)
 
 doc_burn_mixed
 
@@ -895,10 +891,10 @@ summary(doc_burn_mixed) # p-value: for all groupings are > 0.05
 fixef(doc_burn_mixed)
 confint(doc_burn_mixed)
 
-ranef(doc_burn_mixed)$site %>% 
+ranef(doc_burn_mixed)$Site %>% 
   head(5)
 
-coef(doc_burn_mixed)$site %>% 
+coef(doc_burn_mixed)$Site %>% 
   head(5)
 
 predictInterval(doc_burn_mixed)
@@ -934,14 +930,14 @@ Thus, we do not reject the null hypothesis and conclude that the variance among 
 no3_10_burn <- effect_both_doc_no3 %>% 
   filter(response_var == "NO3_Interp")
 
-no3_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | site), data = no3_10_burn)
+no3_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | Site), data = no3_10_burn)
 
 no3_burn_mixed
 
 summary(no3_burn_mixed) # p-value: 0.949 - > 0.05
 
 # now making this by the burn percentage groupings 
-no3_burn_mixed = lmer(Effect_size ~ burn_percentage_group + (1 | site), data = no3_10_burn)
+no3_burn_mixed = lmer(Effect_size ~ burn_percentage_group + (1 | Site), data = no3_10_burn)
 
 no3_burn_mixed
 
@@ -957,10 +953,10 @@ summary(no3_burn_mixed) # p-value: All groupings except 81-90 are insignificant 
 fixef(no3_burn_mixed)
 confint(no3_burn_mixed)
 
-ranef(no3_burn_mixed)$site %>% 
+ranef(no3_burn_mixed)$Site %>% 
   head(5)
 
-coef(no3_burn_mixed)$site %>% 
+coef(no3_burn_mixed)$Site %>% 
   head(5)
 
 predictInterval(no3_burn_mixed)

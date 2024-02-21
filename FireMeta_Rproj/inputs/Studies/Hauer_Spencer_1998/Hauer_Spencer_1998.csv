@@ -1,4 +1,4 @@
-Study_ID,DOI,Design_Control_Burn_Pre_Post,Latitude,Longitude,Area_watershed,Area_unit,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
+Study_ID,DOI,Design_Control_Burn_Pre_Post,latitude,longitude,Area_watershed,Area_unit,Pair,Climate,Site,Sampling_Date,Burn_Unburn,Time_Since_Fire,Mean_Median_or_IndividualSample,DOC,DOC_unit,STDEV_DOC,STER_DOC,NO3,NO3_unit,STDEV_NO3,STER_NO3,Data_Found,Notes
 Hauer & Spencer 1998,10.1071/WF9980183,Control_Reference_vs_Impact,48.81409,-114.39971,183,ha,Site_1,Dfc,Red_Bench_Creek,3/15/89,Burn,1,Individual,,,,,86.66920074,ug_N_L,,,Figure_5,Data was extracted from figure 5 but I got some of the site data and the coordinates from Hampton et al. 2022
 Hauer & Spencer 1998,10.1071/WF9980183,Control_Reference_vs_Impact,48.81409,-114.39971,183,ha,Site_1,Dfc,Red_Bench_Creek,5/2/89,Burn,1,Individual,,,,,427.652072,ug_N_L,,,Figure_5,
 Hauer & Spencer 1998,10.1071/WF9980183,Control_Reference_vs_Impact,48.81409,-114.39971,183,ha,Site_1,Dfc,Red_Bench_Creek,5/27/89,Burn,1,Individual,,,,,346.9791576,ug_N_L,,,Figure_5,

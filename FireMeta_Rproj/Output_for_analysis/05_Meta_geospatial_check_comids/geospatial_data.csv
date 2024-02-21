@@ -1,4 +1,4 @@
-site,comid,totdasqkm,minelevraw,maxelevsmo,minelevsmo,elevfixed,slope,geometry
+Site,comid,totdasqkm,minelevraw,maxelevsmo,minelevsmo,elevfixed,slope,geometry
 Site_3,8943613,130.7673,190790,191496,190790,0,0.00686103,"c(-120.009019, 38.873743)"
 Reference,15032969,16.5357,6151,15180,6151,0,0.05750955,"c(-111.669222, 40.175336)"
 Payson,10350360,70.5753,156372,163694,156372,0,0.03599803,"c(-111.697245, 39.98249)"

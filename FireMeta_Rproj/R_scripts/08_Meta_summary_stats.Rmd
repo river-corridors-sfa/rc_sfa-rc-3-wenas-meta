@@ -28,13 +28,8 @@ library(GGally)
 
 #### NHD Catchment characteristics ####
 ```{r}
-geospatial_data<- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2024-01-18.csv"))
-names(geospatial_data)
-# It doesnt look like they have any vegetation data. 
-#They have size of watershed, elevation, slope 
+geospatial_data<- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2024-02-15.csv"))
 
-q <- geospatial_data %>% 
-  select(site, qa_ma, qc_ma)
 ```
 
 

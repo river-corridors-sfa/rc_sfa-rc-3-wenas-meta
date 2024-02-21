@@ -1,9 +1,9 @@
-"","Study_ID","response_var","Pair","year","meanConc","Site","Latitude","Longitude","Area_watershed_km","Climate","Burn_Unburn","TempNorm"
-"1","Rhea et al. 2021","DOC_Interp","Control",2017,3.43508880820455,"U1",40.26237,-105.590804,7.04,"Dfc","Unburn","0.487938751"
-"2","Rhea et al. 2021","DOC_Interp","Site_1",2017,3.1149918300463,"B1",NA,NA,3.25,"Dfc","Burn","0.958459025"
-"3","Rhea et al. 2021","DOC_Interp","Site_2",2017,1.354284502,"B2",NA,NA,6.02,"Dfc","Burn","0.224964203"
-"4","Rhea et al. 2021","DOC_Interp","Site_3",2017,1.85060803180769,"B3",NA,NA,8.33,"Dfc","Burn","0.222161829"
-"5","Rhea et al. 2021","NO3_Interp","Control",2017,0.0165584421688312,"U1",40.26237,-105.590804,7.04,"Dfc","Unburn","0.002352051"
-"6","Rhea et al. 2021","NO3_Interp","Site_1",2017,0.0662379972777778,"B1",NA,NA,3.25,"Dfc","Burn","0.020380922"
-"7","Rhea et al. 2021","NO3_Interp","Site_2",2017,0.353240741057692,"B2",NA,NA,6.02,"Dfc","Burn","0.058677864"
-"8","Rhea et al. 2021","NO3_Interp","Site_3",2017,0.278935185423077,"B3",NA,NA,8.33,"Dfc","Burn","0.033485616"
+Study_ID,response_var,Pair,year,meanConc,Site,latitude,longitude,Area_watershed_km,Climate,Burn_Unburn,TempNorm
+Rhea et al. 2021,DOC_Interp,Control,2017,3.4350888082045454,U1,40.26237,-105.590804,7.04,Dfc,Unburn,0.487938751
+Rhea et al. 2021,DOC_Interp,Site_1,2017,3.1149918300462964,B1,NA,NA,3.25,Dfc,Burn,0.958459025
+Rhea et al. 2021,DOC_Interp,Site_2,2017,1.354284502,B2,NA,NA,6.02,Dfc,Burn,0.224964203
+Rhea et al. 2021,DOC_Interp,Site_3,2017,1.8506080318076923,B3,NA,NA,8.33,Dfc,Burn,0.222161829
+Rhea et al. 2021,NO3_Interp,Control,2017,0.016558442168831164,U1,40.26237,-105.590804,7.04,Dfc,Unburn,0.002352051
+Rhea et al. 2021,NO3_Interp,Site_1,2017,0.06623799727777778,B1,NA,NA,3.25,Dfc,Burn,0.020380922
+Rhea et al. 2021,NO3_Interp,Site_2,2017,0.3532407410576923,B2,NA,NA,6.02,Dfc,Burn,0.058677864
+Rhea et al. 2021,NO3_Interp,Site_3,2017,0.27893518542307694,B3,NA,NA,8.33,Dfc,Burn,0.033485616

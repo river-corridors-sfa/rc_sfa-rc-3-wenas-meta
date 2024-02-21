@@ -98,7 +98,7 @@ control_impact_units <- control_impact %>%
 
 # Creating a site characteristics data frame that I will use to merge later to add in the proper data 
 site_data <- control_impact_units %>% 
-  select(Study_ID, Pair, Site, Latitude, Longitude, Area_watershed_km, Climate, Burn_Unburn)
+  select(Study_ID, Pair, Site, latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
 
 site_data_unique <- site_data %>% 
   group_by(Study_ID, Pair, Area_watershed_km) %>% 
@@ -115,7 +115,7 @@ abbott_average_watershed_area <- site_data_unique %>%
 ```{r - Abbott}
 # filling in daily time series and interpolating by study and site
 control_impact_fill <-  control_impact_units %>% 
-  select("Study_ID", "Latitude", "Longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+  select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
   group_by(Study_ID, Site) %>%
   complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
   fill(Study_ID:Time_Since_Fire) %>%
@@ -126,6 +126,7 @@ control_impact_fill <-  control_impact_units %>%
          DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
   fill(Study_ID:Time_Since_Fire)
 
+write_csv(control_impact_fill, here("Output_for_analysis", "02_Abbott_effect_size", "abbott_conc_fill.csv"))
 
 
 ```
@@ -168,7 +169,7 @@ yearly_mean_site$TempNorm <- yearly_mean_site_test$TempNorm # replacing the temp
 
 yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
 
-write.csv(yearly_mean_site, here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_temp_norm.csv"))
+write_csv(yearly_mean_site, here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_temp_norm.csv"))
 
 ```
 
@@ -206,13 +207,13 @@ yearly_effect_multiple <- yearly_multiple_control %>%
 yearly_effect_size_combine_long <- yearly_effect_multiple %>% 
   pivot_longer(
     cols = lnR1:lnR1,
-    names_to = "Site",
+    names_to = "Effect_size_pair",
     values_to = "Effect_size",
     values_drop_na = TRUE
   ) %>% 
   filter(is.finite(Effect_size))
 
-write.csv(yearly_effect_size_combine_long, here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_effect_size.csv"))
+write_csv(yearly_effect_size_combine_long, here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_effect_size.csv"))
 
 
 ```

@@ -61,8 +61,9 @@ sf_use_s2(FALSE)
 site_type = "xy" # OR site_type = "comid"
 
 sites <- read_csv(here("inputs", "catchment_characteristics", "watershed_lat_long.csv")) %>%
-  distinct(site, .keep_all = TRUE) %>%
-  dplyr::select('site','latitude','longitude') %>% 
+  distinct(Site, .keep_all = TRUE) %>%
+  dplyr::select('Site','latitude','longitude') %>% 
+  rename(site = Site) %>% 
   drop_na()
 
 ```
@@ -160,14 +161,16 @@ sites <- updated_sites %>%
   distinct(site, .keep_all = TRUE)
 
 sites <- sites %>% 
-  dplyr::select(site, comid, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope)
+  dplyr::select(site, comid, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope) %>% 
+  rename(Site = site)
 
 site_watersheds <- getWatersheds(df = sites, make_pretty = TRUE) %>%
   inner_join(., dplyr::select(sf::st_drop_geometry(sites), site, comid), by = "comid")
 
 write_csv(sites, here("Output_for_analysis", "05_Meta_geospatial_check_comids", "geospatial_data.csv"))
 
-
+site_watersheds <- site_watersheds %>% 
+  rename(Site = site)
 write_csv(site_watersheds, here("Output_for_analysis", "05_Meta_geospatial_check_comids", "meta_comids.csv"))
 
 
