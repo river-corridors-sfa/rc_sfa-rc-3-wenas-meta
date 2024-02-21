@@ -202,9 +202,9 @@ yearly_mean_site <- rbind(yearly_mean_site, crandall_conc_fill, abbott_conc_fill
 ```{r Calculate CV}
 metadata_cv <- yearly_mean_site %>% 
   group_by(Study_ID, response_var, Burn_Unburn) %>% 
-  summarise(meanconc = mean(TempNorm, na.rm = TRUE),
+  summarise(meanConc = mean(TempNorm, na.rm = TRUE),
             sdconc = sd(TempNorm, na.rm = TRUE),
-            CVconc = sdconc/meanconc) # generating CVs
+            CVconc = sdconc/meanConc) # generating CVs
 
 doc_cv <- metadata_cv %>% 
   filter(response_var == "DOC_Interp")
@@ -262,15 +262,9 @@ leveneTest(TempNorm ~ Burn_Unburn, data = no3_yearly) # df: 1,181, F-value: 0.74
 # Write csv's
 write_csv(doc_yearly, here("Output_for_analysis", "09_Temp_Norm_comp", "DOC_temp_norm_fig_data.csv"))
 
-dov_cv <- doc_cv %>% 
-  rename(meanConc = meanconc)
-
 write_csv(doc_cv, here("Output_for_analysis", "09_Temp_Norm_comp", "DOC_CV_temp_norm_fig_data.csv"))
 
 write_csv(no3_yearly, here("Output_for_analysis", "09_Temp_Norm_comp", "NO3_temp_norm_fig_data.csv"))
-
-no3_cv <- no3_cv %>% 
-  rename(meanConc = meanconc)
 
 write_csv(no3_cv, here("Output_for_analysis", "09_Temp_Norm_comp", "NO3_CV_temp_norm_fig_data.csv"))
 

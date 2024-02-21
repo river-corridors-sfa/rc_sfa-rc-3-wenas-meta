@@ -1,4 +1,4 @@
-Study_ID,response_var,Burn_Unburn,meanconc,sdconc,CVconc
+Study_ID,response_var,Burn_Unburn,meanConc,sdconc,CVconc
 Abbott et al. 2021,DOC_Interp,Burn,0.39111985940000005,0.038388703689773665,0.09815074015587985
 Abbott et al. 2021,DOC_Interp,Unburn,0.36830419895,0.02999047119080781,0.08142853455460941
 Burd et al 2018,DOC_Interp,Burn,0.077220152018,NA,NA
