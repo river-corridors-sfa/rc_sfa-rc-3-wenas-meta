@@ -1,25 +1,25 @@
-Column_or_Row_Name,Unit,Definition,Data_Type,Term_Type
-Study_ID,N/A,The shorthand in-text citation of the publication,text,column_header
-DOI,N/A,"Digital Object Identifier used to uniquely identify an article or document, and to provide it with a permanent web address (URL).",text,column_header
-Design_Control_Burn_Pre_Post,N/A,The methodoligcal study design for the publication,text,column_header
-Latitude,decimal degrees,Geographic location (latitude) of site.,numeric,column_header
-Longitude,decimal degrees,Geographic location (longitude) of site.,numeric,column_header
-Area_watershed,ha or km,The total upstream catchment area from downstream end of flowline.,numeric,column_header
 Area_unit,N/A,Unit of measurement that applies to the Area_watershed column in the data package.,text,column_header
-Pair,N/A,The designation for each site to identify if it was a burned watershed or an unburned watershed and which site it is being compared to. ,text,column_header
-Climate,N/A,Kšppen climate classification,text,column_header
-Site,N/A,Name of site.,text,column_header
-Sampling_Date,MM-DD-YY,Date of discrete sampling events,date,column_header
+Area_watershed,ha or km,The total upstream catchment area from downstream end of flowline.,numeric,column_header
 Burn_Unburn,N/A,Designates if the site is affected by the wildfire or not. ,text,column_header
-Time_Since_Fire,years,The lag time between when sampling occurred relative to when the wildfire occurred. ,numeric,column_header
-Mean_Median_or_IndividualSample,N/A,"To identify if the solute concentration reported in the study was a mean, median or an individual sample",text,column_header
+Climate,N/A,Kšppen climate classification,text,column_header
+Column_or_Row_Name,Unit,Definition,Data_Type,Term_Type
+Data_Found,N/A,Where the data was found within the publication,text,column_header
+Design_Control_Burn_Pre_Post,N/A,The methodoligcal study design for the publication,text,column_header
 DOC,,Dissolved organic concentrations,numeric,column_header
 DOC_unit,N/A,Unit of measurement that applies to the DOC column in the data package.,text,column_header
-STDEV_DOC,,The standard deviation of dissolved organic carbon reported in the study,numeric,column_header
-STER_DOC,,The standard error of dissolved organic carbon reported in the study,numeric,column_header
+DOI,N/A,"Digital Object Identifier used to uniquely identify an article or document, and to provide it with a permanent web address (URL).",text,column_header
+Latitude,decimal degrees,Geographic location (latitude) of site.,numeric,column_header
+Longitude,decimal degrees,Geographic location (longitude) of site.,numeric,column_header
+Mean_Median_or_IndividualSample,N/A,"To identify if the solute concentration reported in the study was a mean, median or an individual sample",text,column_header
 NO3,,nitrate concentrations,numeric,column_header
 NO3_unit,N/A,Unit of measurement that applies to the NO3 column in the data package.,text,column_header
-STDEV_NO3,,The standard deviation of nitrate reported in the study,numeric,column_header
-STER_NO3,,The standard error of nitrate reported in the study,numeric,column_header
-Data_Found,N/A,Where the data was found within the publication,text,column_header
 Notes,N/A,Free text field to record notes related to data extraction process,text,column_header
+Pair,N/A,The designation for each site to identify if it was a burned watershed or an unburned watershed and which site it is being compared to. ,text,column_header
+Sampling_Date,MM-DD-YY,Date of discrete sampling events,date,column_header
+Site,N/A,Name of site.,text,column_header
+STDEV_DOC,,The standard deviation of dissolved organic carbon reported in the study,numeric,column_header
+STDEV_NO3,,The standard deviation of nitrate reported in the study,numeric,column_header
+STER_DOC,,The standard error of dissolved organic carbon reported in the study,numeric,column_header
+STER_NO3,,The standard error of nitrate reported in the study,numeric,column_header
+Study_ID,N/A,The shorthand in-text citation of the publication,text,column_header
+Time_Since_Fire,years,The lag time between when sampling occurred relative to when the wildfire occurred. ,numeric,column_header

@@ -1,4 +1,4 @@
-Study_ID,Site,Effect_size_pair,Fire_name,Fire_year,latitude,longitude,Watershed_Size,burn_percentage,Reports_Size,Reports_Burn_Percentage,Reports_Coords,Have_HUC
+Study_ID,Site,Effect_size_pair,Fire_name,Fire_year,latitude,longitude,Area_watershed,burn_percentage,Reports_Size,Reports_Burn_Percentage,Reports_Coords,Have_HUC
 Burd et al 2018,,,Northwest Territories Fire ,MTBS_2013Ws,,,,,,,,
 Burd et al 2018,Scotty Creek,,Northwest Territories Fire ,MTBS_2013Ws,61.4,-121.433,134,0,Y,Y,Y,N_Canada
 Burd et al 2018,Notawohka Creek,lnR1,Northwest Territories Fire ,MTBS_2013Ws,61.133333,-120.283333,321,>90%,Y,Y,Y,N_Canada
