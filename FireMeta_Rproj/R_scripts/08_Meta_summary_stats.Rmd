@@ -30,6 +30,9 @@ library(GGally)
 ```{r}
 geospatial_data<- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2024-02-15.csv"))
 
+geospatial_data <- geospatial_data %>%
+  mutate(Site = str_replace_all(Site, "_", " "))
+
 ```
 
 
@@ -97,9 +100,24 @@ final_dataset <- final_dataset %>%
                                      TRUE ~ Time_Since_Fire)) # changing the time since fire to a numeric structure and changing the abbott and rhea time since fire to the exact time since fire 
 doc <- final_dataset %>% 
   filter(response_var == "DOC_Interp") %>% # filtering out DOC 
-  dplyr::select(Effect_size, Climate, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire) %>% # Only want to do the catchment characteristics
-  na.omit()
+  dplyr::select(Study_ID, Site, Effect_size, Climate, burn_percentage, Time_Since_Fire) # Only want to do the catchment characteristics
+  
+doc <- doc %>%
+  filter(!is.na(Site)) # Filter out Rhea and Abbott
 
+doc <- doc %>% 
+  filter(!Study_ID == "Hickenbottom et al. 2023") # Hickenbottom doesn't have catchment data because its too new
+
+doc <- doc %>% 
+  filter(!Study_ID == "Burd et al 2018") # Burd is in canada so it doesn't have catchment data 
+
+doc_test <- left_join(doc, geospatial_data, by = "Site")
+# doc_test <- left_join(doc, geospatial_data, by = c("Site", "totdasqkm", "minelevraw", "maxelevsmo", "minelevsmo",
+#                                                    "elevfixed", "slope"))
+
+doc_test <- doc_test %>% 
+  dplyr::select(Study_ID, Site, Effect_size, Climate, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire)
+  
 
 write_csv(doc, here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"))
 

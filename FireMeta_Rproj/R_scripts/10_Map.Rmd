@@ -51,65 +51,13 @@ This is the workflow to read in the meta analysis studies and the fires they are
 meta <- read_csv(here("inputs", "Studies_Summary", "Map_input.csv")) # reading in the finalized filtered meta-analysis papers. 
 
 coords <- meta %>% 
-  select(Fire_Name, Lat, Long, number_of_burn, State, group) # Picking only the columns I want 
+  select(Fire_name, latitude, longitude, number_of_burn, State, group) # Picking only the columns I want 
 
 coords_noNA <- coords %>% 
-    drop_na(Fire_Name) # eliminating rows that are NAs if they dont have an associated fire name with it. 
+    drop_na(Fire_name) # eliminating rows that are NAs if they dont have an associated fire name with it. 
  
 # Create an sf object from the data
-coordinates_sf <- st_as_sf(coords_noNA, coords = c("Long", "Lat"), crs = 4326)
-
-# Download the United States map shapefile from the US Census Bureau
-# Replace "cb_2019_us_state_20m.zip" with the most recent shapefile available
-url <- "https://www2.census.gov/geo/tiger/GENZ2021/shp/cb_2021_us_state_20m.zip"
-download.file(url, "us_states.zip", mode = "wb")
-unzip("us_states.zip", exdir = "us_states")
-
-# Read the shapefile
-us_states <- st_read("us_states/cb_2021_us_state_20m.shp")
-
-# Plot the map with points
-ggplot() +
-  geom_sf(data = us_states, fill = "white", color = "black") +
-  geom_sf(data = coordinates_sf, aes(color = Fire_Name)) +
-  xlim(-150, -68) +
-  scale_size_continuous(range = c(1, 10)) +
-  labs(title = "Points on US Map with Conditional Variable") +
-  theme_minimal()
-
-# Color values #
-"#666666"
-"#00AFBB"
-"#1B9E77"
-"#7570B3"
-"#E7298A"
-"darkred"
-"#A6CEE3"
-"#1F78B4"
-"#E31A1C"
-"#33A02C"
-"#FB9A99"
-"black"
-ggplot() +
-  geom_sf(data = us_states, fill = "white", color = "black") +
-  geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_Name)) +
-  scale_size_continuous(guide = guide_legend(title = "")) +
-  scale_color_manual(values = c("#666666", "#A6CEE3", "#00AFBB", "#1B9E77",
-                                "#7570B3", "#E7298A", "darkred", "black", 
-                                "#1F78B4", "#E31A1C", "#33A02C", "#FB9A99",
-                                "darkblue", "darkgreen"), 
-                     guide = guide_legend(title = "Fire Name")) +
-  xlim(-125, -68) +
-  ylim(25, 52) +
-  theme_map() +
-  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
-        axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),
-        )
-
-ggsave("climate_figure_map.pdf",
-       path = here("initial_plots", "Maps"),
-       width = 6, height = 8,  units = "in")
-
+coordinates_sf <- st_as_sf(coords_noNA, coords = c("longitude", "latitude"), crs = 4326)
 
 ```
 
@@ -130,25 +78,40 @@ us_states <- st_read("inputs/map_shape_files/us_states/cb_2021_us_state_20m.shp"
 # Read the Alaska shapefile
 alaska <- st_read("inputs/map_shape_files/alaska/cb_2021_us_state_20m.shp")
 
+ak <- ggplot() +
+  geom_sf(data = alaska, fill = "white", color = "black") +
+  geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_name)) +
+  xlim(-180, -127) +
+  ylim(50, 72) + 
+  theme_void() +
+  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),
+        legend.position = "none")
+  
+
+print(ak)
+
 # I want to include Canada # 
 # Download shapefile for world countries
 world <- ne_countries(scale = "medium", returnclass = "sf")
 
 # Filter for Canada
 canada <- world[world$iso_a2 == "CA", ]
+canadian_provinces <- sf::st_as_sf(rnaturalearth::ne_states(country = "Canada", returnclass = "sf"))
+
 
 # US and Canada plot with all the fires
 us_ca <- ggplot() +
-  geom_sf(data = canada, fill = "white", color = "black", size = 0.8) +
+  geom_sf(data = canadian_provinces, fill = "white", color = "black") +
   geom_sf(data = us_states, fill = "white", color = "black") +
-  geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_Name)) +
+  geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_name)) +
   scale_color_manual(values = c("#666666", "#A6CEE3", "#00AFBB", "#1B9E77",
                                 "#7570B3", "#E7298A", "darkred", "black", 
                                 "#1F78B4", "#E31A1C", "#33A02C", "black",
                                 "darkblue", "darkgreen", "blue", "yellow", "red",
                                 "green", "purple")) +
   xlim(-135, -68) +
-  ylim(25, 60) +
+  ylim(25, 62) +
   theme_void() +
   theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
         axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),
@@ -190,50 +153,6 @@ print(p)
 
 ```
 
-### Xia map making ###
-```{r workflow for a map Xia}
-effect_size_fire <- read_csv(here("Output_for_analysis", "07_Meta_effect_size_models",  "effect_size_geospatial_fire_lat_long.csv")) # effect size data frame with lat longs and geospatial data and fire names
-
-# IF there are no geospatial data (comid, totdasqkm, streamorde, burn_percentage) its because the watersheds couldn't be pulled from the NHD+ database. This might be because:
-    #1) Might be out of the country
-    #2) fires are too old (pre-1984) or too recent (2021-present)
-# There is a subset of papers that were used for the Climate analysis and a subset of papers that were used for the burn percentage analysis due to these factors. So unfortunately this is what we got to work with. 
-
-# Create an sf object from the data
-map_sf <- st_as_sf(effect_size_fire, coords = c("longitude", "latitude"), crs = 4326)
-
-# Download the United States map shapefile from the US Census Bureau
-# Replace "cb_2019_us_state_20m.zip" with the most recent shapefile available
-url <- "https://www2.census.gov/geo/tiger/GENZ2021/shp/cb_2021_us_state_20m.zip"
-download.file(url, "us_states.zip", mode = "wb")
-unzip("us_states.zip", exdir = "us_states")
-
-# Read the shapefile
-us_states <- st_read("us_states/cb_2021_us_state_20m.shp")
-
-# Add columns to dataframe for map
-
-map_sf$Effect_size_direction <- with(map_sf, ifelse(Effect_size > 0, 'positive','negative'))
-
-map_sf$Effect_size_magnitude <- with(map_sf, abs(Effect_size))
-
-# Make colors
-myblue <- rgb(173, 216, 230, max=255, alpha=125, names = "blue50")
-
-myred <- rgb(230, 144, 203, max = 255, alpha = 125, names = "red50")
-
-# Plot the map with points, filter map_sf for nitrate effect size and 0 years since fire
-
-ggplot() +
-  geom_sf(data = us_states, fill = "white", color = "black") +
-  geom_sf(data = map_sf %>% filter(Time_Since_Fire == 0, response_var == "NO3_Interp") %>% arrange(desc(Effect_size_magnitude)), aes(size = Effect_size_magnitude, fill = Effect_size_direction), shape = 21) +
-  scale_fill_manual(values = c("#ADD8E67D","#E690CB7D")) +
-  scale_size(range = c(1, 12), name = "Effect Size") +
-  xlim(-125, -68) +
-  ylim(-25,-53) +
-  labs(title = "Nitrate effect size 0 years since fire") +
-  theme_minimal()
-```
 
 
 
