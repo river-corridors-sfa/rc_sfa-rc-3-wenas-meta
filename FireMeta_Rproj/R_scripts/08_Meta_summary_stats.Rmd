@@ -37,7 +37,13 @@ geospatial_data <- geospatial_data %>%
 
 
 ```{r filtered data}
-final_dataset <- read_csv(here("Output_for_analysis", "07_Meta_effect_size_models", "effect_size_geospatial_fire_lat_long.csv"))
+doc_meta_random_forest <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"))
+
+no3_meta_random_forest <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"))
+
+final_dataset <- rbind(doc_meta_random_forest, no3_meta_random_forest)
+
+#final_dataset <- read_csv(here("Output_for_analysis", "07_Meta_effect_size_models", "effect_size_geospatial_fire_lat_long.csv"))
 
 # might want to include maxelevraw from the geospatial 
 # stream order - probably sample in the more accessible portion of the catchment 
@@ -93,45 +99,16 @@ unique(final_dataset$Study_ID) # 18
 
 ```{r - correlation matrix - catchment characteristics}
 ### DOC #### 
-final_dataset <- final_dataset %>% 
-  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire)) %>% 
-  mutate(Time_Since_Fire = case_when(Study_ID == "Abbott et al. 2021" ~ 10,
-                                     Study_ID == "Rhea et al. 2021" ~ 15,
-                                     TRUE ~ Time_Since_Fire)) # changing the time since fire to a numeric structure and changing the abbott and rhea time since fire to the exact time since fire 
-doc <- final_dataset %>% 
-  filter(response_var == "DOC_Interp") %>% # filtering out DOC 
-  dplyr::select(Study_ID, Site, Effect_size, Climate, burn_percentage, Time_Since_Fire) # Only want to do the catchment characteristics
-  
-doc <- doc %>%
-  filter(!is.na(Site)) # Filter out Rhea and Abbott
-
-doc <- doc %>% 
-  filter(!Study_ID == "Hickenbottom et al. 2023") # Hickenbottom doesn't have catchment data because its too new
-
-doc <- doc %>% 
-  filter(!Study_ID == "Burd et al 2018") # Burd is in canada so it doesn't have catchment data 
-
-doc_test <- left_join(doc, geospatial_data, by = "Site")
-# doc_test <- left_join(doc, geospatial_data, by = c("Site", "totdasqkm", "minelevraw", "maxelevsmo", "minelevsmo",
-#                                                    "elevfixed", "slope"))
-
-doc_test <- doc_test %>% 
-  dplyr::select(Study_ID, Site, Effect_size, Climate, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire)
-  
-
-write_csv(doc, here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"))
-
-  
 # Simple correlation matrix between effect size and all the other catchment characteristics
-doc <- doc %>% 
-  select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire)
+doc_correlation <- doc_meta_random_forest %>% 
+  dplyr::select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire)
 
-res <- cor(doc)
+res <- cor(doc_correlation)
 round(res, 2) 
 
 
 # Correlation matrix with significance levels (p-value)
-res2 <- rcorr(as.matrix(doc))
+res2 <- rcorr(as.matrix(doc_correlation))
 res2 # the only significant p-value with effect size is watershed area
 
 
@@ -143,26 +120,22 @@ corrplot(res, type = "upper", order = "FPC",
 corrplot(res2$r, type="upper", order="hclust", 
          p.mat = res2$P, sig.level = 0.05, insig = "blank")
 
-ggpairs(doc, columns = c("Effect_size", "totdasqkm", "minelevraw", "maxelevsmo","minelevsmo", "elevfixed", "slope", "burn_percentage", "Time_Since_Fire")) +
+ggpairs(doc_correlation, columns = c("Effect_size", "totdasqkm", "minelevraw", "maxelevsmo","minelevsmo", "elevfixed", "slope", "burn_percentage", "Time_Since_Fire")) +
   theme_bw()
 
 
 ### NO3 #### 
-no3 <- final_dataset %>% 
-  filter(response_var == "NO3_Interp") %>% 
-  dplyr::select(Effect_size, Climate, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire) %>% 
-  na.omit()
+no3_correlation <- no3_meta_random_forest %>% 
+  dplyr::select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire)
 
-write_csv(no3, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"))
-
-ggpairs(no3, columns = c("Effect_size", "totdasqkm", "minelevraw", "maxelevsmo","minelevsmo", "elevfixed", "slope", "burn_percentage", "Time_Since_Fire")) +
+ggpairs(no3_correlation, columns = c("Effect_size", "totdasqkm", "minelevraw", "maxelevsmo","minelevsmo", "elevfixed", "slope", "burn_percentage", "Time_Since_Fire")) +
   theme_bw()
 
 # Correlation matrix with significance levels (p-value)
-res <- cor(no3)
+res <- cor(no3_correlation)
 round(res, 2) 
 
-res2 <- rcorr(as.matrix(no3))
+res2 <- rcorr(as.matrix(no3_correlation))
 res2 # the only significant p-value with effect size is watershed area
 
 
@@ -181,7 +154,7 @@ library(hrbrthemes)
 watershed_area <- read_csv(here("inputs", "Studies_Summary", "Watershed_area.csv")) 
 
 burn_ratio <- watershed_area %>%
-  group_by(Study) %>%
+  group_by(Study_ID) %>%
   summarise(BR = sum(Watershed_Size_km[Burn_Unburn == "Burn"]) / sum(Watershed_Size_km[Burn_Unburn == "Unburn"]))
 
 ggplot(burn_ratio, aes(x = BR)) +

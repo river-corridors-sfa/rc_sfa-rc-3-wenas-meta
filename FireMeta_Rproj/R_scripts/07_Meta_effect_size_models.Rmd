@@ -65,6 +65,11 @@ geospatial <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extractio
 geospatial <- geospatial %>% 
   dplyr::select(Site, comid, totdasqkm, streamorde, maxelevraw, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws)
 
+geospatial <- geospatial %>%
+  mutate(Site = str_replace_all(Site, "_", " "))
+
+unique(geospatial$Site) # 52 sites with geospatial data. 
+
 # pivoting to make the responses in one column
 geospatial_long <- geospatial %>%
   pivot_longer(
@@ -391,7 +396,49 @@ Thus, we do not reject the null hypothesis and conclude that the variance among 
 The p-value of the test is 0.1377, which is greater than our significance level of 0.05. 
 Thus, we do not reject the null hypothesis and conclude that the variance among the climate groups ARE equal. 
 
+### Building Random forest dataframe 
+```{r }
+# The effect sizes of each study's watershed
+effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv")) %>% dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
 
+# This has site and effect size pair which will merge with the effect size dataframe to get a site name with each effect size. 
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv")) %>% 
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
+  rename(year = Fire_year)
+
+study_site_data <- study_site_data %>%
+  mutate(Site = str_replace_all(Site, "_", " "))
+
+unique(study_site_data$Site) # 65 sites here 
+
+no_geo_random_forest_data <- full_join(effect_size, study_site_data) %>% 
+  na.omit(Effect_size) # this na.omit eliminates all the control sites that dont have an associated effect size. 
+
+unique(no_geo_random_forest_data$Site) # 28 sites
+
+# Joining our effect sizes and sites df with the geospatial dataframe to get catchment characteristics. yay. 
+random_forest_data <- left_join(no_geo_random_forest_data, geospatial) %>% 
+  dplyr::select(Study_ID, Site, response_var, Effect_size_pair, Effect_size, Climate, Biome, Time_Since_Fire, burn_percentage, totdasqkm, streamorde, maxelevraw, maxelevsmo, minelevraw, minelevsmo, elevfixed, slope) %>% 
+  na.omit(slope) # eliminates sites that dont have associated geospatial data. 
+
+unique(random_forest_data$Site) # 25 sites
+
+#splitting by analyte
+doc_RF <- random_forest_data %>% 
+  filter(response_var == "DOC_Interp") %>% 
+  dplyr::select(Study_ID, Site, Effect_size, Climate, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire)
+
+write_csv(doc_RF, here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"))
+
+no3_RF <- random_forest_data %>% 
+  filter(response_var == "NO3_Interp") %>% 
+  dplyr::select(Study_ID, Site, Effect_size, Climate, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire)
+
+write_csv(no3_RF, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"))
+
+  
+
+```
 
 ### Back to geospatial 
 ```{r load in effect size csv's}
@@ -406,6 +453,11 @@ values_to_filter <- unique(effect_size$Study_ID)
 studies_data <- read_csv(here("inputs", "Studies_Summary", "Sites_meta_data.csv")) %>% 
   dplyr::select(Study_ID, Fire_name, Fire_year) %>% 
   filter(Study_ID %in% values_to_filter)
+
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv")) %>% 
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
+  rename(year = Fire_year) %>% 
+  na.omit()
 
 effect_size_doc <- effect_size %>% 
   filter(response_var == "DOC_Interp")
