@@ -43,17 +43,8 @@ control_impact <- meta_df
 
 # separate out the time columns 
 time_format <- control_impact %>% 
-  select(Study_ID, Sampling_Date) 
-
-# Make them all the same format and then merge back together in one column
-time_format <- time_format %>% 
-  mutate(DateTime = mdy(Sampling_Date),
-         DateTime2 = mdy_hm(Sampling_Date), 
-         DateTime2 = as.Date(DateTime2)) %>% 
-  select(-Sampling_Date) %>% 
-  mutate(Sampling_Date = coalesce(DateTime, DateTime2),
-         Sampling_Date = as.character(Sampling_Date)) %>% 
-  select(-DateTime, -DateTime2) 
+  select(Study_ID, Sampling_Date) %>% 
+  mutate(Sampling_Date = as.character(Sampling_Date))
 
 # merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
 control_impact <- control_impact %>% 
