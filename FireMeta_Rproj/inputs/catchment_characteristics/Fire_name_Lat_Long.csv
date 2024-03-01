@@ -1,0 +1,90 @@
+Study_ID,Site,Effect_size_pair,Fire_N/Ame,Fire_year,latitude,longitude,Area_watershed,burn_percentage,Reports_Size,Reports_Burn_Percentage,Reports_Coords,Have_HUC
+Abbott et al. 2021,AN/Aktuvuk Fire,N/A,AN/Aktuvuk Fire,MTBS_2007Ws,69.047,-150.837,-9999,-9999,N/A,N/A,N/A,N/A
+Burd et al 2018,Notawohka Creek,lnR1,Northwest Territories Fire ,MTBS_2013Ws,61.133333,-120.283333,321,90,Y,Y,Y,N_CaN/Ada
+Burd et al 2018,Scotty Creek,N/A,Northwest Territories Fire ,MTBS_2013Ws,61.4,-121.433,134,0,Y,Y,Y,N_CaN/Ada
+Burd et al 2018,N/A,N/A,Northwest Territories Fire ,MTBS_2013Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
+Coombs & Melack; 2013,Arroyo Hondo,lnR3,Gaviota Fire ,MTBS_2004Ws,34.475086,-120.14228,10.85,18,Y,Y,N_Hampton,Y
+Coombs & Melack; 2013,Gaviota,lnR2,Gaviota Fire ,MTBS_2004Ws,34.484966,-120.229926,52.16,12,Y,Y,N_Hampton,Y
+Coombs & Melack; 2013,RattlesN/Ake,N/A,Gaviota Fire ,MTBS_2004Ws,35.526656,-118.856815,5.74,0,Y,N,N_Hampton,Y
+Coombs & Melack; 2013,San Onofre,lnR1,Gaviota Fire ,MTBS_2004Ws,34.472966,-120.187279,5.26,98.9419,Y,Y,N_Hampton,Y
+Coombs & Melack; 2013,N/A,N/A,Gaviota Fire ,MTBS_2004Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
+Crandall et al. 2021,Benjamin Slough,lnR1,Pole Creek Fire Complex,MTBS_2008Ws,40.134567,-111.791953,219,67,Y,Y,N_Google,Y_not quite the same watershed; and the sus points doesn’t get the exact one correctly
+Crandall et al. 2021,Dry Creek,N/A,Pole Creek Fire Complex,MTBS_2008Ws,40.180113,-111.669809,30,0,Y,Y,N_Google,Y_not quite the same watershed; and the sus points doesn’t get the exact one correctly
+Crandall et al. 2021,Hobble Creek Lower,N/A,Pole Creek Fire Complex,MTBS_2008Ws,40.184012,-111.647362,324,0,Y,Y,N_Google,Y_same COMID as upper
+Crandall et al. 2021,Hobble Creek Upper,N/A,Pole Creek Fire Complex,MTBS_2008Ws,40.157766,-111.5979,280,0,Y,Y,N_Google,Y
+Crandall et al. 2021,Mill Race,N/A,Pole Creek Fire Complex,MTBS_2008Ws,40.200989,-111.659265,47,0,Y,Y,N_Google,Y
+Crandall et al. 2021,Mitsubishi Race,N/A,Pole Creek Fire Complex,MTBS_2008Ws,40.192393,-111.652799,3,0,Y,Y,N_Google,Y_not quite the same watershed; and the sus points doesn’t get the exact one correctly
+Crandall et al. 2021,Payson,lnR2,Pole Creek Fire Complex,MTBS_2008Ws,39.974595,-111.702362,54,90,Y,Y,N_Google,Y_pretty far off; looks like it is a subset of the Benjamin slough COMID; Had to change the comid and now we are good
+Crandall et al. 2021,Provo River,N/A,Pole Creek Fire Complex,MTBS_2008Ws,40.234889,-111.724869,1769,0,Y,Y,N_Google,Y
+Crandall et al. 2021,Spanish Fork Lower,lnR3,Pole Creek Fire Complex,MTBS_2008Ws,40.103145,-111.681659,1712,24,Y,Y,N_Google,Y_pretty far off; the sus points doesn’t get the correct watershed
+Crandall et al. 2021,Spanish Fork Upper,lnR4,Pole Creek Fire Complex,MTBS_2008Ws,40.071704,-111.57715,1650,25,Y,Y,N_Google,Y
+Crandall et al. 2021,N/A,N/A,Pole Creek Fire Complex,MTBS_2008Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
+Gerla & Galloway; 1998,Crow Creek,N/A,Clover-Mist Wildfire ,MTBS_1988Ws,44.51295,-109.984156,494.6,9.1827,Y,N,N_Hampton,Y
+Gerla & Galloway; 1998,Jones Creek,lnR1,Clover-Mist Wildfire ,MTBS_1988Ws,44.558208,-109.995153,642.3,96.1969,Y,N,N_Hampton,Y
+Gerla & Galloway; 1998,N/A,N/A,Clover-Mist Wildfire ,MTBS_1988Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
+Gluns & Toews; 1989,East Fork,lnR1,Matt fire,MTBS_1985Ws,49.70434,-116.118877,20.9,26.1,Y,Y,N_Google,N_CaN/Ada
+Gluns & Toews; 1989,Middle Fork,lnR2,Matt fire,MTBS_1985Ws,49.712888,-116.122217,34.5,32.8,Y,Y,N_Google,N_CaN/Ada
+Gluns & Toews; 1989,West Fork,N/A,Matt fire,MTBS_1985Ws,49.706719,-116.140608,37.8,0,Y,Y,N_Google,N_CaN/Ada
+Gluns & Toews; 1989,N/A,N/A,Matt fire,MTBS_1985Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
+Hauer & Spencer 1998,Akokala_Creek,lnR3,Red Bench Fire ,MTBS_1988Ws,48.797378,-114.286749,105.98,9.9,Y,Y,N_Hampton,Y
+Hauer & Spencer 1998,Bowman_Creek,lnR4,Red Bench Fire ,MTBS_1988Ws,48.790458,-114.274616,130.13,11.3,Y,Y,N_Hampton,Y
+Hauer & Spencer 1998,Coal_Creek,N/A,Red Bench Fire ,MTBS_1988Ws,48.688413,-114.199739,211.59,0,Y,Y,N_Hampton,Y
+Hauer & Spencer 1998,Logging_Creek,N/A,Red Bench Fire ,MTBS_1988Ws,48.701412,-114.185106,238.08,1.5154,Y,Y,N_Hampton,Y_size is pretty off_sus_points didn’t work
+Hauer & Spencer 1998,Quartz_Creek,lnR5,Red Bench Fire ,MTBS_1988Ws,48.72261,-114.225834,136.29,29.4,Y,Y,N_Hampton,Y
+Hauer & Spencer 1998,Red_Bench_Creek,lnR1,Red Bench Fire ,MTBS_1988Ws,48.81409,-114.39971,1.83,95.6,Y,Y,N_Hampton,Y
+Hauer & Spencer 1998,Red_Meadow_Creek,lnR2,Red Bench Fire ,MTBS_1988Ws,48.802772,-114.32894,64,24.087,Y,Y,N_Hampton,Y
+Hauer & Spencer 1998,Wally_Creek ,N/A,Red Bench Fire ,MTBS_1988Ws,48.80153,-114.436506,2.38,93.5391,Y,Y,N_Hampton,Y
+Hauer & Spencer 1998,N/A,N/A,Red Bench Fire ,MTBS_1988Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
+Hickenbottom et al. 2023,Cold_Creek,N/A,Caldor Fire,MTBS_2021Ws,38.898689,-119.948785,30.3471,N/A,N_got_from_HUC,N,N_Google,Y_cant confirm size cause its not in text
+Hickenbottom et al. 2023,Middle_Fork,lnR2,Mosquito Fire,MTBS_2022Ws,38.958701,-120.920501,1520.7759,N/A,N_got_from_HUC,N,N_Google,Y_cant confirm size cause its not in text
+Hickenbottom et al. 2023,North_Fork,N/A,Mosquito Fire,MTBS_2022Ws,39.000053,-120.939907,856.9953,N/A,N_got_from_HUC,N,N_Google,Y_cant confirm size cause its not in text
+Hickenbottom et al. 2023,Trout_Creek,lnR1,Caldor Fire,MTBS_2021Ws,38.88376,-119.978005,56.0808,N/A,N_got_from_HUC,N,N_Google,Y_cant confirm size cause its not in text
+Hickenbottom et al. 2023,N/A,N/A,Caldor Fire,MTBS_2021Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
+Mast & Clow; 2008,Coal,lnR1,Rampage Fire_Robert Fire_Trapper Fire,MTBS_2003Ws,48.418961,-113.696178,96.4,51,Y,Y,N_Hampton,Y
+Mast & Clow; 2008,Fish Creek,lnR2_post,Rampage Fire_Robert Fire_Trapper Fire,MTBS_2003Ws,48.54888888,-113.9858333,42.6,73,Y,Y,N_Hampton,Y
+Mast & Clow; 2008,Lower MacDoN/Ald Creek,lnR3_post,Rampage Fire_Robert Fire_Trapper Fire,MTBS_2003Ws,48.525536,-113.997184,450,31.3921,Y,Y,N_Hampton,Y
+Mast & Clow; 2008,Pinchot,N/A,Rampage Fire_Robert Fire_Trapper Fire,MTBS_2003Ws,48.42222,-113.7005555,47.3,0.2982,Y,Y,N_Hampton,Y
+Mast & Clow; 2008,Upper MacDoN/Ald Creek,lnR4_post,Rampage Fire_Robert Fire_Trapper Fire,MTBS_2003Ws,48.63527778,-113.8669444,282,26,Y,Y,N_Hampton,Y
+Mast & Clow; 2008,N/A,N/A,Rampage Fire_Robert Fire_Trapper Fire,MTBS_2003Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
+Murphy et al. 2015,DS1,lnR1,Fourmile Canyon Fire,MTBS_2010Ws,40.039046,-105.393878,37,16.3095,N_Hampton,N,N_Google,Y
+Murphy et al. 2015,DS2,lnR2,Fourmile Canyon Fire,MTBS_2010Ws,40.041668,-105.364823,50,27.1144,N_Hampton_has USGS Q Gauge,N,N_Google,Y
+Murphy et al. 2015,DS3,lnR3,Fourmile Canyon Fire,MTBS_2010Ws,40.0155,-105.324566,63.1,27.1121,N_Hampton_has USGS Q Gauge,N,N_Google,Y
+Murphy et al. 2015,US1,N/A,Fourmile Canyon Fire,MTBS_2010Ws,40.036103,-105.439101,25.9,0,N_Hampton,N,N_Google,Y_Same_COMID_as_US2
+Murphy et al. 2015,US2,N/A,Fourmile Canyon Fire,MTBS_2010Ws,40.037791,-105.421247,29,0,N_Hampton,N,N_Google,Y
+Murphy et al. 2015,N/A,N/A,Fourmile Canyon Fire,MTBS_2010Ws,40.033333,-105.416667,-9999,-9999,N/A,N/A,N/A,N/A
+Murphy et al. 2018,DS1,lnR1,Fourmile Canyon Fire,MTBS_2010Ws,40.039046,-105.393878,370,16.3095,N_Hampton,N,N_Google,Y
+Murphy et al. 2018,DS2,lnR2,Fourmile Canyon Fire,MTBS_2010Ws,40.041668,-105.364823,500,27.1144,N_Hampton_has USGS Q Gauge,N,N_Google,Y
+Murphy et al. 2018,DS3,lnR3,Fourmile Canyon Fire,MTBS_2010Ws,40.0155,-105.324566,631,27.1121,N_Hampton_has USGS Q Gauge,N,N_Google,Y
+Murphy et al. 2018,US1,N/A,Fourmile Canyon Fire,MTBS_2010Ws,40.036103,-105.439101,259,0,N_Hampton,N,N_Google,Y_Same_COMID_as_US2
+Murphy et al. 2018,N/A,N/A,Fourmile Canyon Fire,MTBS_2010Ws,40.0502637,-105.3666599,-9999,-9999,N/A,N/A,N/A,N/A
+Neary & Currier; 1982,Crane Creek ,N/A,Jumping Branch Wildfire,MTBS_1978Ws,34.937946,-83.093596,3.66,N/A,Y,Y,N_Hampton,Y
+Neary & Currier; 1982,Wash Branch,lnR1,Jumping Branch Wildfire,MTBS_1978Ws,34.920959,-83.0922,2.18,31.3,Y,Y,N_Hampton,N_too small I think
+Neary & Currier; 1982,N/A,N/A,Jumping Branch Wildfire,MTBS_1978Ws,36.095349,-82.265,-9999,-9999,N/A,N/A,N/A,N/A
+Oliver et al. 2012,Control,N/A,Angora Fire,MTBS_2007Ws,38.868,-120.062,6.64,74,Y,Y,N_Google,Y_need to add
+Oliver et al. 2012,Site 1,N/A,Angora Fire,MTBS_2007Ws,38.88,-120.041,-9999,-9999,N,N,N_Google,Y
+Oliver et al. 2012,Site 2,lnR1,Angora Fire,MTBS_2007Ws,38.879,-120.03,8.39,76.4673,Y,Y,N_Google,Y_Same_COMID_as_Site_1
+Oliver et al. 2012,Site 3,lnR2,Angora Fire,MTBS_2007Ws,38.873,-120.013,15.3,41,Y,Y,N_Google,Y_needed to change Comid in code
+Oliver et al. 2012,Site 4,lnR3,Angora Fire,MTBS_2007Ws,-9999,-9999,-9999,56,N/A,N/A,N/A,N/A
+Oliver et al. 2012,N/A,N/A,Angora Fire,MTBS_2007Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
+Rhea et al. 2021,B1,lnR1,High Park Fire,MTBS_2012Ws,40.26237,-105.590804,3.25,N/A,N/A,N/A,N/A,N/A
+Rhea et al. 2021,B2,lnR2,Hayman Fire,MTBS_2002Ws,40.26237,-105.590804,6.02,N/A,N/A,N/A,N/A,N/A
+Rhea et al. 2021,B3,lnR3,Hayman Fire,MTBS_2002Ws,40.26237,-105.590804,8.33,N/A,N/A,N/A,N/A,N/A
+Rhea et al. 2021,U1,N/A,High Park Fire,MTBS_2012Ws,40.26237,-105.590804,7.04,0,N/A,N/A,N/A,N/A
+Rhea et al. 2021,U2,N/A,Hayman Fire,MTBS_2002Ws,40.26237,-105.590804,19.38,0,N/A,N/A,N/A,N/A
+Rhea et al. 2021,U3,N/A,Hayman Fire,MTBS_2002Ws,40.26237,-105.590804,8.6,0,N/A,N/A,N/A,N/A
+Rhea et al. 2021,N/A,N/A,Hayman_High_Park,MTBS_2012Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
+Tiedemann; 1973,Camas Creek,lnR1,Safety Harbor Fire ,MTBS_1970Ws,48.035327,-120.291846,68,N/A,Y,N_Hampton has values,N,Y
+Tiedemann; 1973,Grade Creek,N/A,Safety Harbor Fire ,MTBS_1970Ws,48.02142,-120.255581,280,N/A,Y,N_Hampton has values,N,Y
+Tiedemann; 1973,N/A,N/A,Safety Harbor Fire ,MTBS_1970Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
+Uzun et al. 2020,Reference ,N/A,Rocky Fire_Wragg Fire,MTBS_2015Ws,38.451372,122.056381,78,0,Y,N,Y,Y_size is pretty off_sus_points didn’t work
+Uzun et al. 2020,Rocky Fire,lnR1,Rocky Fire_Wragg Fire,MTBS_2015Ws,38.923564,122.326478,3017,12.8141,Y,N,Y,Y_size is pretty off_sus_points didn’t work
+Uzun et al. 2020,Wragg Fire,lnR2,Rocky Fire_Wragg Fire,MTBS_2015Ws,38.512031,122.097228,-9999,70.0648,N,N,Y,Y_cant confirm size cause its not in text
+Uzun et al. 2020,N/A,N/A,Rocky Fire_Wragg Fire,MTBS_2015Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
+Wagner et al. 2015,PBR,N/A,High Park Fire,MTBS_2012Ws,40.699423,-105.545085,618.46,0,N_Hampton,N_Hampton has values,N_Hampton,Y
+Wagner et al. 2015,PNF,lnR2,High Park Fire,MTBS_2012Ws,40.703249,-105.2424,1255.15,16.7187,N_Hampton,N_Hampton has values,N_Hampton,Y
+Wagner et al. 2015,PSF,lnR1,High Park Fire,MTBS_2012Ws,40.685031,-105.449096,963.26,1.5243,N_Hampton,N_Hampton has values,N_Hampton,Y_size is pretty off_sus_points didn’t work
+Wagner et al. 2015,N/A,N/A,High Park Fire,MTBS_2012Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
+Writer et al. 2014,PBR,N/A,Hewlett Gulch_High Park fire,MTBS_2012Ws,40.699423,-105.545085,6184.6,0,N_Hampton,N_Hampton has values,N_Hampton,Y
+Writer et al. 2014,PNF,lnR1,Hewlett Gulch_High Park fire,MTBS_2012Ws,40.685031,-105.449096,9632.6,16.7187,N_Hampton,N_Hampton has values,N_Hampton,Y_size is pretty off_sus_points didn’t work
+Writer et al. 2014,PSF,lnR2,Hewlett Gulch_High Park fire,MTBS_2012Ws,40.703249,-105.2424,12551.5,1.5243,N_Hampton,N_Hampton has values,N_Hampton,Y
+Writer et al. 2014,N/A,N/A,Hewlett Gulch_High Park fire,MTBS_2012Ws,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
