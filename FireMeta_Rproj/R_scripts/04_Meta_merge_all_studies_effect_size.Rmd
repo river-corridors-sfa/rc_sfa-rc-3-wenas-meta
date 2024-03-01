@@ -23,9 +23,11 @@ Step 4) Calculate the effect size for each watershed: ln[R] = Xburn/Xunburn
 # Status: in progress
 
 # ==============================================================================
-# Author: Jake Cavaiani 
-# 18 October 2023
+# Author: Jake Cavaiani; jake.cavaiani@pnnl.gov
+# 19 October 2023
 # ==============================================================================
+
+
 
 ## Read in libraries 
 ```{r Jake/Mac Load Packages and}
@@ -47,8 +49,11 @@ library(RobustLinearReg)
 
 ```
 
+
 ### Load in meta data ###
 ```{r load in publications}
+rm(list=ls(all=T)) #this clears your Environment
+
 studies_file_list <- list.files(path = "inputs/Studies/meta_final/", 
                                   recursive=F, 
                                   pattern=".csv", 
@@ -61,9 +66,12 @@ storm_list_beta<-do.call("list", lapply(studies_file_list,
 
 meta_df <-do.call("rbind", lapply(studies_file_list, 
                                      read.csv, 
+                                     na = c('-9999', 'N/A'),
                                      check.names = FALSE,
                                      stringsAsFactors=FALSE, 
-                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE))
+
+unique(meta_df$Study_ID) # should be 18. There are. 
 
 ```
 
@@ -182,7 +190,6 @@ yearly_mean_site <-  metadata_long %>%
 
 yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
 
-
 ```
 
 
@@ -300,11 +307,14 @@ yearly_effect_size_combine_long <- yearly_effect_size_combine %>%
 ```{r - combining in studies that were formatted differently so they needed their own script}
 # combine the yearly_effect_size_combine_long with Crandall, Abbott, and Rhea. 
 
-Crandall_effect_size <- read_csv(here("Output_for_analysis", "01_Crandall_effect_size", "Crandall_effect_size.csv")) 
+Crandall_effect_size <- read_csv(here("Output_for_analysis", "01_Crandall_effect_size", "Crandall_effect_size.csv"),
+                                na = c('-9999', 'N/A')) 
 
-abbott_effect_size <- read_csv(here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_effect_size.csv")) 
+abbott_effect_size <- read_csv(here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_effect_size.csv"),
+                               na = c('-9999', 'N/A'))
 
-rhea_effect_size <- read_csv(here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_effect_size.csv")) 
+rhea_effect_size <- read_csv(here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_effect_size.csv"),
+                             na = c('-9999', 'N/A'))
 
 
 # Adding columns to yearly_effect_size_combine_long to match Crandall_effect_size and above_five_effect_size 
@@ -384,10 +394,7 @@ yearly_effect_size_combine_long <- yearly_effect_size_combine_long %>%
 ```
 
 ```{r - clean up effect size if there are any mistakes csv}
-
 manual_effect_size <- yearly_effect_size_combine_long 
-
-
 
 manual_effect_size <- manual_effect_size %>% 
   mutate(Time_Since_Fire = case_when(Study_ID == 'Mast & Clow, 2008' & 
@@ -399,13 +406,16 @@ manual_effect_size <- manual_effect_size %>%
                                      year == '2011' ~ "1",
                                      TRUE ~ Time_Since_Fire))
 
-
 yearly_effect_size_combine_long <- manual_effect_size
 
+yearly_effect_size_combine_long_out <- yearly_effect_size_combine_long %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
 
-write_csv(yearly_effect_size_combine_long, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"))
 
+write_csv(yearly_effect_size_combine_long_out, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"))
 
+unique(yearly_effect_size_combine_long_out$Study_ID)
 
 ```
 
@@ -456,7 +466,11 @@ vn = expression(paste(""*N*O[3]^"-"))
 under_ten <- yearly_effect_size_combine_long_climate %>% 
   filter(!Time_Since_Fire == ">10") 
 
-write_csv(under_ten, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Climate_ES_Fig_data.csv"))
+under_ten_out <- under_ten %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
+
+write_csv(under_ten_out, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Climate_ES_Fig_data.csv"))
 
 # Count how many watersheds are being included for the climate analysis #
 under_ten_long <- under_ten %>% 
@@ -477,7 +491,7 @@ under_ten_long <- under_ten_long %>%
 
 count_climate <- under_ten_long %>% 
   count(Study_ID)
-sum(count_climate$n) 
+sum(count_climate$n) # Should be 53
 # 53 watersheds are included in the climate analysis 
 
 # geom_jitter for climate for studies within 5 years # 
@@ -541,7 +555,11 @@ ggsave("Effect_Size.climate.pdf",
 # Reordering for plotting purposes
 yearly_effect_size_combine_long$Time_Since_Fire <- factor(yearly_effect_size_combine_long$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", ">10"))
 
-write_csv(yearly_effect_size_combine_long, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "TSF_ES_Fig_data.csv"))
+yearly_effect_size_combine_long_out <- yearly_effect_size_combine_long %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
+
+write_csv(yearly_effect_size_combine_long_out, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "TSF_ES_Fig_data.csv"))
 
 # Count how many watersheds are being included for the climate analysis #
 TSF_long <- yearly_effect_size_combine_long %>% 
@@ -705,7 +723,7 @@ ggplot(doc_filter, aes(Time_Since_Fire, Percent_Difference, color = response_var
   stat_poly_eq(use_label(c("eq", "R2"))) +
   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
   ylab("Percent Difference") +
-  xlab("Year since Fire") +
+  xlab("Year Since Fire") +
   scale_color_manual(values = c("#00AFBB" ),
                      guide = guide_legend(title = ""),
                      labels = c('DOC')) +
@@ -745,7 +763,7 @@ ggplot(no3, aes(Time_Since_Fire, Percent_Difference, color = response_var)) +
   stat_poly_eq(use_label(c("eq", "R2"))) +
   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
   ylab("Percent Difference") +
-  xlab("Year since Fire") +
+  xlab("Year Since Fire") +
   scale_color_manual(values = c("#E7B800" ),
                      guide = guide_legend(title = ""),
                      labels = c(vn)) +

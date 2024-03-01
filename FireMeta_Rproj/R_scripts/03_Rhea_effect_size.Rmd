@@ -14,6 +14,14 @@ Step 2) Filter out studies that are Pre_Post -> we only want papers that are Con
 
 Step 3) run script that fills in concentrations for missing days in between discrete sampling days and then takes an average by month. 
 
+# Status: in progress
+
+# ==============================================================================
+# Author: Jake Cavaiani; jake.cavaiani@pnnl.gov
+# 27 November 2023
+# ==============================================================================
+
+
 
 ## Temporal Normalization 
 ```{r Jake/Mac Load Packages and}
@@ -32,7 +40,9 @@ library(viridis)
 ```
 
 ```{r data prepper}
-meta_df <- read_csv(here("inputs", "Studies", "Rhea_et_al_2021", "Rhea_et_al_2021.csv"))
+meta_df <- read_csv(here("inputs", "Studies", "meta_final", "Rhea_et_al_2021.csv"),
+                    na = c('-9999', 'N/A'))
+
 
 ```
 
@@ -117,8 +127,14 @@ control_impact_fill <-  control_impact_units %>%
   mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
          DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
   fill(Study_ID:Time_Since_Fire)
+
+control_impact_fill_out <- control_impact_fill %>% 
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>% 
+  mutate(across(where(is.logical), ~ifelse(is.na(.), "N/A", .))) %>%          
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
+
   
-write_csv(control_impact_fill, here("Output_for_analysis", "03_Rhea_effect_size", "rhea_conc_fill.csv"))
+write_csv(control_impact_fill_out, here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_conc_fill.csv"))
 
 
 ```
@@ -151,7 +167,13 @@ yearly_mean_site <-  metadata_long %>%
     
 yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
 
-write_csv(yearly_mean_site, here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_temp_norm.csv"))
+yearly_mean_site_out <- yearly_mean_site %>% 
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>% 
+  mutate(across(where(is.logical), ~ifelse(is.na(.), "N/A", .))) %>%          
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
+
+
+write_csv(yearly_mean_site_out, here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_temp_norm.csv"))
 
 ```
 

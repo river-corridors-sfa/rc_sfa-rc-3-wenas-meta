@@ -11,8 +11,8 @@ The purpose of this script is to read in the studies from the final meta data li
 # Status: in progress
 
 # ==============================================================================
-# Author: Jake Cavaiani 
-# 18 October 2023
+# Author: Jake Cavaiani; jake.cavaiani@pnnl.gov 
+# 01 December 2023
 # ==============================================================================
 
 ## Temporal Normalization 
@@ -44,7 +44,8 @@ storm_list_beta<-do.call("list", lapply(studies_file_list,
                                         header=T))
 
 meta_df <-do.call("rbind", lapply(studies_file_list, 
-                                     read.csv, 
+                                     read.csv,
+                                     na = c('-9999', 'N/A'),
                                      check.names = FALSE,
                                      stringsAsFactors=FALSE, 
                                      header=T, blank.lines.skip = TRUE, fill=TRUE)) 
@@ -69,16 +70,6 @@ control_impact <- meta_df %>%
 # separate out the time columns 
 time_format <- control_impact %>% 
   select(Study_ID, Sampling_Date) 
-
-# Make them all the same format and then merge back together in one column
-time_format <- time_format %>% 
-  mutate(DateTime = mdy(Sampling_Date),
-         DateTime2 = mdy_hm(Sampling_Date), 
-         DateTime2 = as.Date(DateTime2)) %>% 
-  select(-Sampling_Date) %>% 
-  mutate(Sampling_Date = coalesce(DateTime, DateTime2),
-         Sampling_Date = as.character(Sampling_Date)) %>% 
-  select(-DateTime, -DateTime2) 
 
 # merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
 control_impact <- control_impact %>% 
@@ -186,11 +177,11 @@ yearly_mean_site <-  yearly_mean_site %>%
 ```{r}
 # combine the conc. fill of Crandall, Abbott, and Rhea with the rest of it 
 
-crandall_conc_fill <- read_csv(here("Output_for_analysis", "01_Crandall_effect_size", "crandall_temp_norm.csv")) 
+crandall_conc_fill <- read_csv(here("Output_for_analysis", "01_Crandall_effect_size", "crandall_temp_norm.csv"), na = c('-9999', 'N/A')) 
 
-abbott_conc_fill <- read_csv(here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_temp_norm.csv")) 
+abbott_conc_fill <- read_csv(here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_temp_norm.csv"), na = c('-9999', 'N/A')) 
 
-rhea_conc_fill <- read_csv(here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_temp_norm.csv")) 
+rhea_conc_fill <- read_csv(here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_temp_norm.csv"), na = c('-9999', 'N/A')) 
 
 
 yearly_mean_site <- rbind(yearly_mean_site, crandall_conc_fill, abbott_conc_fill, rhea_conc_fill)
@@ -260,13 +251,29 @@ summary(log.one.way.no3) # df: 1,181, F-value: 0.152, p-value: 0.697
 leveneTest(TempNorm ~ Burn_Unburn, data = no3_yearly) # df: 1,181, F-value: 0.7465,  p-value: 0.38 
 
 # Write csv's
-write_csv(doc_yearly, here("Output_for_analysis", "09_Temp_Norm_comp", "DOC_temp_norm_fig_data.csv"))
+doc_yearly_out <- doc_yearly %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
 
-write_csv(doc_cv, here("Output_for_analysis", "09_Temp_Norm_comp", "DOC_CV_temp_norm_fig_data.csv"))
+write_csv(doc_yearly_out, here("Output_for_analysis", "09_Temp_Norm_comp", "DOC_temp_norm_fig_data.csv"))
 
-write_csv(no3_yearly, here("Output_for_analysis", "09_Temp_Norm_comp", "NO3_temp_norm_fig_data.csv"))
+doc_cv_out <- doc_cv %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
 
-write_csv(no3_cv, here("Output_for_analysis", "09_Temp_Norm_comp", "NO3_CV_temp_norm_fig_data.csv"))
+write_csv(doc_cv_out, here("Output_for_analysis", "09_Temp_Norm_comp", "DOC_CV_temp_norm_fig_data.csv"))
+
+no3_yearly_out <- no3_yearly %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
+
+write_csv(no3_yearly_out, here("Output_for_analysis", "09_Temp_Norm_comp", "NO3_temp_norm_fig_data.csv"))
+
+no3_cv_out <- no3_cv %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
+
+write_csv(no3_cv_out, here("Output_for_analysis", "09_Temp_Norm_comp", "NO3_CV_temp_norm_fig_data.csv"))
 
 ```
 
@@ -415,64 +422,6 @@ no3_summary <- no3_yearly %>%
 
 ```
 
-#### Random forest with psuedo yield metric with Geospatial data for Peter ####
-```{r - merge geospatial with yield metric}
-# geospatial dataset #
-geospatial_data<- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2024-02-15.csv"))
-
-# select the columns that I want 
-filter_geospatial <- geospatial_data %>% 
-  select(Site, totdasqkm, maxelevsmo, minelevsmo, slope)
-
-# effect size dataset 
-effect_dataset <- read_csv(here("Output_for_analysis", "07_Meta_effect_size_models", "effect_size_geospatial_fire_lat_long.csv"))
-
-# select the columns that I want 
-filter_effect <- effect_dataset %>% 
-  select(Site, totdasqkm, maxelevsmo, minelevsmo, slope:response_var)
-
-# merge the geospatial dataframe with the effect size data frame 
-effect_geospatial <- left_join(filter_geospatial, filter_effect)
-
-# making reference sites with no burn percentage 0!
-effect_geospatial <- effect_geospatial %>%
-  mutate(burn_percentage = ifelse(is.na(burn_percentage), 0, burn_percentage))
-
-
-# select the columns that I want from the yield metric 
-filter_temp_norm <- yearly_mean_site %>% 
-  select(Site, Climate, Area_watershed_km, response_var, year, Burn_Unburn, TempNorm) 
-
-# merging the geospatial with the yield dataframe
-temp_norm_geospatial <- full_join(effect_geospatial, filter_temp_norm, by = c("Site", "Climate", "response_var")) %>% 
-  distinct(TempNorm, .keep_all = T)
-
-doc <- temp_norm_geospatial %>% 
-  filter(response_var == "DOC_Interp") %>% # filtering out DOC
-  select(TempNorm, Climate, Site, Burn_Unburn, totdasqkm, minelevsmo, maxelevsmo, slope, burn_percentage, Time_Since_Fire) %>% 
-  na.omit()
-
-
-write_csv(doc, here("Output_for_analysis", "09_Temp_Norm_comp", "doc_yield_meta_random_forest.csv"))
-
-no3 <- temp_norm_geospatial %>% 
-  filter(response_var == "NO3_Interp") %>% # filtering out DOC
-  select(TempNorm, Climate, Site, Burn_Unburn, totdasqkm, minelevsmo, maxelevsmo, slope, burn_percentage, Time_Since_Fire) %>% 
-  na.omit()
- 
-
-write_csv(no3, here("Output_for_analysis", "09_Temp_Norm_comp", "no3_yield_meta_random_forest.csv"))
-
-
-```
-
-```{r compare effect size and yield metric}
-doc_rf_effect <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"))
-
-no3_rf_effect <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"))
-
-
-```
 
 
 

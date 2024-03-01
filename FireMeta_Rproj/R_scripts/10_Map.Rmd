@@ -19,7 +19,7 @@ Step 3) Plot
 # Status: in progress
 
 # ==============================================================================
-# Author: Jake Cavaiani 
+# Author: Jake Cavaiani; jake.cavaiani@pnnl.gov 
 # 19 October 2023
 # ==============================================================================
 
@@ -48,7 +48,7 @@ library(patchwork)
 
 This is the workflow to read in the meta analysis studies and the fires they are studying and then loading in a CONUS map and plotting our data on top of that
 ```{r load in fire names and associated study}
-meta <- read_csv(here("inputs", "Studies_Summary", "Map_input.csv")) # reading in the finalized filtered meta-analysis papers. 
+meta <- read_csv(here("inputs", "Studies_Summary", "Map_input.csv"), na = c('-9999', 'N/A')) # reading in the finalized filtered meta-analysis papers. 
 
 coords <- meta %>% 
   select(Fire_name, latitude, longitude, number_of_burn, State, group) # Picking only the columns I want 
@@ -128,30 +128,7 @@ ggsave("number_watersheds_map.pdf",
 
 ```
 
-```{r Chat GPT to get legends on top of each other}
-set.seed(42)
-df <- data.frame(
-  x = rnorm(100),
-  y = rnorm(100),
-  group = rep(c("Group A", "Group B"), each = 50),
-  color = rep(c("Red", "Blue"), each = 50),
-  shape = rep(c("Circle", "Square"), each = 50)
-)
 
-p <- ggplot(df, aes(x, y)) +
-  geom_point(aes(color = color, shape = shape)) +
-  scale_color_manual(values = c("Red" = "red", "Blue" = "blue")) +
-  scale_shape_manual(values = c("Circle" = 16, "Square" = 15)) +
-  labs(title = "Example Plot") +
-  theme(
-    legend.position = c(0.9, 0.1),  # Adjust the position of the color legend
-    legend.justification = c(1, 0),  # Right-justify the color legend
-    legend.box.just = "right"  # Place the color legend outside the plot area
-  )
- 
-print(p)
-
-```
 
 
 

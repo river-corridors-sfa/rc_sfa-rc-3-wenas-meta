@@ -23,7 +23,10 @@ Step 3) Load in the effect size sheet that comes from the All_Studies_Temporal_N
 
 # ==============================================================================
 # Author: Peter Regier
-#  February 2024
+
+# Adapted by Jake Cavaiani; jake.cavaiani@pnnl.gov
+
+# 7 February 2024
 # ==============================================================================
 
 # Library download # 
@@ -45,16 +48,18 @@ library(here)
 # random forest dataframes # 
 ```{r read in csv's}
 ## Read in effect datasets
-no3 <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv")) %>% 
+no3 <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"), na = c('-9999', 'N/A')) %>% 
   clean_names() %>% 
   rename("dependent" = effect_size) %>% 
-  select(-c(study_id, site, minelevraw, elevfixed, minelevsmo))
+  select(-c(study_id, site, minelevraw, elevfixed, minelevsmo)) %>% 
+  na.omit()
 
 
-doc <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv")) %>% 
+doc <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"), na = c('-9999', 'N/A')) %>% 
   clean_names() %>% 
   rename("dependent" = effect_size) %>% 
-  select(-c(study_id, site, minelevraw, elevfixed, minelevsmo))
+  select(-c(study_id, site, minelevraw, elevfixed, minelevsmo))%>% 
+  na.omit()
 
 ## Set ggplot theme
 theme_set(theme_bw())

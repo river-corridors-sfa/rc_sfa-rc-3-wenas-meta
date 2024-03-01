@@ -13,6 +13,14 @@ Step 2) Filter out studies that are Pre_Post -> we only want papers that are Con
 
 Step 3) run script that fills in concentrations for missing days in between discrete sampling days and then takes an average by month. 
 
+# Status: in progress
+
+# ==============================================================================
+# Author: Jake Cavaiani; jake.cavaiani@pnnl.gov
+# 14 November 2024
+# ==============================================================================
+
+
 
 ## Temporal Normalization 
 ```{r Jake/Mac Load Packages and}
@@ -31,7 +39,8 @@ library(viridis)
 ```
 
 ```{r data prepper}
-meta_df <- read_csv(here("inputs", "Studies", "Crandall_et_al_2021", "Crandall_et_al_2021.csv"))
+meta_df <- read_csv(here("inputs", "Studies", "meta_final", "Crandall_et_al_2021.csv"),
+                    na = c('-9999', 'N/A'))
 
 
 ```
@@ -112,8 +121,13 @@ control_impact_fill <-  control_impact_units %>%
          DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
   fill(Study_ID:Time_Since_Fire)
   
-
-write_csv(control_impact_fill, here("Output_for_analysis", "01_Crandall_effect_size", "crandall_conc_fill.csv"))
+control_impact_fill_out <- control_impact_fill %>% 
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>% 
+  mutate(across(where(is.logical), ~ifelse(is.na(.), "N/A", .))) %>%          
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
+  
+  
+write_csv(control_impact_fill_out, here("Output_for_analysis", "01_Crandall_effect_size", "crandall_conc_fill.csv"))
 
 ```
 

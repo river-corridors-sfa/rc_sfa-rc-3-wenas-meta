@@ -8,6 +8,14 @@ editor_options:
 
 The purpose of this script is to investigate the structure and makeup of the data that we have from the studies that are included. I want to spit out histograms that will show how much of each study design we have, how many fall into different climates and time since fire buckets
 
+# Status: in progress
+
+# ==============================================================================
+# Author: Jake Cavaiani; jake.cavaiani@pnnl.gov
+# 13 November 2023
+# ==============================================================================
+
+
 
 ```{r Load packages}
 #for Jake/mac
@@ -94,7 +102,7 @@ ggplot(final_dataset, aes(x = totdasqkm)) +
 ```
 
 ```{r - how many studies}
-unique(final_dataset$Study_ID) # 18
+unique(final_dataset$Study_ID) # Should be 15?
 ```
 
 ```{r - correlation matrix - catchment characteristics}
@@ -151,7 +159,7 @@ corrplot(res, type = "upper", order = "hclust",
 ```{r ratio between burned and unburned watersheds}
 library(tidyverse)
 library(hrbrthemes)
-watershed_area <- read_csv(here("inputs", "Studies_Summary", "Watershed_area.csv")) 
+watershed_area <- read_csv(here("inputs", "Studies_Summary", "Watershed_area.csv"), na = c('-9999', 'N/A')) 
 
 burn_ratio <- watershed_area %>%
   group_by(Study_ID) %>%

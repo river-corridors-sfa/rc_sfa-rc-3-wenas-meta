@@ -4,6 +4,17 @@ output: html_document
 date: "2023-10-30"
 ---
 
+# Status: in progress
+
+# ==============================================================================
+# Author: Kathryn Willi & Matthew R. V. Ross: https://doi.org/10.5281/zenodo.8140272
+
+# Adapted by Jake Cavaiani for the manuscript: Catchment characteristics modulate the influence of wildfires on nitrate and dissolved organic carbon across space and time: A meta-analysis; jake.cavaiani@pnnl.gov
+
+# 30 October 2023
+# ==============================================================================
+
+
 ```{r setup, include=TRUE, echo = T, warning = F, comment = F, message = FALSE}
 rm(list=ls(all=T))
 library(sf)

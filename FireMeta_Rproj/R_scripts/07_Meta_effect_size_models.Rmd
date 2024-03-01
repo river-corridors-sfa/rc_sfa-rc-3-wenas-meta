@@ -25,7 +25,7 @@ Our model:Effect_size ~ burn_percentage*TSF + (1|Site)
 # Status: in progress
 
 # ==============================================================================
-# Author: Jake Cavaiani 
+# Author: Jake Cavaiani; jake.cavaiani@pnnl.gov
 # 16 November 2023
 # ==============================================================================
 
@@ -94,13 +94,12 @@ ggplot(geospatial_long, aes(x = seq_along(year), y = burn_percentage)) +
 
 ```{r fire site data}
 # Read in the study and site csv 
-study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv")) %>% 
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
   rename(year = Fire_year) %>% 
   na.omit()
 
-unique(study_site_data$Study_ID) # 14 studies. 
-# missing Abbott, 
+unique(study_site_data$Study_ID) # Should be 17 studies because we are missing Abbott.
 # Abbott because of merging burned and unburned sites. 
 
 ```
@@ -111,9 +110,9 @@ bp_clip <- study_site_data %>%
   dplyr::select(Study_ID, Site, year, Effect_size_pair, burn_percentage)
 
 # The effect sizes of each study's watershed
-effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv")) %>% dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
+effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
 
-unique(effect_size$Study_ID) # 18 studies
+unique(effect_size$Study_ID) # Should be 18 studies.
 
 
 BP_ES <- full_join(bp_clip, effect_size) %>% 
@@ -123,7 +122,9 @@ BP_ES <- full_join(bp_clip, effect_size) %>%
 unique(BP_ES$Study_ID) # 14 studies
 
 BP_model <- full_join(BP_ES, study_site_data) %>% 
-  dplyr::select(Study_ID, Site, response_var, Climate, year, Biome, Effect_size_pair, Effect_size, Time_Since_Fire, burn_percentage)# joining the TSF dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
+  dplyr::select(Study_ID, Site, response_var, Climate, year, Biome, Effect_size_pair, Effect_size, Time_Since_Fire, burn_percentage) %>% 
+  mutate(burn_percentage = as.numeric(burn_percentage))
+# joining the TSF dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
 
 
 doc_es_bp <- BP_model %>% 
@@ -160,6 +161,8 @@ burn_percentage_plot <- burn_percentage_plot %>%
 
 burn_percentage_plot$burn_percentage_group <- factor(burn_percentage_plot$burn_percentage_group, levels = c("0-10", "11-20", "21-30", "31-40", "41-50", "51-60", "61-70", "71-80", "81-90", "91-100"))
 
+burn_percentage_plot <- burn_percentage_plot %>% 
+  na.omit(response_var)
 
 # calculating the mean percent_difference by climate
 burn_percentage_effect <- burn_percentage_plot %>% 
@@ -172,9 +175,19 @@ burn_percentage_effect <- burn_percentage_plot %>%
          lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
          upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
 
-write_csv(burn_percentage_effect, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_CIs.csv"))
+burn_percentage_effect_out <- burn_percentage_effect %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .))) %>% 
+  mutate(across(where(is.factor), ~ifelse(is.na(.), -9999, .)))
 
-#write_csv(burn_percentage_plot, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_fig_data.csv"))
+write_csv(burn_percentage_effect_out, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_CIs.csv"))
+
+burn_percentage_plot_out <- burn_percentage_plot %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .))) %>% 
+  mutate(across(where(is.factor), ~ifelse(is.na(.), -9999, .)))
+
+write_csv(burn_percentage_plot_out, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_fig_data.csv"))
 
 # Plot #
 vn = expression(paste(""*N*O[3]^"-"))
@@ -399,22 +412,22 @@ Thus, we do not reject the null hypothesis and conclude that the variance among 
 ### Building Random forest dataframe 
 ```{r }
 # The effect sizes of each study's watershed
-effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv")) %>% dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
+effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
 
 # This has site and effect size pair which will merge with the effect size dataframe to get a site name with each effect size. 
-study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv")) %>% 
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
   rename(year = Fire_year)
 
 study_site_data <- study_site_data %>%
   mutate(Site = str_replace_all(Site, "_", " "))
 
-unique(study_site_data$Site) # 65 sites here 
+unique(study_site_data$Site) # Supposed to be 65 sites
 
 no_geo_random_forest_data <- full_join(effect_size, study_site_data) %>% 
   na.omit(Effect_size) # this na.omit eliminates all the control sites that dont have an associated effect size. 
 
-unique(no_geo_random_forest_data$Site) # 28 sites
+unique(no_geo_random_forest_data$Site) # Supposed to be 33 sites here
 
 # Joining our effect sizes and sites df with the geospatial dataframe to get catchment characteristics. yay. 
 random_forest_data <- left_join(no_geo_random_forest_data, geospatial) %>% 
@@ -443,14 +456,14 @@ write_csv(no3_RF, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta
 ### Back to geospatial 
 ```{r load in effect size csv's}
 # The effect sizes of each study's watershed
-effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv")) %>% dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
+effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
 
 
-unique(effect_size$Study_ID) # 18 studies
+unique(effect_size$Study_ID) # Should be all 18 studies.
 values_to_filter <- unique(effect_size$Study_ID)
 
 # Site summary of each study and its respective fire and the year of that fire
-studies_data <- read_csv(here("inputs", "Studies_Summary", "Sites_meta_data.csv")) %>% 
+studies_data <- read_csv(here("inputs", "Studies_Summary", "Sites_meta_data.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Study_ID, Fire_name, Fire_year) %>% 
   filter(Study_ID %in% values_to_filter)
 
@@ -552,9 +565,14 @@ unique(effect_size_geospatial_fire$Study_ID)
 effect_size_geospatial_fire <- effect_size_geospatial_fire %>% 
   dplyr::select(Study_ID, Fire_name, Fire_year, Site, comid, totdasqkm, streamorde, maxelevraw, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Climate, Biome, Time_Since_Fire, response_var, Effect_size)
 
-write_csv(effect_size_geospatial_fire, here("Output_for_analysis", "07_meta_effect_size_models", "effect_size_geospatial_fire.csv"))
+effect_size_geospatial_fire_out <- effect_size_geospatial_fire %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
 
-meta <- read_csv(here("inputs", "Studies_Summary", "Map_input.csv")) # reading in filtered meta data sheet
+
+write_csv(effect_size_geospatial_fire_out, here("Output_for_analysis", "07_meta_effect_size_models", "effect_size_geospatial_fire.csv"))
+
+meta <- read_csv(here("inputs", "Studies_Summary", "Map_input.csv"), na = c('-9999', 'N/A')) # reading in filtered meta data sheet
 
 
 coords <- meta %>%
@@ -690,7 +708,7 @@ effect_size_fire <- effect_size_fire %>%
 
 # merge effect size fire with unique lat/longs for each watershed site. #
 # load in the sites with the unique lat/longs 
-watershed_lat_long <- read_csv(here("inputs", "catchment_characteristics", "watershed_lat_long.csv")) %>% 
+watershed_lat_long <- read_csv(here("inputs", "catchment_characteristics", "watershed_lat_long.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Site, latitude, longitude) 
 
 xia_effect <- effect_size_fire %>%
@@ -699,26 +717,30 @@ xia_effect <- effect_size_fire %>%
 xia_effect <- full_join(xia_effect, watershed_lat_long, by = "Site") %>% 
   distinct(Effect_size, .keep_all = TRUE) 
 
+xia_effect_out <- xia_effect %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
 
-write_csv(xia_effect, here("Output_for_analysis", "07_meta_effect_size_models", "effect_size_geospatial_fire_lat_long.csv"))
+
+write_csv(xia_effect_out, here("Output_for_analysis", "07_meta_effect_size_models", "effect_size_geospatial_fire_lat_long.csv"))
 
 ```
 
 ### 04_Meta_merge_all_studies_effect_size - TSF
 ```{r load in time since fire dataframe}
 # doc_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = doc_es_tsf)
-TSF_ES <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "TSF_ES_Fig_data.csv")) %>% 
+TSF_ES <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "TSF_ES_Fig_data.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size_pair, Effect_size, year, Time_Since_Fire) %>% 
   rename(fire_year = year)
-unique(TSF_ES$Study_ID) # 18 - all studies 
+unique(TSF_ES$Study_ID) # Should be all 18 studies
 
 
-study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv")) %>% 
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair) %>% 
   rename(year = Fire_year) %>% 
   na.omit()
 
-unique(study_site_data$Study_ID)
+unique(study_site_data$Study_ID) # should be all 18 studies. 
 
 TSF_model <- full_join(TSF_ES, study_site_data) # joining the TSF dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
 
@@ -776,7 +798,7 @@ shapiro.test(residuals) # p-value is > 0.05
  
 doc_tsf_mixed
 
-summary(doc_tsf_mixed) # df: 40.812, t-value: -4.756, p-value: 2.47e-05
+summary(doc_tsf_mixed) # df: 40.9851, t-value: -4.792, p-value: 2.47e-05
 fixef(doc_tsf_mixed)
 confint(doc_tsf_mixed)
 
@@ -863,10 +885,10 @@ Thus, we reject the null hypothesis and conclude that the variance among the tim
 ### 04_Meta_merge_all_studies_effect_size - Climate
 ```{r load in time since fire dataframe}
 # doc_tsf_mixed <-  lmer(Effect_size ~ Climate + (1 | Site), data = doc_es_tsf)
-climate_ES <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Climate_ES_Fig_data.csv")) %>% 
+climate_ES <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Climate_ES_Fig_data.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size_pair, Effect_size, year, Time_Since_Fire) %>% 
   rename(fire_year = year)
-unique(climate_ES$Study_ID) # 16 no Rhea and Abbott due to > 5 years 
+unique(climate_ES$Study_ID) # Should be 16 no Rhea and Abbott due to > 5 years 
 
 climate_model <- full_join(climate_ES, study_site_data) %>% 
   na.omit() # joining the climate dataframe used to make the figure and study site data to match sites because we will be including site as a random effect

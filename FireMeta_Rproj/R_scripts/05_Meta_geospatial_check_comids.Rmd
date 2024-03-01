@@ -4,6 +4,17 @@ output: html_document
 date: "2023-10-30"
 ---
 
+# Status: in progress
+
+# ==============================================================================
+# Author: Kathryn Willi & Matthew R. V. Ross: https://doi.org/10.5281/zenodo.8140272
+
+# Adapted by Jake Cavaiani for the manuscript: Catchment characteristics modulate the influence of wildfires on nitrate and dissolved organic carbon across space and time: A meta-analysis; jake.cavaiani@pnnl.gov
+
+# 30 October 2023
+# ==============================================================================
+
+
 ```{r setup, include=TRUE, echo = T, warning = F, comment = F, message = FALSE}
 rm(list = ls())
 library(sf)
@@ -60,7 +71,7 @@ sf_use_s2(FALSE)
 
 site_type = "xy" # OR site_type = "comid"
 
-sites <- read_csv(here("inputs", "catchment_characteristics", "watershed_lat_long.csv")) %>%
+sites <- read_csv(here("inputs", "catchment_characteristics", "watershed_lat_long.csv"), na = c('-9999', 'N/A')) %>%
   distinct(Site, .keep_all = TRUE) %>%
   dplyr::select('Site','latitude','longitude') %>% 
   rename(site = Site) %>% 
@@ -200,40 +211,4 @@ write_csv(sites_export, here("inputs", "catchment_characteristics", "meta_lat_lo
 
 ```
 
-#### Fire Permiter behind the watershed Figure for AGU_2023 ####
-```{r}
-
-# Only want the Gaviota sites 
-sites <- read_csv(here("inputs", "Studies_Summary", "Coombs_Melack_Coords.csv")) %>%
-  distinct(site, .keep_all = TRUE) %>%
-  dplyr::select('site','latitude','longitude') %>% 
-  drop_na()
-
-if(site_type == "xy"){
-  sites <- sites %>%
-    dplyr::select(site, latitude, longitude) %>% 
-    sf::st_as_sf(coords = c("longitude","latitude"), crs = 4269) # 4269 = NAD83 CRS
-  
-  if(sf::st_crs(sites) != sf::st_crs(4269)){
-    sites <- sites %>% st_transform(., crs = 4269)
-  }
-  
-  mapview(sites)
-}
-
-if(site_type == "xy"){
-  sites <- getNHDxy(df = sites)
-}
-
-site_watersheds <- getWatersheds(df = sites, make_pretty = TRUE) %>%
-  inner_join(., dplyr::select(sf::st_drop_geometry(sites), site, comid), by = "comid")
-
-
-m1 <- mapview(st_read(here("gis_data", "Fire_Perimeters", "Gaviota", "ca3448712019620040605_20040425_20050412_burn_bndy.shp")), lwd = 3, col.regions = "red", color = "red", quiet = T, alpha.regions = 0.4, layer.name = "Fire Perimeter") +
-  mapview(site_watersheds, col.regions = "#56B4E9", alpha.regions = 0.2, lwd = 3, layer.name = "Watershed") +
-  mapview(sites, cex = 5, col.regions = "black", layer.name = "Points")
-
-mapshot(m1, file = "~/GitHub/rc_sfa-rc-3-wenas-meta/FireMeta_Rproj/initial_plots/Maps/gaviota.pdf", format = "pdf")
-  
-```
 
