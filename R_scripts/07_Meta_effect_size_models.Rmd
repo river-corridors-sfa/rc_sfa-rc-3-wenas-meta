@@ -207,10 +207,53 @@ ggplot(burn_percentage_plot, aes(burn_percentage_group, Effect_size, color = res
   ylab("Effect Size") +
   xlab("Burn Percentage") +
   scale_color_manual(values = c("#00AFBB", "#E7B800"),
-                     guide = guide_legend(title = "Analyte"),
+                     guide = guide_legend(title = ""),
                      labels = c('DOC', vn)) +
-  stat_summary(fun.data = give.n, geom = "text", fun.y = median,
-                  position = position_nudge(x = -0.4)) +
+  # stat_summary(fun.data = give.n, geom = "text", fun.y = median,
+  #                 position = position_nudge(x = -0.4)) +
+  annotate("text",
+           x = c(0.45, 1.4,
+                 1.55, 2.4,
+                 2.55, 3.5,
+                 3.75,
+                 4.70,
+                 5.75, 6.4,
+                 6.5, 7.4,
+                 7.50, 8.4,
+                 8.60, 9.4,
+                 9.6),
+           y = c(1.4, -0.65,
+                 0.3, -1.3,
+                 1.65, -0.6,
+                 2,
+                 -1,
+                 0.5, 0.4,
+                 1.4, 1,
+                 -1, -3,
+                 -4, -1,
+                 1.1),
+           label = c("7", "3",
+                     "20", "14",
+                     "31", "19",
+                     "6",
+                     "2",
+                     "6", "5",
+                     "1", "1",
+                     "4", "2",
+                     "2", "1",
+                     "12"),
+           color = c("#E7B800","#00AFBB",
+                     "#E7B800","#00AFBB",
+                     "#E7B800","#00AFBB",
+                     "#E7B800",
+                     "#E7B800",
+                     "#E7B800","#00AFBB",
+                     "#E7B800","#00AFBB",
+                     "#E7B800","#00AFBB",
+                     "#E7B800","#00AFBB",
+                     "#E7B800"),
+           size = c(6),
+           family = "") +
   scale_x_discrete(expand = c(0.1, 0.1), limits = c("0-10", "11-20", "21-30", "31-40", "41-50", "51-60", "61-70", "71-80", "81-90", "91-100")) +
   ylim(-5, 5) +
   theme_bw() +
@@ -219,7 +262,9 @@ ggplot(burn_percentage_plot, aes(burn_percentage_group, Effect_size, color = res
         axis.title.x = element_text(size = 40),
         axis.title.y = element_text(size = 35),
         legend.text = element_text(size = 30),
-        legend.position = c(0.5, 0.86))
+        legend.key = element_blank(),
+        legend.background = element_blank(),
+        legend.position = c(0.1, 0.86))
 
 ggsave("Effect_Size_Burn_Percentage.pdf",
        path = here("initial_plots", "07_Meta_effect_size_models"),
@@ -467,7 +512,7 @@ studies_data <- read_csv(here("inputs", "Studies_Summary", "Sites_meta_data.csv"
   dplyr::select(Study_ID, Fire_name, Fire_year) %>% 
   filter(Study_ID %in% values_to_filter)
 
-study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv")) %>% 
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
   rename(year = Fire_year) %>% 
   na.omit()
@@ -784,6 +829,7 @@ no3_es_tsf <- TSF_model %>%
 #   mutate(logES = log(Effect_size),
 #          cuberoot = sqrt(sqrt(Effect_size)))
 
+# Continuous 
 doc_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = doc_es_tsf)
 
 # Check for equal variance
@@ -807,6 +853,43 @@ predictInterval(doc_tsf_mixed)
 REsim(doc_tsf_mixed) 
 
 plotREsim(REsim(doc_tsf_mixed))
+
+# Categorical #
+doc_es_tsf <- doc_es_tsf %>% 
+  mutate(TSF_grouped = case_when(Time_Since_Fire == "0" ~ "0",
+                                 Time_Since_Fire == "1" ~ "1-2",
+                                 Time_Since_Fire == "2" ~ "2-3",
+                                 Time_Since_Fire == "3" ~ "3-4",
+                                 Time_Since_Fire == "4" ~ "4-5",
+                                 Time_Since_Fire == "5" ~ "5-6",
+                                 Time_Since_Fire == "10" ~ ">10",
+                                 Time_Since_Fire == "11" ~ ">10",
+                                 Time_Since_Fire == "15" ~ ">10"))
+
+doc_es_tsf$TSF_grouped <- factor(doc_es_tsf$TSF_grouped, levels = c("0", "1-2", "2-3", "3-4", "4-5", "5-6", ">10"))
+
+
+doc_tsf_cat <-  lmer(Effect_size ~ TSF_grouped + (1 | Site), data = doc_es_tsf)
+
+     
+# Check for equal variance
+performance::check_heteroscedasticity(doc_tsf_cat) #OK: Error variance appears to be homoscedastic (p = 0.961).
+
+# Check for normality
+residuals <- resid(doc_tsf_cat)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # p-value is 0.4557
+# when p > 0.05 can assume normality 
+ 
+doc_tsf_cat
+
+summary(doc_tsf_cat) # df: 40.9851, t-value: -4.792, p-value: 2.47e-05
+                            
+
+# post hoc test 
+emmeans::lsmeans(doc_tsf_cat, pairwise ~ TSF_grouped, adjust = "tukey") # across all time since fire and all burn percentages we dont see any climates that are significantly different from each other. 
+
 
 ```
 

@@ -44,6 +44,7 @@ library(cowplot)
 library(sf)
 library(RColorBrewer)
 library(patchwork)
+library(ggspatial)
 ```
 
 This is the workflow to read in the meta analysis studies and the fires they are studying and then loading in a CONUS map and plotting our data on top of that
@@ -81,15 +82,20 @@ alaska <- st_read("inputs/map_shape_files/alaska/cb_2021_us_state_20m.shp")
 ak <- ggplot() +
   geom_sf(data = alaska, fill = "white", color = "black") +
   geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_name)) +
+  # annotation_north_arrow(location = "tr", which_north = "true", scale = 0.2) +
+  annotation_scale(location = "bl", width_hint = 0.1) +
   xlim(-180, -127) +
-  ylim(50, 72) + 
-  theme_void() +
-  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
-        axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),
-        legend.position = "none")
-  
+  ylim(50, 72) +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid = element_blank(), 
+        axis.text.x = element_blank())
 
 print(ak)
+
+#
+
+
 
 # I want to include Canada # 
 # Download shapefile for world countries
@@ -105,6 +111,8 @@ us_ca <- ggplot() +
   geom_sf(data = canadian_provinces, fill = "white", color = "black") +
   geom_sf(data = us_states, fill = "white", color = "black") +
   geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_name)) +
+  annotation_north_arrow(location = "tr", which_north = "true") +
+  annotation_scale(location = "br", width_hint = 0.1) +
   scale_color_manual(values = c("#666666", "#A6CEE3", "#00AFBB", "#1B9E77",
                                 "#7570B3", "#E7298A", "darkred", "black", 
                                 "#1F78B4", "#E31A1C", "#33A02C", "black",
@@ -112,23 +120,30 @@ us_ca <- ggplot() +
                                 "green", "purple")) +
   xlim(-135, -68) +
   ylim(25, 62) +
-  theme_void() +
-  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
-        axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),
-        legend.position = "none")
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid = element_blank())
 
 print(us_ca)
 
 # add the AK insert #
-us_ca + inset_element(ak, 0, -1.0, 0.3, 1.3, align_to = 'full')
+us_ca + inset_element(ak, 0.05, -0.75, 0.35, 1.2, align_to = 'full')
   
 ggsave("number_watersheds_map.pdf",
        path = here("initial_plots", "10_Map"),
        width = 6, height = 4,  units = "in")
 
+
 ```
 
+```{r chat gpt}
 
+
+
+
+
+
+```
 
 
 
