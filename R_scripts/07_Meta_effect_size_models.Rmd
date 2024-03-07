@@ -53,6 +53,9 @@ library(ggbreak)
 library(lmerTest)
 library(car)
 library(ggpubr)
+
+library(officer)
+library(flextable)
 ```
 
 ## Geospatial data
@@ -200,7 +203,7 @@ give.n <- function(x){
 ggplot(burn_percentage_plot, aes(burn_percentage_group, Effect_size, color = response_var),
        position = position_dodge(width = -0.5)) +
   geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
-  geom_pointrange(aes(ymin = lower_ci_effect, ymax = upper_ci_effect,
+  geom_pointrange(aes(ymin = mean_effect - se_effect, ymax = mean_effect + se_effect,
                       color = response_var),
                   position = position_dodge(width = -0.5), size = 1.5, data = burn_percentage_effect) +
   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
@@ -329,109 +332,48 @@ plotREsim(REsim(no3_bp_mixed))
 ```
 
 ### Burn percentage models for 10% intervals (categorical)
-```{r Effect size models-DOC}
-# # DOC #
-# # Effect_size ~ burn_percentage*TSF + (1|Site)
-# 
-# doc_10_burn <- effect_both_doc_no3 %>% 
-#   filter(response_var == "DOC_Interp")
-# 
-# doc_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | Site), data = doc_10_burn)
-# 
-# doc_burn_mixed
-# 
-# summary(doc_burn_mixed) # p-value: 0.973 - > 0.05
-# 
-# # now making this by the burn percentage groupings 
-# doc_burn_mixed = lmer(Effect_size ~ burn_percentage_group + (1 | Site), data = doc_10_burn)
-# 
-# doc_burn_mixed
-# 
-# summary(doc_burn_mixed) # p-value: for all groupings are > 0.05
-# # burn_percentage_group11-20 -1.02189    1.45939  4.98650  -0.700    0.515
-# # burn_percentage_group21-30  0.54756    1.41353  4.99319   0.387    0.714
-# # burn_percentage_group51-60  0.27944    1.78662  4.97804   0.156    0.882
-# # burn_percentage_group61-70  1.23719    1.79152  5.03288   0.691    0.520
-# # burn_percentage_group71-80 -2.39369    1.78846  4.99857  -1.338    0.238
-# # burn_percentage_group81-90 -0.07337    1.79152  5.03288  -0.041    0.969
-# 
-# fixef(doc_burn_mixed)
-# confint(doc_burn_mixed)
-# 
-# ranef(doc_burn_mixed)$Site %>% 
-#   head(5)
-# 
-# coef(doc_burn_mixed)$Site %>% 
-#   head(5)
-# 
-# predictInterval(doc_burn_mixed)
-# 
-# REsim(doc_burn_mixed) 
-# 
-# plotREsim(REsim(doc_burn_mixed))
-
-```
-
-```{r DOC levenes test}
-# # Null: the variance amoung the groups is equal. 
-# # conduct Levene's Test for equality of variances
-# leveneTest(Effect_size ~ burn_percentage_group, data = doc_10_burn) #F-value: 0.621, p-value: 0.7122, Df: 6, 38
-# 
-# # plot 
-# 
-# boxplot(Effect_size ~ burn_percentage_group,
-#   data = doc_10_burn,
-#   main = "Effect size Distribution by burn percentage - DOC",
-#   xlab = "Burn Percentage",
-#   ylab = "Effect Size",
-#   col = "steelblue",
-#   border = "black")
-```
-The p-value of the test is 0.7122, which is greater than our significance level of 0.05. 
-Thus, we do not reject the null hypothesis and conclude that the variance among the climate groups is equal. 
-
 ```{r Effect size models-NO3}
 # NO3 #
-# # Effect_size ~ burn_percentage*TSF + (1|Site)
-# 
-# no3_10_burn <- effect_both_doc_no3 %>% 
-#   filter(response_var == "NO3_Interp")
-# 
-# no3_burn_mixed = lmer(Effect_size ~ burn_percentage + (1 | Site), data = no3_10_burn)
-# 
-# no3_burn_mixed
-# 
-# summary(no3_burn_mixed) # p-value: 0.949 - > 0.05
-# 
-# # now making this by the burn percentage groupings 
-# no3_burn_mixed = lmer(Effect_size ~ burn_percentage_group + (1 | Site), data = no3_10_burn)
-# 
-# no3_burn_mixed
-# 
-# summary(no3_burn_mixed) # p-value: All groupings except 81-90 are insignificant (>0.05)
-# #burn_percentage_group11-20   -0.5275     0.8514 14.8742  -0.620  0.54495   
-# #burn_percentage_group21-30    0.7697     0.8533 14.9168   0.902  0.38136   
-# #burn_percentage_group51-60    0.5647     1.3650 13.8405   0.414  0.68542   
-# #burn_percentage_group61-70    1.1795     1.4779 18.9576   0.798  0.43471   
-# #burn_percentage_group71-80   -0.8912     1.1083 15.4049  -0.804  0.43359   
-# #burn_percentage_group81-90   -4.3541     1.4779 18.9576  -2.946  0.00831 **
-# #burn_percentage_group91-100   0.9352     0.9755 14.4181   0.959  0.35351 
-# 
-# fixef(no3_burn_mixed)
-# confint(no3_burn_mixed)
-# 
-# ranef(no3_burn_mixed)$Site %>% 
-#   head(5)
-# 
-# coef(no3_burn_mixed)$Site %>% 
-#   head(5)
-# 
-# predictInterval(no3_burn_mixed)
-# 
-# REsim(no3_burn_mixed) 
-# 
-# plotREsim(REsim(no3_burn_mixed))
-# 
+no3_es_bp <- no3_es_bp %>% 
+   mutate(burn_percentage_group = case_when(burn_percentage >= 0 & burn_percentage <= 10  ~ "0-10",
+                                           burn_percentage >= 11 & burn_percentage <= 20  ~ "11-20",
+                                           burn_percentage >= 21 & burn_percentage <= 30  ~ "21-30",
+                                           burn_percentage >= 31 & burn_percentage <= 40  ~ "31-40",
+                                           burn_percentage >= 41 & burn_percentage <= 50  ~ "41-50",
+                                           burn_percentage >= 51 & burn_percentage <= 60  ~ "51-60",
+                                           burn_percentage >= 61 & burn_percentage <= 70  ~ "61-70",
+                                           burn_percentage >= 71 & burn_percentage <= 80  ~ "71-80",
+                                           burn_percentage >= 81 & burn_percentage <= 90  ~ "81-90",
+                                           burn_percentage >= 91 & burn_percentage <= 100  ~ "91-100"))
+
+no3_bp_cat <-  lmer(Effect_size ~ burn_percentage_group + (1 | Site), data = no3_es_bp)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_bp_cat) #OK: Error variance appears to be homoscedastic (p = 0.948).
+
+# Check for normality
+residuals <- resid(no3_bp_cat)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # p-value is > 0.05: 0.2065
+# when p > 0.05 can assume normality 
+ 
+no3_bp_cat
+
+summary(no3_bp_cat) # df: 14.80975, t-value: 1.239, p-value: 0.2346 for the intercept
+# We only saw significance between the 81-90% group and the naught group for nitrate 
+
+# post-hoc
+emmeans::lsmeans(no3_bp_cat, pairwise ~ burn_percentage_group, adjust = "tukey") # post hoc test comparing 
+# (0-10) - (81-90)
+# (21-30) - (81-90)
+# (31-40) - (81-90) # These are the pairwise that are significant from each other. 
+
+summary_output <- summary(no3_bp_cat) 
+
+summary_df <- as.data.frame(summary_output$coefficients)
+
+write_csv(summary_df, "~/OneDrive - PNNL/Documents/RC_3/Wenas_Watershed_project/Manuscript/no3_bp_post_hoc.csv")
 
 
 ```
@@ -453,6 +395,63 @@ Thus, we do not reject the null hypothesis and conclude that the variance among 
 ```
 The p-value of the test is 0.1377, which is greater than our significance level of 0.05. 
 Thus, we do not reject the null hypothesis and conclude that the variance among the climate groups ARE equal. 
+
+```{r Effect size models-DOC}
+# # DOC #
+doc_es_bp <- doc_es_bp %>% 
+   mutate(burn_percentage_group = case_when(burn_percentage >= 0 & burn_percentage <= 10  ~ "0-10",
+                                           burn_percentage >= 11 & burn_percentage <= 20  ~ "11-20",
+                                           burn_percentage >= 21 & burn_percentage <= 30  ~ "21-30",
+                                           burn_percentage >= 31 & burn_percentage <= 40  ~ "31-40",
+                                           burn_percentage >= 41 & burn_percentage <= 50  ~ "41-50",
+                                           burn_percentage >= 51 & burn_percentage <= 60  ~ "51-60",
+                                           burn_percentage >= 61 & burn_percentage <= 70  ~ "61-70",
+                                           burn_percentage >= 71 & burn_percentage <= 80  ~ "71-80",
+                                           burn_percentage >= 81 & burn_percentage <= 90  ~ "81-90",
+                                           burn_percentage >= 91 & burn_percentage <= 100  ~ "91-100"))
+
+doc_bp_cat <-  lmer(Effect_size ~ burn_percentage_group + (1 | Site), data = doc_es_bp)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_bp_cat) #OK: Error variance appears to be homoscedastic (p = 0.976).
+
+# Check for normality
+residuals <- resid(doc_bp_cat)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # p-value is > 0.05: 0.2195
+# when p > 0.05 can assume normality 
+ 
+doc_bp_cat
+
+summary(doc_bp_cat) # df: 5.9804, t-value: -0.370, p-value: 0.724 for the intercept
+# We saw no significant difference between any of the time buckets and the naught value 
+
+summary_output <- summary(doc_bp_cat) 
+
+summary_df <- as.data.frame(summary_output$coefficients)
+
+write_csv(summary_df, "~/OneDrive - PNNL/Documents/RC_3/Wenas_Watershed_project/Manuscript/doc_bp_post_hoc.csv")
+```
+
+```{r DOC levenes test}
+# # Null: the variance amoung the groups is equal. 
+# # conduct Levene's Test for equality of variances
+# leveneTest(Effect_size ~ burn_percentage_group, data = doc_10_burn) #F-value: 0.621, p-value: 0.7122, Df: 6, 38
+# 
+# # plot 
+# 
+# boxplot(Effect_size ~ burn_percentage_group,
+#   data = doc_10_burn,
+#   main = "Effect size Distribution by burn percentage - DOC",
+#   xlab = "Burn Percentage",
+#   ylab = "Effect Size",
+#   col = "steelblue",
+#   border = "black")
+```
+The p-value of the test is 0.7122, which is greater than our significance level of 0.05. 
+Thus, we do not reject the null hypothesis and conclude that the variance among the climate groups is equal. 
+
 
 ### Building Random forest dataframe 
 ```{r }
@@ -818,6 +817,102 @@ no3_es_tsf <- TSF_model %>%
 ```
 
 ### TSF models
+```{r NO3 TSF models}
+no3_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = no3_es_tsf)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_tsf_mixed) #OK: Error variance appears to be homoscedastic (p = 0.951).
+
+# Check for normality
+residuals <- resid(no3_tsf_mixed)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+
+no3_tsf_mixed
+
+summary(no3_tsf_mixed) # df: 89.25566, t-value: 2.462, p-value: 0.0158
+fixef(no3_tsf_mixed)
+confint(no3_tsf_mixed)
+
+predictInterval(no3_tsf_mixed)
+
+REsim(no3_tsf_mixed) 
+
+plotREsim(REsim(no3_tsf_mixed))
+
+# Categorical #
+no3_es_tsf <- no3_es_tsf %>% 
+  mutate(TSF_grouped = case_when(Time_Since_Fire == "0" ~ "0",
+                                 Time_Since_Fire == "1" ~ "1-2",
+                                 Time_Since_Fire == "2" ~ "2-3",
+                                 Time_Since_Fire == "3" ~ "3-4",
+                                 Time_Since_Fire == "4" ~ "4-5",
+                                 Time_Since_Fire == "5" ~ "5-6",
+                                 Time_Since_Fire == "10" ~ ">10",
+                                 Time_Since_Fire == "11" ~ ">10",
+                                 Time_Since_Fire == "15" ~ ">10"))
+
+no3_es_tsf$TSF_grouped <- factor(no3_es_tsf$TSF_grouped, levels = c("0", "1-2", "2-3", "3-4", "4-5", "5-6", ">10"))
+
+
+no3_tsf_cat <-  lmer(Effect_size ~ TSF_grouped + (1 | Site), data = no3_es_tsf)
+
+     
+# Check for equal variance
+performance::check_heteroscedasticity(no3_tsf_cat) #OK: Error variance appears to be homoscedastic (p = 0.954).
+
+# Check for normality
+residuals <- resid(no3_tsf_cat)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # p-value is 0.3994
+# when p > 0.05 can assume normality 
+ 
+no3_tsf_cat
+
+summary_output <- summary(no3_tsf_cat) 
+
+summary_df <- as.data.frame(summary_output$coefficients)
+
+write_csv(summary_df, "~/OneDrive - PNNL/Documents/RC_3/Wenas_Watershed_project/Manuscript/no3_tsf_post_hoc.csv")
+
+# post hoc test 
+no3_tsf <- emmeans::lsmeans(no3_tsf_cat, pairwise ~ TSF_grouped, adjust = "tukey") # post hoc test comparing 
+
+no3_tsf
+
+# summary_df <- as.data.frame(no3_tsf$contrasts)
+# 
+# write_csv(summary_df, "~/OneDrive - PNNL/Documents/RC_3/Wenas_Watershed_project/Manuscript/no3_tsf_post_hoc.csv")
+
+
+```
+
+```{r NO3 levenes test}
+# effect_size_no3$Time_Since_Fire <- factor(effect_size_no3$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", ">10")) # reordering to make sure that the >10 year bin is at the end of the plot to visualize through time. 
+
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ TSF_grouped, data = no3_es_tsf) #F-value: 2.6525, p-value: 0.02012, Df: 6,95
+
+# plot 
+
+boxplot(Effect_size ~ TSF_grouped,
+  data = no3_es_tsf,
+  main = "Effect size Distribution by Time Since Fire - NO3",
+  xlab = "Time Since Fire",
+  ylab = "Effect Size",
+  col = "#E7B800",
+  border = "black")
+
+
+```
+The p-value of the test is 0.03067, which is less than our significance level of 0.05. 
+Thus, we reject the null hypothesis and conclude that the variance among the time since fire groups is NOT equal. 
+
 ```{r DOC TSF models}
 # # Check for normality 
 # qqPlot(doc_es_tsf$Time_Since_Fire)
@@ -844,7 +939,7 @@ shapiro.test(residuals) # p-value is > 0.05
  
 doc_tsf_mixed
 
-summary(doc_tsf_mixed) # df: 40.9851, t-value: -4.792, p-value: 2.47e-05
+summary(doc_tsf_mixed) # df: 40.9851, t-value: -4.792, p-value: 2.47e-05 # TSF is significant for DOC 
 fixef(doc_tsf_mixed)
 confint(doc_tsf_mixed)
 
@@ -884,26 +979,36 @@ shapiro.test(residuals) # p-value is 0.4557
  
 doc_tsf_cat
 
-summary(doc_tsf_cat) # df: 40.9851, t-value: -4.792, p-value: 2.47e-05
-                            
+summary(doc_tsf_cat) # df: 17.63971, t-value: -1.084, p-value: 0.293038
+
+summary_output <- summary(doc_tsf_cat) 
+
+summary_df <- as.data.frame(summary_output$coefficients)
+
+write_csv(summary_df, "~/OneDrive - PNNL/Documents/RC_3/Wenas_Watershed_project/Manuscript/doc_tsf_post_hoc.csv")
 
 # post hoc test 
-emmeans::lsmeans(doc_tsf_cat, pairwise ~ TSF_grouped, adjust = "tukey") # across all time since fire and all burn percentages we dont see any climates that are significantly different from each other. 
+doc_tsf <- emmeans::lsmeans(doc_tsf_cat, pairwise ~ TSF_grouped, adjust = "tukey") # post hoc test comparing 
 
+doc_tsf
+
+summary_df <- as.data.frame(doc_tsf$contrasts)
+
+# write_csv(summary_df, "~/OneDrive - PNNL/Documents/RC_3/Wenas_Watershed_project/Manuscript/doc_tsf_post_hoc.csv")
 
 ```
 
 ```{r DOC levenes test}
-effect_size_doc$Time_Since_Fire <- factor(effect_size_doc$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", ">10")) # reordering to make sure that the >10 year bin is at the end of the plot to visualize through time. 
+# effect_size_doc$Time_Since_Fire <- factor(effect_size_doc$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", ">10")) # reordering to make sure that the >10 year bin is at the end of the plot to visualize through time. 
 
 # Null: the variance amoung the groups is equal. 
 # conduct Levene's Test for equality of variances
-leveneTest(Effect_size ~ Time_Since_Fire, data = effect_size_doc) #F-value: 0.73 p-value: 0.6277, Df: 6, 48
+leveneTest(Effect_size ~ TSF_grouped, data = doc_es_tsf) #F-value: 0.6532 p-value: 0.6873, Df: 6, 48
 
 # plot 
 
-boxplot(Effect_size ~ Time_Since_Fire,
-  data = effect_size_doc,
+boxplot(Effect_size ~ TSF_grouped,
+  data = doc_es_tsf,
   main = "Effect size Distribution by Time Since Fire - DOC",
   xlab = "Time Since Fire",
   ylab = "Effect Size",
@@ -914,55 +1019,6 @@ boxplot(Effect_size ~ Time_Since_Fire,
 The p-value of the test is 0.69, which is greater than our significance level of 0.05. 
 Thus, we do not reject the null hypothesis and conclude that the variance among the time since fire groups is equal. 
 
-```{r NO3 TSF models}
-no3_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = no3_es_tsf)
-
-# Check for equal variance
-performance::check_heteroscedasticity(no3_tsf_mixed) #OK: Error variance appears to be homoscedastic (p = 0.951).
-
-# Check for normality
-residuals <- resid(no3_tsf_mixed)
-qqnorm(residuals)
-qqline(residuals)
-shapiro.test(residuals) # p-value is > 0.05
-# when p > 0.05 can assume normality 
-
-
-no3_tsf_mixed
-
-summary(no3_tsf_mixed) # df: 89.25566, t-value: 2.462, p-value: 0.0158
-fixef(no3_tsf_mixed)
-confint(no3_tsf_mixed)
-
-predictInterval(no3_tsf_mixed)
-
-REsim(no3_tsf_mixed) 
-
-plotREsim(REsim(no3_tsf_mixed))
-
-```
-
-```{r NO3 levenes test}
-effect_size_no3$Time_Since_Fire <- factor(effect_size_no3$Time_Since_Fire, levels = c("0", "1", "2", "3", "4", "5", ">10")) # reordering to make sure that the >10 year bin is at the end of the plot to visualize through time. 
-
-# Null: the variance amoung the groups is equal. 
-# conduct Levene's Test for equality of variances
-leveneTest(Effect_size ~ Time_Since_Fire, data = effect_size_no3) #F-value: 2.4422, p-value: 0.03067, Df: 6,95
-
-# plot 
-
-boxplot(Effect_size ~ Time_Since_Fire,
-  data = effect_size_no3,
-  main = "Effect size Distribution by Time Since Fire - NO3",
-  xlab = "Time Since Fire",
-  ylab = "Effect Size",
-  col = "#E7B800",
-  border = "black")
-
-
-```
-The p-value of the test is 0.03067, which is less than our significance level of 0.05. 
-Thus, we reject the null hypothesis and conclude that the variance among the time since fire groups is NOT equal. 
 
 
 ### 04_Meta_merge_all_studies_effect_size - Climate
@@ -985,60 +1041,8 @@ no3_es_climate <- climate_model %>%
 ```
 
 ### Climate models
-```{r DOC climate models}
-doc_climate_mixed <-  lmer(Effect_size ~ Climate + (1 | Site), data = doc_es_climate)
-unique(doc_es_climate$Climate)
-# Check for equal variance
-performance::check_heteroscedasticity(doc_climate_mixed) #OK: Error variance appears to be homoscedastic (p = 0.966).
-
-# Check for normality
-residuals <- resid(doc_climate_mixed)
-qqnorm(residuals)
-qqline(residuals)
-shapiro.test(residuals) # p-value is > 0.05
-# when p > 0.05 can assume normality 
-
-doc_climate_mixed
-
-summary(doc_climate_mixed) # The way this model is structured since it is categorical is the intercept is assessing whether the 0 coded climate classification (Cfb) is significantly different from 0. In this case - NO (p-value > 0.05). This it is assessing if the other climate types are significantly different from Cfb, but not each other. Which in this case, is no. 
-
-# post hoc test 
-emmeans::lsmeans(doc_climate_mixed, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case, nothing is signficantly different from each other!
-
-fixef(doc_climate_mixed)
-confint(doc_climate_mixed)
-
-predictInterval(doc_climate_mixed)
-
-REsim(doc_climate_mixed) 
-
-plotREsim(REsim(doc_climate_mixed))
-
-```
-
-```{r DOC levenes test}
-# Null: the variance amoung the groups is equal. 
-# conduct Levene's Test for equality of variances
-leveneTest(Effect_size ~ Climate, data = doc_es_climate) #F-value: 66.819, p-value: <2.2e-16, Df: 4, 44
-
-# plot 
-
-boxplot(Effect_size ~ Climate,
-  data = doc_es_climate,
-  main = "Effect size Distribution by Climate - DOC",
-  xlab = "Climate",
-  ylab = "Effect Size",
-  col = "#00AFBB",
-  border = "black")
-
-```
-The p-value of the test is <2.2e-16, which is less than our significance level of 0.05. 
-Thus, we reject the null hypothesis and conclude that the variance among the climate groups is NOT equal. 
-
-From the plot, Csa (Hot-Mediterranean) is the most variable. Now we have to think about why?
-
 ```{r NO3 climate models}
-no3_climate_mixed <-  lmer(Effect_size ~ Climate + (1 | Site), data = no3_es_climate)
+no3_climate_mixed <-  lmer(Effect_size ~ as.factor(Climate) + (1 | Site), data = no3_es_climate)
 unique(no3_es_climate$Climate)
 # Check for equal variance
 performance::check_heteroscedasticity(no3_climate_mixed) #OK: Error variance appears to be homoscedastic (p = 0.985).
@@ -1052,7 +1056,15 @@ shapiro.test(residuals) # p-value is > 0.05
 
 no3_climate_mixed
 
+
 summary(no3_climate_mixed) # The way this model is structured since it is categorical is the intercept is assessing whether the 0 coded climate classification (Bsk) is significantly different from 0. In this case - NO (p-value > 0.05). This it is assessing if the other climate types are significantly different from Bsk, but not each other. Which in this case, is no. 
+
+summary_output <- summary(no3_climate_mixed) 
+
+summary_df <- as.data.frame(summary_output$coefficients)
+
+write_csv(summary_df, "~/OneDrive - PNNL/Documents/RC_3/Wenas_Watershed_project/Manuscript/no3_climate_post_hoc.csv")
+
 
 # post hoc test 
 emmeans::lsmeans(no3_climate_mixed, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there is one pair that is significantly different from each other: Csa - Dfc
@@ -1096,6 +1108,90 @@ Thus, we reject the null hypothesis and conclude that the variance among the cli
 
 "Dsb" = "Mediterranean", 
 "Cfa" = "Humid subtropical",
+
+```{r DOC climate models}
+doc_climate_mixed <-  lmer(Effect_size ~ Climate + (1 | Site) + (1 | Time_Since_Fire), data = doc_es_climate)
+unique(doc_es_climate$Climate)
+# Check for equal variance
+performance::check_heteroscedasticity(doc_climate_mixed) #OK: Error variance appears to be homoscedastic (p = 0.966).
+
+# Check for normality
+residuals <- resid(doc_climate_mixed)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+doc_climate_mixed
+
+summary(doc_climate_mixed) # The way this model is structured since it is categorical is the intercept is assessing whether the 0 coded climate classification (Cfb) is significantly different from 0. In this case - NO (p-value > 0.05). This it is assessing if the other climate types are significantly different from Cfb, but not each other. Which in this case, is no. 
+
+summary_output <- summary(doc_climate_mixed) 
+
+summary_df <- as.data.frame(summary_output$coefficients)
+
+write_csv(summary_df, "~/OneDrive - PNNL/Documents/RC_3/Wenas_Watershed_project/Manuscript/doc_climate_post_hoc.csv")
+
+
+# post hoc test 
+emmeans::lsmeans(doc_climate_mixed, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case, nothing is signficantly different from each other!
+
+fixef(doc_climate_mixed)
+confint(doc_climate_mixed)
+
+predictInterval(doc_climate_mixed)
+
+REsim(doc_climate_mixed) 
+
+plotREsim(REsim(doc_climate_mixed))
+
+```
+
+```{r AMP nesting by aggregating}
+doc_es_climate_agg <- doc_es_climate %>% 
+  group_by(Site) %>% 
+  summarize(y = mean(Effect_size),
+            Climate = first(Climate))
+
+# Aggregated data frame
+replications(y ~ Climate + Site, doc_es_climate_agg)
+
+data.nest.agg.lmer <- lmer(y ~ Climate + (1 | Site), doc_es_climate_agg, REML = TRUE)
+
+doc.agg.aov <- aov(y ~ Climate, data = doc_es_climate_agg)
+summary(doc.agg.aov) # Climate is not significant for DOC 
+
+# original data frame
+replications(Effect_size ~ Climate + Site, doc_es_climate)
+
+data.nest.lmer <- lmer(Effect_size ~ Climate + (1 | Site), doc_es_climate, REML = TRUE)
+
+
+
+anova(data.nest.lmer, data.nest.lmer1)
+```
+
+```{r DOC levenes test}
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ Climate, data = doc_es_climate) #F-value: 66.819, p-value: <2.2e-16, Df: 4, 44
+
+# plot 
+
+boxplot(Effect_size ~ Climate,
+  data = doc_es_climate,
+  main = "Effect size Distribution by Climate - DOC",
+  xlab = "Climate",
+  ylab = "Effect Size",
+  col = "#00AFBB",
+  border = "black")
+
+```
+The p-value of the test is <2.2e-16, which is less than our significance level of 0.05. 
+Thus, we reject the null hypothesis and conclude that the variance among the climate groups is NOT equal. 
+
+From the plot, Csa (Hot-Mediterranean) is the most variable. Now we have to think about why?
+
 
 
 # Make the same TSF plot but with Burn percentage #

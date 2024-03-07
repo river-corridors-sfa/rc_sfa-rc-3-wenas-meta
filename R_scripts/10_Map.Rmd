@@ -45,6 +45,7 @@ library(sf)
 library(RColorBrewer)
 library(patchwork)
 library(ggspatial)
+library(raster)
 ```
 
 This is the workflow to read in the meta analysis studies and the fires they are studying and then loading in a CONUS map and plotting our data on top of that
@@ -52,7 +53,7 @@ This is the workflow to read in the meta analysis studies and the fires they are
 meta <- read_csv(here("inputs", "Studies_Summary", "Map_input.csv"), na = c('-9999', 'N/A')) # reading in the finalized filtered meta-analysis papers. 
 
 coords <- meta %>% 
-  select(Fire_name, latitude, longitude, number_of_burn, State, group) # Picking only the columns I want 
+ dplyr::select(Fire_name, latitude, longitude, number_of_burn, State, group) # Picking only the columns I want 
 
 coords_noNA <- coords %>% 
     drop_na(Fire_name) # eliminating rows that are NAs if they dont have an associated fire name with it. 
@@ -60,6 +61,7 @@ coords_noNA <- coords %>%
 # Create an sf object from the data
 coordinates_sf <- st_as_sf(coords_noNA, coords = c("longitude", "latitude"), crs = 4326)
 
+common_crs = 4326
 ```
 
 ```{r - US map with AK as an inset map}
@@ -74,7 +76,13 @@ download.file(url_alaska, "inputs/map_shape_files/alaska.zip", mode = "wb")
 unzip("inputs/map_shape_files/alaska.zip", exdir = "inputs/map_shape_files/alaska")
 
 # Read the US states shapefile
-us_states <- st_read("inputs/map_shape_files/us_states/cb_2021_us_state_20m.shp")
+us_states <- read_sf("inputs/map_shape_files/us_states/cb_2021_us_state_20m.shp") %>% 
+  st_transform(common_crs) %>% 
+  filter(NAME != 'Hawaii' & NAME != 'Puerto Rico') %>% 
+  st_crop(xmin = -180, xmax = -55, ymin = 12, ymax = 62)
+
+ggplot() +
+  geom_sf(data = us_states, fill = "white", color = "black")
 
 # Read the Alaska shapefile
 alaska <- st_read("inputs/map_shape_files/alaska/cb_2021_us_state_20m.shp")
@@ -84,18 +92,14 @@ ak <- ggplot() +
   geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_name)) +
   # annotation_north_arrow(location = "tr", which_north = "true", scale = 0.2) +
   annotation_scale(location = "bl", width_hint = 0.1) +
-  xlim(-180, -127) +
-  ylim(50, 72) +
+  # xlim(-180, -127) +
+  # ylim(50, 72) +
   theme_minimal() +
   theme(legend.position = "none",
         panel.grid = element_blank(), 
         axis.text.x = element_blank())
 
 print(ak)
-
-#
-
-
 
 # I want to include Canada # 
 # Download shapefile for world countries
@@ -134,19 +138,106 @@ ggsave("number_watersheds_map.pdf",
        width = 6, height = 4,  units = "in")
 
 
+# Bind US and canadian provinces # 
+us_ca <- bind_rows(us_states, canadian_provinces)
+
+ggplot() +
+  geom_sf(data = us_ca, fill = "white", color = "black") +
+
+# Set up the Lambert Azimuthal Equal Area projection
+laea_proj <- "+proj=laea +lat_0=45 +lon_0=-100 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+
+ggplot() +
+  geom_sf(data = us_ca, fill = "white", color = "black") +
+  coord_sf(crs = laea_proj) +
+  theme_void()
+
+us_ca_transformed <- st_transform(us_ca, crs = laea_proj)
+
+ggplot() +
+  geom_sf(data = us_ca_transformed, fill = "white", color = "black") +
+  theme_void()
+
 ```
 
-```{r chat gpt}
+```{r koppen climate classification layer}
+# Peter code to plot tif #
+## Set common coordinate reference system
+common_crs = 4326
+## Read in koppen climate classification - only needs to be read in once when plotting and then can be deleted after the kppen_reproject
+koppen_raw <-  raster::raster("~/Downloads/1984_2013/kc_1984_2013.tif")
 
+## Re-project koppen map
+koppen_reproject <- raster::projectRaster(koppen_raw, crs = laea_proj)
 
+## Mask (crop in essence) severity to fire boundary
+koppen_crop <- raster::mask(koppen_reproject, us_ca_transformed)
 
+## Convert to dataframe
+koppen <- as.data.frame(koppen_crop, xy = T) %>% 
+  as_tibble() %>% 
+  rename("long" = x, 
+         "lat" = y, 
+         "koppen" = kc_1984_2013) %>% 
+  filter(!is.na(koppen)) %>% 
+  mutate(f_koppen = as.factor(round(koppen, 0)),
+         f2_koppen = case_when(f_koppen < 200 ~ "Tropical",
+                               f_koppen > 200 & f_koppen < 300 ~ "Arid",
+                               f_koppen > 300 & f_koppen < 400 ~ "Temperate",
+                               f_koppen > 400 & f_koppen < 500 ~ "Boreal",
+                               f_koppen > 500 ~ "Polar"))
+
+# Plot raster 
+ggplot() + 
+  geom_raster(data = koppen, 
+              aes(long, lat, fill = f_koppen), alpha = 0.85, show.legend = FALSE) +
+  geom_sf(data = coordinates_sf, aes(size = number_of_burn), color = "black", show.legend = FALSE) +
+  annotation_north_arrow(location = "bl", which_north = "true") +
+  annotation_scale(location = "br", width_hint = 0.1) +
+  theme_map()
+  # geom_sf(data = boundary, fill = NA, color = "red", lwd = 0.5) + 
+  scale_fill_manual(values = fire_colors) + 
+  theme_map() + 
+  labs(x = "", y = "", fill = "Severity \n (dNBR)")
+  
+#
+ggsave("koppen_map.pdf",
+       path = here("initial_plots", "10_Map"),
+       width = 20, height = 20,  units = "in") 
+#
+
+#
+boundary <- read_sf("~/GitHub/rc_sfa-rc-3-wenas-modeling/data/mtbs/wa4685412079920200831/wa4685412079920200831_20200830_20200909_burn_bndy.shp") %>% 
+  st_transform(common_crs)
+
+w10 <- tibble(lat = 46.86752, long = -120.7744, site_id = "W10") %>% 
+  st_as_sf(coords = c("long", "lat"), crs = common_crs)
+
+ggplot() + 
+  geom_sf(data = boundary) + 
+  geom_sf(data = w10)
+
+```
+
+```{r Chat GPT code}
+library(raster)
+library(sf)
+
+raster_data <- raster("~/Downloads/1984_2013/kc_1984_2013.tif")
+
+# Convert raster to SpatialPolygonsDataFrame
+polygons <- rasterToPolygons(raster_data)
+
+# Convert SpatialPolygonsDataFrame to sf object
+sf_object <- st_as_sf(polygons)
+
+# Plot the sf object
+ggplot() +
+  geom_sf(data = sf_object) +
+  theme_void()
 
 
 
 ```
-
-
-
-
 
 
