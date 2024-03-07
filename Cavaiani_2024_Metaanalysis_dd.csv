@@ -1,0 +1,151 @@
+﻿Column_or_Row_Name,Unit,Definition,Data_Type,Term_Type
+analyte,N/A,Indicates which analyte is being measured (Dissolved organic carbon (DOC) or nitrate (NO3)). ,text,column_header
+Area_unit,hectare_square_kilometer,"Unit of measurement that applies to the ""Area_watershed"" column in the data package.",text,column_header
+Area_watershed,hectare_square_kilometer,The total upstream catchment area from downstream end of flowline.,numeric,column_header
+Area_watershed_km,square_kilometer,The total upstream catchment area from downstream end of flowline in square kilometers.,numeric,column_header
+Biome,N/A,"The broad classification of a geographic area according to environmental conditions based on the Koppen climate classification as defined in the ""Climate"" column header. ",text,column_header
+burn_percentage,percentage,The proportion of the watershed that was burned by a wildfire. ,numeric,column_header
+burn_percentage_group,percentage,Grouped burn percentages in 10% intervals.,numeric,column_header
+Burn_Type,N/A,Indicates what type of burn occurred in the publication (prescribed or natural).,text,column_header
+Burn_Unburn,N/A,Indicates whether the site is affected by the wildfire or not. ,text,column_header
+Climate,N/A,A three digit identifier from the Koppen climate classification.,text,column_header
+Closest_USGS_gauge,N/A,Indicates where the closes United States Geological Survey (USGS) stream gauge is located relative to the site monitored in the publication.,text,column_header
+Column_or_Row_Name,N/A,Column or row headers from each csv file in the dataset.,text,column_header
+comid,N/A,The NHDPlus Version 2 common identifier (COMID) which is a unique identifier for the watershed associated with the location of the water sample.  ,text,column_header
+CVconc,miligrams_per_liter_carbon_miligrams_per_liter_nitrogen,The coefficient of variation (CV) for analyte concentrations (dissolved organic carbon or nitrate).,numeric,column_header
+Data_citations,N/A,Indicates where the data used within in the publication are located/published or where data were extracted from within a publication if it was not originally reported by the authors.,text,column_header
+Data_Found,N/A,A designation to where the data were found within the publication.,text,column_header
+Data_Type,N/A,Type of data (numeric; text; date; time; datetime).,text,column_header
+Date_End,YYYY-MM-DD,The latest date in the file.,date,column_header
+Date_Start,YYYY-MM-DD,The earliest date in the file.,date,column_header
+Definition,N/A,Description of the information in a given column or row in the dataset.,text,column_header
+Design_Control_Burn_Pre_Post,N/A,"The methodological study design for the publication which can either be a ""Control_Burn"" approach or a ""Pre_Post"" approach. ",text,column_header
+Discharge,N/A,Indicates whether the publication includes or reports discharge data within their publication.,text,column_header
+Discharge_notes,N/A,Free text field to record notes related to discharge data reported the publication. ,text,column_header
+DOC,N/A,"The reported dissolved organic carbon (DOC) concentrations from the publication. See ""DOC_unit"" for the unit of the dissolved organic carbon value. ",numeric,column_header
+DOC_Interp,miligrams_per_liter_carbon,The interpolated dissolved organic carbon concentration using the gap_fill function within R. ,numeric,column_header
+DOC_mg_C_L,miligrams_per_liter_carbon,The reported dissolved organic carbon concentrations as milligrams per liter as carbon (C). ,numeric,column_header
+DOC_reported,N/A,"Indicates if dissolved organic carbon (DOC) was reported in the associated publication. ""x"" indicates that DOC was reported; ""N/A"" indicates that DOC was not reported.",text,column_header
+DOC_unit,N/A,"The unit of measurement that the publication reports and applies to the ""DOC"" column in the data package.",text,column_header
+DOI,N/A,"The Digital Object Identifier (DOI) is used to uniquely identify an article or document, and to provide it with a permanent web address (URL).",text,column_header
+Ecosystem,N/A,The ecosystem type where the study was conducted.,text,column_header
+Effect_size,N/A,The proportional differences between burned and unburned in-stream solute concentrations. This is a calculation and the response variable in many of our statistical analyses. ,numeric,column_header
+Effect_size_pair,N/A,Indicates which watershed pair was used for the effect size calculation. ,text,column_header
+elevfixed,N/A,Flag indicating that the downstream elevation is fixed (i.e. not smoothed). ,text,column_header
+Exact_Date_Extracted,N/A,Designates if the publication reported exact dates associated with their water sampling or not. Results that are included in a figure with coarse time-frames would be designated as no.,text,column_header
+Exclusion,N/A,Explains why a publication was not included in the final analysis.,text,column_header
+fi,percentage,Feature Importance (FI) determined by Random Forest models.,numeric,column_header
+File_Description,N/A,A brief description of the files in the data package.,text,column_header
+File_Name,N/A,Name of files in the data package.,text,column_header
+File_Path,N/A,File path within the data package.,text,column_header
+Fire_name,N/A,The name of the fire that was investigated in each publication.,text,column_header
+Fire_year,YYYY,The year the fire occurred that was investigated in each publication.,text,column_header
+geometry,decimal_degrees_WGS1984,Geographic coordinates of each study site.,text,column_header
+group,N/A,A unique number identifier that is associated with a United States state. ,numeric,column_header
+grouped_percentage,N/A,A unique number indicating which 10% interval the burn_percentage_group falls into (1-10). For example a 5% burn extent falls within the 0-10% burn_percentage_group which would be indicated in this column as 1. ,numeric,column_header
+Have_HUC,N/A,Denotes if the watershed that is being monitored in the publication has an associated hydrologic unit code (HUC). ,text,column_header
+In_git_studies_folder,N/A,Denotes if the publication was used and exported into the final publication analysis.,text,column_header
+Included,N/A,Indicates whether a study was incorporated in the final analysis or not. ,text,column_header
+latitude,decimal_degrees_WGS1984,Site latitude.,numeric,column_header
+longitude,decimal_degrees_WGS1984,Site longitude.,numeric,column_header
+lower_ci_effect,N/A,Lower confidence interval (ci) effect. The lower end of the 95 percent confidence interval calculated within each variable bin (climates; burn percentage; time since fire bins),numeric,column_header
+maxelevraw,centimeters,Maximum elevation (unsmoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,column_header
+maxelevsmo,centimeters,Maximum elevation (smoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,column_header
+mean_effect,N/A,The mean effect size within each variable bin (climates; burn percentage groups; or time since fire bins).,text,column_header
+Mean_Median_or_IndividualSample,N/A,Identifies if the solute concentration reported in the publication was a mean; median or an individual sample.,text,column_header
+meanConc,miligrams_per_liter_carbon_miligrams_per_liter_nitrogen,Mean concentration of analytes (dissolved organic carbon or nitrate) for each publication.,numeric,column_header
+minelevraw,centimeters,Minimum elevation (unsmoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,column_header
+minelevsmo,centimeters,Maximum elevation (smoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,column_header
+Missing_Value_Codes,N/A,"Cells with missing data are represented with a missing value code rather than an empty cell. This column describes which missing value codes were used. The recommendation for numeric data is ""-9999"" and for character data is ""N/A"".",text,column_header
+MTBS_1986Ws,percentage,Monitoring trends in burn severity for a watershed in 1986.,numeric,column_header
+MTBS_1987Ws,percentage,Monitoring trends in burn severity for a watershed in 1987.,numeric,column_header
+MTBS_1988Ws,percentage,Monitoring trends in burn severity for a watershed in 1988.,numeric,column_header
+MTBS_1989Ws,percentage,Monitoring trends in burn severity for a watershed in 1989.,numeric,column_header
+MTBS_1990Ws,percentage,Monitoring trends in burn severity for a watershed in 1990.,numeric,column_header
+MTBS_1991Ws,percentage,Monitoring trends in burn severity for a watershed in 1991.,numeric,column_header
+MTBS_1992Ws,percentage,Monitoring trends in burn severity for a watershed in 1992.,numeric,column_header
+MTBS_1993Ws,percentage,Monitoring trends in burn severity for a watershed in 1993.,numeric,column_header
+MTBS_1994Ws,percentage,Monitoring trends in burn severity for a watershed in 1994.,numeric,column_header
+MTBS_1995Ws,percentage,Monitoring trends in burn severity for a watershed in 1995.,numeric,column_header
+MTBS_1996Ws,percentage,Monitoring trends in burn severity for a watershed in 1996.,numeric,column_header
+MTBS_1997Ws,percentage,Monitoring trends in burn severity for a watershed in 1997.,numeric,column_header
+MTBS_1998Ws,percentage,Monitoring trends in burn severity for a watershed in 1998.,numeric,column_header
+MTBS_1999Ws,percentage,Monitoring trends in burn severity for a watershed in 1999.,numeric,column_header
+MTBS_2000Ws,percentage,Monitoring trends in burn severity for a watershed in 2000.,numeric,column_header
+MTBS_2001Ws,percentage,Monitoring trends in burn severity for a watershed in 2001.,numeric,column_header
+MTBS_2002Ws,percentage,Monitoring trends in burn severity for a watershed in 2002.,numeric,column_header
+MTBS_2003Ws,percentage,Monitoring trends in burn severity for a watershed in 2003.,numeric,column_header
+MTBS_2004Ws,percentage,Monitoring trends in burn severity for a watershed in 2004.,numeric,column_header
+MTBS_2005Ws,percentage,Monitoring trends in burn severity for a watershed in 2005.,numeric,column_header
+MTBS_2006Ws,percentage,Monitoring trends in burn severity for a watershed in 2006.,numeric,column_header
+MTBS_2007Ws,percentage,Monitoring trends in burn severity for a watershed in 2007.,numeric,column_header
+MTBS_2008Ws,percentage,Monitoring trends in burn severity for a watershed in 2008.,numeric,column_header
+MTBS_2009Ws,percentage,Monitoring trends in burn severity for a watershed in 2009.,numeric,column_header
+MTBS_2010Ws,percentage,Monitoring trends in burn severity for a watershed in 2010.,numeric,column_header
+MTBS_2011Ws,percentage,Monitoring trends in burn severity for a watershed in 2011.,numeric,column_header
+MTBS_2012Ws,percentage,Monitoring trends in burn severity for a watershed in 2012.,numeric,column_header
+MTBS_2013Ws,percentage,Monitoring trends in burn severity for a watershed in 2013.,numeric,column_header
+MTBS_2014Ws,percentage,Monitoring trends in burn severity for a watershed in 2014.,numeric,column_header
+MTBS_2015Ws,percentage,Monitoring trends in burn severity for a watershed in 2015.,numeric,column_header
+MTBS_2016Ws,percentage,Monitoring trends in burn severity for a watershed in 2016.,numeric,column_header
+MTBS_2017Ws,percentage,Monitoring trends in burn severity for a watershed in 2017.,numeric,column_header
+n_effect,N/A,Number of observations within each variable class (climate; time since fire; burn percentage). ,numeric,column_header
+NO3,N/A,"The reported nitrate (NO3) concentrations from each publication. See ""NO3_unit"" for the unit of the nitrate value. ",numeric,column_header
+NO3_Interp,miligrams_per_liter_nitrogen,The interpolated nitrate concentration using the gap_fill function within R. ,numeric,column_header
+NO3_mg_N_L,miligrams_per_liter_nitrogen,The reported nitrate concentrations as milligrams per liter as nitrogen (N). ,numeric,column_header
+NO3_reported,N/A,"Indicates if nitrate (NO3) was reported in the associated publication. ""x"" indicates that NO3 was reported; ""N/A"" indicates that NO3 was not reported.",text,column_header
+NO3_unit,N/A,"The unit of measurement that the publication reports and applies to the ""NO3"" column in the data package.",text,column_header
+Notes,N/A,Free text field to record notes related to data extraction process.,text,column_header
+number_of_burn,N/A,Number of burned watersheds included and monitored in each publication.,numeric,column_header
+number_of_pairs,N/A,Number of paired watersheds included in each publication. ,numeric,column_header
+number_of_reference,N/A,Number of unburned watersheds included and monitored in each publication. ,numeric,column_header
+number_of_sites,N/A,Number of total sites included and monitored in each publication. ,numeric,column_header
+Pair,N/A,The designation for each site to identify if it was a burned watershed or an unburned watershed and which site it is being compared to. ,text,column_header
+Percent_Difference,percentage,The percent difference in analyte concentration between the burned and the unburned watershed. ,numeric,column_header
+predictor,N/A,Predictor variables included in the random forest model (climate; totdasqkm; maxelevsmo; slope; burn_percentage; time_since_fire). ,text,column_header
+Publication_Year,YYYY,The year the publication was published and released.,date,column_header
+Q_df_in_git,N/A,Indicates whether the discharge (Q) data frame is included within the repository. ,text,column_header
+Q_Extracted,N/A,Indicates how and where discharge (Q) data were extracted from. ,text,column_header
+raw_fi,percentage,Raw feature importance (FI) output from the random forest model. ,numeric,column_header
+Reports_Burn_Percentage,N/A,Indicates whether the publication reports burn percentage for each watershed they include in their study. ,text,column_header
+Reports_Coords,N/A,Indicates whether the publication reports latitude and longitude coordinates for each watersheds they include in their study. ,text,column_header
+Reports_Size,N/A,Indicates whether the publication reports watershed area for each watershed they include in their study. ,text,column_header
+response_var,N/A,Associates effect size with the proper analyte (dissolved organic carbon or nitrate). ,text,column_header
+Sample_Freq,N/A,Indicates the frequency at which samples were taken within each publication. ,text,column_header
+Sampling_Date,YYYY-MM-DD,Date of discrete sampling events.,date,column_header
+Sampling_exact_days,N/A,Indicates whether discrete water sampling days were reported in individual publications. ,text,column_header
+Sampling_Resolution,N/A,Indicates how often water samples were taken in each publication.,text,column_header
+sd_effect,N/A,Standard deviation of the effect within each variable class.,numeric,column_header
+sdconc,miligrams_per_liter_carbon_miligrams_per_liter_nitrogen,Standard deviation of the concentration for each analyte and within each watershed.,numeric,column_header
+se_effect,N/A,Standard error of the effect within each variable class. ,numeric,column_header
+Site,N/A,Name of site that was monitored or sampled from the publication.,text,column_header
+slope,degrees,Slope of flowline (meters/meters) based on smoothed elevations extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,column_header
+Standard,N/A,ESS-DIVE Reporting Format or other standard applied to the data file.,text,column_header
+State,N/A,Indicates which state the publication was located in. ,text,column_header
+streamorde,N/A,Modified Strahler Stream Order extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,column_header
+Study_design,N/A,Indicates which study design was used within each publication. Examples include: pre_post; control_burn. ,text,column_header
+Study_Duration_yrs,years,The length of the study duration in years.,numeric,column_header
+Study_ID,N/A,The shorthand in-text citation of the publication.,text,column_header
+TempNorm,miligrams_analyte_per_liter_per_square_kilometer_per_year,Pseudo yield metric we calculated that normalized for watershed area by year for each watershed. ,numeric,column_header
+Term_Type,N/A,Indicates whether the header is a column header or row header.,text,column_header
+Time_Since_Fire,years,The lag time between when sampling occurred relative to when the wildfire occurred. ,text,column_header
+Title,N/A,The title of the publication. ,text,column_header
+totdasqkm,km2,Total upstream catchment area from downstream end of flowline extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,column_header
+TSF,years,Time-lag (time-since-fire; TSF) between when sampling and the wildfire occurred.,text,column_header
+Type,N/A,The study design type. ,text,column_header
+Unit,N/A,Unit of measurement that applies to a given column in the data package.,text,column_header
+upper_ci_effect,N/A,Upper confidence interval (ci) effect. The upper end of the 95 percent confidence interval calculated within each variable bin (climates; burn percentage; time since fire bins),numeric,column_header
+Vegetation,N/A,General type of vegetation present in the study site area reported within the publication,text,column_header
+Watershed_Area,N/A,Indicates whether studies reported watershed area within the publication.,text,column_header
+Watershed_Size_km,km2,Size of the watershed in square kilometers. ,numeric,column_header
+Where,N/A,A generalizable location of where the study took place. Examples include: states; territories; countries. ,text,column_header
+Xc,N/A,Pseudo yield metric calculated for the reference watershed when a publication only included one reference. ,numeric,column_header
+Xc2,N/A,Pseudo yield metric calculated for the second reference watershed and compared to a specific burned watershed when the publication included more than one reference site. ,numeric,column_header
+Xc34,N/A,Pseudo yield metric calculated for the reference watershed and compared to two burned watersheds when a publication compared multiple burns to one reference watershed. ,numeric,column_header
+Xc345,N/A,Pseudo yield metric calculated for the reference watershed and compared to multiple burned watersheds when a publication compared multiple burns to one reference watershed. ,numeric,column_header
+Xe1,N/A,Pseudo yield metric calculated for the first burned watershed. ,numeric,column_header
+Xe2,N/A,Pseudo yield metric calculated for the second burned watershed if included.  ,numeric,column_header
+Xe3,N/A,Pseudo yield metric calculated for the third burned watershed if included.  ,numeric,column_header
+Xe4,N/A,Pseudo yield metric calculated for the fourth burned watershed if included.  ,numeric,column_header
+Xe5,N/A,Pseudo yield metric calculated for the fifth burned watershed if included.  ,numeric,column_header
+year,YYYY,Year when the fire took place.,Date,column_header
