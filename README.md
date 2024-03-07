@@ -9,12 +9,15 @@ submitted to Global Change Biology (Cavaiani et al. 2024., in preparation). This
 
 This data package contains five primary folders that include the following: (1) inputs; (2) output for analysis; (3) initial plots; (4) R scripts; and (5) GIS data. The data package also contains a data dictionary (dd) that provides column header definitions and a file-level metadata (flmd) file that describes every file. The “inputs” folder contains a list of all publications identified during the formal web search and an indication of whether each publication was included in the final analysis. Additionally, it includes site-level metadata, catchment characteristics, and GIS data for all publications included in the final analysis. The “Output_for_analysis” folder contains all data frames and figures generated from each R script used for additional data analysis. The “initial_plots” folder includes all exploratory figures that will be included in a supplemental and figures that will be submitted with the manuscript for publication. The “R_scripts” folder contains the scripts that perform all the data manipulations, statistical analyses, and plots. The “gis_data” folder includes shape files for each fire included in this meta-analysis. This data package contains the following file types: csv, pdf, jpeg, cpg, dbf, prj, shp, shp.ea.iso.xml, shp.iso.xml, shx.
 
-## Manuscript Preprint Reference
-The manuscript associated with this repo and Data Package can be cited as follows:  
-
 ## Data Reference
 In addition to this repo, the Data Package is published and publicly available on ESS-DIVE. If using these data, please cite the Data Package with the following citation and DOI:  
-> Cavaiani J ; Regier P ; Roebuck A ; Barnes M ; Garayburu-Caruso V A ; Gillespie X ; McKever S A ; Renteria L ; Forbes B ; Powers-McCormack B ; Myers-Pigg A (2024): Data and scripts associated with a manuscript on a meta-analysis synthesizing stream biogeochemical response to wildfires across space and time. River Corridor and Watershed Biogeochemistry SFA, ESS-DIVE repository. Dataset. doi:10.15485/2319038
+``` 
+Cavaiani J ; Regier P ; Roebuck A ; Barnes M ; Garayburu-Caruso V A ; Gillespie X ; McKever S A ;
+Renteria L ; Forbes B ; Powers-McCormack B ; Myers-Pigg A (2024): Data and scripts associated
+with a manuscript on a meta-analysis synthesizing stream biogeochemical response to wildfires
+across space and time. River Corridor and Watershed Biogeochemistry SFA, ESS-DIVE repository.
+Dataset. doi:10.15485/2319038
+``` 
 
 ## Contact
 Jake Cavaiani, jake.cavaiani@pnnl.gov
