@@ -11,10 +11,18 @@ This data package contains five primary folders that include the following: (1) 
 
 ## Manuscript Preprint Reference
 The manuscript associated with this repo and Data Package can be cited as follows:  
+```
+``` 
 
 ## Data Reference
 In addition to this repo, the Data Package is published and publicly available on ESS-DIVE. If using these data, please cite the Data Package with the following citation and DOI:  
-> Cavaiani J ; Regier P ; Roebuck A ; Barnes M ; Garayburu-Caruso V A ; Gillespie X ; McKever S A ; Renteria L ; Forbes B ; Powers-McCormack B ; Myers-Pigg A (2024): Data and scripts associated with a manuscript on a meta-analysis synthesizing stream biogeochemical response to wildfires across space and time. River Corridor and Watershed Biogeochemistry SFA, ESS-DIVE repository. Dataset. doi:10.15485/2319038
+``` 
+Cavaiani J ; Regier P ; Roebuck A ; Barnes M ; Garayburu-Caruso V A ; Gillespie X ; McKever S A ;
+Renteria L ; Forbes B ; Powers-McCormack B ; Myers-Pigg A (2024): Data and scripts associated
+with a manuscript on a meta-analysis synthesizing stream biogeochemical response to wildfires
+across space and time. River Corridor and Watershed Biogeochemistry SFA, ESS-DIVE repository.
+Dataset. doi:10.15485/2319038
+``` 
 
 ## Contact
 Jake Cavaiani, jake.cavaiani@pnnl.gov
