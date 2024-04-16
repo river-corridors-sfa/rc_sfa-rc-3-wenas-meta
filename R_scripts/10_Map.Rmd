@@ -142,17 +142,19 @@ ggplot() +
       fill = c("black", "white"),
       line_col = "grey20")) +
   theme_minimal() +
-  theme(legend.position = "left")
+  theme(legend.position = "bottom")
   
 ggsave("number_watersheds_map_legend.pdf",
        path = "~/Documents/RC_3/Wenas_Watershed_project/Manuscript",
-       width = 10, height = 8,  units = "in")
+       width = 14, height = 8,  units = "in")
 
 
 
 
 ```
 
+
+#### Supplemental map with Koppen biomes #####
 
 
 ## Load packages and set working directory
@@ -187,24 +189,10 @@ meta <- read_csv(here("inputs", "Studies_Summary", "Map_input.csv"), na = c('-99
 coords <- meta %>% 
  dplyr::select(Fire_name, latitude, longitude, number_of_burn, State, group) # Picking only the columns I want 
 
-coords_noNA <- coords %>% 
-    drop_na(Fire_name) # eliminating rows that are NAs if they dont have an associated fire name with it. 
-
-# Projection # 
-laea_proj <- "+proj=laea +lat_0=45 +lon_0=-100 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
- 
 # Create an sf object from the data
-coordinates_sf <- st_as_sf(coords_noNA, coords = c("longitude", "latitude"), crs = 4269)
+coordinates_sf <- st_as_sf(coords, coords = c("longitude", "latitude"), crs = 4269)
 
-# common_crs = 4326 - World Geodetic System 1984
-# common_crs = 4269 - North American Datum 1983
-# common_crs = 3857 - Google maps
-# common_crs = 4087 - World Equidistant Cylindrical
-common_crs = 5070 # = USA Contiguous Albers Equal Area Conic
-# common_crs = 3338 # - Alaska equal
-
-# common_crs = 2264 # - State Plane North Carolina Feet. 
-
+common_crs = 4269
 ```
 
 ```{r - US map with AK as an inset map}
@@ -213,77 +201,23 @@ url_us_states <- "https://www2.census.gov/geo/tiger/GENZ2021/shp/cb_2021_us_stat
 download.file(url_us_states, "inputs/map_shape_files/us_states.zip", mode = "wb")
 unzip("inputs/map_shape_files/us_states.zip", exdir = "inputs/map_shape_files/us_states")
 
-# Download the Alaska shapefile
-url_alaska <- "https://www2.census.gov/geo/tiger/GENZ2021/shp/cb_2021_us_state_20m.zip"
-download.file(url_alaska, "inputs/map_shape_files/alaska.zip", mode = "wb")
-unzip("inputs/map_shape_files/alaska.zip", exdir = "inputs/map_shape_files/alaska")
 
 # Read the US states shapefile
 us_states <- read_sf("inputs/map_shape_files/us_states/cb_2021_us_state_20m.shp") %>% 
   st_transform(common_crs) %>% 
-  filter(NAME != 'Hawaii' & NAME != 'Puerto Rico')
-# %>%
-#   st_crop(xmin = -180, xmax = -55, ymin = 12, ymax = 62)
+  filter(NAME != 'Hawaii' & NAME != 'Puerto Rico') %>%
+  st_crop(xmin = -180, xmax = -55, ymin = 12, ymax = 62)
 
 ggplot() +
   geom_sf(data = us_states, fill = "white", color = "black")
 
-# Read the Alaska shapefile
-alaska <- st_read("inputs/map_shape_files/alaska/cb_2021_us_state_20m.shp")
 
-ak <- ggplot() +
-  geom_sf(data = alaska, fill = "white", color = "black") +
-  geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_name)) +
-  # annotation_north_arrow(location = "tr", which_north = "true", scale = 0.2) +
-  annotation_scale(location = "bl", width_hint = 0.1) +
-  # xlim(-180, -127) +
-  # ylim(50, 72) +
-  theme_minimal() +
-  theme(legend.position = "none",
-        panel.grid = element_blank(), 
-        axis.text.x = element_blank())
-
-print(ak)
-
-# I want to include Canada # 
-# Download shapefile for world countries
-world <- ne_countries(scale = "medium", returnclass = "sf")
-
-# Filter for Canada
-canada <- world[world$iso_a2 == "CA", ]
+# Canadian provinces
 canadian_provinces <- sf::st_as_sf(rnaturalearth::ne_states(country = "Canada", returnclass = "sf")) %>% 
   st_transform(common_crs) 
 
 ggplot() +
   geom_sf(data = canadian_provinces, fill = "white", color = "black")
-
-
-# US and Canada plot with all the fires
-us_ca <- ggplot() +
-  geom_sf(data = canadian_provinces, fill = "white", color = "black") +
-  geom_sf(data = us_states, fill = "white", color = "black") +
-  geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_name)) +
-  annotation_north_arrow(location = "tr", which_north = "true") +
-  annotation_scale(location = "br", width_hint = 0.1) +
-  scale_color_manual(values = c("#666666", "#A6CEE3", "#00AFBB", "#1B9E77",
-                                "#7570B3", "#E7298A", "darkred", "black", 
-                                "#1F78B4", "#E31A1C", "#33A02C", "black",
-                                "darkblue", "darkgreen", "blue", "yellow", "red",
-                                "green", "purple")) +
-  xlim(-135, -68) +
-  ylim(25, 62) +
-  theme_minimal() +
-  theme(legend.position = "none",
-        panel.grid = element_blank())
-
-print(us_ca)
-
-# add the AK insert #
-us_ca + inset_element(ak, 0.05, -0.75, 0.35, 1.2, align_to = 'full')
-  
-ggsave("number_watersheds_map.pdf",
-       path = here("initial_plots", "10_Map"),
-       width = 6, height = 4,  units = "in")
 
 
 # Bind US and canadian provinces # 
@@ -292,23 +226,11 @@ us_ca <- bind_rows(us_states, canadian_provinces)
 ggplot() +
   geom_sf(data = us_ca, fill = "white", color = "black")
 
-# Set up the Lambert Azimuthal Equal Area projection
-laea_proj <- "+proj=laea +lat_0=45 +lon_0=-100 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
-
 ggplot() +
   geom_sf(data = us_ca, fill = "white", color = "black") +
   geom_sf(data = coordinates_sf, aes(size = number_of_burn, color = Fire_name)) +
-  # xlim(-185, -60) +
-  # ylim(25, 90) +
-  # coord_sf(crs = laea_proj) +
   theme_void() +
   theme(legend.position = "none")
-
-# us_ca_transformed <- st_transform(us_ca, crs = laea_proj)
-
-# ggplot() +
-#   geom_sf(data = us_ca_transformed, fill = "white", color = "black") +
-#   theme_void()
 
 ```
 
@@ -319,7 +241,7 @@ ggplot() +
 koppen_raw <-  raster::raster("~/Downloads/1984_2013/kc_1984_2013.tif")
 
 ## Re-project koppen map
-koppen_reproject <- raster::projectRaster(koppen_raw, crs = 5070)
+koppen_reproject <- raster::projectRaster(koppen_raw, crs = 4269)
 
 ## Mask (crop in essence) severity to fire boundary
 koppen_crop <- raster::mask(koppen_reproject, us_ca)
@@ -331,64 +253,47 @@ koppen <- as.data.frame(koppen_crop, xy = T) %>%
          "lat" = y, 
          "koppen" = kc_1984_2013) %>% 
   filter(!is.na(koppen)) %>% 
-  mutate(f_koppen = as.factor(round(koppen, 0)),
+  mutate(f_koppen = as.numeric(round(koppen, 0)),
          f2_koppen = case_when(f_koppen < 200 ~ "Tropical",
                                f_koppen > 200 & f_koppen < 300 ~ "Arid",
                                f_koppen > 300 & f_koppen < 400 ~ "Temperate",
                                f_koppen > 400 & f_koppen < 500 ~ "Boreal",
                                f_koppen > 500 ~ "Polar"))
+koppen <- koppen %>% 
+  na.omit(f2_koppen)
 
 # Plot raster 
 ggplot() + 
   geom_raster(data = koppen, 
-              aes(long, lat, fill = f_koppen), alpha = 0.85, show.legend = FALSE) +
-  geom_sf(data = coordinates_sf, aes(size = number_of_burn), color = "black", show.legend = FALSE) +
-  annotation_north_arrow(location = "bl", which_north = "true") +
-  annotation_scale(location = "br", width_hint = 0.1) +
-  theme_map()
-  # geom_sf(data = boundary, fill = NA, color = "red", lwd = 0.5) + 
-  scale_fill_manual(values = fire_colors) + 
-  theme_map() + 
-  labs(x = "", y = "", fill = "Severity \n (dNBR)")
+              aes(long, lat, fill = f2_koppen), alpha = 0.85) +
+  geom_sf(data = coordinates_sf, aes(size = number_of_burn), color = "black") +
+  labs(fill = "Biome") +
+  labs(size = "Number of Burned Watersheds") +
+  ggtitle("Koppen-Geiger Classification") +
+  ggspatial::annotation_scale(
+    location = "br",
+    pad_x = unit(0.5, "in"), 
+    bar_cols = c("black", "white")) +
+  ggspatial::annotation_north_arrow(
+    location = "bl", which_north = "true",
+    pad_x = unit(1.1, "in"), pad_y = unit(0.5, "in"),
+    style = ggspatial::north_arrow_nautical(
+      fill = c("black", "white"),
+      line_col = "grey20")) +
+  theme_minimal() +
+  theme(legend.position = "left", 
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+ 
   
 #
-ggsave("koppen_map.pdf",
-       path = here("initial_plots", "10_Map"),
-       width = 20, height = 20,  units = "in") 
-#
-
-#
-boundary <- read_sf("~/GitHub/rc_sfa-rc-3-wenas-modeling/data/mtbs/wa4685412079920200831/wa4685412079920200831_20200830_20200909_burn_bndy.shp") %>% 
-  st_transform(common_crs)
-
-w10 <- tibble(lat = 46.86752, long = -120.7744, site_id = "W10") %>% 
-  st_as_sf(coords = c("long", "lat"), crs = common_crs)
-
-ggplot() + 
-  geom_sf(data = boundary) + 
-  geom_sf(data = w10)
-
-```
-
-```{r Chat GPT code}
-library(raster)
-library(sf)
-
-raster_data <- raster("~/Downloads/1984_2013/kc_1984_2013.tif")
-
-# Convert raster to SpatialPolygonsDataFrame
-polygons <- rasterToPolygons(raster_data)
-
-# Convert SpatialPolygonsDataFrame to sf object
-sf_object <- st_as_sf(polygons)
-
-# Plot the sf object
-ggplot() +
-  geom_sf(data = sf_object) +
-  theme_void()
-
+ggsave("koppen_map_burn_label.pdf",
+       path = "~/Documents/RC_3/Wenas_Watershed_project/Manuscript",
+       width = 10, height = 8,  units = "in") 
 
 
 ```
+
+
 
 
