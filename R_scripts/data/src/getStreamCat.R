@@ -1,5 +1,27 @@
+# getStreamCat <- function(sites = sites,
+#                          epa_categories = c("NLCD", "FirePerimeters", "Elevation", "NADP", "RefStreamTempPred", "MTBS",
+#                                             "Runoff", "STATSGO_Set1","STATSGO_Set2", "Lithology", "PRISM", "Runoff", "sw"), 
+#                          # "CoalMines", "CanalDensity", "ImperviousSurfaces", "NLCD2019", 
+#                          #                    "Dams","FirePerimeters","Kffact",'Elevation',"NADP","RefStreamTempPred", "MTBS", 
+#                          #                    "RoadDensity","RoadStreamCrossings","Runoff","STATSGO_Set1","STATSGO_Set2",
+#                          #                    "USCensus2010","WWTP","GeoChemPhys3","Lithology"),
+#                          save = TRUE){
+  
+
+# # # Define the start and end years
+# start_year <- 1984
+# end_year <- 1989
+# 
+# # # Generate the list of years
+# years <- seq(start_year, end_year, by = 1)
+# 
+# getStreamCat <- function(sites = sites,
+#                          epa_categories = paste0("MTBS_Severity_", years),
+#                          save = TRUE){
+
 getStreamCat <- function(sites = sites,
-                         epa_categories = c("AgMidHiSlopes", "CoalMines", "CanalDensity", "ImperviousSurfaces", "NLCD2019", "Dams","FirePerimeters","Kffact",'Elevation',"NADP","RefStreamTempPred", "MTBS", "RoadDensity","RoadStreamCrossings","Runoff","STATSGO_Set1","STATSGO_Set2","USCensus2010","WWTP","GeoChemPhys3","Lithology"),
+                         epa_categories = c("NLCD", "BFI", "FirePerimeters", "Elevation", "NADP", "RefStreamTempPred", "MTBS",
+                                            "Runoff", "STATSGO_Set1","STATSGO_Set2", "Lithology", "PRISM", "Runoff", "sw"), 
                          save = TRUE){
 ### StreamCat extraction (adapted from Simon Topp's code)
 # Code adapted from Simon Topps LakeCat extraction [LakeCat](https://github.com/SimonTopp/USLakeClarityTrendr/blob/master/1_nhd_join_and_munge.Rmd).
@@ -26,7 +48,7 @@ hackastreamcat <- function(name){
     sort(.)
   
   urls = paste0(base_url, name, '_Region', regions, '.zip')
-  
+
   folder = paste0('data/temp_streamcat/', name)
   
   files = paste0(folder, '/', regions, '.zip')
@@ -56,8 +78,8 @@ walk(epa_categories, hackastreamcat)
 ## 2) Linking StreamCat data to the site features, based on each site's comid.
 
 
-kitten_folders <- list.files('data/temp_streamcat', full.names = T)
-simple_folders <- list.files('data/temp_streamcat', full.names = F)
+kitten_folders <- list.files('~/GitHub/rc_sfa-rc-3-wenas-meta/R_scripts/data/temp_streamcat', full.names = T)
+simple_folders <- list.files('~/GitHub/rc_sfa-rc-3-wenas-meta/R_scripts/data/temp_streamcat', full.names = F)
 
 stream_kittens <- function(cat_file){
   temp_list <- list()

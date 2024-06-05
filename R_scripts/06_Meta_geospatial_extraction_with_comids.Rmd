@@ -115,12 +115,404 @@ This `getStreamCat()` function is adapted from [Simon Topp's Lakecat extraction]
 To download the data that you want, be sure to update the `epa_categories` vector argument in `getStreamCat()` with the names of the categorized data sets you are interested in downloading. A list of those data sets can be found [here](https://gaftp.epa.gov/epadatacommons/ORD/NHDPlusLandscapeAttributes/StreamCat/HydroRegions/). Change `save = TRUE` to `save = FALSE` if you do not want to keep all CONUS-level StreamCat data that you downloaded.
 
 ```{r cat,echo = T, warning = FALSE, comment = F, message = FALSE, results='hide'}
-sites <- getStreamCat(sites = sites,
-                      # Choose EPA categories to download here. These example two categories took a few minutes to download. 
-                      epa_categories = c("MTBS", "FirePerimeters"),
-                      save = FALSE)
+# FirePerimeters # DONE
+  #PctFire[year] - % Forest loss to fire (fire perimeter) within AOI
+  # MTBS[Year] - Mean % of AOI burned from wildfires for each year for 1984-2018
+
+# MTBS # DONE 
+  # MTBS[year] - Wildfire Burn Percent 1984 - 2018 - Mean % of AOI burned from wildfires for each year for 1984-2018
+
+# MTBS_Severity_[year] # DONE 
+  # PctNoFireWs - Percent No Fire Burn Class Class For Year - (PctNoFireWs) % of AOI in each burn severity class for wildfires for each year for 1984-2018
+  #PctUnderburned to Low Burn SeverityWs (PctUndSevWs) - Percent Underburned to Low Burn Severity Class For Year - % of AOI in each burn severity class for wildfires for each year for 1984-2018
+  # PctLow Burn SeverityWs - (PctLowSevWs) Percent Low Burn Severity Class For Year
+  # PctModerate Burn SeverityWs - (PctModSevWs)
+  # PctHigh Burn SeverityWs - (PctHighSevWs)
+  # PctIncVegRespWs - Percent Increased Greenness and Veg Response Class For Year
+  # PctNonProcMaskWs - Percent Non Processing Mask Class For Year
+
+# Elevation # DONE
+  #ElevWs - Mean area of interest elevation (m)
+
+# NADP # DONE
+  #InorgNWetDep_2008Ws - Annual gradient map of precipitation-weighted mean deposition for inorganic nitrogen wet deposition from nitrate and ammonium for 2008 in kg of N/ha/yr, within AOI
+  #SN_2008Ws - Annual Mean Sulfur and Nitrogen Wet Deposition: Annual gradient map of precipitation-weighted mean deposition for average sulfur & nitrogen wet deposition for 2008 in kg of S+N/ha/yr, within AOI
+  # NO3_2008Ws - Mean Annual Precipitation-Weighted NO3 Mean: Annual gradient map of precipitation-weighted mean deposition for nitrate ion concentration wet deposition for 2008 in kg of NO3/ha/yr, within AOI
+  # NH4_2008Ws - Mean annual Precipitation-Weighted NH4 Mean: Annual gradient map of precipitation-weighted mean deposition for ammonium ion concentration wet deposition for 2008 in kg of NH4/ha/yr, within AOI
+
+# RefStreamTempPred # DONE 
+  # MAST[year] - Mean Annual Stream Temp - Predicted mean annual stream temperature (Jan-Dec) for year 2008, 2009, 2013, 2014
+  # MSST[year] - Mean Summer Stream Temp - Predicted mean summer stream temperature (July-Aug) for years 2008, 2009, 2013, 2014
+
+# PRISM_1981_2010 - doesnt seem to work 
+# PRISM_1991_2020 # DONE 
+  # Precip9120Ws - 30-year Mean Annual Precipitation
+  # Tmax9120Ws - 30-year Average Annual Normal Maximum Air Temperature
+  # Tmean9120Ws - 30-year Mean Annual Air Temperature
+  # Tmin9120Ws - 30-year Average Annual Normal Minimum Air Temperature
+  # Tmin9120Ws - 30-year Average Annual Normal Minimum Air Temperature
+
+# BFI # DONE 
+  #BFI - Base Flow Index - Base flow is the component of streamflow that can be attributed to ground-water discharge into streams. The BFI is the ratio of base flow to total flow, expressed as a percentage, within AOI
+
+# Runoff # DONE 
+  # RunoffWs - Mean Runoff - Mean runoff (mm) within AOI
+
+# STATSGO_Set1 # DONT NEED 
+  # ClayWs - Clay Mean - Mean % clay content of soils (STATSGO) within AOI
+  # SandWs - Clay Sand Content - Mean % sand content of soils (STATSGO) within AOI
+
+# STATSGO_Set2 # DONE 
+  # WtDepWs - Mean Water Table Depth - Mean seasonal water table depth (cm) of soils (STATSGO) within AOI
+  # OmWs - Organic Matter Mean - Mean organic matter content (% by weight) of soils (STATSGO) within AOI
+  # PermWs - Mean Permeability - Mean permeability (cm/hour) of soils (STATSGO) within AOI
+  # RckDepWs - Mean Bedrock Depth - Mean depth (cm) to bedrock of soils (STATSGO) within AOI
+
+# Lithology # DONE 
+  # PctCarbResidWs -Carbonate Residual Material
+  # PctNonCarbResidWs - Non-Carbonate Residual Material
+  # PctAlkIntruVolWs - Alkaline Intrusive Volcanic Rock
+  # PctSilicicWs - Silicic Residual Material
+  # PctExtruVolWs - Extrusive Volcanic Rock
+  # PctColluvSedWs - Colluvial Sediment
+  # PctGlacTilClayWs - Glacial Till, Clayey
+  # PctGlacTilLoamWs - Glacial Till, Loamy
+  # PctGlacTilCrsWs - Glacial Till, Coarse-Textured
+  # PctGlacLakeCrsWs - Glacial Outwash and Glacial Lake Sediment
+  # PctGlacLakeFineWs - Glacial Outwash and Glacial Lake
+  # PctHydricWs - Hydric, Peat & Muck -% of AOI area classified as lithology type: hydric, peat and muck
+  # PctEolCrsWs - Eolian Sediment, Coarse-Textured 
+  # PctEolFineWs - Eolian Sediment, Fine-Textured
+  # PctSalLakeWs - Saline Lake Sediment
+  # PctAlluvCoastWs - Alluvium & Fine-Textured Coastal Zone Sediment
+  # PctCoastCrsWs - Coastal Zone Sediment, Coarse-Textured
+  # PctWaterWs - Water
+
+# sw_flux 
+  # sw_fluxWs - Surface Water Nitrogen Flux
+
+# NLCD2001 # Running this for every year will be tough and they don't have every year anyways - ask AMP
+  # PctOw2001Ws - Open Water Percentage
+  # PctIce2001Ws - Ice/Snow Cover Percentage
+  # PctUrbOp2001Ws - Developed, Open Space Land Use Percentage
+  # PctUrbLo2001Ws - Developed, Low Intensity Land Use Percentage
+  # PctUrbMd2001Ws - Developed, Medium Intensity Land Use Percentage
+  # PctUrbHi2001Ws - Developed, High Intensity Land Use Percentage
+  # PctBl2001Ws - Bedrock and Similar Earthen Material Percentage
+  # PctDecid2001Ws - Deciduous Forest Percentage
+  # PctConif2001Ws - Evergreen Forest Percentage
+  # PctMxFst2001Ws - Mixed Deciduous/Evergreen Forest Percentage
+  # PctShrb2001Ws - Shrub/Scrub Percentage
+  # PctGrs2001Ws - Grassland/Herbaceous Percentage
+  # PctHay2001Ws - Pasture/Hay Percentage
+  # PctCrop2001Ws - Row Crop Percentage
+  # PctWdWet2001Ws - Woody Wetland Percentage
+  # PctHbWet2001Ws - Herbaceous Wetland Percentage 
+
+# NLCD2001HiSlope
+  # All the same as NLCD for 2001
+
+
+sites_stream_cat <- getStreamCat(sites = sites,
+                                 epa_categories = c("Lithology"),
+                                 save = FALSE)
+
+# sites_stream_cat <- getStreamCat(sites = sites,
+#                       # Choose EPA categories to download here. These example two categories took a few minutes to download. 
+#                       epa_categories = c("FirePerimeters", "Elevation", "NADP", "RefStreamTempPred", "MTBS", "Runoff", "STATSGO_Set1", "STATSGO_Set2", "Lithology", "PRISM_1991_2020", "sw_flux", "NLCD2001"),
+#                       save = FALSE)
 
 #NOTE: the getStreamCat is setup to extract ALL of the variables available on StreamCat, the user will have to modify the epa_categories function input to extract all the variables of interest. 
+
+```
+
+# =================================== Random forest PULL ==============================================
+
+```{r}
+# Pulling Lithology 
+lithology <- sites_stream_cat %>% 
+  dplyr::select(site, comid, PctCarbResidWs:PctWaterWs) %>% 
+  rename(Site = site) %>% 
+  st_drop_geometry(lithology)
+
+write_csv(lithology, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "lithology.csv"))
+
+
+# Pulling % of Forest loss to fire (fire perimeter within Area of Interest)
+forest_lost <- sites_stream_cat %>% 
+  dplyr::select(site, comid, PctFire2000Ws, PctFire2001Ws, PctFire2002Ws, PctFire2003Ws, PctFire2004Ws, PctFire2005Ws, PctFire2006Ws, PctFire2007Ws, PctFire2008Ws, PctFire2009Ws, PctFire2010Ws) %>% 
+  rename(Site = site) %>% 
+  st_drop_geometry(forest_lost)
+
+write_csv(forest_lost, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "forest_lost.csv"))
+
+# Pulling burn percentages for each watershed # MTBS
+burn_percentage <- sites_stream_cat %>% 
+  dplyr::select(site, comid, totdasqkm, streamorde, maxelevraw, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws) %>% 
+  rename(Site = site) %>% 
+  st_drop_geometry(burn_percentage)
+
+write_csv(burn_percentage, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "burn_percentage.csv"))
+
+# Pulling mean annual stream temperature/mean summer stream temp/mean winter stream temp for 2008, 2009, 2013, 2014 (Thats all they have) # RefStreamTempPred
+MAST <- sites_stream_cat %>% 
+  dplyr::select(site, comid, MAST_2008:MWST_2014) %>% 
+  rename(Site = site) %>% 
+  st_drop_geometry(MAST)
+
+write_csv(MAST, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "stream_temp.csv"))
+
+
+# Pulling OM and permeability # STATSGO_Set2
+stats_go <- sites_stream_cat %>% 
+  dplyr::select(site, comid, WtDepWs, OmWs, PermWs, RckDepWs) %>% 
+  rename(Site = site) %>% 
+  st_drop_geometry(stats_go)
+
+write_csv(stats_go, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "OM_perm.csv"))
+
+
+# Pulling runoff data # Runoff
+runoff <- sites_stream_cat %>% 
+  dplyr::select(site, comid, RunoffWs) %>% 
+  rename(Site = site) %>% 
+  st_drop_geometry(runoff)
+
+write_csv(runoff, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "runoff.csv"))
+
+# Pulling mean annual precipitation - weighted Nitrogen for 2008 because that is all they have. #NADP
+NWetdep <- sites_stream_cat %>% 
+  dplyr::select(site, comid, NO3_2008Ws, InorgNWetDep_2008Ws, NH4_2008Ws) %>% 
+  rename(Site = site) %>% 
+  st_drop_geometry(NWetdep)
+
+write_csv(NWetdep, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "NWetdep_2008.csv"))
+
+# Pulling precip and temp # PRISM_1991_2020
+climate <- sites_stream_cat %>% 
+  dplyr::select(site, comid, Precip9120Ws, Tmax9120Ws, Tmean9120Ws, Tmin9120Ws) %>% 
+  rename(Site = site) %>% 
+  st_drop_geometry(climate)
+
+write_csv(climate, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "temp_precip.csv"))
+
+
+# Pulling baseflow Index # BFI
+BFI <- sites_stream_cat %>% 
+  dplyr::select(site, comid, BFIWs) %>% 
+  rename(Site = site) %>% 
+  st_drop_geometry(BFI)
+
+write_csv(BFI, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "BFI.csv"))
+
+# Merge all the watershed characteristic data frames together #
+watershed_dfs <- list(BFI, burn_percentage, climate, forest_lost, lithology, MAST, NWetdep, runoff, stats_go)
+
+# Use reduce to successively full_join all data frames
+random_forest_data <- reduce(watershed_dfs, full_join, by = c("Site", "comid"))
+
+write_csv(random_forest_data, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "random_forest_data.csv"))
+
+# Merge MTBS severity with the rest of the geospatial data
+# random_forest_data <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids",
+#                                  "random_forest_data.csv")) %>%
+#   mutate(Site = str_replace_all(Site, "_", " "))
+# 
+# MTBS_data <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids",
+#                                  "MTBS_severity.csv")) %>%
+#   mutate(Site = str_replace_all(Site, "_", " "))
+# 
+# merged_df <- full_join(random_forest_data, MTBS_data)
+# 
+# write_csv(merged_df, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "random_forest_data.csv"))
+```
+
+# =================================== BURN SEVERITY PULL ==============================================
+
+```{r 1984-1989}
+MTBS_severity_1984_1989 <- sites_stream_cat %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y\\.y\\.y$", "_1989"), .cols = ends_with(".y.y.y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x\\.x\\.x$", "_1988"), .cols = ends_with(".x.x.x")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y\\.y", "_1987"), .cols = ends_with(".y.y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x\\.x$", "_1986"), .cols = ends_with(".x.x")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y$", "_1985"), .cols = ends_with(".y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x$", "_1984"), .cols = ends_with(".x"))
+
+MTBS_severity_1984_1989 <- MTBS_severity_1984_1989 %>% 
+  select(site, comid, matches("SeverityWs")) %>% 
+  select(!matches("PctUnderburned")) %>% 
+  rename(Site = site)
+
+# Drop the geometry column
+MTBS_severity_1984_1989 <- st_drop_geometry(MTBS_severity_1984_1989)
+
+
+# Export the combined data frame to a CSV file
+write_csv(MTBS_severity_1984_1989, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", 
+                            "MTBS_severity_1984_1989.csv"))
+
+```
+
+
+```{r 1990-1995}
+MTBS_severity_1990_1995 <- sites_stream_cat %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y\\.y\\.y$", "_1995"), .cols = ends_with(".y.y.y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x\\.x\\.x$", "_1994"), .cols = ends_with(".x.x.x")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y\\.y", "_1993"), .cols = ends_with(".y.y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x\\.x$", "_1992"), .cols = ends_with(".x.x")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y$", "_1991"), .cols = ends_with(".y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x$", "_1990"), .cols = ends_with(".x"))
+
+MTBS_severity_1990_1995 <- MTBS_severity_1990_1995 %>% 
+  select(site, comid, matches("SeverityWs")) %>% 
+  select(!matches("PctUnderburned")) %>% 
+  rename(Site = site)
+
+# Drop the geometry column
+MTBS_severity_1990_1995 <- st_drop_geometry(MTBS_severity_1990_1995)
+
+# Export the combined data frame to a CSV file
+write_csv(MTBS_severity_1990_1995, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", 
+                            "MTBS_severity_1990_1995.csv"))
+```
+
+```{r 1996-2001}
+MTBS_severity_1996_2001 <- sites_stream_cat %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y\\.y\\.y$", "_2001"), .cols = ends_with(".y.y.y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x\\.x\\.x$", "_2000"), .cols = ends_with(".x.x.x")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y\\.y", "_1999"), .cols = ends_with(".y.y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x\\.x$", "_1998"), .cols = ends_with(".x.x")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y$", "_1997"), .cols = ends_with(".y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x$", "_1996"), .cols = ends_with(".x"))
+
+MTBS_severity_1996_2001 <- MTBS_severity_1996_2001 %>% 
+  select(site, comid, matches("SeverityWs")) %>% 
+  select(!matches("PctUnderburned")) %>% 
+  rename(Site = site)
+
+# Drop the geometry column
+MTBS_severity_1996_2001 <- st_drop_geometry(MTBS_severity_1996_2001)
+
+
+# Export the combined data frame to a CSV file
+write_csv(MTBS_severity_1996_2001, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", 
+                            "MTBS_severity_1996_2001.csv"))
+```
+
+```{r 2002-2007}
+MTBS_severity_2007_2002 <- sites_stream_cat %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y\\.y\\.y$", "_2007"), .cols = ends_with(".y.y.y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x\\.x\\.x$", "_2006"), .cols = ends_with(".x.x.x")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y\\.y", "_2005"), .cols = ends_with(".y.y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x\\.x$", "_2004"), .cols = ends_with(".x.x")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y$", "_2003"), .cols = ends_with(".y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x$", "_2002"), .cols = ends_with(".x"))
+
+MTBS_severity_2007_2002 <- MTBS_severity_2007_2002 %>% 
+  select(site, comid, matches("SeverityWs")) %>% 
+  select(!matches("PctUnderburned")) %>% 
+  rename(Site = site)
+
+# Drop the geometry column
+MTBS_severity_2007_2002 <- st_drop_geometry(MTBS_severity_2007_2002)
+
+
+# Export the combined data frame to a CSV file
+write_csv(MTBS_severity_2007_2002, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", 
+                            "MTBS_severity_2007_2002.csv"))
+```
+
+```{r 2008-2013}
+MTBS_severity_2008_2013 <- sites_stream_cat %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y\\.y\\.y$", "_2013"), .cols = ends_with(".y.y.y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x\\.x\\.x$", "_2012"), .cols = ends_with(".x.x.x")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y\\.y", "_2011"), .cols = ends_with(".y.y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x\\.x$", "_2010"), .cols = ends_with(".x.x")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y$", "_2009"), .cols = ends_with(".y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x$", "_2008"), .cols = ends_with(".x"))
+
+MTBS_severity_2008_2013 <- MTBS_severity_2008_2013 %>% 
+  select(site, comid, matches("SeverityWs")) %>% 
+  select(!matches("PctUnderburned")) %>% 
+  rename(Site = site)
+
+# Drop the geometry column
+MTBS_severity_2008_2013 <- st_drop_geometry(MTBS_severity_2008_2013)
+
+
+# Export the combined data frame to a CSV file
+write_csv(MTBS_severity_2008_2013, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", 
+                            "MTBS_severity_2008_2013.csv"))
+```
+
+```{r 2014-2017}
+MTBS_severity_2014_2017 <- sites_stream_cat %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y\\.y", "_2017"), .cols = ends_with(".y.y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x\\.x$", "_2016"), .cols = ends_with(".x.x")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.y$", "_2015"), .cols = ends_with(".y")) %>%
+  rename_with(.fn = ~str_replace_all(., "\\.x$", "_2014"), .cols = ends_with(".x"))
+
+MTBS_severity_2014_2017 <- MTBS_severity_2014_2017 %>% 
+  select(site, comid, matches("SeverityWs")) %>% 
+  select(!matches("PctUnderburned")) %>% 
+  rename(Site = site)
+
+# Drop the geometry column
+MTBS_severity_2014_2017 <- st_drop_geometry(MTBS_severity_2014_2017)
+
+
+# Export the combined data frame to a CSV file
+write_csv(MTBS_severity_2014_2017, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", 
+                            "MTBS_severity_2014_2017.csv"))
+```
+
+```{r 2018}
+MTBS_severity_2018 <- sites_stream_cat %>%
+  rename_with(.fn = ~str_replace_all(., "Ws", "Ws_2018"), .cols = ends_with("Ws")) 
+
+MTBS_severity_2018 <- MTBS_severity_2018 %>% 
+  select(site, comid, matches("SeverityWs")) %>% 
+  select(!matches("PctUnderburned")) %>% 
+  rename(Site = site)
+
+# Drop the geometry column
+MTBS_severity_2018 <- st_drop_geometry(MTBS_severity_2018)
+
+# Export the combined data frame to a CSV file
+write_csv(MTBS_severity_2018, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", 
+                            "MTBS_severity_2018.csv"))
+```
+
+```{r merge all MTBS}
+combined_df <- full_join(MTBS_severity_1984_1989, MTBS_severity_1990_1995,
+                         MTBS_severity_1996_2001, MTBS_severity_2007_2002, 
+                         MTBS_severity_2008_2013, MTBS_severity_2014_2017,
+                         MTBS_severity_2018, by = c("Site", "comid"))
+
+MTBS_1984_2001 <- full_join(MTBS_severity_1984_1989, MTBS_severity_1990_1995,
+                         MTBS_severity_1996_2001, 
+                         by = c("Site", "comid"))
+
+MTBS_2002_2013 <- full_join(MTBS_severity_2007_2002, MTBS_severity_2008_2013,
+                         by = c("Site", "comid"))
+
+MTBS_2014_2018 <- full_join(MTBS_severity_2014_2017, MTBS_severity_2018,
+                         by = c("Site", "comid"))
+
+MTBS_1984_2013 <- full_join(MTBS_1984_2001, MTBS_2002_2017, by = c("Site", "comid"))
+
+MTBS_all <- full_join(MTBS_1984_2013, MTBS_2014_2018, by = c("Site", "comid"))
+
+# Export the combined data frame to a CSV file
+write_csv(MTBS_all, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", 
+                            "MTBS_severity.csv"))
+
+```
+
+Export all the data.
+
+```{r}
+
 
 ```
 
@@ -139,7 +531,7 @@ sites <- getOmernikSite(df = sites)
 sites <- getOmernikWs(df = sites, sf = site_watersheds)
 
 # Extract PRSIM ppt, tmean, tmax, and tmin data for each site's location
-sites <- getPRISM(df = sites)
+sites_prism <- getPRISM(df = sites)
 
 # Extract mean chemistry values within each site's watershed as well as each site's locationa
 sites <- getChemistry(df = sites, sf = site_watersheds)
@@ -148,14 +540,29 @@ sites <- getChemistry(df = sites, sf = site_watersheds)
 # https://lpdaac.usgs.gov/products/mod17a3hgfv006/ "Terra MODIS Net Primary Production Yearly L4 Global 500 m SIN Grid products are currently unavailable due to unexpected errors in the input data. Please note that a newer version of MODIS land products is available and plans are being developed for the retirement of Version 6 MODIS data products. Users are advised to transition to the improved Version 6.1 products as soon as possible."
 ```
 
-Export all the data.
+```{r change names for burn severity}
 
-```{r}
-sites <- sites %>% 
-  dplyr::select(site, comid, totdasqkm, streamorde, maxelevraw, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws) %>% 
-  rename(Site = site)
+# List of data frames
+df_list <- list(MTBS_severity_1984_1989, MTBS_severity_1990_1995, MTBS_severity_1996_2001,
+                MTBS_severity_2007_2002, MTBS_severity_2008_2013, MTBS_severity_2014_2017,
+                MTBS_severity_2018)
 
-write_csv(sites, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2024-02-15.csv"))
+# Columns to select
+columns_to_select <- c("Site", "comid")
+
+# Function to select columns
+select_columns <- function(df, cols) {
+  df %>% select(all_of(cols), matches("SeverityWs"))
+}
+
+# Apply the function to each data frame in the list
+selected_dfs <- map(df_list, ~ select_columns(.x, columns_to_select))
+
+# Combine the selected data frames into a single data frame
+combined_df <- bind_rows(selected_dfs) 
+
+# Export the combined data frame to a CSV file
+write_csv(combined_df, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", 
+                            "MTBS_severity.csv"))
 
 ```
-

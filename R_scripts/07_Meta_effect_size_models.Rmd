@@ -53,6 +53,7 @@ library(ggbreak)
 library(lmerTest)
 library(car)
 library(ggpubr)
+library(sf)
 
 library(officer)
 library(flextable)
@@ -95,6 +96,8 @@ ggplot(geospatial_long, aes(x = seq_along(year), y = burn_percentage)) +
 
 ```
 
+# ============================= Burn Percent ========================================================
+# User inputs
 ```{r fire site data}
 # Read in the study and site csv 
 study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
@@ -452,79 +455,474 @@ write_csv(summary_df, "~/OneDrive - PNNL/Documents/RC_3/Wenas_Watershed_project/
 The p-value of the test is 0.7122, which is greater than our significance level of 0.05. 
 Thus, we do not reject the null hypothesis and conclude that the variance among the climate groups is equal. 
 
+# ============================= Burn Severity ==================================================================
+# User inputs
+```{r load burn severity data frame}
+# Geospatial csv from stream cat with only the sites and the total area + the burn percentages 
+severity <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "MTBS_severity.csv"))
 
-### Building Random forest dataframe 
-```{r }
-# The effect sizes of each study's watershed
-effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
-
-# This has site and effect size pair which will merge with the effect size dataframe to get a site name with each effect size. 
-study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
-  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
-  rename(year = Fire_year)
-
-study_site_data <- study_site_data %>%
+# Remove the underscore
+severity <- severity %>%
   mutate(Site = str_replace_all(Site, "_", " "))
 
-unique(study_site_data$Site) # Supposed to be 65 sites
+unique(severity$Site) # 52 sites with severity data. 
 
-no_geo_random_forest_data <- full_join(effect_size, study_site_data) %>% 
-  na.omit(Effect_size) # this na.omit eliminates all the control sites that dont have an associated effect size. 
 
-unique(no_geo_random_forest_data$Site) # Supposed to be 33 sites here
+# Pivot longing the low/moderate/high burn
+low_long <- severity %>%
+  pivot_longer(
+    cols = contains("PctLow"),
+    names_to = "Low_year",
+    values_to = "Low_Severity",
+    values_drop_na = TRUE
+  ) %>% 
+  dplyr::select(Site, comid, Low_year, Low_Severity) %>% 
+  mutate(year = str_extract(Low_year, "(?<=_)[0-9]{4}$")) %>% 
+  dplyr::select(!Low_year)
 
-# Joining our effect sizes and sites df with the geospatial dataframe to get catchment characteristics. yay. 
-random_forest_data <- left_join(no_geo_random_forest_data, geospatial) %>% 
-  dplyr::select(Study_ID, Site, response_var, Effect_size_pair, Effect_size, Climate, Biome, Time_Since_Fire, burn_percentage, totdasqkm, streamorde, maxelevraw, maxelevsmo, minelevraw, minelevsmo, elevfixed, slope) %>% 
-  na.omit(slope) # eliminates sites that dont have associated geospatial data. 
+mod_long <- severity %>%
+  pivot_longer(
+    cols = contains("PctMod"),
+    names_to = "Mod_year",
+    values_to = "Moderate_Severity",
+    values_drop_na = TRUE
+  ) %>% 
+  dplyr::select(Site, comid, Mod_year, Moderate_Severity) %>% 
+  mutate(year = str_extract(Mod_year, "(?<=_)[0-9]{4}$")) %>% 
+  dplyr::select(!Mod_year)
 
-unique(random_forest_data$Site) # 25 sites
+high_long <- severity %>%
+  pivot_longer(
+    cols = contains("PctHigh"),
+    names_to = "High_year",
+    values_to = "High_Severity",
+    values_drop_na = TRUE
+  ) %>% 
+  dplyr::select(Site, comid, High_year, High_Severity) %>% 
+  mutate(year = str_extract(High_year, "(?<=_)[0-9]{4}$")) %>% 
+  dplyr::select(!High_year)
 
-#splitting by analyte
-doc_RF <- random_forest_data %>% 
-  filter(response_var == "DOC_Interp") %>% 
-  dplyr::select(Study_ID, Site, Effect_size, Climate, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire)
+# merge all 
+low_mod_long <- full_join(low_long, mod_long, by = c("Site", "comid", "year"))
 
-write_csv(doc_RF, here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"))
-
-no3_RF <- random_forest_data %>% 
-  filter(response_var == "NO3_Interp") %>% 
-  dplyr::select(Study_ID, Site, Effect_size, Climate, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire)
-
-write_csv(no3_RF, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"))
-
-  
+all_long <- full_join(low_mod_long, high_long) %>% 
+  dplyr::select(Site, comid, Low_Severity, Moderate_Severity, High_Severity, year)
 
 ```
 
-### Back to geospatial 
-```{r load in effect size csv's}
-# The effect sizes of each study's watershed
-effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
-
-
-unique(effect_size$Study_ID) # Should be all 18 studies.
-values_to_filter <- unique(effect_size$Study_ID)
-
-# Site summary of each study and its respective fire and the year of that fire
-studies_data <- read_csv(here("inputs", "Studies_Summary", "Sites_meta_data.csv"), na = c('-9999', 'N/A')) %>% 
-  dplyr::select(Study_ID, Fire_name, Fire_year) %>% 
-  filter(Study_ID %in% values_to_filter)
-
+### Creating dataframe for Burn Severity plot 
+```{r fire site data}
+# Read in the study and site csv 
 study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
-  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair) %>% 
   rename(year = Fire_year) %>% 
   na.omit()
 
-effect_size_doc <- effect_size %>% 
-  filter(response_var == "DOC_Interp")
+study_site_data <- study_site_data %>% 
+  mutate(year = str_extract(year, "(?<=_)[0-9]{4}(?=Ws)"))
 
-effect_size_no3 <- effect_size %>% 
-  filter(response_var == "NO3_Interp")
+# Manually change the years to make sure I am pulling the correct fire years 
+study_site_data <- study_site_data %>% 
+mutate(year = case_when(Study_ID == 'Crandall et al. 2021' ~ "2018",
+                                TRUE ~ year))
+
+#
+unique(study_site_data$Study_ID) # 17 sites 
+
+# clip and merge dataframes
+severity_clip <- left_join(study_site_data, all_long) %>% 
+  dplyr::select(!comid)
+
+unique(severity_clip$Study_ID) 
+
+severity_clip <- severity_clip %>% 
+  na.omit()
+
+unique(severity_clip$Study_ID) # 11 sites are in the analysis 
+# Burd et al 2018 - In Canada so it wont have MTBS data
+# Hauer & Spencer 1998 - Dont know why
+# Hickenbottom et al. 2023 Too new to have MTBS data
+# Neary & Currier; 1982 - Too old to have MTBS data
+# Rhea et al. 2021 - Dont know why
+# Tiedemann; 1973 - Too old to have MTBS
+
+
 ```
 
 
+```{r read in effect size and merge dataframes}
+# The effect sizes of each study's watershed
+effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
 
+unique(effect_size$Study_ID) # Should be 18 studies.
+
+# Merging severity with effect size data frame 
+MTBS_model <- full_join(severity_clip, effect_size) %>% 
+  dplyr::select(Study_ID, Site, response_var, Climate, Biome, year, Effect_size_pair, Effect_size, Low_Severity, Moderate_Severity, High_Severity, Time_Since_Fire) %>% 
+  na.omit()
+
+unique(MTBS_model$Study_ID) # 11 studies. Should match the severity_clip data frame
+  
+# Pivot long to have all burn severities in one column
+MTBS_model_long <- MTBS_model %>% 
+  pivot_longer(
+    cols = Low_Severity:High_Severity,
+    names_to = "Severity_type",
+    values_to = "MTBS_Severity",
+    values_drop_na = TRUE
+  )
+
+
+doc_es_mtbs <- MTBS_model_long %>% 
+  filter(response_var == "DOC_Interp")
+
+no3_es_mtbs <- MTBS_model_long %>% 
+  filter(response_var == "NO3_Interp")
+
+```
+
+### CLIMATE MATCH Plot 
+```{r Severity plot to match climate plots}
+# Test just low severity #
+low <- MTBS_model_long %>% 
+  filter(Severity_type == "Low_Severity")
+
+mean(low$Effect_size) # -0.1050479
+
+# Moderate
+mod <- MTBS_model_long %>% 
+  filter(Severity_type == "Moderate_Severity")
+
+mean(mod$Effect_size) # -0.1050479
+#
+
+# Resume 
+mtbs_percentage_effect <- MTBS_model_long %>% 
+  group_by(response_var, Severity_type) %>% 
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
+   mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
+
+write_csv(mtbs_percentage_effect_out, here("Output_for_analysis", "07_Meta_effect_size_models", "MTBS_percentage_ES_CIs.csv"))
+
+
+# write_csv(burn_percentage_plot_out, here("Output_for_analysis", "07_Meta_effect_size_models", "Burn_percentage_ES_fig_data.csv"))
+
+# Plot #
+vn = expression(paste(""*N*O[3]^"-"))
+
+give.n <- function(x){
+  return(c(y = median(x)*1.5, label = length(x))) 
+  # experiment with the multiplier to find the perfect position
+}
+
+MTBS_model_long <- MTBS_model_long %>% 
+  mutate(Severity_type = fct_relevel(Severity_type, "Low_Severity", "Moderate_Severity", "High_Severity")) 
+
+# MTBS_model_long <- MTBS_model_long %>% 
+#   mutate(Severity_type = recode(Severity_type,
+#                                 "High_Severity" = "High",
+#                                 "Moderate_Severity" = "Moderate",
+#                                 "Low_Severity" = "Low"),
+#          Severity_type = fct_relevel(Severity_type, "High", "Moderate", "Low"))
+# 
+# df$severity <- factor(df$severity, 
+#                       levels = c("High_Severity", "Moderate_Severity", "Low_Severity"), 
+#                       labels = c("High", "Moderate", "Low"))
+
+ggplot(MTBS_model_long, aes(x = Effect_size, y = Severity_type, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(xmin = mean_effect - se_effect, xmax = mean_effect + se_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = mtbs_percentage_effect) +
+  geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("MTBS Severity") +
+  xlab("Effect Size") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = ""),
+                     labels = c('DOC', vn)) +
+  scale_y_discrete(label = c("Low", "Moderate", "High")) +
+  theme_bw() 
+# +
+#   theme(axis.text.x = element_text(size = 30, angle = -90),
+#         axis.text.y = element_text(size = 30),
+#         axis.title.x = element_text(size = 40),
+#         axis.title.y = element_text(size = 35),
+#         legend.text = element_text(size = 30),
+#         legend.key = element_blank(),
+#         legend.background = element_blank(),
+#         legend.position = c(0.1, 0.86))
+
+
+ggsave("Effect_Size_MTBS_Severity.pdf",
+       path = here("initial_plots", "07_Meta_effect_size_models"),
+       width = 10, height = 8, units = "in")
+
+```
+
+# BP MATCH PLOT  
+```{r Low grouping}
+#### 5 % grouping ####
+low_mtbs_severity_plot <- MTBS_model %>%
+  mutate(grouped_percentage_low = cut(Low_Severity, breaks = seq(0, 50, by = 5), include.lowest = TRUE, labels = FALSE))
+
+low_mtbs_severity_plot <- low_mtbs_severity_plot %>% 
+  mutate(grouped_percentage_low = as.character(grouped_percentage_low))
+
+low_mtbs_severity_plot <- low_mtbs_severity_plot %>% 
+  mutate(burn_severity_group_low = case_when(grouped_percentage_low == "1" ~ "0-5",
+                                           grouped_percentage_low == "2" ~ "6-10",
+                                           grouped_percentage_low == "3" ~ "11-15",
+                                           grouped_percentage_low == "4" ~ "16-20",
+                                           grouped_percentage_low == "5" ~ "21-25",
+                                           grouped_percentage_low == "6" ~ "26-30",
+                                           grouped_percentage_low == "7" ~ "31-35",
+                                           grouped_percentage_low == "8" ~ "36-40",
+                                           grouped_percentage_low == "9" ~ "41-45",
+                                           grouped_percentage_low == "10" ~ "46-50"))
+                                           
+
+# Refactor to make them in ascending order 
+# low_mtbs_severity_plot <- low_mtbs_severity_plot %>%
+#   mutate(burn_severity_group_low = fct_relevel(burn_severity_group_low, "0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40", "41-45", "46-50"))
+
+low_mtbs_severity_plot$burn_severity_group_low <- factor(low_mtbs_severity_plot$burn_severity_group_low, levels = c("0-5", "6-10", "11-15", "16-20", "21-25", "26-30", "31-35", "36-40", "41-45", "46-50"))
+
+# calculating the mean effect size by low severity
+low_mtbs_severity_effect <- low_mtbs_severity_plot %>% 
+  group_by(response_var, burn_severity_group_low) %>% 
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
+   mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
+
+# Plot #
+vn = expression(paste(""*N*O[3]^"-"))
+
+give.n <- function(x){
+  return(c(y = median(x)*1.5, label = length(x))) 
+  # experiment with the multiplier to find the perfect position
+}
+
+ggplot(low_mtbs_severity_plot, aes(burn_severity_group_low, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(ymin = mean_effect - se_effect, ymax = mean_effect + se_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = low_mtbs_severity_effect) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("MTBS - Low Severity") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = ""),
+                     labels = c('DOC', vn)) +
+  theme_bw()
+
+
+# ggsave("Effect_Size_MTBS_Severity.pdf",
+#        path = here("initial_plots", "07_Meta_effect_size_models"),
+#        width = 10, height = 8, units = "in")
+
+```
+
+# BP MATCH PLOT - all test 
+```{r all grouping}
+#### 5 % grouping ####
+mtbs_severity_plot <- MTBS_model %>%
+  mutate(grouped_percentage_low = cut(Low_Severity, breaks = seq(0, 50, by = 5), include.lowest = TRUE, labels = FALSE)) %>% 
+  mutate(grouped_percentage_mod = cut(Moderate_Severity, breaks = seq(0, 50, by = 5), include.lowest = TRUE, labels = FALSE)) %>% 
+   mutate(grouped_percentage_high = cut(High_Severity, breaks = seq(0, 50, by = 5), include.lowest = TRUE, labels = FALSE))
+
+mtbs_severity_plot <- mtbs_severity_plot %>% 
+  mutate(grouped_percentage_low = as.character(grouped_percentage_low)) %>% 
+  mutate(grouped_percentage_mod = as.character(grouped_percentage_mod)) %>% 
+  mutate(grouped_percentage_high = as.character(grouped_percentage_high))
+
+mtbs_severity_plot <- mtbs_severity_plot %>% 
+  mutate(burn_severity_group_low = case_when(grouped_percentage_low == "1" ~ "0-5",
+                                           grouped_percentage_low == "2" ~ "6-10",
+                                           grouped_percentage_low == "3" ~ "11-15",
+                                           grouped_percentage_low == "4" ~ "16-20",
+                                           grouped_percentage_low == "5" ~ "21-25",
+                                           grouped_percentage_low == "6" ~ "26-30",
+                                           grouped_percentage_low == "7" ~ "31-35",
+                                           grouped_percentage_low == "8" ~ "36-40",
+                                           grouped_percentage_low == "9" ~ "41-45",
+                                           grouped_percentage_low == "10" ~ "46-50")) %>%
+  
+  mutate(burn_severity_group_mod = case_when(grouped_percentage_mod == "1" ~ "0-5",
+                                           grouped_percentage_mod == "2" ~ "6-10",
+                                           grouped_percentage_mod == "3" ~ "11-15",
+                                           grouped_percentage_mod == "4" ~ "16-20",
+                                           grouped_percentage_mod == "5" ~ "21-25",
+                                           grouped_percentage_mod == "6" ~ "26-30",
+                                           grouped_percentage_mod == "7" ~ "31-35",
+                                           grouped_percentage_mod == "8" ~ "36-40",
+                                           grouped_percentage_mod == "9" ~ "41-45",
+                                           grouped_percentage_mod == "10" ~ "46-50")) %>% 
+  
+  mutate(burn_severity_group_high = case_when(grouped_percentage_high == "1" ~ "0-5",
+                                           grouped_percentage_high == "2" ~ "6-10",
+                                           grouped_percentage_high == "3" ~ "11-15",
+                                           grouped_percentage_high == "4" ~ "16-20",
+                                           grouped_percentage_high == "5" ~ "21-25",
+                                           grouped_percentage_high == "6" ~ "26-30",
+                                           grouped_percentage_high == "7" ~ "31-35",
+                                           grouped_percentage_high == "8" ~ "36-40",
+                                           grouped_percentage_high == "9" ~ "41-45",
+                                           grouped_percentage_high == "10" ~ "46-50")) %>% 
+  
+  dplyr::select(!Low_Severity:grouped_percentage_high)
+
+# Pivot long to have all burn severities in one column
+MTBS_model_long <- mtbs_severity_plot %>% 
+  pivot_longer(
+    cols = burn_severity_group_low:burn_severity_group_high,
+    names_to = "Severity_type",
+    values_to = "MTBS_Severity",
+    values_drop_na = TRUE
+  )
+
+# calculating the mean effect size by low severity
+mtbs_severity_effect <- MTBS_model_long %>% 
+  group_by(response_var, Severity_type) %>% 
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
+   mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
+
+# Plot #
+vn = expression(paste(""*N*O[3]^"-"))
+
+give.n <- function(x){
+  return(c(y = median(x)*1.5, label = length(x))) 
+  # experiment with the multiplier to find the perfect position
+}
+
+ggplot(low_mtbs_severity_plot, aes(burn_severity_group_low, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(ymin = mean_effect - se_effect, ymax = mean_effect + se_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = low_mtbs_severity_effect) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("MTBS - Low Severity") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = ""),
+                     labels = c('DOC', vn)) +
+  theme_bw()
+
+
+# ggsave("Effect_Size_MTBS_Severity.pdf",
+#        path = here("initial_plots", "07_Meta_effect_size_models"),
+#        width = 10, height = 8, units = "in")
+
+```
+
+# BP separate and then merge 
+```{r doing low/mod/high separately and then merging}
+
+# Resume 
+mtbs_percentage_effect <- MTBS_model_long %>% 
+  group_by(response_var, Severity_type) %>% 
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
+   mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
+
+
+
+```
+
+# ============================= Random forest dataframe ==================================== 
+# As of June 5th, 2024 - moving this block to 08_Meta_summary_stats
+### Back to geospatial 
+```{r Building Random forest dataframe}
+# # The effect sizes of each study's watershed
+# effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
+# 
+# # This has site and effect size pair which will merge with the effect size dataframe to get a site name with each effect size. 
+# study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
+#   dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
+#   rename(year = Fire_year)
+# 
+# study_site_data <- study_site_data %>%
+#   mutate(Site = str_replace_all(Site, "_", " "))
+# 
+# unique(study_site_data$Site) # Supposed to be 65 sites
+# 
+# no_geo_random_forest_data <- full_join(effect_size, study_site_data) %>% 
+#   na.omit(Effect_size) # this na.omit eliminates all the control sites that dont have an associated effect size. 
+# 
+# unique(no_geo_random_forest_data$Site) # Supposed to be 25 sites here
+# 
+# # Joining our effect sizes and sites df with the geospatial dataframe to get catchment characteristics. yay. 
+# random_forest_data <- left_join(no_geo_random_forest_data, geospatial) %>% 
+#   dplyr::select(Study_ID, Site, response_var, Effect_size_pair, Effect_size, Climate, Biome, Time_Since_Fire, burn_percentage, totdasqkm, streamorde, maxelevraw, maxelevsmo, minelevraw, minelevsmo, elevfixed, slope) %>%
+#   na.omit(slope) # eliminates sites that dont have associated geospatial data.
+# 
+# unique(random_forest_data$Site) # 25 sites
+# 
+# #splitting by analyte
+# doc_RF <- random_forest_data %>% 
+#   filter(response_var == "DOC_Interp") %>% 
+#   dplyr::select(Study_ID, Site, Effect_size, Climate, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire)
+# 
+# write_csv(doc_RF, here("Output_for_analysis", "07_Meta_effect_size_models", "doc_meta_random_forest.csv"))
+# 
+# no3_RF <- random_forest_data %>% 
+#   filter(response_var == "NO3_Interp") %>% 
+#   dplyr::select(Study_ID, Site, Effect_size, Climate, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, burn_percentage, Time_Since_Fire)
+# 
+# write_csv(no3_RF, here("Output_for_analysis", "07_Meta_effect_size_models", "no3_meta_random_forest.csv"))
+
+```
+
+# Check what this is doing
+```{r load in effect size csv's}
+# # The effect sizes of each study's watershed
+# effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
+# 
+# 
+# unique(effect_size$Study_ID) # Should be all 18 studies.
+# values_to_filter <- unique(effect_size$Study_ID)
+# 
+# # Site summary of each study and its respective fire and the year of that fire
+# studies_data <- read_csv(here("inputs", "Studies_Summary", "Sites_meta_data.csv"), na = c('-9999', 'N/A')) %>% 
+#   dplyr::select(Study_ID, Fire_name, Fire_year) %>% 
+#   filter(Study_ID %in% values_to_filter)
+# 
+# study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
+#   dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
+#   rename(year = Fire_year) %>% 
+#   na.omit()
+# 
+# effect_size_doc <- effect_size %>% 
+#   filter(response_var == "DOC_Interp")
+# 
+# effect_size_no3 <- effect_size %>% 
+#   filter(response_var == "NO3_Interp")
+
+```
+
+
+### Fire years from studies vs. MTBS data 
 ```{r - manually check fire years vs. MTBS data}
 
 fire_clip <- right_join(geospatial_long, study_site_data) 
@@ -816,7 +1214,7 @@ no3_es_tsf <- TSF_model %>%
 
 ```
 
-### TSF models
+# ============================= TSF ================================================== 
 ```{r NO3 TSF models}
 no3_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = no3_es_tsf)
 
@@ -1040,7 +1438,7 @@ no3_es_climate <- climate_model %>%
 
 ```
 
-### Climate models
+# ============================= Climate Models ================================================== 
 ```{r NO3 climate models}
 no3_climate_mixed <-  lmer(Effect_size ~ as.factor(Climate) + (1 | Site), data = no3_es_climate)
 unique(no3_es_climate$Climate)

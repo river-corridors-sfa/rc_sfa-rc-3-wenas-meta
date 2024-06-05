@@ -34,11 +34,178 @@ library(Hmisc)
 library(GGally)
 ```
 
+# ============================= Build random forest dataframe ==================================== 
+### Load in geospatial data 
+```{r Building Random forest dataframe}
+# Geospatial data 
+geospatial_data <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids",
+                                 "random_forest_data.csv")) %>%
+  mutate(Site = str_replace_all(Site, "_", " "))
+
+# The effect sizes of each study's watershed
+effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
+
+# This has site and effect size pair which will merge with the effect size dataframe to get a site name with each effect size.
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>%
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>%
+  rename(year = Fire_year) %>%
+  mutate(Site = str_replace_all(Site, "_", " "))
+
+unique(study_site_data$Site) # Supposed to be 65 sites
+
+no_geo_random_forest_data <- full_join(effect_size, study_site_data) %>%
+  na.omit(Effect_size) # this na.omit eliminates all the control sites that dont have an associated effect size.
+
+unique(no_geo_random_forest_data$Site) # Supposed to be 28 sites here
+
+# Joining our effect sizes and sites df with the geospatial dataframe to get catchment characteristics. yay.
+random_forest_data <- left_join(no_geo_random_forest_data, geospatial_data) %>% 
+  dplyr::select(!MTBS_1986Ws:MTBS_2017Ws) %>% # Pulled in from study_site_data
+  na.omit(slope) # eliminates sites that dont have associated geospatial data 
+  
+unique(random_forest_data$Site) # 24 sites
+
+#splitting by analyte
+doc_RF <- random_forest_data %>%
+  filter(response_var == "DOC_Interp")
+
+write_csv(doc_RF, here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"))
+
+no3_RF <- random_forest_data %>%
+  filter(response_var == "NO3_Interp") 
+
+write_csv(no3_RF, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"))
+
+```
+
+# ============================= Correlation Matrix ==================================== 
+# DOC
+```{r correlation plot}
+# Simple correlation matrix between effect size and all the other catchment characteristics
+doc_correlation <- doc_RF %>% 
+  dplyr::select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, Tmax9120Ws,Tmean9120Ws, Tmin9120Ws, OmWs, BFIWs, PermWs, RunoffWs, burn_percentage, Time_Since_Fire) %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire))
+
+# Calculate the correlation matrix
+cor_matrix_doc <- cor(doc_correlation, use = "complete.obs")
+
+# Assuming cor_matrix_doc is your correlation matrix
+cor_matrix_doc <- as.data.frame(cor_matrix_doc)
+
+# Get the order of columns with 'Effect_size' first
+column_order <- c("Effect_size", setdiff(names(cor_matrix_doc), "Effect_size"))
+
+# Reorder columns using select
+cor_matrix_doc <- cor_matrix_doc %>%
+  select(all_of(column_order))
+
+# Reorder rows by converting row names to a column, ordering, then converting back
+cor_matrix_doc <- cor_matrix_doc %>%
+  rownames_to_column(var = "rowname") %>%
+  arrange(factor(rowname, levels = column_order)) %>%
+  column_to_rownames(var = "rowname")
+
+# Convert back to matrix if needed
+cor_matrix_doc <- as.matrix(cor_matrix_doc)
+
+# Print the reordered correlation matrix
+print(cor_matrix_doc)
+
+# Specify the file path and format for the output PDF file
+output_file <- here("initial_plots", "08_Meta_summary_stats", "DOC_geospatial_correlation.pdf")
+
+# Open a PDF device
+pdf(file = output_file, width = 12, height = 12)
+
+# Plot the reordered correlation matrix using corrplot
+corrplot(cor_matrix, method = "circle", type = "upper", order = "original", 
+         tl.cex = 0.8, tl.col = "black", addgrid.col = "grey")
+
+# Add a title to the bottom left corner
+mtext("DOC Correlation Matrix", side = 3, line = 1, adj = 0, cex = 1.2)
+
+
+# Close the device to save the file
+dev.off()
+
+# 
+# # Correlation matrix with significance levels (p-value)
+# res2 <- rcorr(as.matrix(doc_correlation))
+# res2 # the only significant p-value with effect size is watershed area
+# 
+# corrplot(res2$r, type="upper", order="hclust", 
+#          p.mat = res2$P, sig.level = 0.05, insig = "blank")
+# 
+# ggpairs(doc_correlation, columns = c("Effect_size", "totdasqkm", "minelevraw", "maxelevsmo","minelevsmo", "elevfixed", "slope", "burn_percentage", "Time_Since_Fire")) +
+#   theme_bw()
+
+```
+
+# NO3
+```{r correlation plot}
+# Simple correlation matrix between effect size and all the other catchment characteristics
+no3_correlation <- no3_RF %>% 
+  dplyr::select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, Tmax9120Ws,Tmean9120Ws, Tmin9120Ws, OmWs, BFIWs, PermWs, RunoffWs, burn_percentage, Time_Since_Fire) %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire))
+
+# Assuming cor_matrix_no3 is your correlation matrix
+cor_matrix_no3 <- as.data.frame(cor_matrix_no3)
+
+# Get the order of columns with 'Effect_size' first
+column_order <- c("Effect_size", setdiff(names(cor_matrix_no3), "Effect_size"))
+
+# Reorder columns using select
+cor_matrix_no3 <- cor_matrix_no3 %>%
+  select(all_of(column_order))
+
+# Reorder rows by converting row names to a column, ordering, then converting back
+cor_matrix_no3 <- cor_matrix_no3 %>%
+  rownames_to_column(var = "rowname") %>%
+  arrange(factor(rowname, levels = column_order)) %>%
+  column_to_rownames(var = "rowname")
+
+# Convert back to matrix if needed
+cor_matrix_no3 <- as.matrix(cor_matrix_no3)
+
+# Print the reordered correlation matrix
+print(cor_matrix_no3)
+
+# Specify the file path and format for the output PDF file
+output_file <- "~/GitHub/rc_sfa-rc-3-wenas-meta/initial_plots/08_Meta_summary_stats/NO3_geospatial_correlation.pdf"
+
+output_file <- here("initial_plots", "08_Meta_summary_stats", "NO3_geospatial_correlation.pdf")
+
+# Open a PDF device
+pdf(file = output_file, width = 12, height = 12)
+
+# Plot the reordered correlation matrix using corrplot
+corrplot(cor_matrix_no3, method = "circle", type = "upper", order = "original", 
+         tl.cex = 0.8, tl.col = "black", addgrid.col = "grey")
+
+# Add a title to the bottom left corner
+mtext("NO3 Correlation Matrix", side = 3, line = 1, adj = 0, cex = 1.2)
+
+
+# Close the device to save the file
+dev.off()
+
+# 
+# # Correlation matrix with significance levels (p-value)
+# res2 <- rcorr(as.matrix(doc_correlation))
+# res2 # the only significant p-value with effect size is watershed area
+# 
+# corrplot(res2$r, type="upper", order="hclust", 
+#          p.mat = res2$P, sig.level = 0.05, insig = "blank")
+# 
+# ggpairs(doc_correlation, columns = c("Effect_size", "totdasqkm", "minelevraw", "maxelevsmo","minelevsmo", "elevfixed", "slope", "burn_percentage", "Time_Since_Fire")) +
+#   theme_bw()
+
+```
+
 #### NHD Catchment characteristics ####
 ```{r}
-geospatial_data<- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2024-02-15.csv"))
-
-geospatial_data <- geospatial_data %>%
+geospatial_data<- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2024-02-15.csv")) %>%
   mutate(Site = str_replace_all(Site, "_", " "))
 
 ```
