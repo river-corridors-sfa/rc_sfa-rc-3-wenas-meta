@@ -86,6 +86,31 @@ Make NHD-based watershed shapefiles for all CONUS sites. To make this step MUCH 
 ```{r}
 site_watersheds <- getWatersheds(df = sites, make_pretty = TRUE) %>%
   inner_join(., select(sf::st_drop_geometry(sites), site, comid), by = "comid")
+
+# Write the sf object to a shapefile
+st_write(site_watersheds, "~/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/06_Meta_geospatial_extraction_with_comids/watershed_shapefile.shp")
+
+# Test to get individual shape file for each watershed
+# Get unique watershed identifiers
+outdir <- "~/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/06_Meta_geospatial_extraction_with_comids/watershed_shapefiles/"
+
+unique_watersheds <- unique(site_watersheds$site)
+
+# Iterate through each watershed and write to individual shapefiles
+for (watershed_id in unique_watersheds) {
+ 
+  # Subset the sf object for the current watershed 
+  watershed_sf <- site_watersheds %>% 
+    filter(watershed_id == !!watershed_id)
+
+  # Define the output file name
+  output_file <- paste0(outdir, watershed_id, "_watershed", ".shp")
+  
+  # Write the subset sf object to a shapefile
+  st_write(watershed_sf, output_file)
+}
+
+
 ```
 
 
