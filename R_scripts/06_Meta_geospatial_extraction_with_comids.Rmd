@@ -115,6 +115,20 @@ This `getStreamCat()` function is adapted from [Simon Topp's Lakecat extraction]
 To download the data that you want, be sure to update the `epa_categories` vector argument in `getStreamCat()` with the names of the categorized data sets you are interested in downloading. A list of those data sets can be found [here](https://gaftp.epa.gov/epadatacommons/ORD/NHDPlusLandscapeAttributes/StreamCat/HydroRegions/). Change `save = TRUE` to `save = FALSE` if you do not want to keep all CONUS-level StreamCat data that you downloaded.
 
 ```{r cat,echo = T, warning = FALSE, comment = F, message = FALSE, results='hide'}
+# NABD # Not using 
+  # NABD_DensWs: Density of georeferenced dams within AOI (dams/ square km)
+  # NABD_NIDStorWs: NABD NID Reservoir Volume - Volume all reservoirs (NID_STORA in NID) per unit area of AOI (cubic meters/square km)
+  # NABD_NrmStorWs: NABD Normal Reservoir Volume - Volume all reservoirs (NORM_STORA in NID) per unit area of AOI (cubic meters/square km)
+
+# NRSA_PredictedBioCondition # Not using 
+  # NRSA_Frame
+  # NARS_Region
+  # prG_BMMI: Predicted probability that a stream segment is in good biologial condition based on a random forest model of the NRSA benthic invertebrate multimetric index (BMMI)
+
+# GeoChemPhys4 # Not using 
+  # CompStrgthWs: Mean Lithological Compressive Strength - Mean lithological uniaxial compressive strength (megaPascals) content in surface or near surface geology within AOI
+
+
 # FirePerimeters # DONE
   #PctFire[year] - % Forest loss to fire (fire perimeter) within AOI
   # MTBS[Year] - Mean % of AOI burned from wildfires for each year for 1984-2018
@@ -191,7 +205,7 @@ To download the data that you want, be sure to update the `epa_categories` vecto
 # sw_flux 
   # sw_fluxWs - Surface Water Nitrogen Flux
 
-# NLCD2001 # Running this for every year will be tough and they don't have every year anyways - ask AMP
+# NLCD2001 # We are running this for every year that it has. We are going to run mid slope 
   # PctOw2001Ws - Open Water Percentage
   # PctIce2001Ws - Ice/Snow Cover Percentage
   # PctUrbOp2001Ws - Developed, Open Space Land Use Percentage
@@ -214,7 +228,10 @@ To download the data that you want, be sure to update the `epa_categories` vecto
 
 
 sites_stream_cat <- getStreamCat(sites = sites,
-                                 epa_categories = c("Lithology"),
+                                 epa_categories = c("NLCD2001MidSlope", "NLCD2004MidSlope",
+                                                    "NLCD2006MidSlope", "NLCD2008MidSlope",
+                                                    "NLCD2011MidSlope", "NLCD2013MidSlope",
+                                                    "NLCD2016MidSlope", "NLCD2019MidSlope"),
                                  save = FALSE)
 
 # sites_stream_cat <- getStreamCat(sites = sites,
@@ -227,6 +244,35 @@ sites_stream_cat <- getStreamCat(sites = sites,
 ```
 
 # =================================== Random forest PULL ==============================================
+
+```{r NLCD 2001/2004}
+# Pulling land cover data 
+NLCD_2001_2019 <- sites_stream_cat %>%
+  rename_with(~ str_replace(., "(.*2001).*", "\\1"), contains("2001")) %>% 
+  rename_with(~ str_replace(., "(.*2004).*", "\\1"), contains("2004")) %>% 
+  rename_with(~ str_replace(., "(.*2006).*", "\\1"), contains("2006")) %>% 
+  rename_with(~ str_replace(., "(.*2008).*", "\\1"), contains("2008")) %>% 
+  rename_with(~ str_replace(., "(.*2011).*", "\\1"), contains("2011")) %>% 
+  rename_with(~ str_replace(., "(.*2013).*", "\\1"), contains("2013")) %>% 
+  rename_with(~ str_replace(., "(.*2016).*", "\\1"), contains("2016")) %>% 
+  rename_with(~ str_replace(., "(.*2019).*", "\\1"), contains("2019"))
+
+# Filter columns I want and rename
+NLCD_2001_2019 <- NLCD_2001_2019 %>% 
+  select(site, comid, matches("Pct")) %>% 
+  select(!matches(".y")) %>% 
+  select(!matches(".x")) %>% 
+  rename(Site = site) %>% 
+  st_drop_geometry(NLCD_2001_2019)
+
+# Export the combined data frame to a CSV file
+write_csv(NLCD_2001_2019, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", 
+                            "NLCD_2001_2019.csv"))
+
+
+
+```
+
 
 ```{r}
 # Pulling Lithology 
@@ -325,6 +371,22 @@ write_csv(random_forest_data, here("Output_for_analysis", "06_Meta_geospatial_ex
 # merged_df <- full_join(random_forest_data, MTBS_data)
 # 
 # write_csv(merged_df, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "random_forest_data.csv"))
+
+# Merge NLCD (land cover data) with the rest of the geospatial data
+# random_forest_data <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids",
+#                                  "random_forest_data.csv")) %>%
+#   mutate(Site = str_replace_all(Site, "_", " "))
+# 
+# NLCD_data <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids",
+#                                  "NLCD_2001_2019.csv")) %>%
+#   mutate(Site = str_replace_all(Site, "_", " "))
+# 
+# merged_df <- full_join(random_forest_data, NLCD_data)
+# 
+# write_csv(merged_df, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "random_forest_data.csv"))
+
+
+
 ```
 
 # =================================== BURN SEVERITY PULL ==============================================

@@ -1,11 +1,11 @@
 getWatersheds <- function(df = sites, massive = TRUE, make_pretty = TRUE){
   
   # Read in the NHD. This is a table representing all flow direction data across CONUS.
-  nhd <- read_csv('data/nhd_flow_network.csv')
+  nhd <- read_csv('~/GitHub/rc_sfa-rc-3-wenas-meta/R_scripts/data/nhd_flow_network.csv')
   
   subset_sites <- df %>% #remove comid duplicates (i.e., samples located in the same catchment)
     distinct(comid,.keep_all=T)
-  
+
   watersheds <- function(spid_union){
     
     tracer <- function(samples){
@@ -51,9 +51,9 @@ getWatersheds <- function(df = sites, massive = TRUE, make_pretty = TRUE){
   
   if(massive == TRUE){
     # If you are running this code across MANY watersheds or watersheds are LARGE (think Mississippi River),
-    # you can make the code faster by using the stored CONUS catchment polygons instead of the code below. 
+    # you can make the code faster by using the stored CONUS catchment polygons instead of the code below.
     # Trade-off is polygons are not the most up-to-date since it uses a static, downloaded version.
-    catchments <- readRDS('data/us_catchments.RDS') %>%
+    catchments <- readRDS('~/GitHub/rc_sfa-rc-3-wenas-meta/R_scripts/data/us_catchments.RDS') %>%
       dplyr::rename(comid = FEATUREID) %>%
       dplyr::filter(comid %in% upstream_list$comid)
   }

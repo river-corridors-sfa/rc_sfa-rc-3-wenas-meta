@@ -527,13 +527,13 @@ mutate(year = case_when(Study_ID == 'Crandall et al. 2021' ~ "2018",
                                 TRUE ~ year))
 
 #
-unique(study_site_data$Study_ID) # 17 sites 
+unique(study_site_data$Study_ID) # Should be 17 sites 
 
 # clip and merge dataframes
 severity_clip <- left_join(study_site_data, all_long) %>% 
   dplyr::select(!comid)
 
-unique(severity_clip$Study_ID) 
+unique(severity_clip$Study_ID) # Still 17
 
 severity_clip <- severity_clip %>% 
   na.omit()
@@ -546,6 +546,14 @@ unique(severity_clip$Study_ID) # 11 sites are in the analysis
 # Rhea et al. 2021 - Dont know why
 # Tiedemann; 1973 - Too old to have MTBS
 
+severity_clip <- severity_clip %>% 
+ rowwise() %>%
+  mutate(Severity_Category = case_when(
+    Low_Severity == max(c(Low_Severity, Moderate_Severity, High_Severity)) ~ "Low",
+    Moderate_Severity == max(c(Low_Severity, Moderate_Severity, High_Severity)) ~ "Moderate",
+    High_Severity == max(c(Low_Severity, Moderate_Severity, High_Severity)) ~ "High"
+  )) %>%
+  ungroup()
 
 ```
 
@@ -559,26 +567,79 @@ unique(effect_size$Study_ID) # Should be 18 studies.
 
 # Merging severity with effect size data frame 
 MTBS_model <- full_join(severity_clip, effect_size) %>% 
-  dplyr::select(Study_ID, Site, response_var, Climate, Biome, year, Effect_size_pair, Effect_size, Low_Severity, Moderate_Severity, High_Severity, Time_Since_Fire) %>% 
+  dplyr::select(Study_ID, Site, response_var, Climate, Biome, year, Effect_size_pair, Effect_size, Low_Severity, Moderate_Severity, High_Severity, Severity_Category, Time_Since_Fire) %>% 
   na.omit()
 
 unique(MTBS_model$Study_ID) # 11 studies. Should match the severity_clip data frame
   
 # Pivot long to have all burn severities in one column
-MTBS_model_long <- MTBS_model %>% 
-  pivot_longer(
-    cols = Low_Severity:High_Severity,
-    names_to = "Severity_type",
-    values_to = "MTBS_Severity",
-    values_drop_na = TRUE
-  )
+# MTBS_model_long <- MTBS_model %>% 
+#   pivot_longer(
+#     cols = Low_Severity:High_Severity,
+#     names_to = "Severity_type",
+#     values_to = "MTBS_Severity",
+#     values_drop_na = TRUE
+#   )
 
 
-doc_es_mtbs <- MTBS_model_long %>% 
+doc_es_mtbs <- MTBS_model %>% 
   filter(response_var == "DOC_Interp")
 
-no3_es_mtbs <- MTBS_model_long %>% 
+no3_es_mtbs <- MTBS_model %>% 
   filter(response_var == "NO3_Interp")
+
+```
+
+### CLIMATE MATCH PLOT with highest % being the category 
+```{r severity plot with highest % as the category}
+mtbs_percentage_effect <- MTBS_model %>% 
+  group_by(response_var, Severity_Category) %>% 
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
+   mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) 
+
+# Plot #
+vn = expression(paste(""*N*O[3]^"-"))
+
+give.n <- function(x){
+  return(c(y = median(x)*1.5, label = length(x))) 
+  # experiment with the multiplier to find the perfect position
+}
+# Refactor so we have low on the bottom and high on the top 
+MTBS_model <- MTBS_model %>% 
+  mutate(Severity_Category = fct_relevel(Severity_Category, "Low", "Moderate", "High"))
+
+ggplot(MTBS_model, aes(x = Effect_size, y = Severity_Category, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(xmin = mean_effect - se_effect, xmax = mean_effect + se_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = mtbs_percentage_effect) +
+  geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("MTBS Severity") +
+  xlab("Effect Size") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = ""),
+                     labels = c('DOC', vn)) +
+  scale_y_discrete(label = c("Low", "Moderate", "High")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.key = element_blank(),
+        legend.background = element_blank(),
+        legend.position = c(0.1, 0.86))
+
+ggsave("Effect_Size_MTBS_Severity.pdf",
+       path = here("initial_plots", "07_Meta_effect_size_models"),
+       width = 10, height = 8, units = "in")
+
 
 ```
 
