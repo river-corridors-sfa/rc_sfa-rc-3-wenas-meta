@@ -23,8 +23,9 @@ The purpose of this script is to clean MTBS wildfire file names. The MTBS downlo
 library(here)
 
 ```
-
+### Functions
 ```{r}
+# Function 1
 str_split2 <- function(string, pattern, n=Inf, simplify=F){
   val <- str_split(string, pattern=pattern, n=n, simplify = simplify)
   if(length(val) == 1){
@@ -33,192 +34,6 @@ str_split2 <- function(string, pattern, n=Inf, simplify=F){
   val
 }
 
-```
-
-
-```{r}
-#'@import sf
-#'@import stringr
-
-#' @param wd the location with the raw MTBS files
-#' @param save_loc the location to save all the files 
-#' 
-
-wd <- here("gis_data", "Fire_Perimeters", "Angora_2007", "angora_mtbs", "2007")
-
-save_loc <- here("gis_data", "Fire_Perimeters", "renamed_MTBS")
-
-clean_mtbs <- function(wd, save_loc){
-  #get files of fires 
-  files <- list.files(wd, recursive = T)  
-  # files <- files[stringr::str_detect(files, ".zip")] # Keep this in if you have zipped files
-  
-  lapply(1:length(files), function(f){
-    
-    x <- files[f]
-
-    #get place to put zip files
-    exdir <- paste(wd, unlist(stringr::str_split(x, "/"))[1], sep="/")
-    
-    #upzip file
-    unzip(paste(wd, x, sep="/"), exdir=exdir)
-    
-    #find shape file to extract fire name
-    zip_files <- list.files(exdir)
-    shp_file <- zip_files[stringr::str_detect(zip_files, "burn_bndy.shp")]
-    
-    #read file to get fire name 
-    name <- sf::st_read(paste(exdir, shp_file, sep="/"))
-    filename <- name$Incid_Name
-    
-    #format name for file 
-    filename <- tolower(filename)
-    filename <- stringr::str_replace_all(filename, " ", "_")
-    filename <- gsub("[][()]", "", filename) 
-    
-    #rename files 
-    #get dates of data 
-    dates <- str_split2(shp_file, "_")[2:3]
-    
-    #get header, remove files from other fires 
-    header <- str_split2(shp_file, "_")[1]
-    zip_files <- zip_files[str_detect(zip_files, regex(header, ignore_case=T))]
-    
-    #if both, remove completely 
-    new_files <- gsub(paste("_", paste(dates, collapse ="_"), sep=""), "", zip_files)
-    
-    #if just one use pre or post 
-    new_files <- gsub(dates[1], "pre", new_files)
-    new_files <- gsub(dates[2], "post", new_files)
-    
-    #replace long name with fire name 
-    new_files <- gsub(header, filename, new_files)
-    
-    #replace metadata name 
-    new_files <- gsub(toupper(header), filename, new_files)
-    
-    #rename files 
-    file.rename(paste(exdir, zip_files, sep="/"), paste(save_loc, new_files, sep="/"))
-  })
-}
-
-clean_mtbs(wd, save_loc)
-
-
-
-```
-
-### Loop through each folder 
-```{r}
-# Define the base directory where the folders are located
-base_dir <- here("gis_data", "Fire_Perimeters")
-
-# Define a vector of folder names
-folder_names <- c("Angora_2007", "Caldor_2021", "Clovermist_1988", "Fourmile_Canyon_2010", "Gaviota_2004", "Hayman_2002", "High_Park_2012", "Mosquito_2022", "Pole_Creek_2018", "Rampage_Complex_2003","Red_Bench_1988", "Wragg_2015") # 12 fires
-
-#'@import sf
-#'@import stringr
-
-#' @param wd the location with the raw MTBS files
-#' @param save_loc the location to save all the files 
-#' 
-
-# Set the working directory of where the fires are located 
-# wd <- here("gis_data", "Fire_Perimeters")
-wd <- here("gis_data", "Fire_Perimeters", "Angora_2007", "angora_mtbs", "2007")
-
-save_loc <- here("gis_data", "Fire_Perimeters", "Angora_2007", "angora_mtbs", "2007", "ca3888612004020070623")
-
-
-
-# Define the function to clean MTBS files
-clean_mtbs <- function(wd, save_loc){
-  # Get files of fires 
-  files <- list.files(wd, recursive = TRUE)  
-  # files <- files[stringr::str_detect(files, ".zip")] # Uncomment if you have zipped files
-
-  lapply(1:length(files), function(f){
-    
-    x <- files[f]
-  
-    # Get place to put zip files
-    exdir <- paste(wd, unlist(stringr::str_split(x, "/"))[1], sep="/")
-  
-    # Unzip file
-    unzip(paste(wd, x, sep="/"), exdir=exdir)
-    
-    # Find shape file to extract fire name
-    zip_files <- list.files(exdir)
-    shp_file <- zip_files[stringr::str_detect(zip_files, "burn_bndy.shp")]
-    
-    # Read file to get fire name 
-    name <- sf::st_read(paste(exdir, shp_file, sep="/"))
-    filename <- name$Incid_Name
-    
-    # Format name for file 
-    filename <- tolower(filename)
-    filename <- stringr::str_replace_all(filename, " ", "_")
-    filename <- gsub("[][()]", "", filename) 
-    
-    # Rename files 
-    # Get dates of data 
-    dates <- str_split2(shp_file, "_")[2:3]
-    
-    # Get header, remove files from other fires 
-    header <- str_split2(shp_file, "_")[1]
-    zip_files <- zip_files[str_detect(zip_files, regex(header, ignore_case=TRUE))]
-    
-    # If both, remove completely 
-    new_files <- gsub(paste("_", paste(dates, collapse ="_"), sep=""), "", zip_files)
-    
-    # If just one use pre or post 
-    new_files <- gsub(dates[1], "pre", new_files)
-    new_files <- gsub(dates[2], "post", new_files)
-    
-    # Replace long name with fire name 
-    new_files <- gsub(header, filename, new_files)
-    
-    # Replace metadata name 
-    new_files <- gsub(toupper(header), filename, new_files)
-    
-    # Rename files 
-    file.rename(paste(exdir, zip_files, sep="/"), paste(save_loc, new_files, sep="/"))
-  })
-}
-
-# Iterate over each folder and process the files
-lapply(folder_names, function(folder_name) {
-  wd <- here("gis_data", "Fire_Perimeters", folder_name, "angora_mtbs", "2007")
-})
-  clean_mtbs(wd, base_dir)
-})
-
-
-```
-
-
-### Chat GPT 2.0 
-```{r}
-# Define the base directory where the folders are located
-base_dir <- here("gis_data", "renamed_fire_files")
-
-folder_names <- c("Angora_2007", "Caldor_2021", "Clovermist_1988", "Fourmile_Canyon_2010", "Gaviota_2004", "Hayman_2002", "High_Park_2012", "Mosquito_2022", "Pole_Creek_2018", "Rampage_Complex_2003","Red_Bench_1988", "Wragg_2015") # 12 fires
-
-
-# Define a named vector or list of folder names and their corresponding years
-folders_and_years <- list(
-  "Angora_2007" = "2007",
-  "Caldor_2021" = "2021",
-  "Clovermist_1988" = "1988",
-  "Fourmile_Canyon_2010" = "2010",
-  "Gaviota_2004" = "2004",
-  "Hayman_2002" = "2002",
-  "High_Park_2012" = "2012",
-  "Mosquito_2022" = "2022",
-  "Pole_Creek_2018" = "2018",
-  "Rampage_Complex_2003" = "2003",
-  "Red_Bench_1988" = "1988",
-  "Wragg_2015" = "2015")
 
 # Define the function to clean MTBS files
 clean_mtbs <- function(wd){
@@ -270,17 +85,52 @@ clean_mtbs <- function(wd){
     # Replace metadata name 
     new_files <- gsub(toupper(header), filename, new_files)
     
-    # Rename files 
-    file.rename(paste(exdir, zip_files, sep="/"), paste(exdir, new_files, sep="/"))
+    # Copy files with new names instead of renaming
+    file.copy(from = paste(exdir, zip_files, sep="/"), 
+              to = paste(exdir, new_files, sep="/"))
   })
 }
+```
+
+# Loop through all the fires we have for the analysis
+```{r}
+# Define the base directory where the folders are located
+base_dir <- here("gis_data", "renamed_fire_files")
+
+folder_names <- c("Angora_2007", "Caldor_2021", "Clovermist_1988", "Fourmile_Canyon_2010", "Gaviota_2004", "Hayman_2002", "High_Park_2012", "Mosquito_2022", "Pole_Creek_2018", "Rampage_Complex_2003","Red_Bench_1988", "Wragg_2015") # 12 fires
+
+
+# Define a named vector or list of folder names and their corresponding years
+folders_and_years <- list(
+  "angora" = "2007",
+  "caldor" = "2021",
+  "clovermist" = "1988",
+  "fourmile_canyon" = "2010",
+  "gaviota" = "2004",
+  "hayman" = "2002",
+  "high_park" = "2012",
+  "mosquito" = "2022",
+  "pole_creek" = "2018",
+  "rampage_complex" = "2003",
+  "red_bench" = "1988",
+  "wragg" = "2015")
+
+# folder_name <- "Clovermist_1988"
+# folder_name <- "Fourmile_Canyon_2010"
+# folder_name <- "Gaviota_2004"
+# folder_name <- "Hayman_2002"
+# folder_name <- "High_Park_2012"
+# folder_name <- "Mosquito_2022"
+# folder_name <- "Pole_Creek_2018"
+# folder_name <- "Rampage_Complex_2003"
+# folder_name <- "Red_Bench_1988"
+
 
 # Iterate over each folder and process the files using a for loop
 for (folder_name in names(folders_and_years)) {
   year <- folders_and_years[[folder_name]]
   wd <- here("gis_data", "Fire_Perimeters", folder_name, "mtbs", year)
-
-  clean_mtbs(wd, base_dir)
+  clean_mtbs(wd)
 }
 
 

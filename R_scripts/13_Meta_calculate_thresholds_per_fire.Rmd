@@ -1,0 +1,134 @@
+---
+title: "13_Meta_calculate_thresholds_per_fire"
+output: html_document
+date: "2024-06-13"
+editor_options: 
+  chunk_output_type: console
+---
+
+The purpose of this script is to calculate the burn severity thresholds for individual fires
+
+### Load Libraries
+```{r}
+library(raster)
+
+```
+
+# Gaviota Test #
+```{r Gaviota test}
+# get classified burn severity map 
+dnbr6 <- raster("~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Gaviota_2004/mtbs/2004/ca3448712019620040605/gaviota_dnbr6.tif")
+
+# get raw dnbr map 
+dnbr <- raster("~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Gaviota_2004/mtbs/2004/ca3448712019620040605/gaviota_dnbr.tif")
+
+#do zonal stats 
+thresh_low <- zonal(dnbr, dnbr6, "min")
+thresh_high <- zonal(dnbr, dnbr6, "max")
+
+thresh <- data.frame(zone = thresh_low[,1], min=thresh_low[,2],max=thresh_high[,2])
+
+# -845 - (-150): Increased Greenness
+# (-149 - 50): Unburned to low
+# 51-270: Low
+# 271 - 520: Moderate
+# 521 - 978: High
+
+```
+
+### For loop test 
+```{r}
+library(raster)
+library(dplyr)
+library(here)
+library(stringr)
+
+# Define the list of directories for each fire
+fire_directories <- list(
+  here("gis_data", "Fire_Perimeters", "angora", "mtbs", "2007", "ca3888612004020070623"),
+  here("gis_data", "Fire_Perimeters", "caldor", "mtbs", "2021", "ca3858612053820210815"),
+  here("gis_data", "Fire_Perimeters", "clovermist", "mtbs", "1988", "wy4473710995419880709"),
+  here("gis_data", "Fire_Perimeters", "fourmile_canyon", "mtbs", "2010", "co4005110538520100906"),
+  here("gis_data", "Fire_Perimeters", "gaviota", "mtbs", "2004", "ca3448712019620040605"),
+  here("gis_data", "Fire_Perimeters", "hayman", "mtbs", "2002", "co3922010528720020608"),
+  here("gis_data", "Fire_Perimeters", "high_park", "mtbs", "2012", "co4058910540420120609"),
+  here("gis_data", "Fire_Perimeters", "mosquito", "mtbs", "2022", "ca3900612074520220907"),
+  here("gis_data", "Fire_Perimeters", "pole_creek", "mtbs", "2018", "ut3980611166020180906"),
+  here("gis_data", "Fire_Perimeters", "rampage_complex_double_mountain_2", "mtbs", "2003", "mt4839411359020030819"),
+  here("gis_data", "Fire_Perimeters", "red_bench", "mtbs", "1988", "mt4878711426219880906"),
+  here("gis_data", "Fire_Perimeters", "wragg", "mtbs", "2015", "ca3851412213120150722"))
+
+# Initialize a list to store the results
+results <- list()
+
+# Loop over each fire directory
+for (dir in fire_directories) {
+  # Extract fire name from directory path
+  fire_name <- str_match(dir, "Fire_Perimeters/(.*?)/")[2]
+
+  # Construct the file paths for the dnbr and dnbr6 rasters using here
+  dnbr6_path <- here(dir, paste0(fire_name, "_dnbr6.tif"))
+  dnbr_path <- here(dir, paste0(fire_name, "_dnbr.tif"))
+  
+  # Load the rasters
+  dnbr6 <- raster(dnbr6_path)
+  dnbr <- raster(dnbr_path)
+  
+  # Perform zonal statistics and convert to tibbles
+  thresh_low <- as_tibble(zonal(dnbr, dnbr6, "min"), .name_repair = "minimal") %>% 
+    rename(zone = 1, min = 2)
+  thresh_high <- as_tibble(zonal(dnbr, dnbr6, "max"), .name_repair = "minimal") %>% 
+    rename(zone = 1, max = 2)
+  
+  # Join the two tibbles by 'zone'
+  thresh <- inner_join(thresh_low, thresh_high, by = "zone")
+  
+  # Add fire_name as a column
+  thresh <- thresh %>% 
+    mutate(fire_name = fire_name)
+  
+  # Store the results in the list
+  results[[fire_name]] <- thresh
+}
+
+# Combine all results into a single data frame (optional)
+combined_results <- bind_rows(results)
+
+# These zones do not have an association with the Burn Severity 
+combined_results_filter <- combined_results %>% 
+  filter(!zone == "0") %>% 
+  filter(!zone == "6")
+
+# Mutate a column to assign burn severities to the thresholds
+combined_results_filter <- combined_results_filter %>% 
+  mutate(Burn_Severity = case_when(zone == "1" ~ "Unburned to Low",
+                                   zone == "2" ~ "Low",
+                                   zone == "3" ~ "Moderate",
+                                   zone == "4" ~ "High",
+                                   zone == "5" ~ "Increased Greeness"))
+
+write.csv(combined_results_filter, here("Output_for_analysis", "13_Meta_calculate_thresholds_per_fire", "Fire_thresholds.csv"))
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

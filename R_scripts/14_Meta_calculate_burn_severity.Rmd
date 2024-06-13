@@ -1,5 +1,5 @@
 ---
-title: "13_Meta_calculate_burn_severity"
+title: "14_Meta_calculate_burn_severity"
 output: html_document
 date: "2024-06-12"
 editor_options: 
@@ -410,7 +410,7 @@ for (ws in watersheds) {
 
 ```
 
-# ===================================== Directory option ========================================================
+# ===================================== Directory option ===========================================
 ```{r}
 # Define the list of sites
 sites <- c("DS1", "DS2", "DS3" # Add all 53 site names here
