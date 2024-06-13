@@ -127,82 +127,30 @@ clean_raster <- function (raster, sf, type = "numeric",
 
 ```
 
-# load in sites and their comid's
-```{r load in meta_lat_longs}
-site_comids <- read_csv(here("inputs", "catchment_characteristics", "meta_lat_long_comids.csv"))
-
-# Function to parse the geometry string
-parse_geometry <- function(geom_str) {
-  coords <- as.numeric(str_extract_all(geom_str, "-?\\d+\\.\\d+")[[1]])
-  st_point(coords)
-}
-
-# Use mutate to parse the geometry and convert to sf object
-site_comids_sf <- site_comids %>%
-  mutate(
-    geometry = purrr::map(geometry, parse_geometry),
-    geometry = sf::st_sfc(geometry, crs = 4326)
-  ) %>%
-  st_as_sf()
-
-```
-
-# Plot gaviota fire test 
-```{r}
-# Read the shapefile
-burn_boundary <- st_read("~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Gaviota_2004/mtbs/2004/ca3448712019620040605/ca3448712019620040605_20040425_20050412_burn_bndy.shp")
-
-# Plot using ggplot2
-ggplot() +
-  geom_sf(data = burn_boundary) +
-  ggtitle("Burn Boundary") +
-  theme_minimal()
-```
-
-# talk with Katie #
+# Read in site shape files #
 ```{r}
 # Can just read in the shape file of all the watersheds
 site_shape <- st_read("~/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/06_Meta_geospatial_extraction_with_comids/watershed_shapefile.shp")
+
 # add location of the fire in the data frame 
+fire_names <- read_csv(here("inputs", "catchment_characteristics", "fire_watershed_lat_long_comids.csv")) %>% 
+  select(site = Site, comid, fire_name)
+  
 
-
-plot(site_shape[36, ])
+site_shape_fire_combined <- full_join(site_shape, fire_names)
 
 ```
 
-
-# Section 1: load data layers
+# Read in fire files
 ```{r}
-#section 1.1: load basin area 
-# Test basin that Katie gave: 17090004
-basin <- get_huc(id = "17090004", type = "huc08")
-# 
-# #section 1.2: load fire data 
-# #load in the dnbr and shapefile
-# dnbr <- raster("Z:/3_GIS-GPS/Wildfire/MTBS/McKenzie/holiday_farm_dnbr.tif")
-# fire_shape <- read_sf("Z:/3_GIS-GPS/Wildfire/MTBS/McKenzie/holiday_farm_burn_bndy.shp")
-
-
-# Test basin - Gaviota basin (comid = 17594763): According to the paper - 12% burned. 
-  # 4.95%, 2.26%, 0.19% from MTBS - classified as Low Severity
-gaviota_sf_test <- site_comids_sf %>% 
-  filter(Site == "Gaviota") 
-
-# Get HUC for the geometry column
-gaviota_basin <- get_huc(AOI = gaviota_sf_test$geometry, type = "huc08")
-
-
-
-#section 1.2: load fire data
 #load in the dnbr and shapefile
-# This is the Gaviota Fire
-dnbr <- raster("~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Gaviota_2004/mtbs/2004/ca3448712019620040605/ca3448712019620040605_20040425_20050412_dnbr.tif")
+dnbr <- raster(here("gis_data", "Fire_Perimeters", "gaviota", "mtbs", "2004", "ca3448712019620040605", "gaviota_dnbr.tif"))
 
-fire_shape <- read_sf("~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Gaviota_2004/mtbs/2004/ca3448712019620040605/ca3448712019620040605_20040425_20050412_burn_bndy.shp")
+fire_shape <- read_sf(here("gis_data", "Fire_Perimeters", "gaviota", "mtbs", "2004", "ca3448712019620040605", "gaviota_burn_bndy.shp"))
 
 ```
 
-# Section 2: Clip data to the watershed
+# Clip data to the watershed
 ```{r}
 #section 2.1: clip the DNBR data to the fire boundry 
 dnbr <- clean_raster(dnbr, fire_shape, type = "numeric", return="raster")
@@ -228,13 +176,15 @@ if(compareCRS(dnbr, site_shape[36, ]) == F){
 mean_dnbr <- exactextractr::exact_extract(dnbr,basin_pj, "mean", 
                                            progress=F)
 
-#section 3.2: classify based on mean dnbr
-  ## Based on Lutes, D. C., Keane, R. E., Caratti, J. F., Key, C. H., Benson, N. C., Sutherland, S., & Gangi, L. J. (2006). FIREMON: Fire effects monitoring and inventory system. Gen. Tech. Rep. RMRS-GTR-164. Fort Collins, CO: U.S. Department of Agriculture, Forest Service, Rocky Mountain Research Station. 1 CD., 164. https://doi.org/10.2737/RMRS-GTR-164
+# Read in thresholds data frame that we created that have the ranges for each fire
+thresholds <- read_csv(here("Output_for_analysis", "13_Meta_calculate_thresholds_per_fire", "Fire_thresholds.csv"))
 
-thresholds <- data.frame(severity=c("Regrowth", "Unburned", "Low","Moderate-low","Moderate-high",
-                                        "High"),
-                             low_dnbr =c(-500, -100, 100, 270, 440, 600),
-                             high_dnbr=c(-101, 99,269,439,659,1300))
+
+results <- tibble(
+  site = character(),
+  mean_dnbr = numeric(),
+  Burn_Severity = character()
+)
     
 sev_level <- thresholds$severity[mean_dnbr >= thresholds$low_dnbr & mean_dnbr < thresholds$high_dnbr] 
     
@@ -247,83 +197,69 @@ cat("Mean DNBR is ", round(mean_dnbr, 0),
 
 ```
 
-Lets do one that is really high burned.
-# ================================== Murphy et al. 2015 DS1 =================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ==================================== Script Graveyard ================================================================
+# load in sites and their comid's
+```{r load in meta_lat_longs}
+# site_comids <- read_csv(here("inputs", "catchment_characteristics", "meta_lat_long_comids.csv"))
+# 
+# # Function to parse the geometry string
+# parse_geometry <- function(geom_str) {
+#   coords <- as.numeric(str_extract_all(geom_str, "-?\\d+\\.\\d+")[[1]])
+#   st_point(coords)
+# }
+# 
+# # Use mutate to parse the geometry and convert to sf object
+# site_comids_sf <- site_comids %>%
+#   mutate(
+#     geometry = purrr::map(geometry, parse_geometry),
+#     geometry = sf::st_sfc(geometry, crs = 4326)
+#   ) %>%
+#   st_as_sf()
+
+```
+
 # Plot gaviota fire test 
 ```{r}
-# Read the shapefile
-burn_boundary <- st_read("~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Fourmile_Canyon_2010/mtbs 3/2010/co4005110538520100906/co4005110538520100906_20100621_20110624_burn_bndy.shp")
-
-# Plot using ggplot2
-ggplot() +
-  geom_sf(data = burn_boundary) +
-  ggtitle("Burn Boundary") +
-  theme_minimal()
-
-
-```
-
-# Section 1: load data layers
-```{r}
-#section 1.1: load basin area 
-# Test basin - San_Onofre basin (comid = 2889268): 
-  # 2.74% 5.66% 5.67% from MTBS - classified as High Severity due to that being the highest. 
-DS1_sf_test <- site_comids_sf %>% 
-  filter(Site == "DS1") 
-
-# Get HUC for the geometry column
-DS1_basin <- get_huc(AOI = DS1_sf_test$geometry, type = "huc08")
-# san_onofre_basin <- get_huc(id = "17594757", type = "huc12")
-
-#section 1.2: load fire data
-#load in the dnbr and shapefile
-# This is the Gaviota Fire
-dnbr <- raster("~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Fourmile_Canyon_2010/mtbs 3/2010/co4005110538520100906/co4005110538520100906_20100621_20110624_dnbr.tif")
-
-fire_shape <- read_sf("~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Fourmile_Canyon_2010/mtbs 3/2010/co4005110538520100906/co4005110538520100906_20100621_20110624_burn_bndy.shp")
-
-```
-
-# Section 2: Clip data to the watershed
-```{r}
-#section 2.1: clip the DNBR data to the fire boundry 
-dnbr <- clean_raster(dnbr, fire_shape, type = "numeric", return="raster")
-plot(dnbr) #use to make sure it's doing what you expect
-    
-#section 2.2: clip the DNBR data to the watershed boundry # This doesnt work for me, I don't know if this is what is correct
-basin_dnbr <- clean_raster(dnbr, DS1_basin,  type = "numeric", return="raster")
-#plot(basin_dnbr) #use to make sure it's doing what you expect
-
-```
-
-# Section 3: Get the average DNBR
-```{r}
-# NOTE HERE: this deviates from my method where unburned areas in the basin were give 0's. The method done here will get the average severity of just the area in the basin the burned 
-    
-#section 3.1: make sure basin and fire layer are the same projection
-if(compareCRS(dnbr, basin) == F){
-      basin_pj <- st_transform(DS1_basin, crs(dnbr))}else{
-        basin_pj <- basin}
-    
-#extract data
-mean_dnbr <- exactextractr::exact_extract(dnbr,basin_pj, "mean", 
-                                           progress=F)
+# # Read the shapefile
+# burn_boundary <- st_read("~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Gaviota_2004/mtbs/2004/ca3448712019620040605/ca3448712019620040605_20040425_20050412_burn_bndy.shp")
+# 
+# # Plot using ggplot2
+# ggplot() +
+#   geom_sf(data = burn_boundary) +
+#   ggtitle("Burn Boundary") +
+#   theme_minimal()
 
 #section 3.2: classify based on mean dnbr
   ## Based on Lutes, D. C., Keane, R. E., Caratti, J. F., Key, C. H., Benson, N. C., Sutherland, S., & Gangi, L. J. (2006). FIREMON: Fire effects monitoring and inventory system. Gen. Tech. Rep. RMRS-GTR-164. Fort Collins, CO: U.S. Department of Agriculture, Forest Service, Rocky Mountain Research Station. 1 CD., 164. https://doi.org/10.2737/RMRS-GTR-164
 
-thresholds <- data.frame(severity=c("Regrowth", "Unburned", "Low","Moderate-low","Moderate-high",
-                                        "High"),
-                             low_dnbr =c(-500, -100, 100, 270, 440, 600),
-                             high_dnbr=c(-101, 99,269,439,659,1300))
-    
-sev_level <- thresholds$severity[mean_dnbr >= thresholds$low_dnbr & mean_dnbr < thresholds$high_dnbr] 
-    
-  
-cat("Mean DNBR is ", round(mean_dnbr, 0),
-        ", which is classified as: ", sev_level, sep="")
-
-# DS1 is listed as Moderate-low
+#thresholds <- data.frame(severity=c("Regrowth", "Unburned", "Low","Moderate-low","Moderate-high",
+                               #         "High"),
+                             #low_dnbr =c(-500, -100, 100, 270, 440, 600),
+                             #high_dnbr=c(-101, 99,269,439,659,1300))
 
 ```
 
@@ -344,136 +280,133 @@ cat("Mean DNBR is ", round(mean_dnbr, 0),
 #   # Add more watersheds as needed
 # )
 
-# Define the list of watersheds and associated fire data
-watersheds <- list(
-  list(
-    Site = "DS1",
-    fire_tif = "~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Fourmile_Canyon_2010/mtbs 3/2010/co4005110538520100906/co4005110538520100906_20100621_20110624_dnbr.tif",
-    fire_shp = "~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Fourmile_Canyon_2010/mtbs 3/2010/co4005110538520100906/co4005110538520100906_20100621_20110624_burn_bndy.shp"
-  ),
-  list(
-    Site = "DS2",
-    fire_tif = "~/path_to_DS2_fire_tif.tif",  # Update with actual path
-    fire_shp = "~/path_to_DS2_fire_shp.shp"   # Update with actual path
-  )
-  # Add more watersheds as needed
-)
-
-# Define the DNBR severity thresholds
-thresholds <- data.frame(
-  severity = c("Regrowth", "Unburned", "Low", "Moderate-low", "Moderate-high", "High"),
-  low_dnbr = c(-500, -100, 100, 270, 440, 600),
-  high_dnbr = c(-101, 99, 269, 439, 659, 1300)
-)
-
-# Loop over each watershed
-for (ws in watersheds) {
-  cat("Processing Site:", ws$Site, "\n")
-
-  # Load basin area for the current watershed
-  DS_sf <- site_comids_sf %>%
-    filter(Site == ws$Site)
-  
-  # Get HUC for the geometry column
-  basin <- get_huc(AOI = DS_sf$geometry, type = "huc08")
-  
-  # Load fire data
-  dnbr <- raster(ws$fire_tif)
-  fire_shape <- read_sf(ws$fire_shp)
-  
-  # Section 2: Clip data to the watershed
-  # Clip the DNBR data to the fire boundary
-  dnbr <- clean_raster(dnbr, fire_shape, type = "numeric", return = "raster")
-  plot(dnbr) # Optional: use to make sure it's doing what you expect
-  
-  # Clip the DNBR data to the watershed boundary
-  basin_dnbr <- clean_raster(dnbr, basin, type = "numeric", return = "raster")
-  plot(basin_dnbr) # Optional: use to make sure it's doing what you expect
-  
-  # Section 3: Get the average DNBR
-  # Make sure basin and fire layer are the same projection
-  if (compareCRS(dnbr, basin) == FALSE) {
-    basin_pj <- st_transform(basin, crs(dnbr))
-  } else {
-    basin_pj <- basin
-  }
-  
-  # Extract data
-  mean_dnbr <- exactextractr::exact_extract(dnbr, basin_pj, "mean", progress = FALSE)
-  
-  # Classify based on mean DNBR
-  sev_level <- thresholds$severity[mean_dnbr >= thresholds$low_dnbr & mean_dnbr < thresholds$high_dnbr]
-  
-  cat("Mean DNBR for Site", ws$Site, "is", round(mean_dnbr, 0), ", which is classified as:", sev_level, "\n")
-}
+# # Define the list of watersheds and associated fire data
+# watersheds <- list(
+#   list(
+#     Site = "DS1",
+#     fire_tif = "~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Fourmile_Canyon_2010/mtbs 3/2010/co4005110538520100906/co4005110538520100906_20100621_20110624_dnbr.tif",
+#     fire_shp = "~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Fourmile_Canyon_2010/mtbs 3/2010/co4005110538520100906/co4005110538520100906_20100621_20110624_burn_bndy.shp"
+#   ),
+#   list(
+#     Site = "DS2",
+#     fire_tif = "~/path_to_DS2_fire_tif.tif",  # Update with actual path
+#     fire_shp = "~/path_to_DS2_fire_shp.shp"   # Update with actual path
+#   )
+#   # Add more watersheds as needed
+# )
+# 
+# # Define the DNBR severity thresholds
+# thresholds <- data.frame(
+#   severity = c("Regrowth", "Unburned", "Low", "Moderate-low", "Moderate-high", "High"),
+#   low_dnbr = c(-500, -100, 100, 270, 440, 600),
+#   high_dnbr = c(-101, 99, 269, 439, 659, 1300)
+# )
+# 
+# # Loop over each watershed
+# for (ws in watersheds) {
+#   cat("Processing Site:", ws$Site, "\n")
+# 
+#   # Load basin area for the current watershed
+#   DS_sf <- site_comids_sf %>%
+#     filter(Site == ws$Site)
+#   
+#   # Get HUC for the geometry column
+#   basin <- get_huc(AOI = DS_sf$geometry, type = "huc08")
+#   
+#   # Load fire data
+#   dnbr <- raster(ws$fire_tif)
+#   fire_shape <- read_sf(ws$fire_shp)
+#   
+#   # Section 2: Clip data to the watershed
+#   # Clip the DNBR data to the fire boundary
+#   dnbr <- clean_raster(dnbr, fire_shape, type = "numeric", return = "raster")
+#   plot(dnbr) # Optional: use to make sure it's doing what you expect
+#   
+#   # Clip the DNBR data to the watershed boundary
+#   basin_dnbr <- clean_raster(dnbr, basin, type = "numeric", return = "raster")
+#   plot(basin_dnbr) # Optional: use to make sure it's doing what you expect
+#   
+#   # Section 3: Get the average DNBR
+#   # Make sure basin and fire layer are the same projection
+#   if (compareCRS(dnbr, basin) == FALSE) {
+#     basin_pj <- st_transform(basin, crs(dnbr))
+#   } else {
+#     basin_pj <- basin
+#   }
+#   
+#   # Extract data
+#   mean_dnbr <- exactextractr::exact_extract(dnbr, basin_pj, "mean", progress = FALSE)
+#   
+#   # Classify based on mean DNBR
+#   sev_level <- thresholds$severity[mean_dnbr >= thresholds$low_dnbr & mean_dnbr < thresholds$high_dnbr]
+#   
+#   cat("Mean DNBR for Site", ws$Site, "is", round(mean_dnbr, 0), ", which is classified as:", sev_level, "\n")
+# }
 
 
 ```
 
 # ===================================== Directory option ===========================================
 ```{r}
-# Define the list of sites
-sites <- c("DS1", "DS2", "DS3" # Add all 53 site names here
-           )
-
-# Base directories for DNBR and shapefiles
-dnbr_base_dir <- "~/path_to_fire_data/dnbr/"
-shapefiles_base_dir <- "~/path_to_fire_data/shapefiles/"
-
-# Define the DNBR severity thresholds
-thresholds <- data.frame(
-  severity = c("Regrowth", "Unburned", "Low", "Moderate-low", "Moderate-high", "High"),
-  low_dnbr = c(-500, -100, 100, 270, 440, 600),
-  high_dnbr = c(-101, 99, 269, 439, 659, 1300)
-)
-
-# Loop over each site
-for (site in sites) {
-  cat("Processing Site:", site, "\n")
-  
-  # Load basin area for the current site
-  DS_sf <- site_comids_sf %>%
-    filter(Site == site)
-  
-  # Get HUC for the geometry column
-  basin <- get_huc(AOI = DS_sf$geometry, type = "huc08")
-  
-  # Generate file paths dynamically
-  dnbr_file <- paste0(dnbr_base_dir, site, "_dnbr.tif")
-  shapefile <- paste0(shapefiles_base_dir, site, "_bndy.shp")
-  
-  # Load fire data
-  dnbr <- raster(dnbr_file)
-  fire_shape <- read_sf(shapefile)
-  
-  # Section 2: Clip data to the watershed
-  # Clip the DNBR data to the fire boundary
-  dnbr <- clean_raster(dnbr, fire_shape, type = "numeric", return = "raster")
-  plot(dnbr) # Optional: use to make sure it's doing what you expect
-  
-  # Clip the DNBR data to the watershed boundary
-  basin_dnbr <- clean_raster(dnbr, basin, type = "numeric", return = "raster")
-  plot(basin_dnbr) # Optional: use to make sure it's doing what you expect
-  
-  # Section 3: Get the average DNBR
-  # Make sure basin and fire layer are the same projection
-  if (compareCRS(dnbr, basin) == FALSE) {
-    basin_pj <- st_transform(basin, crs(dnbr))
-  } else {
-    basin_pj <- basin
-  }
-  
-  # Extract data
-  mean_dnbr <- exactextractr::exact_extract(dnbr, basin_pj, "mean", progress = FALSE)
-  
-  # Classify based on mean DNBR
-  sev_level <- thresholds$severity[mean_dnbr >= thresholds$low_dnbr & mean_dnbr < thresholds$high_dnbr]
-  
-  cat("Mean DNBR for Site", site, "is", round(mean_dnbr, 0), ", which is classified as:", sev_level, "\n")
-}
-
-
-
+# # Define the list of sites
+# sites <- c("DS1", "DS2", "DS3" # Add all 53 site names here
+#            )
+# 
+# # Base directories for DNBR and shapefiles
+# dnbr_base_dir <- "~/path_to_fire_data/dnbr/"
+# shapefiles_base_dir <- "~/path_to_fire_data/shapefiles/"
+# 
+# # Define the DNBR severity thresholds
+# thresholds <- data.frame(
+#   severity = c("Regrowth", "Unburned", "Low", "Moderate-low", "Moderate-high", "High"),
+#   low_dnbr = c(-500, -100, 100, 270, 440, 600),
+#   high_dnbr = c(-101, 99, 269, 439, 659, 1300)
+# )
+# 
+# # Loop over each site
+# for (site in sites) {
+#   cat("Processing Site:", site, "\n")
+#   
+#   # Load basin area for the current site
+#   DS_sf <- site_comids_sf %>%
+#     filter(Site == site)
+#   
+#   # Get HUC for the geometry column
+#   basin <- get_huc(AOI = DS_sf$geometry, type = "huc08")
+#   
+#   # Generate file paths dynamically
+#   dnbr_file <- paste0(dnbr_base_dir, site, "_dnbr.tif")
+#   shapefile <- paste0(shapefiles_base_dir, site, "_bndy.shp")
+#   
+#   # Load fire data
+#   dnbr <- raster(dnbr_file)
+#   fire_shape <- read_sf(shapefile)
+#   
+#   # Section 2: Clip data to the watershed
+#   # Clip the DNBR data to the fire boundary
+#   dnbr <- clean_raster(dnbr, fire_shape, type = "numeric", return = "raster")
+#   plot(dnbr) # Optional: use to make sure it's doing what you expect
+#   
+#   # Clip the DNBR data to the watershed boundary
+#   basin_dnbr <- clean_raster(dnbr, basin, type = "numeric", return = "raster")
+#   plot(basin_dnbr) # Optional: use to make sure it's doing what you expect
+#   
+#   # Section 3: Get the average DNBR
+#   # Make sure basin and fire layer are the same projection
+#   if (compareCRS(dnbr, basin) == FALSE) {
+#     basin_pj <- st_transform(basin, crs(dnbr))
+#   } else {
+#     basin_pj <- basin
+#   }
+#   
+#   # Extract data
+#   mean_dnbr <- exactextractr::exact_extract(dnbr, basin_pj, "mean", progress = FALSE)
+#   
+#   # Classify based on mean DNBR
+#   sev_level <- thresholds$severity[mean_dnbr >= thresholds$low_dnbr & mean_dnbr < thresholds$high_dnbr]
+#   
+#   cat("Mean DNBR for Site", site, "is", round(mean_dnbr, 0), ", which is classified as:", sev_level, "\n")
+# }
 ```
 
 
