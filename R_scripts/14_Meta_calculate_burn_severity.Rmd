@@ -127,73 +127,266 @@ clean_raster <- function (raster, sf, type = "numeric",
 
 ```
 
-# Read in site shape files #
+# ==================================== for loop  ===============================
+
 ```{r}
-# Can just read in the shape file of all the watersheds
+# Read in site shapefiles
 site_shape <- st_read("~/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/06_Meta_geospatial_extraction_with_comids/watershed_shapefile.shp")
 
-# add location of the fire in the data frame 
-fire_names <- read_csv(here("inputs", "catchment_characteristics", "fire_watershed_lat_long_comids.csv")) %>% 
-  select(site = Site, comid, fire_name)
-  
+# Add location of the fire in the data frame
+fire_names <- read_csv(here("inputs", "catchment_characteristics", "fire_watershed_lat_long_comids.csv")) %>%
+  dplyr::select(site = Site, comid, fire_name, fire_year, mtbs_id)
 
+fire_names <- fire_names %>%
+  mutate(fire_name = str_to_lower(fire_name))
+
+# Add columns for file paths to the fire_names data frame
+fire_names <- fire_names %>%
+  mutate(
+    dnbr_path = paste0("gis_data/Fire_Perimeters/", fire_name, "/mtbs/", fire_year, "/", mtbs_id, "/", fire_name, "_dnbr.tif"),
+    fire_shape_path = paste0("gis_data/Fire_Perimeters/", fire_name, "/mtbs/", fire_year, "/", mtbs_id, "/", fire_name, "_burn_bndy.shp")
+  )
+
+# Join the site shape and fire names data
 site_shape_fire_combined <- full_join(site_shape, fire_names)
 
-```
+# site_shape_fire_combined <- site_shape_fire_combined %>% 
+#   filter(fire_name == "gaviota")
 
-# Read in fire files
-```{r}
-#load in the dnbr and shapefile
-dnbr <- raster(here("gis_data", "Fire_Perimeters", "gaviota", "mtbs", "2004", "ca3448712019620040605", "gaviota_dnbr.tif"))
-
-fire_shape <- read_sf(here("gis_data", "Fire_Perimeters", "gaviota", "mtbs", "2004", "ca3448712019620040605", "gaviota_burn_bndy.shp"))
-
-```
-
-# Clip data to the watershed
-```{r}
-#section 2.1: clip the DNBR data to the fire boundry 
-dnbr <- clean_raster(dnbr, fire_shape, type = "numeric", return="raster")
-plot(dnbr) #use to make sure it's doing what you expect
-    
-#section 2.2: clip the DNBR data to the watershed boundry # This doesnt work for me, I don't know if this is what is correct
-basin_dnbr <- clean_raster(dnbr, site_shape[36, ],  type = "numeric", return="raster")
-plot(basin_dnbr) #use to make sure it's doing what you expect
-
-```
-
-# Section 3: Get the average DNBR
-```{r}
-# NOTE HERE: this deviates from my method where unburned areas in the basin were give 0's. The method done here will get the average severity of just the area in the basin the burned 
-    
-#section 3.1: make sure basin and fire layer are the same projection
-if(compareCRS(dnbr, site_shape[36, ]) == F){
-      basin_pj <- st_transform(site_shape[36, ], crs(dnbr))}else{
-        basin_pj <- site_shape[36, ]
-        }
-    
-#extract data
-mean_dnbr <- exactextractr::exact_extract(dnbr,basin_pj, "mean", 
-                                           progress=F)
-
-# Read in thresholds data frame that we created that have the ranges for each fire
-thresholds <- read_csv(here("Output_for_analysis", "13_Meta_calculate_thresholds_per_fire", "Fire_thresholds.csv"))
-
-
-results <- tibble(
+# Initialize the results data frame
+burn_severity <- tibble(
   site = character(),
-  mean_dnbr = numeric(),
-  Burn_Severity = character()
-)
-    
-sev_level <- thresholds$severity[mean_dnbr >= thresholds$low_dnbr & mean_dnbr < thresholds$high_dnbr] 
+  fire_name = character(),
+  mean_dnbr = numeric())
+
+# Read in thresholds data frame
+thresholds <- read_csv(here("Output_for_analysis", "13_Meta_calculate_thresholds_per_fire", "Fire_thresholds.csv")) %>% 
+  dplyr::select(!zone) %>% 
+  dplyr::select(!...1)
+
+# Iterate through each site in the combined shapefile
+for (i in 1:nrow(site_shape_fire_combined)) {
+  # Get the site name, fire name, and file paths
+  site_name <- site_shape_fire_combined$site[i]
+ 
+  fire_name <- site_shape_fire_combined$fire_name[i]
+  dnbr_path <- site_shape_fire_combined$dnbr_path[i]
+  fire_shape_path <- site_shape_fire_combined$fire_shape_path[i] 
+  
+  if (file.exists(here(dnbr_path)) && file.exists(here(fire_shape_path))) {
+    # Load the corresponding dnbr raster and fire shapefile
+    dnbr <- raster(here(dnbr_path))
+    plot(dnbr)
     
   
-cat("Mean DNBR is ", round(mean_dnbr, 0),
-        ", which is classified as: ", sev_level, sep="")
+    fire_shape <- st_read(here(fire_shape_path))
+    plot(fire_shape)
+    
+    # Clip the dNBR data to the fire boundary
+    dnbr <- mask(dnbr, st_as_sf(fire_shape))
+    plot(dnbr)
+    
+    # Get the watershed boundary
+    watershed_boundary <- site_shape_fire_combined[i, ]
+    plot(watershed_boundary)
+    
+    # Ensure the CRS of the layers are compatible
+    if (!st_crs(watershed_boundary) == crs(dnbr)) {
+      watershed_boundary <- st_transform(watershed_boundary, crs(dnbr))
+    }
+    
+    # Clip the dNBR data to the watershed boundary
+    dnbr_clipped <- mask(dnbr, st_as_sf(watershed_boundary))
+    plot(dnbr_clipped)
+    # Extract data and calculate the mean dNBR
+    mean_dnbr_value <- exactextractr::exact_extract(dnbr_clipped, watershed_boundary, "mean", progress = FALSE)
+    
+    # Add a new row to the dataframe
+    burn_severity <- burn_severity %>%
+      add_row(
+        site = site_name,  # use the scalar value directly
+        fire_name = fire_name,  # use the scalar value directly
+        mean_dnbr = mean_dnbr_value
+      )
+  
+  }
+}
 
-# Gaviota is listed as Unburned
-# Maybe go one step further and check the meta data to extract or calculate the thresholds for each fire. 
+# Merge burn_severity with thresholds on fire_name
+burn_severity_thresholds <- burn_severity %>%
+  left_join(thresholds, by = "fire_name")
+
+# Calculate the burn severity category based on mean dNBR and thresholds
+burn_severity_thresholds <- burn_severity_thresholds %>%
+  rowwise() %>%
+  mutate(
+    burn_severity_category = case_when(
+      mean_dnbr >= min & mean_dnbr <= max ~ Burn_Severity,
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  ungroup()
+
+# Group by site and fire_name, and select the desired columns
+final_burn_severity <- burn_severity_thresholds %>%
+  group_by(site, fire_name) %>%
+  summarize(
+    mean_dnbr = mean(mean_dnbr, na.rm = TRUE),
+    burn_severity_category = first(burn_severity_category[!is.na(burn_severity_category)])
+  ) %>%
+  ungroup()
+
+# Print the results
+print(final_burn_severity)
+
+# rename Site
+final_burn_severity <- final_burn_severity %>% 
+  rename(Site = site) %>% 
+  mutate(Site = str_replace_all(Site, "_", " "))
+  
+ 
+
+# Read in the study and site csv 
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
+  rename(year = Fire_year) %>% 
+  mutate(Site = str_replace_all(Site, "_", " ")) %>% 
+  na.omit()
+
+# merge 
+test <- full_join(final_burn_severity, study_site_data) %>% 
+  dplyr::select(Study_ID, Site, fire_name, year, Effect_size_pair, mean_dnbr, burn_severity_category, burn_percentage) %>% 
+  na.omit(Effect_size_pair)
+
+
+# write_csv(final_burn_severity, here("Output_for_analysis", "14_Meta_calculate_burn_severity", "DNBR_Severity.csv"))
+
+```
+
+```{r read in effect size and merge dataframes}
+# The effect sizes of each study's watershed
+effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
+
+unique(effect_size$Study_ID) # Should be 18 studies.
+
+# Merging severity with effect size data frame 
+DNBR_model <- full_join(test, effect_size) %>% 
+  dplyr::select(Study_ID, Site, response_var, Climate, Biome, fire_name, year, Effect_size_pair, Effect_size, mean_dnbr, burn_severity_category, burn_percentage, Time_Since_Fire) %>% 
+  na.omit(burn_severity_category)
+
+
+unique(DNBR_model$Study_ID) # 11 studies. Should match the severity_clip data frame
+  
+
+doc_es_dnbr <- DNBR_model %>% 
+  filter(response_var == "DOC_Interp")
+
+no3_es_dnbr <- DNBR_model %>% 
+  filter(response_var == "NO3_Interp")
+
+```
+
+### CLIMATE MATCH PLOT with highest % being the category 
+```{r severity plot with highest % as the category}
+dnbr_percentage_effect <- DNBR_model %>% 
+  group_by(response_var, burn_severity_category) %>% 
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>% 
+   mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) %>% 
+  na.omit(burn_severity_category)
+
+# Plot #
+vn = expression(paste(""*N*O[3]^"-"))
+
+give.n <- function(x){
+  return(c(y = median(x)*1.5, label = length(x))) 
+  # experiment with the multiplier to find the perfect position
+}
+# Refactor so we have low on the bottom and high on the top 
+DNBR_model <- DNBR_model %>% 
+  mutate(burn_severity_category = fct_relevel(burn_severity_category, "Unburned to Low", "Low", "Moderate", "High"))
+
+ggplot(DNBR_model, aes(x = Effect_size, y = burn_severity_category, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_pointrange(aes(xmin = mean_effect - se_effect, xmax = mean_effect + se_effect,
+                      color = response_var),
+                  position = position_dodge(width = -0.5), size = 1.5, data = dnbr_percentage_effect) +
+  geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("MTBS Severity") +
+  xlab("Effect Size") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = ""),
+                     labels = c('DOC', vn)) +
+  scale_y_discrete(label = c("Unburned to Low", "Low", "Moderate", "High")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 30),
+        axis.text.y = element_text(size = 30),
+        axis.title.x = element_text(size = 40),
+        axis.title.y = element_text(size = 35),
+        legend.text = element_text(size = 30),
+        legend.key = element_blank(),
+        legend.background = element_blank(),
+        legend.position = c(0.2, 0.66))
+
+# ggsave("Effect_Size_MTBS_Severity.pdf",
+#        path = here("initial_plots", "07_Meta_effect_size_models"),
+#        width = 10, height = 8, units = "in")
+
+```
+
+# Summary stats of the for loop 
+```{r summary stats}
+na_omit_final <- final_burn_severity %>% 
+  na.omit(burn_severity_category)
+
+# Check how many burns are included
+unique(final_burn_severity$fire_name) # 10 fires 
+# red bench
+# gaviota
+# pole creek
+# rampage_complex_double_mountain_2
+# angora
+# clovermist
+# fourmile_canyon
+# mosquito
+# high_park
+# wragg
+
+# Check how many unique sites are included 
+unique(na_omit_final$Site) # 29 sites 
+unique(severity_clip$Site) # 20 sites 
+
+# Summarize the number of observations for each burn level for each method
+DNBR_summary <- na_omit_final %>%
+  group_by(burn_severity_category) %>%
+  summarise(Count = n()) %>%
+  arrange(burn_severity_category)
+
+MTBS_summary <- severity_clip %>%
+  group_by(Severity_Category) %>%
+  summarise(Count = n()) %>%
+  arrange(Severity_Category)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```
 
@@ -213,17 +406,74 @@ cat("Mean DNBR is ", round(mean_dnbr, 0),
 
 
 
-
-
-
-
-
-
-
-
-# ==================================== Script Graveyard ================================================================
-# load in sites and their comid's
-```{r load in meta_lat_longs}
+# ==================================== Script Graveyard =================================
+# Read in site shape files #
+```{r}
+# # Can just read in the shape file of all the watersheds
+# site_shape <- st_read("~/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/06_Meta_geospatial_extraction_with_comids/watershed_shapefile.shp")
+# 
+# # add location of the fire in the data frame 
+# fire_names <- read_csv(here("inputs", "catchment_characteristics", "fire_watershed_lat_long_comids.csv")) %>% 
+#   dplyr::select(site = Site, comid, fire_name)
+#   
+# 
+# 
+# site_shape_fire_combined <- full_join(site_shape, fire_names)
+# 
+# ```
+# 
+# # Read in fire files
+# ```{r}
+# #load in the dnbr and shapefile
+# dnbr <- raster(here("gis_data", "Fire_Perimeters", "gaviota", "mtbs", "2004", "ca3448712019620040605", "gaviota_dnbr.tif"))
+# 
+# fire_shape <- read_sf(here("gis_data", "Fire_Perimeters", "gaviota", "mtbs", "2004", "ca3448712019620040605", "gaviota_burn_bndy.shp"))
+# 
+# ```
+# 
+# # Clip data to the watershed
+# ```{r}
+# #section 2.1: clip the DNBR data to the fire boundry 
+# dnbr <- clean_raster(dnbr, fire_shape, type = "numeric", return="raster")
+# plot(dnbr) #use to make sure it's doing what you expect
+#     
+# #section 2.2: clip the DNBR data to the watershed boundry # This doesnt work for me, I don't know if this is what is correct
+# basin_dnbr <- clean_raster(dnbr, site_shape[36, ],  type = "numeric", return="raster")
+# plot(basin_dnbr) #use to make sure it's doing what you expect
+# 
+# ```
+# 
+# # Section 3: Get the average DNBR
+# ```{r}
+# # NOTE HERE: this deviates from my method where unburned areas in the basin were give 0's. The method done here will get the average severity of just the area in the basin the burned 
+#     
+# #section 3.1: make sure basin and fire layer are the same projection
+# if(compareCRS(dnbr, site_shape[36, ]) == F){
+#       basin_pj <- st_transform(site_shape[36, ], crs(dnbr))}else{
+#         basin_pj <- site_shape[36, ]
+#         }
+#     
+# #extract data
+# mean_dnbr <- exactextractr::exact_extract(dnbr,basin_pj, "mean", 
+#                                            progress=F)
+# 
+# # Read in thresholds data frame that we created that have the ranges for each fire
+# thresholds <- read_csv(here("Output_for_analysis", "13_Meta_calculate_thresholds_per_fire", "Fire_thresholds.csv"))
+# 
+# 
+# burn_severity <- tibble(
+#   site = character(),
+#   mean_dnbr = numeric(),
+#   Burn_Severity = character()
+# )
+# 
+# 
+# # Gaviota is listed as Unburned
+# # Maybe go one step further and check the meta data to extract or calculate the thresholds for each fire. 
+# 
+# ```
+# # load in sites and their comid's
+# ```{r load in meta_lat_longs}
 # site_comids <- read_csv(here("inputs", "catchment_characteristics", "meta_lat_long_comids.csv"))
 # 
 # # Function to parse the geometry string
@@ -239,13 +489,13 @@ cat("Mean DNBR is ", round(mean_dnbr, 0),
 #     geometry = sf::st_sfc(geometry, crs = 4326)
 #   ) %>%
 #   st_as_sf()
-
-```
-
-# Plot gaviota fire test 
-```{r}
+# 
+# ```
+# 
+# # Plot gaviota fire test 
+# ```{r}
 # # Read the shapefile
-# burn_boundary <- st_read("~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Gaviota_2004/mtbs/2004/ca3448712019620040605/ca3448712019620040605_20040425_20050412_burn_bndy.shp")
+# burn_boundary <- st_read("~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/gaviota/mtbs/2004/ca3448712019620040605/ca3448712019620040605_20040425_20050412_burn_bndy.shp")
 # 
 # # Plot using ggplot2
 # ggplot() +
@@ -260,6 +510,13 @@ cat("Mean DNBR is ", round(mean_dnbr, 0),
                                #         "High"),
                              #low_dnbr =c(-500, -100, 100, 270, 440, 600),
                              #high_dnbr=c(-101, 99,269,439,659,1300))
+
+# sev_level <- thresholds$severity[mean_dnbr >= thresholds$low_dnbr & mean_dnbr < thresholds$high_dnbr] 
+    
+  
+# cat("Mean DNBR is ", round(mean_dnbr, 0),
+#         ", which is classified as: ", sev_level, sep="")
+
 
 ```
 

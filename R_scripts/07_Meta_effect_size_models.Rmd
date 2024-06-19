@@ -33,7 +33,7 @@ Our model:Effect_size ~ burn_percentage*TSF + (1|Site)
 ```{r Jake/Mac Load Packages}
 #for Jake/mac
 
-rm(list=ls(all=T)) #this clears your Environment
+#rm(list=ls(all=T)) #this clears your Environment
 
 
 library(tidyverse)
@@ -555,6 +555,8 @@ severity_clip <- severity_clip %>%
   )) %>%
   ungroup()
 
+# write_csv(severity_clip, here("Output_for_analysis", "07_Meta_effect_size_models", "severity_clip.csv"))
+
 ```
 
 
@@ -580,6 +582,7 @@ unique(MTBS_model$Study_ID) # 11 studies. Should match the severity_clip data fr
 #     values_to = "MTBS_Severity",
 #     values_drop_na = TRUE
 #   )
+
 
 
 doc_es_mtbs <- MTBS_model %>% 

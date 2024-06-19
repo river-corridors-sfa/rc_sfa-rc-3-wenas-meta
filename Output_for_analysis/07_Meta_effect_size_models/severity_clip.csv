@@ -1,0 +1,30 @@
+Study_ID,Site,year,Effect_size_pair,Low_Severity,Moderate_Severity,High_Severity,Severity_Category
+Coombs & Melack; 2013,Arroyo Hondo,2004,lnR3,7.91,2.65,0.54,Low
+Coombs & Melack; 2013,Gaviota,2004,lnR2,4.95,2.26,0.19,Low
+Coombs & Melack; 2013,San Onofre,2004,lnR1,32.38,28.3,11.47,Low
+Crandall et al. 2021,Benjamin Slough,2018,lnR1,3.61,4.82,3.87,Moderate
+Crandall et al. 2021,Payson,2018,lnR2,16.02,21.11,16.91,Moderate
+Crandall et al. 2021,Spanish Fork Lower,2018,lnR3,8.07,9.47,4.43,Moderate
+Crandall et al. 2021,Spanish Fork Upper,2018,lnR4,9.88,11.59,5.42,Moderate
+Gerla & Galloway; 1998,Jones Creek,1988,lnR1,13.1,15.31,43.67,High
+Gluns & Toews; 1989,Middle Fork,1985,lnR2,0,0,0,Low
+Mast & Clow; 2008,Coal,2003,lnR1,13.21,14.7,17.490000000000002,High
+Mast & Clow; 2008,Coal,2003,lnR1,13.21,14.7,17.490000000000002,High
+Mast & Clow; 2008,Fish Creek,2003,lnR2_post,18.7,20.56,20.47,Moderate
+Murphy et al. 2015,DS1,2010,lnR1,2.74,5.66,5.67,High
+Murphy et al. 2015,DS2,2010,lnR2,5.64,8.98,9.23,High
+Murphy et al. 2015,DS3,2010,lnR3,5.64,8.98,9.23,High
+Murphy et al. 2018,DS1,2010,lnR1,2.74,5.66,5.67,High
+Murphy et al. 2018,DS2,2010,lnR2,5.64,8.98,9.23,High
+Murphy et al. 2018,DS3,2010,lnR3,5.64,8.98,9.23,High
+Murphy et al. 2018,DS1,2010,lnR1,2.74,5.66,5.67,High
+Murphy et al. 2018,DS2,2010,lnR2,5.64,8.98,9.23,High
+Murphy et al. 2018,DS3,2010,lnR3,5.64,8.98,9.23,High
+Oliver et al. 2012,Site 2,2007,lnR1,11.93,16.63,38.19,High
+Oliver et al. 2012,Site 3,2007,lnR2,1.24,1.71,2.88,High
+Uzun et al. 2020,Rocky Fire,2015,lnR1,3.59,4.16,4.08,Moderate
+Uzun et al. 2020,Wragg Fire,2015,lnR2,6.8100000000000005,12,45.44,High
+Wagner et al. 2015,PNF,2012,lnR2,4.95,4.64,4.03,Low
+Wagner et al. 2015,PSF,2012,lnR1,0.48,0.41,0.43,Low
+Writer et al. 2014,PNF,2012,lnR1,4.95,4.64,4.03,Low
+Writer et al. 2014,PSF,2012,lnR2,0.48,0.41,0.43,Low
