@@ -33,7 +33,7 @@ Our model:Effect_size ~ burn_percentage*TSF + (1|Site)
 ```{r Jake/Mac Load Packages}
 #for Jake/mac
 
-#rm(list=ls(all=T)) #this clears your Environment
+rm(list=ls(all=T)) #this clears your Environment
 
 
 library(tidyverse)
@@ -64,7 +64,10 @@ library(flextable)
 options(max.print = 200)
 
 # Geospatial csv from stream cat with only the sites and the total area + the burn percentages 
-geospatial <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2024-02-15.csv"))
+# geospatial <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "Geospatial_data_2024-02-15.csv"))
+
+geospatial <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "random_forest_data.csv"))
+
 
 geospatial <- geospatial %>% 
   dplyr::select(Site, comid, totdasqkm, streamorde, maxelevraw, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, MTBS_1986Ws, MTBS_1987Ws, MTBS_1988Ws, MTBS_1989Ws, MTBS_1990Ws, MTBS_1991Ws, MTBS_1992Ws, MTBS_1993Ws, MTBS_1994Ws, MTBS_1995Ws, MTBS_1996Ws, MTBS_1997Ws, MTBS_1998Ws, MTBS_1999Ws, MTBS_2000Ws, MTBS_2001Ws, MTBS_2002Ws, MTBS_2003Ws, MTBS_2004Ws, MTBS_2005Ws, MTBS_2006Ws, MTBS_2007Ws, MTBS_2008Ws, MTBS_2009Ws, MTBS_2010Ws, MTBS_2011Ws, MTBS_2012Ws, MTBS_2013Ws, MTBS_2014Ws, MTBS_2015Ws, MTBS_2016Ws, MTBS_2017Ws)
@@ -103,10 +106,12 @@ ggplot(geospatial_long, aes(x = seq_along(year), y = burn_percentage)) +
 study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
   rename(year = Fire_year) %>% 
+  filter(!Study_ID == "Murphy et al. 2015") %>% 
   na.omit()
 
-unique(study_site_data$Study_ID) # Should be 17 studies because we are missing Abbott.
+unique(study_site_data$Study_ID) # Should be 13 studies because we are missing Abbott.
 # Abbott because of merging burned and unburned sites. 
+# Murphy et al. 2015 was already accounted for in the Murphy et al. 2018 
 
 ```
 
@@ -116,16 +121,18 @@ bp_clip <- study_site_data %>%
   dplyr::select(Study_ID, Site, year, Effect_size_pair, burn_percentage)
 
 # The effect sizes of each study's watershed
-effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
+effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire) %>% 
+  filter(!Study_ID == "Murphy et al. 2015")
 
-unique(effect_size$Study_ID) # Should be 18 studies.
+unique(effect_size$Study_ID) # Should be 17 studies.
 
 
 BP_ES <- full_join(bp_clip, effect_size) %>% 
   na.omit() %>% 
   dplyr::select(Study_ID, response_var, Climate, year, Biome, Effect_size_pair, Effect_size, Time_Since_Fire, burn_percentage) # joining the BP dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
 
-unique(BP_ES$Study_ID) # 14 studies
+unique(BP_ES$Study_ID) # 13 studies
 
 BP_model <- full_join(BP_ES, study_site_data) %>% 
   dplyr::select(Study_ID, Site, response_var, Climate, year, Biome, Effect_size_pair, Effect_size, Time_Since_Fire, burn_percentage) %>% 
@@ -283,7 +290,7 @@ ggsave("Effect_Size_Burn_Percentage.pdf",
 doc_bp_mixed <-  lmer(Effect_size ~ burn_percentage + (1 | Site), data = doc_es_bp)
 
 # Check for equal variance
-performance::check_heteroscedasticity(doc_bp_mixed) #OK: Error variance appears to be homoscedastic (p = 0.974).
+performance::check_heteroscedasticity(doc_bp_mixed) #OK: Error variance appears to be homoscedastic (p = 0.946).
 
 # Check for normality
 residuals <- resid(doc_bp_mixed)
@@ -310,7 +317,7 @@ plotREsim(REsim(doc_bp_mixed))
 no3_bp_mixed <-  lmer(Effect_size ~ burn_percentage + (1 | Site), data = no3_es_bp)
 
 # Check for equal variance
-performance::check_heteroscedasticity(no3_bp_mixed) #OK:Error variance appears to be homoscedastic (p = 0.944).
+performance::check_heteroscedasticity(no3_bp_mixed) #OK:Error variance appears to be homoscedastic (p = 0.957).
 
 # Check for normality
 residuals <- resid(no3_bp_mixed)
@@ -322,7 +329,7 @@ shapiro.test(residuals) # p-value is > 0.05
 
 no3_bp_mixed
 
-summary(no3_bp_mixed) # df: 23.923011, t-value: -0.552, p-value: 0.586
+summary(no3_bp_mixed) # df: 24.348285, t-value: -0.497, p-value: 0.624
 fixef(no3_bp_mixed)
 confint(no3_bp_mixed)
 
@@ -352,7 +359,7 @@ no3_es_bp <- no3_es_bp %>%
 no3_bp_cat <-  lmer(Effect_size ~ burn_percentage_group + (1 | Site), data = no3_es_bp)
 
 # Check for equal variance
-performance::check_heteroscedasticity(no3_bp_cat) #OK: Error variance appears to be homoscedastic (p = 0.948).
+performance::check_heteroscedasticity(no3_bp_cat) #OK: Error variance appears to be homoscedastic (p = 0.954).
 
 # Check for normality
 residuals <- resid(no3_bp_cat)
@@ -516,6 +523,7 @@ all_long <- full_join(low_mod_long, high_long) %>%
 study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair) %>% 
   rename(year = Fire_year) %>% 
+  filter(!Study_ID == "Murphy et al. 2015") %>% 
   na.omit()
 
 study_site_data <- study_site_data %>% 
@@ -527,18 +535,18 @@ mutate(year = case_when(Study_ID == 'Crandall et al. 2021' ~ "2018",
                                 TRUE ~ year))
 
 #
-unique(study_site_data$Study_ID) # Should be 17 sites 
+unique(study_site_data$Study_ID) # Should be 16 sites 
 
 # clip and merge dataframes
 severity_clip <- left_join(study_site_data, all_long) %>% 
   dplyr::select(!comid)
 
-unique(severity_clip$Study_ID) # Still 17
+unique(severity_clip$Study_ID) # Still 16
 
 severity_clip <- severity_clip %>% 
   na.omit()
 
-unique(severity_clip$Study_ID) # 11 sites are in the analysis 
+unique(severity_clip$Study_ID) # 10 sites are in the analysis 
 # Burd et al 2018 - In Canada so it wont have MTBS data
 # Hauer & Spencer 1998 - Dont know why
 # Hickenbottom et al. 2023 Too new to have MTBS data
@@ -565,14 +573,14 @@ severity_clip <- severity_clip %>%
 effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
 
-unique(effect_size$Study_ID) # Should be 18 studies.
+unique(effect_size$Study_ID) # Should be 17 studies.
 
 # Merging severity with effect size data frame 
 MTBS_model <- full_join(severity_clip, effect_size) %>% 
   dplyr::select(Study_ID, Site, response_var, Climate, Biome, year, Effect_size_pair, Effect_size, Low_Severity, Moderate_Severity, High_Severity, Severity_Category, Time_Since_Fire) %>% 
   na.omit()
 
-unique(MTBS_model$Study_ID) # 11 studies. Should match the severity_clip data frame
+unique(MTBS_model$Study_ID) # 10 studies. Should match the severity_clip data frame
   
 # Pivot long to have all burn severities in one column
 # MTBS_model_long <- MTBS_model %>% 
@@ -582,8 +590,6 @@ unique(MTBS_model$Study_ID) # 11 studies. Should match the severity_clip data fr
 #     values_to = "MTBS_Severity",
 #     values_drop_na = TRUE
 #   )
-
-
 
 doc_es_mtbs <- MTBS_model %>% 
   filter(response_var == "DOC_Interp")
@@ -1232,6 +1238,7 @@ write_csv(xia_effect_out, here("Output_for_analysis", "07_meta_effect_size_model
 
 ```
 
+# ============================= TSF ================================================== 
 ### 04_Meta_merge_all_studies_effect_size - TSF
 ```{r load in time since fire dataframe}
 # doc_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = doc_es_tsf)
@@ -1278,7 +1285,6 @@ no3_es_tsf <- TSF_model %>%
 
 ```
 
-# ============================= TSF ================================================== 
 ```{r NO3 TSF models}
 no3_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = no3_es_tsf)
 
@@ -1482,7 +1488,7 @@ The p-value of the test is 0.69, which is greater than our significance level of
 Thus, we do not reject the null hypothesis and conclude that the variance among the time since fire groups is equal. 
 
 
-
+# ============================= Climate Models ===========================================
 ### 04_Meta_merge_all_studies_effect_size - Climate
 ```{r load in time since fire dataframe}
 # doc_tsf_mixed <-  lmer(Effect_size ~ Climate + (1 | Site), data = doc_es_tsf)
@@ -1502,7 +1508,7 @@ no3_es_climate <- climate_model %>%
 
 ```
 
-# ============================= Climate Models ================================================== 
+
 ```{r NO3 climate models}
 no3_climate_mixed <-  lmer(Effect_size ~ as.factor(Climate) + (1 | Site), data = no3_es_climate)
 unique(no3_es_climate$Climate)

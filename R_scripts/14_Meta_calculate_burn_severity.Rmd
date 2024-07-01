@@ -227,6 +227,10 @@ burn_severity_thresholds <- burn_severity_thresholds %>%
   ) %>%
   ungroup()
 
+```
+
+```{make final burn severity data frame}
+
 # Group by site and fire_name, and select the desired columns
 final_burn_severity <- burn_severity_thresholds %>%
   group_by(site, fire_name) %>%
@@ -244,41 +248,48 @@ final_burn_severity <- final_burn_severity %>%
   rename(Site = site) %>% 
   mutate(Site = str_replace_all(Site, "_", " "))
   
- 
 
 # Read in the study and site csv 
+# Murphy et al. 2015 data is incorporated in Murphy et al. 2018 data
 study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
   rename(year = Fire_year) %>% 
   mutate(Site = str_replace_all(Site, "_", " ")) %>% 
+  filter(!Study_ID == "Murphy et al. 2015") %>% 
   na.omit()
 
 # merge 
-test <- full_join(final_burn_severity, study_site_data) %>% 
+site_burn_severity <- full_join(final_burn_severity, study_site_data) %>% 
   dplyr::select(Study_ID, Site, fire_name, year, Effect_size_pair, mean_dnbr, burn_severity_category, burn_percentage) %>% 
   na.omit(Effect_size_pair)
 
 
 # write_csv(final_burn_severity, here("Output_for_analysis", "14_Meta_calculate_burn_severity", "DNBR_Severity.csv"))
 
+
 ```
+
 
 ```{r read in effect size and merge dataframes}
 # The effect sizes of each study's watershed
 effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% 
-  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
+  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire) %>% 
+  filter(!Study_ID == "Murphy et al. 2015")
 
-unique(effect_size$Study_ID) # Should be 18 studies.
+unique(effect_size$Study_ID) # Should be 17 studies.
 
 # Merging severity with effect size data frame 
-DNBR_model <- full_join(test, effect_size) %>% 
+DNBR_model <- full_join(site_burn_severity, effect_size) %>% 
   dplyr::select(Study_ID, Site, response_var, Climate, Biome, fire_name, year, Effect_size_pair, Effect_size, mean_dnbr, burn_severity_category, burn_percentage, Time_Since_Fire) %>% 
   na.omit(burn_severity_category)
 
 
-unique(DNBR_model$Study_ID) # 11 studies. Should match the severity_clip data frame
-  
+unique(DNBR_model$Study_ID) # 9 studies. It was 11 but we removed Murphy et al. 2015 and a duplicated Murphy et al. 2018 Should match the severity_clip data frame
 
+DNBR_model <- DNBR_model %>% 
+  mutate(burn_severity_category = case_when(burn_severity_category == "Unburned to Low" ~ "Low", 
+                                           TRUE ~ burn_severity_category))
+  
 doc_es_dnbr <- DNBR_model %>% 
   filter(response_var == "DOC_Interp")
 
@@ -309,7 +320,7 @@ give.n <- function(x){
 }
 # Refactor so we have low on the bottom and high on the top 
 DNBR_model <- DNBR_model %>% 
-  mutate(burn_severity_category = fct_relevel(burn_severity_category, "Unburned to Low", "Low", "Moderate", "High"))
+  mutate(burn_severity_category = fct_relevel(burn_severity_category, "Low", "Moderate", "High"))
 
 ggplot(DNBR_model, aes(x = Effect_size, y = burn_severity_category, color = response_var),
        position = position_dodge(width = -0.5)) +
@@ -323,7 +334,7 @@ ggplot(DNBR_model, aes(x = Effect_size, y = burn_severity_category, color = resp
   scale_color_manual(values = c("#00AFBB", "#E7B800"),
                      guide = guide_legend(title = ""),
                      labels = c('DOC', vn)) +
-  scale_y_discrete(label = c("Unburned to Low", "Low", "Moderate", "High")) +
+  scale_y_discrete(label = c("Low", "Moderate", "High")) +
   theme_bw() +
   theme(axis.text.x = element_text(size = 30),
         axis.text.y = element_text(size = 30),
@@ -334,14 +345,52 @@ ggplot(DNBR_model, aes(x = Effect_size, y = burn_severity_category, color = resp
         legend.background = element_blank(),
         legend.position = c(0.2, 0.66))
 
-# ggsave("Effect_Size_MTBS_Severity.pdf",
-#        path = here("initial_plots", "07_Meta_effect_size_models"),
-#        width = 10, height = 8, units = "in")
+ggsave("Effect_Size_DNBR_Severity.pdf",
+       path = here("initial_plots", "14_Meta_calculate_burn_severity"),
+       width = 10, height = 8, units = "in")
 
 ```
 
-# Summary stats of the for loop 
-```{r summary stats}
+# Summary output 
+```{r}
+duplicate_comids <- fire_names %>%
+  group_by(comid) %>%
+  filter(n() > 1) %>%
+  ungroup()
+
+print(duplicate_comids)
+
+# there are 8 duplicates
+# Site_1 - angora fire
+# Site_2 - angora fire
+# US1 - fourmile_canyon fire - unburned
+# US2 - fourmile_canyon fire - unburned
+# Hobble_Creek_Lower - pole_creek - unburned
+# Hobble_Creek_Upper - pole_creek - unburned
+
+# DNBR model #
+# How many observations per year 
+ggplot(DNBR_model, aes(x = as.numeric(Time_Since_Fire))) +
+  geom_histogram(fill = "darkred") +
+  xlab("Time Since Fire") +
+  ggtitle("DNBR observations per time since fire bin") +
+  theme_bw()
+
+# I think we are counting DS1 twice with both Murphy et al. 2015 and Murphy et al. 2018. 
+# How many observations per watershed?
+watershed_total <- DNBR_model_filter %>%
+  group_by(Site, Time_Since_Fire, response_var) %>%
+  summarise(Count = n()) %>%
+  arrange(Site)
+
+ggplot(watershed_total, aes(x = Site, y = Count)) +
+  geom_point() +
+  facet_wrap(~response_var, scales = "free") +
+  theme_bw()
+
+write_csv(watershed_total, here("Output_for_analysis", "14_Meta_calculate_burn_severity", "watershed_count_per_year.csv"))
+
+# Omit the sites that don't have a burn severity category. This can be for a variety of reasons, it could have been because it was the reference (Unburned site)
 na_omit_final <- final_burn_severity %>% 
   na.omit(burn_severity_category)
 
@@ -373,24 +422,232 @@ MTBS_summary <- severity_clip %>%
   summarise(Count = n()) %>%
   arrange(Severity_Category)
 
+```
 
 
+# ================== Exploratory data analysis ======================================= 
+```{r plot DNBR values as continuous against effect size}
+# All years of data so there will be duplicate DNBR values for different effect sizes
+ggplot(data = DNBR_model, aes(x = mean_dnbr, y = Effect_size, color = burn_severity_category)) +
+  geom_point() +
+  scale_color_manual(values = c("darkgreen", "#E7B800", "darkred"),
+                     guide = guide_legend(title = "")) +
+  xlab("Mean DNBR") +
+  ylab("Effect Size") +
+  ggtitle("All TSF years included") +
+  facet_wrap(~response_var, scales = "free") +
+  theme_bw() 
 
+####  Filter only year 0 and 1 TSF ####
+DNBR_model_filter_TSF <- DNBR_model %>% 
+  filter(Time_Since_Fire == "0" | Time_Since_Fire == "1")
 
+# Create a function to extract model info
+model_info <- function(DNBR_model_filter_TSF) {
+  model <- lm(Effect_size ~ mean_dnbr, data = DNBR_model_filter_TSF)
+  intercept <- coef(model)[1]
+  slope <- coef(model)[2]
+  r_squared <- summary(model)$r.squared
+  equation <- paste("y = ", round(intercept, 2), " + ", round(slope, 2), "*x", sep = "")
+  r_squared_label <- paste("R² = ", round(r_squared, 2), sep = "")
+  data.frame(equation = equation, r_squared_label = r_squared_label)
+}
 
+# Apply the function to each group
+model_data <- DNBR_model_filter_TSF %>%
+  group_by(response_var) %>%
+  do(model_info(.))
 
+ggplot(data = DNBR_model_filter_TSF, aes(x = mean_dnbr, y = Effect_size, color = burn_severity_category)) +
+  geom_point() +
+  scale_color_manual(values = c("darkgreen", "#E7B800", "darkred"),
+                     guide = guide_legend(title = "")) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  geom_text(
+    data = model_data, 
+    aes(x = Inf, y = -Inf, label = paste(equation, "\n", r_squared_label)), 
+    hjust = 1.5, vjust = -1, size = 3, color = "red", 
+    inherit.aes = FALSE
+  ) +
+  xlab("Mean DNBR") +
+  ylab("Effect Size") +
+  ggtitle("Year 0 and 1 TSF years") +
+  facet_wrap(~response_var, scales = "free") +
+  theme_bw() 
 
+####  Filter only one distinct mean_DNBR for year 0 or 1
+DNBR_model_filter_dnbr <- DNBR_model %>% 
+  group_by(response_var, Site) %>% 
+  slice(1) %>%
+  ungroup()
+  
+  # Create a function to extract model info
+model_info <- function(DNBR_model_filter_dnbr) {
+  model <- lm(Effect_size ~ mean_dnbr, data = DNBR_model_filter_dnbr)
+  intercept <- coef(model)[1]
+  slope <- coef(model)[2]
+  r_squared <- summary(model)$r.squared
+  equation <- paste("y = ", round(intercept, 2), " + ", round(slope, 2), "*x", sep = "")
+  r_squared_label <- paste("R² = ", round(r_squared, 2), sep = "")
+  data.frame(equation = equation, r_squared_label = r_squared_label)
+}
 
+# Apply the function to each group
+model_data <- DNBR_model_filter_dnbr %>%
+  group_by(response_var) %>%
+  do(model_info(.))
 
+ggplot(data = DNBR_model_filter_dnbr, aes(x = mean_dnbr, y = Effect_size, color = burn_severity_category)) +
+  geom_point() +
+  scale_color_manual(values = c("darkgreen", "#E7B800", "darkred"),
+                     guide = guide_legend(title = "")) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  geom_text(
+    data = model_data, 
+    aes(x = Inf, y = -Inf, label = paste(equation, "\n", r_squared_label)), 
+    hjust = 1.5, vjust = -1, size = 3, color = "red", 
+    inherit.aes = FALSE
+  ) +
+  xlab("Mean DNBR") +
+  ylab("Effect Size") +
+  ggtitle("1st value") +
+  facet_wrap(~response_var, scales = "free") +
+  theme_bw() 
 
-
-
-
+doc_filter <- DNBR_model_filter_dnbr %>% 
+  filter(response_var == "DOC_Interp")
 
 
 ```
 
 
+# ================== Checking sites individually that maybe don't make sense =========
+Are Payson and Benjamin Slough being read as the same watershed?
+# Pole Creek Fire 
+```{r Benjamin Slough}
+#section 1: load data layers ------ 
+#section 1.1: load basin area 
+site_shape <- st_read("~/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/06_Meta_geospatial_extraction_with_comids/watershed_shapefile.shp")
+
+# Benjamin Slough is site 20
+
+# add location of the fire in the data frame
+fire_names <- read_csv(here("inputs", "catchment_characteristics", "fire_watershed_lat_long_comids.csv")) %>%
+  dplyr::select(site = Site, comid, fire_name)
+
+site_shape_fire_combined <- full_join(site_shape, fire_names)
+
+dnbr <- raster(here("gis_data", "Fire_Perimeters", "pole_creek", "mtbs", "2018", "ut3980611166020180906", "pole_creek_dnbr.tif"))
+
+fire_shape <- read_sf(here("gis_data", "Fire_Perimeters", "pole_creek", "mtbs", "2018", "ut3980611166020180906", "pole_creek_burn_bndy.shp"))
+
+
+# Clip data to the watershed
+dnbr <- clean_raster(dnbr, fire_shape, type = "numeric", return="raster")
+plot(dnbr) #use to make sure it's doing what you expect
+
+#section 2.2: clip the DNBR data to the watershed boundry # This doesnt work for me, I don't know if this is what is correct
+# Benjamin Slough is site 20
+
+basin_dnbr <- clean_raster(dnbr, site_shape[20, ],  type = "numeric", return="raster")
+plot(basin_dnbr) #use to make sure it's doing what you expect
+plot(site_shape$geometry[20, ])
+
+#section 3.1: make sure basin and fire layer are the same projection
+if(compareCRS(dnbr, site_shape[20, ]) == F){
+      basin_pj <- st_transform(site_shape[20, ], crs(dnbr))}else{
+        basin_pj <- site_shape[20, ]
+      }
+
+#extract data
+mean_dnbr <- exactextractr::exact_extract(dnbr,basin_pj, "mean", 
+                                           progress=F) 
+# Benjamin Slough mean DNBR 102.01708984375
+
+```
+
+```{r Payson}
+#section 1: load data layers ------ 
+
+# Payson is site 23
+
+# read in fire 
+dnbr <- raster(here("gis_data", "Fire_Perimeters", "pole_creek", "mtbs", "2018", "ut3980611166020180906", "pole_creek_dnbr.tif"))
+
+fire_shape <- read_sf(here("gis_data", "Fire_Perimeters", "pole_creek", "mtbs", "2018", "ut3980611166020180906", "pole_creek_burn_bndy.shp"))
+
+
+# Clip data to the watershed
+dnbr <- clean_raster(dnbr, fire_shape, type = "numeric", return="raster")
+plot(dnbr) #use to make sure it's doing what you expect
+plot(site_shape$geometry[23, ])
+
+#section 2.2: clip the DNBR data to the watershed boundry # This doesnt work for me, I don't know if this is what is correct
+# Benjamin Slough is site 20
+
+basin_dnbr <- clean_raster(dnbr, site_shape[23, ],  type = "numeric", return="raster")
+plot(basin_dnbr) #use to make sure it's doing what you expect
+
+#section 3.1: make sure basin and fire layer are the same projection
+if(compareCRS(dnbr, site_shape[23, ]) == F){
+      basin_pj <- st_transform(site_shape[23, ], crs(dnbr))}else{
+        basin_pj <- site_shape[23, ]
+      }
+
+#extract data
+mean_dnbr <- exactextractr::exact_extract(dnbr,basin_pj, "mean", 
+                                           progress=F) 
+# Payson mean DNBR 102.01708984375
+
+```
+
+```{Payson and Benjamin shp plotted together}
+# Read in watershed shape file
+watershed_shape <- st_read("~/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/06_Meta_geospatial_extraction_with_comids/watershed_shapefile.shp") %>%
+    filter(site %in% c("Payson", "Benjamin_Slough", "Spanish_Fork_Lower", "Spanish_Fork_Upper"))
+
+# Read in pole creek fire 
+fire_shape <- read_sf(here("gis_data", "Fire_Perimeters", "pole_creek", "mtbs", "2018", "ut3980611166020180906", "pole_creek_burn_bndy.shp"))
+
+# Plot fire shape file 
+ggplot(data = fire_shape) +
+  geom_sf(aes(fill = "red")) +
+  theme_minimal()
+
+# plot on top of each other 
+ggplot() +
+  geom_sf(data = watershed_shape, fill = "#56B4E9", alpha = 0.2, color = "black") +
+  geom_sf(data = fire_shape, fill = "red", alpha = 0.2, color = "black") +
+  theme_minimal()
+
+# plot only Benjamin Slough 
+ggplot() +
+  geom_sf(data = watershed_shape[1, ], fill = "#56B4E9", alpha = 0.2, color = "black") +
+  geom_sf(data = fire_shape, fill = "red", alpha = 0.2, color = "black") +
+  theme_minimal()
+
+# plot only Spanish Fork Lower
+ggplot() +
+  geom_sf(data = watershed_shape[2, ], fill = "#56B4E9", alpha = 0.2, color = "black") +
+  geom_sf(data = fire_shape, fill = "red", alpha = 0.2, color = "black") +
+  theme_minimal()
+
+# plot only Spanish Fork Upper
+ggplot() +
+  geom_sf(data = watershed_shape[3, ], fill = "#56B4E9", alpha = 0.2, color = "black") +
+  geom_sf(data = fire_shape, fill = "red", alpha = 0.2, color = "black") +
+  theme_minimal()
+
+# plot only Payson 
+ggplot() +
+  geom_sf(data = watershed_shape[4, ], fill = "#56B4E9", alpha = 0.2, color = "black") +
+  geom_sf(data = fire_shape, fill = "red", alpha = 0.2, color = "black") +
+  theme_minimal()
+
+# Payson is a subsection of Benjamin slough and the only part that is burned is the Payson portion so that is why the DNBR values are the same. 
+
+
+```
 
 
 
@@ -520,150 +777,6 @@ MTBS_summary <- severity_clip %>%
 
 ```
 
-# ==================================== for loop attempt =======================================================
-```{r}
-# Multiple watersheds 
-# watersheds <- list(
-#   list(
-#     Site = "DS1",
-#     fire_tif = "~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Fourmile_Canyon_2010/mtbs 3/2010/co4005110538520100906/co4005110538520100906_20100621_20110624_dnbr.tif",
-#     fire_shp = "~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Fourmile_Canyon_2010/mtbs 3/2010/co4005110538520100906/co4005110538520100906_20100621_20110624_burn_bndy.shp"
-#   ),
-#   list(
-#     Site = "DS2",
-#     fire_tif = "~/path_to_DS2_fire_tif.tif",  # Update with actual path
-#     fire_shp = "~/path_to_DS2_fire_shp.shp"   # Update with actual path
-#   )
-#   # Add more watersheds as needed
-# )
 
-# # Define the list of watersheds and associated fire data
-# watersheds <- list(
-#   list(
-#     Site = "DS1",
-#     fire_tif = "~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Fourmile_Canyon_2010/mtbs 3/2010/co4005110538520100906/co4005110538520100906_20100621_20110624_dnbr.tif",
-#     fire_shp = "~/GitHub/rc_sfa-rc-3-wenas-meta/gis_data/Fire_Perimeters/Fourmile_Canyon_2010/mtbs 3/2010/co4005110538520100906/co4005110538520100906_20100621_20110624_burn_bndy.shp"
-#   ),
-#   list(
-#     Site = "DS2",
-#     fire_tif = "~/path_to_DS2_fire_tif.tif",  # Update with actual path
-#     fire_shp = "~/path_to_DS2_fire_shp.shp"   # Update with actual path
-#   )
-#   # Add more watersheds as needed
-# )
-# 
-# # Define the DNBR severity thresholds
-# thresholds <- data.frame(
-#   severity = c("Regrowth", "Unburned", "Low", "Moderate-low", "Moderate-high", "High"),
-#   low_dnbr = c(-500, -100, 100, 270, 440, 600),
-#   high_dnbr = c(-101, 99, 269, 439, 659, 1300)
-# )
-# 
-# # Loop over each watershed
-# for (ws in watersheds) {
-#   cat("Processing Site:", ws$Site, "\n")
-# 
-#   # Load basin area for the current watershed
-#   DS_sf <- site_comids_sf %>%
-#     filter(Site == ws$Site)
-#   
-#   # Get HUC for the geometry column
-#   basin <- get_huc(AOI = DS_sf$geometry, type = "huc08")
-#   
-#   # Load fire data
-#   dnbr <- raster(ws$fire_tif)
-#   fire_shape <- read_sf(ws$fire_shp)
-#   
-#   # Section 2: Clip data to the watershed
-#   # Clip the DNBR data to the fire boundary
-#   dnbr <- clean_raster(dnbr, fire_shape, type = "numeric", return = "raster")
-#   plot(dnbr) # Optional: use to make sure it's doing what you expect
-#   
-#   # Clip the DNBR data to the watershed boundary
-#   basin_dnbr <- clean_raster(dnbr, basin, type = "numeric", return = "raster")
-#   plot(basin_dnbr) # Optional: use to make sure it's doing what you expect
-#   
-#   # Section 3: Get the average DNBR
-#   # Make sure basin and fire layer are the same projection
-#   if (compareCRS(dnbr, basin) == FALSE) {
-#     basin_pj <- st_transform(basin, crs(dnbr))
-#   } else {
-#     basin_pj <- basin
-#   }
-#   
-#   # Extract data
-#   mean_dnbr <- exactextractr::exact_extract(dnbr, basin_pj, "mean", progress = FALSE)
-#   
-#   # Classify based on mean DNBR
-#   sev_level <- thresholds$severity[mean_dnbr >= thresholds$low_dnbr & mean_dnbr < thresholds$high_dnbr]
-#   
-#   cat("Mean DNBR for Site", ws$Site, "is", round(mean_dnbr, 0), ", which is classified as:", sev_level, "\n")
-# }
-
-
-```
-
-# ===================================== Directory option ===========================================
-```{r}
-# # Define the list of sites
-# sites <- c("DS1", "DS2", "DS3" # Add all 53 site names here
-#            )
-# 
-# # Base directories for DNBR and shapefiles
-# dnbr_base_dir <- "~/path_to_fire_data/dnbr/"
-# shapefiles_base_dir <- "~/path_to_fire_data/shapefiles/"
-# 
-# # Define the DNBR severity thresholds
-# thresholds <- data.frame(
-#   severity = c("Regrowth", "Unburned", "Low", "Moderate-low", "Moderate-high", "High"),
-#   low_dnbr = c(-500, -100, 100, 270, 440, 600),
-#   high_dnbr = c(-101, 99, 269, 439, 659, 1300)
-# )
-# 
-# # Loop over each site
-# for (site in sites) {
-#   cat("Processing Site:", site, "\n")
-#   
-#   # Load basin area for the current site
-#   DS_sf <- site_comids_sf %>%
-#     filter(Site == site)
-#   
-#   # Get HUC for the geometry column
-#   basin <- get_huc(AOI = DS_sf$geometry, type = "huc08")
-#   
-#   # Generate file paths dynamically
-#   dnbr_file <- paste0(dnbr_base_dir, site, "_dnbr.tif")
-#   shapefile <- paste0(shapefiles_base_dir, site, "_bndy.shp")
-#   
-#   # Load fire data
-#   dnbr <- raster(dnbr_file)
-#   fire_shape <- read_sf(shapefile)
-#   
-#   # Section 2: Clip data to the watershed
-#   # Clip the DNBR data to the fire boundary
-#   dnbr <- clean_raster(dnbr, fire_shape, type = "numeric", return = "raster")
-#   plot(dnbr) # Optional: use to make sure it's doing what you expect
-#   
-#   # Clip the DNBR data to the watershed boundary
-#   basin_dnbr <- clean_raster(dnbr, basin, type = "numeric", return = "raster")
-#   plot(basin_dnbr) # Optional: use to make sure it's doing what you expect
-#   
-#   # Section 3: Get the average DNBR
-#   # Make sure basin and fire layer are the same projection
-#   if (compareCRS(dnbr, basin) == FALSE) {
-#     basin_pj <- st_transform(basin, crs(dnbr))
-#   } else {
-#     basin_pj <- basin
-#   }
-#   
-#   # Extract data
-#   mean_dnbr <- exactextractr::exact_extract(dnbr, basin_pj, "mean", progress = FALSE)
-#   
-#   # Classify based on mean DNBR
-#   sev_level <- thresholds$severity[mean_dnbr >= thresholds$low_dnbr & mean_dnbr < thresholds$high_dnbr]
-#   
-#   cat("Mean DNBR for Site", site, "is", round(mean_dnbr, 0), ", which is classified as:", sev_level, "\n")
-# }
-```
 
 

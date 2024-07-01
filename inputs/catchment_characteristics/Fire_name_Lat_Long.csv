@@ -57,12 +57,6 @@ Murphy et al. 2018,DS1,lnR1,Fourmile Canyon Fire,MTBS_2010Ws,2011_2012_2013_2014
 Murphy et al. 2018,DS2,lnR2,Fourmile Canyon Fire,MTBS_2010Ws,2011_2012_2013_2014_2015,2011,40.041668,-105.364823,500,27.1144,N_Hampton_has USGS Q Gauge,N,N_Google,Y
 Murphy et al. 2018,DS3,lnR3,Fourmile Canyon Fire,MTBS_2010Ws,2011_2012_2013_2014_2015,2011,40.0155,-105.324566,631,27.1121,N_Hampton_has USGS Q Gauge,N,N_Google,Y
 Murphy et al. 2018,US1,N/A,Fourmile Canyon Fire,MTBS_2010Ws,2011_2012_2013_2014_2015,2011,40.036103,-105.439101,259,0,N_Hampton,N,N_Google,Y_Same_COMID_as_US2
-Murphy et al. 2018,N/A,N/A,Fourmile Canyon Fire,MTBS_2010Ws,2011_2012_2013_2014_2015,2011,40.0502637,-105.3666599,-9999,-9999,N/A,N/A,N/A,N/A
-Murphy et al. 2018,DS1,lnR1,Fourmile Canyon Fire,MTBS_2010Ws,2011_2012_2013_2014_2015,2016,40.039046,-105.393878,370,16.3095,N_Hampton,N,N_Google,Y
-Murphy et al. 2018,DS2,lnR2,Fourmile Canyon Fire,MTBS_2010Ws,2011_2012_2013_2014_2015,2016,40.041668,-105.364823,500,27.1144,N_Hampton_has USGS Q Gauge,N,N_Google,Y
-Murphy et al. 2018,DS3,lnR3,Fourmile Canyon Fire,MTBS_2010Ws,2011_2012_2013_2014_2015,2016,40.0155,-105.324566,631,27.1121,N_Hampton_has USGS Q Gauge,N,N_Google,Y
-Murphy et al. 2018,US1,N/A,Fourmile Canyon Fire,MTBS_2010Ws,2011_2012_2013_2014_2015,2016,40.036103,-105.439101,259,0,N_Hampton,N,N_Google,Y_Same_COMID_as_US2
-Murphy et al. 2018,N/A,N/A,Fourmile Canyon Fire,MTBS_2010Ws,2011_2012_2013_2014_2015,2016,40.0502637,-105.3666599,-9999,-9999,N/A,N/A,N/A,N/A
 Neary & Currier; 1982,Crane Creek ,N/A,Jumping Branch Wildfire,MTBS_1978Ws,1979,2001,34.937946,-83.093596,3.66,N/A,Y,Y,N_Hampton,Y
 Neary & Currier; 1982,Wash Branch,lnR1,Jumping Branch Wildfire,MTBS_1978Ws,1979,2001,34.920959,-83.0922,2.18,31.3,Y,Y,N_Hampton,N_too small I think
 Neary & Currier; 1982,N/A,N/A,Jumping Branch Wildfire,MTBS_1978Ws,1979,2001,36.095349,-82.265,-9999,-9999,N/A,N/A,N/A,N/A

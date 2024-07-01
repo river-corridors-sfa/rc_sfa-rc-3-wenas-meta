@@ -6,8 +6,7 @@ date: "2024-06-13"
 
 #' Clean MTBS wildfire files 
 #' 
-#' MTBS downloads come in multiple zipped folders and the file names are long and meaningless. This 
-#' will pull all files in a single folder and rename files to be more user friendly. 
+#' MTBS downloads come in multiple zipped folders and the file names are long and meaningless. This will pull all files in a single folder and rename files to be more user friendly. 
 
 The purpose of this script is to clean MTBS wildfire file names. The MTBS downloads come in multiple zipped folders and the file names are long and meaningless. This will pull all files in a single folder and rename files to be more user friendly. 
 
@@ -95,9 +94,9 @@ clean_mtbs <- function(wd){
 # Loop through all the fires we have for the analysis
 ```{r}
 # Define the base directory where the folders are located
-base_dir <- here("gis_data", "renamed_fire_files")
+base_dir <- here("gis_data", "Fire_Perimeters")
 
-folder_names <- c("Angora_2007", "Caldor_2021", "Clovermist_1988", "Fourmile_Canyon_2010", "Gaviota_2004", "Hayman_2002", "High_Park_2012", "Mosquito_2022", "Pole_Creek_2018", "Rampage_Complex_2003","Red_Bench_1988", "Wragg_2015") # 12 fires
+folder_names <- c("angora", "caldor", "clovermist", "fourmile_canyon", "gaviota", "hayman", "high_park", "mosquito", "pole_creek", "rampage_complex_double_mountain_2","red_bench", "wragg") # 13 fires
 
 
 # Define a named vector or list of folder names and their corresponding years
@@ -108,6 +107,7 @@ folders_and_years <- list(
   "fourmile_canyon" = "2010",
   "gaviota" = "2004",
   "hayman" = "2002",
+  "hewlett" = "2012",
   "high_park" = "2012",
   "mosquito" = "2022",
   "pole_creek" = "2018",
@@ -133,7 +133,87 @@ for (folder_name in names(folders_and_years)) {
   clean_mtbs(wd)
 }
 
+```
 
+
+
+# ============================ Hewlett Gulch ============================================ # 
+```{r}
+# Define the function to clean MTBS files
+clean_mtbs <- function(wd){
+  # Get files of fires 
+  files <- list.files(wd, recursive = TRUE)  
+  # files <- files[stringr::str_detect(files, ".zip")] # Uncomment if you have zipped files
+
+  lapply(1:length(files), function(f){
+    
+    x <- files[f]
+  
+    # Get place to put zip files
+    exdir <- paste(wd, unlist(stringr::str_split(x, "/"))[1], sep="/")
+    
+    # Unzip file
+    unzip(paste(wd, x, sep="/"), exdir=exdir)
+    
+    # Find shape file to extract fire name
+    zip_files <- list.files(exdir)
+    shp_file <- zip_files[stringr::str_detect(zip_files, "burn_bndy_alb.shp")]
+    
+    # Read file to get fire name 
+    name <- sf::st_read(paste(exdir, shp_file, sep="/"))
+    filename <- name$Incid_Name
+    
+    # Format name for file 
+    filename <- tolower(filename)
+    filename <- stringr::str_replace_all(filename, " ", "_")
+    filename <- gsub("[][()]", "", filename) 
+    
+    # Rename files 
+    # Get dates of data 
+    dates <- str_split2(shp_file, "_")[2:3]
+    
+    # Get header, remove files from other fires 
+    header <- str_split2(shp_file, "_")[1]
+    zip_files <- zip_files[str_detect(zip_files, regex(header, ignore_case=TRUE))]
+    
+    # If both, remove completely 
+    new_files <- gsub(paste("_", paste(dates, collapse ="_"), sep=""), "", zip_files)
+    
+    # If just one use pre or post 
+    new_files <- gsub(dates[1], "pre", new_files)
+    new_files <- gsub(dates[2], "post", new_files)
+    
+    # Replace long name with fire name 
+    new_files <- gsub(header, filename, new_files)
+    
+    # Replace metadata name 
+    new_files <- gsub(toupper(header), filename, new_files)
+    
+    # Copy files with new names instead of renaming
+    file.copy(from = paste(exdir, zip_files, sep="/"), 
+              to = paste(exdir, new_files, sep="/"))
+  })
+}
+```
+
+```{r Hewlett Gulch}
+# Define the base directory where the folders are located
+base_dir <- here("gis_data", "Fire_Perimeters")
+
+folder_names <- c("hewlett") # 1 fire
+
+# Define a named vector or list of folder names and their corresponding years
+folders_and_years <- list(
+  "hewlett" = "2012")
+
+# Iterate over each folder and process the files using a for loop
+for (folder_name in names(folders_and_years)) {
+  year <- folders_and_years[[folder_name]]
+  wd <- here("gis_data", "Fire_Perimeters", folder_name, "mtbs", year)
+  clean_mtbs(wd)
+}
 
 ```
+
+
 

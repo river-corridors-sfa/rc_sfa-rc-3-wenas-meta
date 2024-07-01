@@ -87,6 +87,7 @@ options(max.print = 40)
 control_impact <- meta_df %>% 
   filter(Design_Control_Burn_Pre_Post == "Control_Reference_vs_Impact",
          Study_ID != "Crandall et al. 2021",
+         Study_ID != "Murphy et al. 2015",
          Mean_Median_or_IndividualSample == "Individual",
          as.numeric(Time_Since_Fire) < 6)
 
@@ -491,8 +492,8 @@ under_ten_long <- under_ten_long %>%
 
 count_climate <- under_ten_long %>% 
   count(Study_ID)
-sum(count_climate$n) # Should be 53
-# 53 watersheds are included in the climate analysis 
+sum(count_climate$n) # Should be 49
+# 49 watersheds are included in the climate analysis 
 
 # geom_jitter for climate for studies within 5 years # 
 
