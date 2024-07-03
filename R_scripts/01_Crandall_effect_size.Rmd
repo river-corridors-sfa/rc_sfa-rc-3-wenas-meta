@@ -42,6 +42,12 @@ library(viridis)
 meta_df <- read_csv(here("inputs", "Studies", "meta_final", "Crandall_et_al_2021.csv"),
                     na = c('-9999', 'N/A'))
 
+# On 7/2/2024 I clipped the Benjamin Slough watershed because it was incorporating the Payson watershed. The updated watershed area is 266.787. Lets update that here so we can calculate a proper effect size. 
+
+meta_df <- meta_df %>% 
+  mutate(Area_watershed = case_when(Site == "Benjamin Slough" ~ 266.787,
+                                    TRUE ~ Area_watershed))
+
 
 ```
 
@@ -51,7 +57,7 @@ control_impact <- meta_df
 
 # separate out the time columns 
 time_format <- control_impact %>% 
-  select(Study_ID, Sampling_Date) %>% 
+  dplyr::select(Study_ID, Sampling_Date) %>% 
   mutate(Sampling_Date = as.character(Sampling_Date))
 
 # merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
@@ -97,7 +103,7 @@ control_impact_units <- control_impact %>%
 
 # Creating a site characteristics data frame that I will use to merge later to add in the proper data 
 site_data <- control_impact_units %>% 
-  select(Study_ID, Pair, Site, latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
+  dplyr::select(Study_ID, Pair, Site, latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
 
 site_data_unique <- site_data %>% 
   group_by(Study_ID, Pair, Area_watershed_km) %>% 
@@ -110,7 +116,7 @@ site_data_unique <- site_data %>%
 # Okay lets do this for all the studies # 
 # filling in daily time series and interpolating by study and site
 control_impact_fill <-  control_impact_units %>% 
-  select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
   group_by(Study_ID, Site) %>%
   complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
   fill(Study_ID:Time_Since_Fire) %>%

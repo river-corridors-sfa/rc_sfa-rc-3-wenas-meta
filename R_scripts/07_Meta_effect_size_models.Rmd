@@ -920,7 +920,135 @@ mtbs_percentage_effect <- MTBS_model_long %>%
 
 ```
 
-# ============================= Random forest dataframe ==================================== 
+### Burn severity models 
+```{r read in DNBR severity data frame}
+DNBR_model <- read_csv(here("Output_for_analysis", "14_Meta_calculate_burn_severity", "Burn_severity_ES_fig_data.csv"))
+
+doc_es_dnbr <- DNBR_model %>% 
+  filter(response_var == "DOC_Interp")
+
+no3_es_dnbr <- DNBR_model %>% 
+  filter(response_var == "NO3_Interp")
+
+```
+
+# Continuous models with DNBR values #
+```{r DOC burn severity models}
+doc_sev_mixed <-  lmer(Effect_size ~ mean_dnbr + (1 | Site), data = doc_es_dnbr)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_sev_mixed) #OK: Error variance appears to be homoscedastic (p = 0.986).
+
+# Check for normality
+residuals <- resid(doc_sev_mixed)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # p-value is < 0.05
+# when p > 0.05 can assume normality 
+# So technically this is not normally distributed
+ 
+doc_sev_mixed
+
+summary(doc_sev_mixed) # df: 7.801848, t-value: -3.44, p-value: 0.00916 **
+fixef(doc_sev_mixed)
+confint(doc_sev_mixed)
+
+predictInterval(doc_sev_mixed)
+
+REsim(doc_sev_mixed) 
+
+plotREsim(REsim(doc_sev_mixed))
+
+```
+
+
+```{r NO3 burn severity models}
+no3_sev_mixed <-  lmer(Effect_size ~ mean_dnbr + (1 | Site), data = no3_es_dnbr)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_sev_mixed) #OK:Error variance appears to be homoscedastic (p = 0.962).
+
+# Check for normality
+residuals <- resid(no3_sev_mixed)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+
+no3_sev_mixed
+
+summary(no3_sev_mixed) # df: 18.366293, t-value: 0.895, p-value: 0.382
+fixef(no3_sev_mixed)
+confint(no3_sev_mixed)
+
+predictInterval(no3_sev_mixed)
+
+REsim(no3_sev_mixed) 
+
+plotREsim(REsim(no3_sev_mixed))
+
+```
+
+# Categorical models with burn severity categories #
+```{r DOC burn severity models}
+doc_sev_mixed <-  lmer(Effect_size ~ burn_severity_category + (1 | Site), data = doc_es_dnbr)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_sev_mixed) #OK: Error variance appears to be homoscedastic (p = 0.986).
+
+# Check for normality
+residuals <- resid(doc_sev_mixed)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # p-value is < 0.05
+# when p > 0.05 can assume normality 
+# So technically this is not normally distributed
+ 
+doc_sev_mixed
+
+summary(doc_sev_mixed) # df: 6.0370, t-value: -7.126, p-value: 0.000374 ***
+fixef(doc_sev_mixed)
+confint(doc_sev_mixed)
+
+predictInterval(doc_sev_mixed)
+
+REsim(doc_sev_mixed) 
+
+plotREsim(REsim(doc_sev_mixed))
+
+```
+
+
+```{r NO3 burn severity models}
+no3_sev_mixed <-  lmer(Effect_size ~ burn_severity_category + (1 | Site), data = no3_es_dnbr)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_sev_mixed) #OK:Error variance appears to be homoscedastic (p = 0.964).
+
+# Check for normality
+residuals <- resid(no3_sev_mixed)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+
+no3_sev_mixed
+
+summary(no3_sev_mixed) # df: 16.796, t-value: -1.231, p-value: 0.235
+fixef(no3_sev_mixed)
+confint(no3_sev_mixed)
+
+predictInterval(no3_sev_mixed)
+
+REsim(no3_sev_mixed) 
+
+plotREsim(REsim(no3_sev_mixed))
+
+```
+
+# ============================= Random forest dataframe ================================ 
 # As of June 5th, 2024 - moving this block to 08_Meta_summary_stats
 ### Back to geospatial 
 ```{r Building Random forest dataframe}

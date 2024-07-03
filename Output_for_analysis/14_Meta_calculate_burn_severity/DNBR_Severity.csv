@@ -1,47 +1,47 @@
-site,fire_name,mean_dnbr,burn_severity_category
-Akokala_Creek,red_bench,307.8030090332031,Moderate
-Arroyo_Hondo,gaviota,113.97161865234375,Low
-Benjamin_Slough,pole_creek,101.05889129638672,Low
-Bowman_Creek,red_bench,434.3525695800781,Moderate
+Site,fire_name,mean_dnbr,burn_severity_category
+Akokala Creek,red_bench,307.8030090332031,Moderate
+Arroyo Hondo,gaviota,113.97161865234375,Low
+Benjamin Slough,pole_creek,457.194000244141,Moderate
+Bowman Creek,red_bench,434.3525695800781,Moderate
 Coal,rampage_complex_double_mountain_2,-2081.0693359375,NA
-Coal_Creek,red_bench,NA,NA
-Cold_Creek,angora,NA,NA
+Coal Creek,red_bench,NA,NA
+Cold Creek,angora,NA,NA
 Control,angora,507.67095947265625,Moderate
-Crow_Creek,clovermist,272.44708251953125,Low
+Crow Creek,clovermist,272.44708251953125,Low
 DS1,fourmile_canyon,319.860595703125,Moderate
 DS2,fourmile_canyon,301.2357482910156,Moderate
 DS3,fourmile_canyon,301.2357482910156,Moderate
-Dry_Creek,pole_creek,NA,NA
-Fish_Creek,rampage_complex_double_mountain_2,NA,NA
+Dry Creek,pole_creek,NA,NA
+Fish Creek,rampage_complex_double_mountain_2,NA,NA
 Gaviota,gaviota,49.99661636352539,Unburned to Low
-Hobble_Creek_Lower,pole_creek,NA,NA
-Hobble_Creek_Upper,pole_creek,NA,NA
-Jones_Creek,clovermist,487.6774597167969,Moderate
-Logging_Creek,red_bench,242.0946807861328,Low
-Lower_MacDonald_Creek,rampage_complex_double_mountain_2,NA,NA
-Mill_Race,pole_creek,NA,NA
-Mitsubishi_Race,pole_creek,NA,NA
-North_Fork,mosquito,115.39913177490234,Low
+Hobble Creek Lower,pole_creek,NA,NA
+Hobble Creek Upper,pole_creek,NA,NA
+Jones Creek,clovermist,487.6774597167969,Moderate
+Logging Creek,red_bench,242.0946807861328,Low
+Lower MacDonald Creek,rampage_complex_double_mountain_2,NA,NA
+Mill Race,pole_creek,NA,NA
+Mitsubishi Race,pole_creek,NA,NA
+North Fork,mosquito,115.39913177490234,Low
 PBR,high_park,NA,NA
 PNF,high_park,302.6097106933594,Moderate
 PSF,high_park,331.49774169921875,Moderate
-Payson,pole_creek,101.05889129638672,Low
+Payson,pole_creek,419.645538330078,Moderate
 Pinchot,rampage_complex_double_mountain_2,186.95220947265625,Low
-Provo_River,pole_creek,NA,NA
-Quartz_Creek,red_bench,328.92529296875,Moderate
+Provo River,pole_creek,NA,NA
+Quartz Creek,red_bench,328.92529296875,Moderate
 Rattlesnake,gaviota,NA,NA
-Red_Bench_Creek,red_bench,508.95123291015625,Moderate
-Red_Meadow_Creek,red_bench,483.5830993652344,Moderate
+Red Bench Creek,red_bench,508.95123291015625,Moderate
+Red Meadow Creek,red_bench,483.5830993652344,Moderate
 Reference,wragg,679.62939453125,High
-San_Onofre,gaviota,195.18186950683594,Low
-Site_1,angora,499.23895263671875,Moderate
-Site_2,angora,499.23895263671875,Moderate
-Site_3,angora,459.9641418457031,Moderate
-Spanish_Fork_Lower,pole_creek,300.25909423828125,Low
-Spanish_Fork_Upper,pole_creek,300.25909423828125,Low
-Trout_Creek,angora,NA,NA
+San Onofre,gaviota,195.18186950683594,Low
+Site 1,angora,499.23895263671875,Moderate
+Site 2,angora,499.23895263671875,Moderate
+Site 3,angora,459.9641418457031,Moderate
+Spanish Fork Lower,pole_creek,300.25909423828125,Low
+Spanish Fork Upper,pole_creek,300.25909423828125,Low
+Trout Creek,angora,NA,NA
 US1,fourmile_canyon,NA,NA
 US2,fourmile_canyon,NA,NA
-Upper_MacDonald_Creek,rampage_complex_double_mountain_2,NA,NA
-Wally_Creek,red_bench,724.78076171875,High
-Wragg_Fire,wragg,679.62939453125,High
+Upper MacDonald Creek,rampage_complex_double_mountain_2,NA,NA
+Wally Creek,red_bench,724.78076171875,High
+Wragg Fire,wragg,679.62939453125,High

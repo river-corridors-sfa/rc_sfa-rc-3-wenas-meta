@@ -52,8 +52,6 @@ library(RobustLinearReg)
 
 ### Load in meta data ###
 ```{r load in publications}
-rm(list=ls(all=T)) #this clears your Environment
-
 studies_file_list <- list.files(path = "inputs/Studies/meta_final/", 
                                   recursive=F, 
                                   pattern=".csv", 
@@ -93,7 +91,7 @@ control_impact <- meta_df %>%
 
 # separate out the time columns 
 time_format <- control_impact %>% 
-  select(Study_ID, Sampling_Date) %>% 
+  dplyr::select(Study_ID, Sampling_Date) %>% 
   mutate(Sampling_Date = as.character(Sampling_Date))
 
 # merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
@@ -136,7 +134,7 @@ control_impact_units <- control_impact %>%
 
 # Creating a site characteristics data frame that I will use to merge later to add in the proper data 
 site_data <- control_impact_units %>% 
-  select(Study_ID, Pair, latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
+  dplyr::select(Study_ID, Pair, latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
 
 site_data_unique <- site_data %>% 
   group_by(Study_ID, Pair, Area_watershed_km) %>% 
@@ -148,7 +146,7 @@ site_data_unique <- site_data %>%
 ```{r - gap fill}
 # filling in daily time series and interpolating by study and site
 control_impact_fill <-  control_impact_units %>% 
-  select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
   group_by(Study_ID, Site) %>%
   complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
   fill(Study_ID:Burn_Unburn) %>%
@@ -220,7 +218,7 @@ yearly_mean_site_test_2 <- yearly_mean_site_test %>%
                    Xc = sum(TempNorm[Burn_Unburn == "Unburn"], na.rm = TRUE)) # Creating a control and treatment column for the temporal normalization 
 
 yearly_mean_site_test_3 <- yearly_mean_site_test_2 %>%
-  select(-Pair) %>%
+  dplyr::select(-Pair) %>%
   group_by(Study_ID, response_var, Climate, year) %>%
   summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
             Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
@@ -322,7 +320,7 @@ rhea_effect_size <- read_csv(here("Output_for_analysis", "03_Rhea_effect_size", 
 yearly_effect_size_combine_long <-yearly_effect_size_combine_long %>% 
   add_column(Xc34 = NA) %>% 
   ungroup() %>% 
-  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size)
+  dplyr::select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size)
 
 # Adding columns to Crandall_effect_size to match yearly_effect_size_combine_long and above_five_effect_size 
 Crandall_effect_size <-Crandall_effect_size %>% 
@@ -331,7 +329,7 @@ Crandall_effect_size <-Crandall_effect_size %>%
              Xe5 = NA,
              Xc345 = NA) %>% 
   ungroup() %>% 
-  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size) 
+  dplyr::select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size) 
 
 # Adding columns to abbott_effect_size to match yearly_effect_size_combine_long and Crandall_effect_size 
 abbott_effect_size <-abbott_effect_size %>% 
@@ -344,7 +342,7 @@ abbott_effect_size <-abbott_effect_size %>%
              Xc345 = NA, 
              Biome = NA) %>% 
   ungroup() %>% 
-  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size) 
+  dplyr::select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size) 
 
 # Adding columns to rhea_effect_size to match abbott_effect_size, yearly_effect_size_combine_long and Crandall_effect_size 
 rhea_effect_size <-rhea_effect_size %>% 
@@ -355,7 +353,7 @@ rhea_effect_size <-rhea_effect_size %>%
              Xc345 = NA, 
              Biome = NA) %>% 
   ungroup() %>% 
-  select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size) 
+  dplyr::select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size) 
 
 
 # combining all of them back into the mix back into the mix 
@@ -369,7 +367,7 @@ yearly_effect_size_combine_long <- yearly_effect_size_combine_long %>%
 # Creating a year column with a dataframe that has TSF accurately 
 TSF_year <- control_impact %>% 
   mutate(year = year(Sampling_Date)) %>% 
-  select(Study_ID, Time_Since_Fire, year) %>% 
+  dplyr::select(Study_ID, Time_Since_Fire, year) %>% 
   distinct()
 
 # Joining the TSF and the yearly effect size combine long dataframe 

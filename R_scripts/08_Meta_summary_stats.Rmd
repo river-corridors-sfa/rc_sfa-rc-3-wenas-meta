@@ -34,15 +34,13 @@ library(Hmisc)
 library(GGally)
 ```
 
-# ============================= Build random forest dataframe ==================================== 
-### Load in geospatial data 
+# ============================= Landcover types ========================================
 ```{r}
-
 # Landcover data first 
 landcover_data <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids",
                                  "random_forest_data.csv")) %>%
   mutate(Site = str_replace_all(Site, "_", " ")) %>% 
-  select(Site, comid, PctOw2001:PctHbWet2019)
+  dplyr::select(Site, comid, PctOw2001:PctHbWet2019)
 
 landcover_long <- landcover_data %>%
   pivot_longer(
@@ -51,6 +49,93 @@ landcover_long <- landcover_data %>%
     values_to = "percent_landcover") %>%
     mutate(Vegetation_year_pull = str_extract(landcover_type, "\\d{4}")) 
 
+# NLCD2001 # We are running this for every year that it has. We are going to run mid slope 
+  # PctOw2001Ws - Open Water Percentage
+  # PctIce2001Ws - Ice/Snow Cover Percentage
+  # PctUrbOp2001Ws - Developed, Open Space Land Use Percentage
+  # PctUrbLo2001Ws - Developed, Low Intensity Land Use Percentage
+  # PctUrbMd2001Ws - Developed, Medium Intensity Land Use Percentage
+  # PctUrbHi2001Ws - Developed, High Intensity Land Use Percentage
+  # PctBl2001Ws - Bedrock and Similar Earthen Material Percentage
+  # PctDecid2001Ws - Deciduous Forest Percentage
+  # PctConif2001Ws - Evergreen Forest Percentage
+  # PctMxFst2001Ws - Mixed Deciduous/Evergreen Forest Percentage
+  # PctShrb2001Ws - Shrub/Scrub Percentage
+  # PctGrs2001Ws - Grassland/Herbaceous Percentage
+  # PctHay2001Ws - Pasture/Hay Percentage
+  # PctCrop2001Ws - Row Crop Percentage
+  # PctWdWet2001Ws - Woody Wetland Percentage
+  # PctHbWet2001Ws - Herbaceous Wetland Percentage 
+
+# I can merge a few of them together and then will I just be adding?
+# Forest
+  # PctDecid2001Ws
+  # PctConif2001Ws
+  # PctMxFst2001Ws
+# Urban
+  # PctUrbOp2001Ws
+  # PctUrbLo2001Ws
+  # PctUrbMd2001Ws
+  # PctUrbHi2001Ws
+# Grassland
+  # PctShrb2001Ws
+  # PctGrs2001Ws
+# Wetland
+  # PctWdWet2001Ws
+  # PctHbWet2001Ws
+# AG
+  # PctHay2001Ws
+  # PctCrop2001Ws
+
+# Forest
+forest_summary <- landcover_long %>%
+  filter(str_starts(landcover_type, "PctDecid") | str_starts(landcover_type, "PctConif") | 
+         str_starts(landcover_type, "PctMxFst")) %>%
+  group_by(Site, Vegetation_year_pull) %>%
+  summarise(Forest = sum(percent_landcover, na.rm = TRUE)) 
+
+# Urban
+urban_summary <- landcover_long %>% 
+  filter(str_starts(landcover_type, "PctUrbOp") | str_starts(landcover_type, "PctUrbLo") | 
+         str_starts(landcover_type, "PctUrbMd") | str_starts(landcover_type, "PctUrbHi")) %>%
+  group_by(Site, Vegetation_year_pull) %>%
+  summarise(Urban = sum(percent_landcover, na.rm = TRUE))
+
+# Grassland 
+grassland_summary <- landcover_long %>%
+  filter(str_starts(landcover_type, "PctShrb") | str_starts(landcover_type, "PctGrs")) %>%
+  group_by(Site, Vegetation_year_pull) %>%
+  summarise(Grassland = sum(percent_landcover, na.rm = TRUE))
+
+# Wetland
+wetland_summary <- landcover_long %>%
+  filter(str_starts(landcover_type, "PctWdWet") | str_starts(landcover_type, "PctHbWet")) %>%
+  group_by(Site, Vegetation_year_pull) %>%
+  summarise(Wetland = sum(percent_landcover, na.rm = TRUE))
+
+# AG
+AG_summary <- landcover_long %>%
+  filter(str_starts(landcover_type, "PctHay") | str_starts(landcover_type, "PctCrop")) %>%
+  group_by(Site, Vegetation_year_pull) %>%
+  summarise(AG = sum(percent_landcover, na.rm = TRUE))
+
+# Merge the Forest and Wetland summaries back to the original data frame
+landcover_summary <- landcover_long %>%
+  left_join(forest_summary, by = c("Site", "Vegetation_year_pull")) %>%
+  left_join(urban_summary, by = c("Site", "Vegetation_year_pull")) %>% 
+  left_join(grassland_summary, by = c("Site", "Vegetation_year_pull")) %>% 
+  left_join(wetland_summary, by = c("Site", "Vegetation_year_pull")) %>% 
+  left_join(AG_summary, by = c("Site", "Vegetation_year_pull"))
+
+landcover_summary <- landcover_summary %>% 
+  dplyr::select(!landcover_type:percent_landcover) %>%
+  distinct(Vegetation_year_pull, Site, .keep_all = TRUE)
+
+```
+
+# ============================= Build random forest dataframe ==================================== 
+### Load in geospatial data 
+```{r}
 # The effect sizes of each study's watershed
 effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
@@ -66,7 +151,7 @@ no_geo_random_forest_data <- full_join(effect_size, study_site_data) %>%
 
 unique(no_geo_random_forest_data$Site) # Supposed to be 28 sites here
 
-landcover_data_merged <- left_join(no_geo_random_forest_data, landcover_long) %>% 
+landcover_data_merged <- left_join(no_geo_random_forest_data, landcover_summary) %>% 
   na.omit(percent_landcover) %>% 
   arrange(Vegetation_year_pull)
 
@@ -82,31 +167,39 @@ geospatial_data <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extr
 random_forest_data <- full_join(landcover_data_merged, geospatial_data) %>% 
   na.omit(Effect_size)
 
+# Now add in the burn severity 
+DNBR_Severity <- read_csv(here("Output_for_analysis", "14_Meta_calculate_burn_severity", "DNBR_Severity.csv")) %>% 
+  dplyr::select(Site, mean_dnbr, burn_severity_category)
+
+random_forest_data <- left_join(random_forest_data, DNBR_Severity, by = "Site")
+
+
 unique(random_forest_data$Site) # supposed to be 24 sites here 
 
 # removing duplicates
 random_forest_data <- random_forest_data %>% 
-  group_by(Site, landcover_type) %>% 
+  group_by(Site) %>% 
   distinct() %>% 
   ungroup()
 
-# Making wide so the landcover types are in columns 
-random_forest_data_wide <- random_forest_data %>% 
-  pivot_wider(
-    names_from = "landcover_type",
-    values_from = "percent_landcover"
-  )
-
 #splitting by analyte
-doc_RF <- random_forest_data_wide %>%
+doc_RF <- random_forest_data %>%
   filter(response_var == "DOC_Interp")
 
 write_csv(doc_RF, here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"))
 
-no3_RF <- random_forest_data_wide %>%
+no3_RF <- random_forest_data %>%
   filter(response_var == "NO3_Interp") 
 
 write_csv(no3_RF, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"))
+
+```
+
+# ========================== Exploratory data frames ==================================
+```{r}
+TSF_DNBR_DOC <- doc_RF %>% 
+  dplyr::select(Site, mean_dnbr, Time_Since_Fire)
+
 
 ```
 
@@ -116,8 +209,13 @@ write_csv(no3_RF, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta
 ```{r correlation plot}
 # Simple correlation matrix between effect size and all the other catchment characteristics
 doc_correlation <- doc_RF %>% 
-  dplyr::select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, Tmax9120Ws,Tmean9120Ws, Tmin9120Ws, OmWs, BFIWs, PermWs, RunoffWs, burn_percentage, Time_Since_Fire) %>% 
+  dplyr::select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, Tmax9120Ws,Tmean9120Ws, Tmin9120Ws, Forest, Urban, Grassland, Wetland, AG, OmWs, BFIWs, PermWs, RunoffWs, burn_percentage, mean_dnbr, Time_Since_Fire) %>% 
   mutate(Time_Since_Fire = as.numeric(Time_Since_Fire)) 
+
+# If mean DNBR values are calculated then our measurement is no bueno. Remove. 
+doc_correlation <- doc_correlation %>% 
+  mutate(mean_dnbr = case_when(mean_dnbr < 0 ~ NA,
+                               TRUE ~ mean_dnbr))
 
 # Calculate the correlation matrix
 cor_matrix_doc <- cor(doc_correlation, use = "complete.obs")
@@ -130,7 +228,7 @@ column_order <- c("Effect_size", setdiff(names(cor_matrix_doc), "Effect_size"))
 
 # Reorder columns using select
 cor_matrix_doc <- cor_matrix_doc %>%
-  select(all_of(column_order))
+  dplyr::select(all_of(column_order))
 
 # Reorder rows by converting row names to a column, ordering, then converting back
 cor_matrix_doc <- cor_matrix_doc %>%
@@ -143,6 +241,9 @@ cor_matrix_doc <- as.matrix(cor_matrix_doc)
 
 # Print the reordered correlation matrix
 print(cor_matrix_doc)
+
+# # Filter the correlation matrix to include only values greater than 0.6
+cor_matrix_filtered_doc <- ifelse(abs(cor_matrix_doc) > 0.1, cor_matrix_doc, NA)
 
 # Specify the file path and format for the output PDF file
 output_file <- here("initial_plots", "08_Meta_summary_stats", "DOC_geospatial_correlation.pdf")
@@ -168,8 +269,16 @@ dev.off()
 ```{r correlation plot}
 # Simple correlation matrix between effect size and all the other catchment characteristics
 no3_correlation <- no3_RF %>% 
-  dplyr::select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, Tmax9120Ws,Tmean9120Ws, Tmin9120Ws, OmWs, BFIWs, PermWs, RunoffWs, burn_percentage, Time_Since_Fire) %>% 
+  dplyr::select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, Tmax9120Ws,Tmean9120Ws, Tmin9120Ws, Forest, Urban, Grassland, Wetland, AG, OmWs, BFIWs, PermWs, RunoffWs, burn_percentage, mean_dnbr, Time_Since_Fire) %>% 
   mutate(Time_Since_Fire = as.numeric(Time_Since_Fire))
+
+# If mean DNBR values are calculated then our measurement is no bueno. Remove. 
+no3_correlation <- no3_correlation %>% 
+  mutate(mean_dnbr = case_when(mean_dnbr < 0 ~ NA,
+                               TRUE ~ mean_dnbr))
+
+# Calculate the correlation matrix
+cor_matrix_no3 <- cor(no3_correlation, use = "complete.obs")
 
 # Assuming cor_matrix_no3 is your correlation matrix
 cor_matrix_no3 <- as.data.frame(cor_matrix_no3)
@@ -179,7 +288,7 @@ column_order <- c("Effect_size", setdiff(names(cor_matrix_no3), "Effect_size"))
 
 # Reorder columns using select
 cor_matrix_no3 <- cor_matrix_no3 %>%
-  select(all_of(column_order))
+  dplyr::select(all_of(column_order))
 
 # Reorder rows by converting row names to a column, ordering, then converting back
 cor_matrix_no3 <- cor_matrix_no3 %>%
@@ -193,9 +302,11 @@ cor_matrix_no3 <- as.matrix(cor_matrix_no3)
 # Print the reordered correlation matrix
 print(cor_matrix_no3)
 
-# Specify the file path and format for the output PDF file
-output_file <- "~/GitHub/rc_sfa-rc-3-wenas-meta/initial_plots/08_Meta_summary_stats/NO3_geospatial_correlation.pdf"
+# # Filter the correlation matrix to include only values greater than 0.6
+cor_matrix_filtered_no3 <- ifelse(abs(cor_matrix_no3) > 0, cor_matrix_no3, NA)
 
+
+# Specify the file path and format for the output PDF file
 output_file <- here("initial_plots", "08_Meta_summary_stats", "NO3_geospatial_correlation.pdf")
 
 # Open a PDF device
