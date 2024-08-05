@@ -937,7 +937,7 @@ no3_es_dnbr <- DNBR_model %>%
 doc_sev_mixed <-  lmer(Effect_size ~ mean_dnbr + (1 | Site), data = doc_es_dnbr)
 
 # Check for equal variance
-performance::check_heteroscedasticity(doc_sev_mixed) #OK: Error variance appears to be homoscedastic (p = 0.986).
+performance::check_heteroscedasticity(doc_sev_mixed) #OK: Error variance appears to be homoscedastic (p = 0.990).
 
 # Check for normality
 residuals <- resid(doc_sev_mixed)
@@ -946,10 +946,10 @@ qqline(residuals)
 shapiro.test(residuals) # p-value is < 0.05
 # when p > 0.05 can assume normality 
 # So technically this is not normally distributed
- 
+
 doc_sev_mixed
 
-summary(doc_sev_mixed) # df: 7.801848, t-value: -3.44, p-value: 0.00916 **
+summary(doc_sev_mixed) # df: 7.867850, t-value: -2.467, p-value: 0.0394 *
 fixef(doc_sev_mixed)
 confint(doc_sev_mixed)
 
@@ -959,6 +959,22 @@ REsim(doc_sev_mixed)
 
 plotREsim(REsim(doc_sev_mixed))
 
+# Log transform #
+doc_sev_mixed_log <-  lmer(Effect_size ~ log(mean_dnbr) + (1 | Site), data = doc_es_dnbr)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_sev_mixed_log) #OK: Error variance appears to be homoscedastic (p = 0.992).
+
+# Check for normality
+residuals <- resid(doc_sev_mixed_log)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # p-value is < 0.05
+# when p > 0.05 can assume normality 
+# So technically this is not normally distributed
+
+
+
 ```
 
 
@@ -966,7 +982,7 @@ plotREsim(REsim(doc_sev_mixed))
 no3_sev_mixed <-  lmer(Effect_size ~ mean_dnbr + (1 | Site), data = no3_es_dnbr)
 
 # Check for equal variance
-performance::check_heteroscedasticity(no3_sev_mixed) #OK:Error variance appears to be homoscedastic (p = 0.962).
+performance::check_heteroscedasticity(no3_sev_mixed) #OK:Error variance appears to be homoscedastic (p = 0.955).
 
 # Check for normality
 residuals <- resid(no3_sev_mixed)
@@ -978,7 +994,7 @@ shapiro.test(residuals) # p-value is > 0.05
 
 no3_sev_mixed
 
-summary(no3_sev_mixed) # df: 18.366293, t-value: 0.895, p-value: 0.382
+summary(no3_sev_mixed) # df: 17.91, t-value: 0.030, p-value: 0.976
 fixef(no3_sev_mixed)
 confint(no3_sev_mixed)
 
@@ -995,7 +1011,7 @@ plotREsim(REsim(no3_sev_mixed))
 doc_sev_mixed <-  lmer(Effect_size ~ burn_severity_category + (1 | Site), data = doc_es_dnbr)
 
 # Check for equal variance
-performance::check_heteroscedasticity(doc_sev_mixed) #OK: Error variance appears to be homoscedastic (p = 0.986).
+performance::check_heteroscedasticity(doc_sev_mixed) #OK: Error variance appears to be homoscedastic (p = 0.927).
 
 # Check for normality
 residuals <- resid(doc_sev_mixed)
@@ -1024,7 +1040,7 @@ plotREsim(REsim(doc_sev_mixed))
 no3_sev_mixed <-  lmer(Effect_size ~ burn_severity_category + (1 | Site), data = no3_es_dnbr)
 
 # Check for equal variance
-performance::check_heteroscedasticity(no3_sev_mixed) #OK:Error variance appears to be homoscedastic (p = 0.964).
+performance::check_heteroscedasticity(no3_sev_mixed) #OK:Error variance appears to be homoscedastic (p = 0.950).
 
 # Check for normality
 residuals <- resid(no3_sev_mixed)
@@ -1047,6 +1063,53 @@ REsim(no3_sev_mixed)
 plotREsim(REsim(no3_sev_mixed))
 
 ```
+
+```{r NO3 levenes test for burn severity}
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ burn_severity_category, data = no3_es_dnbr) #F-value: 1.0535, p-value: 0.3551, Df: 2,60
+
+# plot 
+
+boxplot(Effect_size ~ burn_severity_category,
+  data = no3_es_dnbr,
+  main = "Effect size Distribution by Burn Severity - NO3",
+  xlab = "Burn Severity",
+  ylab = "Effect Size",
+  col = "#E7B800",
+  border = "black")
+
+# Calculate percentages of each category
+percentage_data <- no3_es_dnbr %>%
+  count(burn_severity_category) %>%
+  mutate(percentage = n / sum(n) * 100)
+```
+The p-value of the test is 0.3551, which is greater than our significance level of 0.05. 
+Thus, we DO NOT reject the null hypothesis and conclude that the variance among the burn severity groups IS equal.
+
+```{r DOC levenes test for burn severity}
+# Null: the variance amoung the groups is equal. 
+# conduct Levene's Test for equality of variances
+leveneTest(Effect_size ~ burn_severity_category, data = doc_es_dnbr) #F-value: 0.365, p-value: 0.6977, Df: 2, 26
+
+# plot 
+
+boxplot(Effect_size ~ burn_severity_category,
+  data = doc_es_dnbr,
+  main = "Effect size Distribution by Burn Severity - DOC",
+  xlab = "Burn Severity",
+  ylab = "Effect Size",
+  col = "#00AFBB",
+  border = "black")
+
+# Calculate percentages of each category
+percentage_data <- doc_es_dnbr %>%
+  count(burn_severity_category) %>%
+  mutate(percentage = n / sum(n) * 100)
+
+```
+The p-value of the test is 0.6977, which is greater than our significance level of 0.05. 
+Thus, we DO NOT reject the null hypothesis and conclude that the variance among the burn severity groups IS equal.
 
 # ============================= Random forest dataframe ================================ 
 # As of June 5th, 2024 - moving this block to 08_Meta_summary_stats

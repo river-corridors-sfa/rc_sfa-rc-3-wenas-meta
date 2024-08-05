@@ -50,16 +50,22 @@ library(here)
 ## Read in effect datasets
 no3 <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"), na = c('-9999', 'N/A')) %>% 
   clean_names() %>% 
-  rename("dependent" = effect_size) %>% 
-  select(-c(study_id, site, minelevraw, elevfixed, minelevsmo)) %>% 
-  na.omit()
+  rename("dependent" = effect_size) %>%
+  dplyr::select(dependent, climate, totdasqkm, maxelevsmo, slope, tmean9120ws, om_ws, bfi_ws, perm_ws, #runoff_ws, 
+                burn_percentage, mean_dnbr, time_since_fire) %>%
+  mutate(mean_dnbr = as.numeric(mean_dnbr)) %>% 
+  na.omit() 
+  
 
 
 doc <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"), na = c('-9999', 'N/A')) %>% 
   clean_names() %>% 
   rename("dependent" = effect_size) %>% 
-  select(-c(study_id, site, minelevraw, elevfixed, minelevsmo))%>% 
-  na.omit()
+  dplyr::select(dependent, climate, totdasqkm, maxelevsmo, slope, tmean9120ws, om_ws, bfi_ws, perm_ws, #runoff_ws, 
+                burn_percentage, mean_dnbr, time_since_fire) %>% 
+  mutate(mean_dnbr = as.numeric(mean_dnbr)) %>% 
+  na.omit() 
+  
 
 ## Set ggplot theme
 theme_set(theme_bw())
@@ -74,7 +80,7 @@ plot_fi <- function(data){
   model_recipe <- data %>% 
     recipe(dependent ~ .) %>% 
     step_integer(climate) %>% 
-    step_corr(all_predictors()) %>% 
+    # step_corr(all_predictors()) %>% # looking at correlations between the variables and if two things are strongly correlated. Runoff is strongly correlated with another variable within DOC. Random forest do a good job handling multi-colinearity
     step_normalize(all_predictors(), -all_outcomes()) %>% 
     recipes::prep()
   
@@ -106,13 +112,21 @@ plot_fi <- function(data){
 
 ```
 
+```{r correlation matrix}
+df %>% filter(analyte == "doc") %>% 
+  drop_na() %>% 
+  cor()
+
+```
+
 # Plot FI for effect sizes
 ```{r plot Feature importance}
 ## Create a dataset of variable importance
 df <- bind_rows(plot_fi(no3) %>% mutate(analyte = "no3"), 
           plot_fi(doc) %>% mutate(analyte = "doc")) %>% 
   group_by(analyte) %>% 
-  mutate(fi = raw_fi / sum(raw_fi))
+  mutate(fi = raw_fi / sum(raw_fi),
+         fi100 = fi * 100)
 
 write_csv(df, here("Output_for_analysis", "11_Random_forest", "Random_Forest_Effect_Size_Fig_data.csv"))
 
@@ -139,11 +153,18 @@ ggplot(df, aes(fi * 100,
   scale_fill_manual(values = var_colors) + 
   labs(x = "Feature Importance (%)", 
        y = "", fill = "") +
-  scale_y_discrete(labels=c("burn_percentage" = "Burn Percentage", 
-                            "climate" = "Climate",
-                            "maxelevsmo" = "Max Elevation",
+  scale_y_discrete(labels=c("bfi_ws" = "Baseflow Index",
+                            "runoff_ws" = "Runoff",
+                            "perm_ws" = "Soil Permeability",
+                            "tmean9120ws" = "Mean annual air temp",
+                            "mean_dnbr" = "Burn Severity",
+                            "om_ws" = "Organic Matter",
+                            "maxelevsmo" = "Max Watershed Elevation",
+                            "burn_percentage" = "Burn Percentage", 
+                            "climate" = "Koppen Climate Classification",
+                            # "maxelevsmo" = "Max Elevation",
                             # "minelevsmo" = "Minimum Elevation",
-                            "slope" = "Average Slope",
+                            "slope" = "Catchment Slope",
                             "time_since_fire" = "Time Since Fire",
                             "totdasqkm" = "Catchment Area")) +
   theme_bw()
@@ -152,6 +173,8 @@ ggplot(df, aes(fi * 100,
 ggsave("Effect_Size_Random_Forest.pdf",
        path = here("initial_plots", "11_Meta_random_forest"),
        width = 5.5, height = 3,  units = "in")
+
+# including white noise. You put in a random variable. You feed that in as a predictor. If white noise has higher feature importance than any of these variables. The concern there is, we dont want to add anything that doesn't address the comment. 
 
 
 ```

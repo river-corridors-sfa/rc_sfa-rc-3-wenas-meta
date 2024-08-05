@@ -242,9 +242,8 @@ cor_matrix_doc <- as.matrix(cor_matrix_doc)
 # Print the reordered correlation matrix
 print(cor_matrix_doc)
 
-# # Filter the correlation matrix to include only values greater than 0.6
-cor_matrix_filtered_doc <- ifelse(abs(cor_matrix_doc) > 0.1, cor_matrix_doc, NA)
-
+### PLOT ####
+          
 # Specify the file path and format for the output PDF file
 output_file <- here("initial_plots", "08_Meta_summary_stats", "DOC_geospatial_correlation.pdf")
 
@@ -262,6 +261,44 @@ mtext("DOC Correlation Matrix", side = 3, line = 1, adj = 0, cex = 1.2)
 # Close the device to save the file
 dev.off()
 
+
+```
+
+# Variable Selection
+```{r variable selection}
+# DOC 
+# # Filter the correlation matrix to include only values greater than 0.3
+cor_matrix_filtered_doc <- ifelse(abs(cor_matrix_doc) > 0, cor_matrix_doc, NA)
+
+# Export the filtered correlation matrix to a CSV file
+write.csv(cor_matrix_filtered_doc, here("Output_for_analysis", "08_Meta_summary_stats", "doc_filtered_correlation_matrix.csv"), row.names = TRUE)
+
+# Variables to keep for the random forest model (based on correlation matrix - anything > 0.3 is deemed co-correlated and dropped)
+# totdasqkm
+  # max/min elevation are all co-correlated with the landcover types so I feel    like these should be dropped.
+# elevfixed is only co-correlated with TSF so I think we should keep this one in to get the elevation variable in 
+  # Slope is co-correlated with most of the temperature and the burn severity     variable. We probably want to keep this one in though....
+# Tmax/Tmean/Tmin - We should probably just pick one. I am leaning towards Tmean9120Ws. They are all however heavily correlated with Runoff, burn_percentage and mean_dnbr
+
+# AMP suggested to keep the hydrological processes in over the landcover types due to a more direct mechanism. 
+  # Forest - forest is heavily correlated with  Wetland, BFIWs, and PermWs
+  # Urban -  Urban is heavily correlated with  AG, OmWs, and BFIWs
+  # Grassland is heavily correlated with all temperature variables OmWs, RunoffWs, burn_percentage, mean_dnbr. 
+  # Wetland is correlated with the elevation metrics, forest, and PermWs.
+  # AG is correlated with Urban, OmWs, RunoffWs, burn_percentage
+
+# OmWs is correlated with BFIWs, RunoffWs, burn_percentage
+# BFIWs is correlated with OmWs, PermWs
+# PermWs is correlated with BFIWs
+# RunoffWs is correlated with OmWs, burn_percentage, mean_dnbr
+# burn_percentage is correlated with OmWs, RunoffWs, mean_dnbr
+# mean_dnbr is correlated with slope, RunoffWs, burn_percentage
+# Time_Since_Fire is correlated with elevfixed. 
+
+
+# NO3
+# # Filter the correlation matrix to include only values greater than 0.6
+cor_matrix_filtered_no3 <- ifelse(abs(cor_matrix_no3) > 0, cor_matrix_no3, NA)
 
 ```
 
@@ -302,10 +339,7 @@ cor_matrix_no3 <- as.matrix(cor_matrix_no3)
 # Print the reordered correlation matrix
 print(cor_matrix_no3)
 
-# # Filter the correlation matrix to include only values greater than 0.6
-cor_matrix_filtered_no3 <- ifelse(abs(cor_matrix_no3) > 0, cor_matrix_no3, NA)
-
-
+### PLOT ####
 # Specify the file path and format for the output PDF file
 output_file <- here("initial_plots", "08_Meta_summary_stats", "NO3_geospatial_correlation.pdf")
 
