@@ -290,7 +290,7 @@ ggsave("Effect_Size_Burn_Percentage.pdf",
 doc_bp_mixed <-  lmer(Effect_size ~ burn_percentage + (1 | Site), data = doc_es_bp)
 
 # Check for equal variance
-performance::check_heteroscedasticity(doc_bp_mixed) #OK: Error variance appears to be homoscedastic (p = 0.946).
+performance::check_heteroscedasticity(doc_bp_mixed) #OK: Error variance appears to be homoscedastic (p = 0.950).
 
 # Check for normality
 residuals <- resid(doc_bp_mixed)
@@ -338,6 +338,66 @@ predictInterval(no3_bp_mixed)
 REsim(no3_bp_mixed) 
 
 plotREsim(REsim(no3_bp_mixed))
+
+```
+
+### Burn percentage continuous model ###
+```{r Continuous BP plot}
+# Plot #
+vn = expression(paste(""*N*O[3]^"-"))
+
+give.n <- function(x){
+  return(c(y = median(x)*1.5, label = length(x))) 
+  # experiment with the multiplier to find the perfect position
+}
+
+# Creating continuous burn percentage plot data frame 
+continuous_burn_percentage_plot <- BP_model %>% 
+  na.omit()
+
+ggplot(continuous_burn_percentage_plot, aes(burn_percentage, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  # stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+  #              label.x.npc = "right", 
+  #              formula = y ~ x, 
+  #              parse = TRUE) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("Burn Percentage") +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = ""),
+                     labels = c('DOC', vn)) +
+  theme_bw()
+  # theme(axis.text.x = element_text(size = 30, angle = -90),
+  #       axis.text.y = element_text(size = 30),
+  #       axis.title.x = element_text(size = 40),
+  #       axis.title.y = element_text(size = 35),
+  #       legend.text = element_text(size = 30),
+  #       legend.key = element_blank(),
+  #       legend.background = element_blank(),
+  #       legend.position = c(0.1, 0.86))
+
+
+# Nitrate specific
+ggplot(no3_es_bp, aes(burn_percentage, Effect_size, color = response_var),
+       position = position_dodge(width = -0.5)) +
+  geom_jitter(position = position_jitter(0.1), alpha = 0.4, size = 3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+               label.x.npc = "right", 
+               formula = y ~ x, 
+               parse = TRUE) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  ylab("Effect Size") +
+  xlab("Burn Percentage") +
+  scale_color_manual(values = c("#E7B800"),
+                     guide = guide_legend(title = ""),
+                     labels = c(vn)) +
+  theme_bw()
+no3_es_bp
+
 
 ```
 
