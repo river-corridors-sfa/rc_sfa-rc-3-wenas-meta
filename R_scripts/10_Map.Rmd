@@ -148,6 +148,59 @@ ggsave("number_watersheds_map_legend.pdf",
        path = "~/Documents/RC_3/Wenas_Watershed_project/Manuscript",
        width = 14, height = 8,  units = "in")
 
+### Attempt to jitter points on plot ###
+# Assuming us_ca and coordinates_sf are already loaded as sf objects
+
+# Step 1: Transform to a projected CRS (e.g., UTM)
+utm_crs <- 32610  # UTM zone 10N, adjust based on your location
+us_ca_utm <- st_transform(us_ca, crs = utm_crs)
+coordinates_sf_utm <- st_transform(coordinates_sf, crs = utm_crs)
+
+# Step 2: Convert sf object to a data frame with coordinates
+coordinates_df <- coordinates_sf_utm %>%
+  st_drop_geometry() %>%
+  bind_cols(st_coordinates(coordinates_sf_utm))
+
+# Step 3: Manually add jitter to coordinates
+set.seed(123)  # Set seed for reproducibility
+jitter_amount <- 50000  # Adjust this value for more or less jitter in meters
+coordinates_df <- coordinates_df %>%
+  mutate(
+    jittered_x = X + runif(n(), -jitter_amount, jitter_amount),
+    jittered_y = Y + runif(n(), -jitter_amount, jitter_amount)
+  )
+
+# Step 4: Plot with manually jittered points
+ggplot() +
+  geom_sf(data = us_ca_utm, fill = "white", color = "black") +
+  geom_point(
+    data = coordinates_df, 
+    aes(x = jittered_x, y = jittered_y, size = number_of_burn, color = Fire_name)) +
+  scale_color_manual(values = c("#E31A1C", "#A6CEE3", "#00AFBB", "#1B9E77",
+                                "#7570B3", "#E7298A", "darkred", "black", 
+                                "#1F78B4", "#E31A1C", "#33A02C", "black",
+                                "darkblue", "darkgreen", "blue", "yellow", "red",
+                                "green", "purple")) +
+  geom_text(
+    data = coordinates_df,
+    aes(x = jittered_x, y = jittered_y, label = Fire_name),
+    nudge_y = 20000,  # Adjust this for vertical nudging to avoid overlap
+    check_overlap = TRUE) +  # This prevents text from overlapping +
+  labs(size = "Number of Burned Watersheds") +
+  ggspatial::annotation_scale(
+    location = "br",
+    pad_x = unit(0.5, "in"), 
+    bar_cols = c("black", "white")) +
+  ggspatial::annotation_north_arrow(
+    location = "bl", which_north = "true",
+    pad_x = unit(1.1, "in"), pad_y = unit(0.01, "in"),
+    style = ggspatial::north_arrow_nautical(
+      fill = c("black", "white"),
+      line_col = "grey20")) +
+  theme_minimal() +
+  theme(legend.position = "none", 
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank())
 
 
 

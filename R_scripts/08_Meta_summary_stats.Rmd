@@ -212,10 +212,15 @@ doc_correlation <- doc_RF %>%
   dplyr::select(Effect_size, totdasqkm, minelevraw, maxelevsmo, minelevsmo, elevfixed, slope, Tmax9120Ws,Tmean9120Ws, Tmin9120Ws, Forest, Urban, Grassland, Wetland, AG, OmWs, BFIWs, PermWs, RunoffWs, burn_percentage, mean_dnbr, Time_Since_Fire) %>% 
   mutate(Time_Since_Fire = as.numeric(Time_Since_Fire)) 
 
+# Change the news of the variables
+new_names <- c("Effect Size", "Watershed area", "Minimum Watershed Elevation raw", "Maximum Watershed Elevation smooth", "Minimum Watershed Elevation smooth", "Fixed Watershed Elevation", "Watershed Slope", "30-year Max Air Temp" , "30-year Mean Air Temp", "30-year Min Air Temp", "Forest cover", "Urban cover", "Grassland cover", "Wetland cover", "Agriculture cover", "Organic Matter Mean", "Baseflow Index", "Soil Permeability", "Mean Runoff", "Watershed Burn Percentage", "Burn Severity", "Time-Since-Fire")  
+
+colnames(doc_correlation) <- new_names
+
 # If mean DNBR values are calculated then our measurement is no bueno. Remove. 
 doc_correlation <- doc_correlation %>% 
-  mutate(mean_dnbr = case_when(mean_dnbr < 0 ~ NA,
-                               TRUE ~ mean_dnbr))
+  mutate(`Burn Severity` = case_when(`Burn Severity` < 0 ~ NA,
+                               TRUE ~ `Burn Severity`))
 
 # Calculate the correlation matrix
 cor_matrix_doc <- cor(doc_correlation, use = "complete.obs")
@@ -224,7 +229,7 @@ cor_matrix_doc <- cor(doc_correlation, use = "complete.obs")
 cor_matrix_doc <- as.data.frame(cor_matrix_doc)
 
 # Get the order of columns with 'Effect_size' first
-column_order <- c("Effect_size", setdiff(names(cor_matrix_doc), "Effect_size"))
+column_order <- c("Effect Size", setdiff(names(cor_matrix_doc), "Effect Size"))
 
 # Reorder columns using select
 cor_matrix_doc <- cor_matrix_doc %>%
@@ -238,6 +243,10 @@ cor_matrix_doc <- cor_matrix_doc %>%
 
 # Convert back to matrix if needed
 cor_matrix_doc <- as.matrix(cor_matrix_doc)
+
+# Assign new names to both row and column names
+rownames(cor_matrix_doc) <- new_names
+colnames(cor_matrix_doc) <- new_names
 
 # Print the reordered correlation matrix
 print(cor_matrix_doc)
@@ -335,6 +344,11 @@ cor_matrix_no3 <- cor_matrix_no3 %>%
 
 # Convert back to matrix if needed
 cor_matrix_no3 <- as.matrix(cor_matrix_no3)
+
+# Assign new names to both row and column names
+rownames(cor_matrix_no3) <- new_names
+colnames(cor_matrix_no3) <- new_names
+
 
 # Print the reordered correlation matrix
 print(cor_matrix_no3)
