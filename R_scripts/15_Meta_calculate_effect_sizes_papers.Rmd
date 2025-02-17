@@ -1,0 +1,327 @@
+---
+title: "15_Meta_calculate_effect_sizes_papers"
+output: html_document
+date: "2025-02-17"
+editor_options: 
+  chunk_output_type: console
+---
+
+The purpose of this script is to calculate the effect sizes from the results directly from the paper rather than from our gap filling technique and then comparing to see if they are similar or not. 
+
+This will placate the reviewers that are critical of the gap filling technique. 
+
+Script Workflow:
+
+Step 1) Load in results from burned and unburned watersheds from each study.  
+
+*Step 2) calculate our pseudo yield metric: mg-DOC/L*km^2*yr ????* 
+
+Step 3) Calculate the effect size for each watershed: ln[R] = Xburn/Xunburn
+
+Step 4) Compare effect sizes from this approach to the old approach to see how similar they are. 
+
+
+# Status: in progress
+
+# =======================================================================
+# Author: Jake Cavaiani; jake.cavaiani@pnnl.gov
+# 17 February 2025
+# ======================================================================
+
+* Chunk 1:3 are the same from the old approach because it just formats before the gap filling takes place. I think that is what I want to make this work. *
+
+## Read in libraries 
+```{r Jake/Mac Load Packages and}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+library(tidyverse)
+library(here)
+library(forecastML)
+library(zoo)
+library(hrbrthemes)
+library(viridis)
+library(ggpmisc)
+library(RobustLinearReg)
+
+```
+
+### Load in meta data ###
+```{r load in publications}
+studies_file_list <- list.files(
+  path = here("inputs", "Studies", "meta_final"), 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv, 
+                                     na = c('-9999', 'N/A'),
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE))
+
+
+```
+
+```{r format date and units}
+options(max.print = 40)
+# Filtering by only the control vs.impact studies to make sure we have no paper that is included that is any other study design. 
+
+# Crandall is filtered out because the burned and reference sites are not paired so I do that is a separate script and will read that csv in later to merge to this dataframe to get the more accurate effect size calculations 
+
+# The studies that monitor streams more than 5 years following a wildfire are also excluded for this initial code and will be added in later.  
+
+control_impact <- meta_df %>% 
+  filter(Design_Control_Burn_Pre_Post == "Control_Reference_vs_Impact",
+         Study_ID != "Crandall et al. 2021",
+         Study_ID != "Murphy et al. 2015",
+         Mean_Median_or_IndividualSample == "Individual",
+         as.numeric(Time_Since_Fire) < 6)
+
+# separate out the time columns 
+time_format <- control_impact %>% 
+  dplyr::select(Study_ID, Sampling_Date) %>% 
+  mutate(Sampling_Date = as.character(Sampling_Date))
+
+# merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
+control_impact <- control_impact %>% 
+  mutate(Sampling_Date = time_format$Sampling_Date)
+
+
+# changing the structure of the concentrations
+control_impact <- control_impact %>% 
+  mutate(DOC = as.numeric(DOC),
+         NO3 = as.numeric(NO3), 
+         Sampling_Date = ymd(Sampling_Date))
+
+control_impact <- control_impact %>% 
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+
+# Changing the units to make sure everything is consistent in mg_N_L or mg_C_L
+control_impact_units <- control_impact %>% 
+  mutate(Area_watershed_km = case_when(Area_unit == 'ha' ~ Area_watershed * .01,
+                                       Area_unit == 'km' ~ print(Area_watershed)),
+         
+         DOC_mg_C_L = case_when(DOC_unit == 'mg_C_L' ~ print(DOC),
+                                DOC_unit == 'mg_L' ~ print(DOC),
+                                DOC_unit == 'um' ~ DOC * 0.01201),
+         
+         NO3_mg_N_L = case_when(NO3_unit == 'um' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_NO2_NO3_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'mg_N_L' ~ print(NO3),
+                                NO3_unit == 'ug_N_L' ~ NO3 * .001, 
+                                NO3_unit == 'mg_L' ~ NO3 * 0.225904780),
+         
+         DOC_uM_C = case_when(DOC_unit == 'um' ~ print(DOC),
+                              DOC_unit == 'mg_C_L' ~ DOC * 83.2639467,
+                              DOC_unit == 'mg_L' ~ DOC * 83.2639467),
+
+         NO3_uM_N = case_when(NO3_unit == 'um' ~ print(NO3),
+                              NO3_unit == 'umol_L' ~ print(NO3),
+                              NO3_unit == 'umol_NO2_NO3_L' ~ print(NO3),
+                              NO3_unit == 'mg_L' ~ NO3 * 16.127729,
+                              NO3_unit == 'mg_N_L' ~ NO3 * 3.64145101,
+                              NO3_unit == 'ug_N_L' ~ NO3 * 0.22594948))
+
+# Creating a site characteristics data frame that I will use to merge later to add in the proper data 
+site_data <- control_impact_units %>% 
+  dplyr::select(Study_ID, Pair, latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
+
+site_data_unique <- site_data %>% 
+  group_by(Study_ID, Pair, Area_watershed_km) %>% 
+  distinct(Area_watershed_km, .keep_all = TRUE)
+
+# Remove intermediate data frames
+rm(site_data)
+rm(control_impact)
+rm(time_format)
+
+
+# Select columns that I need:
+control_impact_units <- control_impact_units %>% 
+  dplyr::select(Study_ID, Pair, year, latitude, longitude, Area_watershed_km, Climate, DOC_mg_C_L, NO3_mg_N_L)
+```
+
+# Calculating the temporal normalized data
+```{r}
+# pivoting to make the responses in one column
+metadata_long <- control_impact_units %>%
+  pivot_longer(
+    cols = DOC_mg_C_L:NO3_mg_N_L,
+    names_to = "response_var",
+    values_to = "concentration",
+    values_drop_na = TRUE
+  )
+
+# Calculate the mean concentration for each watershed
+mean_site <-  metadata_long %>%
+  group_by(Study_ID, response_var, Pair, year) %>% 
+  summarize(meanConc = mean(concentration)) %>% 
+  left_join(site_data_unique) %>% 
+  group_by(year) %>%
+  distinct(meanConc, .keep_all = TRUE) %>% 
+  mutate(TempNorm = meanConc / Area_watershed_km) %>% 
+  dplyr::select(Study_ID, response_var, year, Pair, Burn_Unburn, meanConc, TempNorm, latitude, longitude, Climate, Area_watershed_km)
+
+
+```
+
+
+# EFFECT SIZE 
+```{r}
+# Taking out Hauer and Spencer and Hickenbottom because they have mutliple controls and that is different than the rest of these sites
+one_control <- mean_site %>%
+  filter(Study_ID != "Hauer & Spencer 1998", Study_ID != "Hickenbottom et al. 2023") %>%
+  mutate(TempNorm = as.numeric(TempNorm))  
+
+# Creating a control and treatment column for the temporal normalization 
+control_treatment <- one_control %>%
+  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate) %>%
+  dplyr::summarize(Xe = sum(TempNorm[Burn_Unburn == "Burn"], na.rm = TRUE),
+                   Xc = sum(TempNorm[Burn_Unburn == "Unburn"], na.rm = TRUE)) 
+
+# Creating an individual column for each site and merging them into one row. 
+control_treatment_wide <- control_treatment %>%
+  dplyr::select(-Pair) %>%
+  group_by(Study_ID, response_var, Climate, year) %>%
+  summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
+            Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
+            Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
+            Xe4 = sum(Xe[Pair == "Site_4"], na.rm = TRUE),
+            Xe5 = sum(Xe[Pair == "Site_5"], na.rm = TRUE),
+            Xc = sum(Xc[Pair == "Control"], na.rm = TRUE))
+
+
+# Calculating effect size: ln((MeanBurn/MeanUnburn)) for all the sites with only one control 
+effect_size <- control_treatment_wide %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  mutate(lnR1 = log(Xe1/Xc),
+         lnR2 = log(Xe2/Xc),
+         lnR3 = log(Xe3/Xc),
+         lnR4 = log(Xe4/Xc),
+         lnR5 = log(Xe5/Xc))
+
+
+# This is doing the same thing as chunk before where we are creating a column header for each individual site but doing it for the studies that have multiple controls. 
+multiple_control <- mean_site %>% 
+  filter(Study_ID == "Hauer & Spencer 1998" | Study_ID == "Hickenbottom et al. 2023") %>%
+  mutate(TempNorm = as.numeric(TempNorm))
+
+
+
+multiple_control_treatment <- multiple_control %>%
+  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate) %>%
+  dplyr::summarize(Xe = sum(TempNorm[Burn_Unburn == "Burn"], na.rm = TRUE),
+                   Xc = sum(TempNorm[Burn_Unburn == "Unburn"], na.rm = TRUE)) # Creating a control and treatment column for the temporal normalization 
+
+multiple_control_treatment_wide <- multiple_control_treatment %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
+            Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
+            Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
+            Xe4 = sum(Xe[Pair == "Site_4"], na.rm = TRUE),
+            Xe5 = sum(Xe[Pair == "Site_5"], na.rm = TRUE),
+            Xc345 = sum(Xc[Pair == "Control_3_4_5"], na.rm = TRUE),
+            Xc2 = sum(Xc[Pair == "Control_2"], na.rm = TRUE),
+            Xc = sum(Xc[Pair == "Control_1"], na.rm = TRUE)) 
+
+
+effect_size_multiple <- multiple_control_treatment_wide %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  mutate(lnR1 = log(Xe1/Xc),
+         lnR2 = log(Xe2/Xc2),
+         lnR3 = log(Xe3/Xc345),
+         lnR4 = log(Xe4/Xc345),
+         lnR5 = log(Xe5/Xc345)) %>% 
+  ungroup()
+
+# Adding columns to match brie_test_stats
+effect_size <-effect_size %>% 
+  add_column(Xc345 = NA,
+             Xc2 = NA) %>% 
+  ungroup()
+
+# combining Hauer and Hickenbottom back into the mix 
+effect_size_no_fill <- effect_size %>% 
+  add_row(effect_size_multiple)
+
+effect_size_no_fill_filter <- effect_size_no_fill %>% 
+  dplyr::select(Study_ID, response_var, year, lnR1:lnR5)
+
+effect_size_no_fill_long <- effect_size_no_fill_filter %>% 
+  pivot_longer(
+    cols = lnR1:lnR5,
+    names_to = "Effect_size_pair",
+    values_to = "Effect_size",
+    values_drop_na = TRUE
+  ) %>% 
+  filter(is.finite(Effect_size))
+
+```
+
+# Compare effect sizes by approaches
+```{r}
+# Read in the old effect size data frame
+effect_size_fill <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"))
+
+# down select columns of interest. 
+effect_size_fill_filter <- effect_size_fill %>% 
+  dplyr::select(Study_ID, response_var, year, Effect_size_pair, Effect_size) %>% 
+  rename()
+
+# Create a mapping of response_var values
+response_var_mapping <- c("DOC_Interp" = "DOC_mg_C_L", "NO3_Interp" = "NO3_mg_N_L")
+
+# Update effect_size_fill_filter with the mapped values for response_var
+effect_size_fill_filter <- effect_size_fill_filter %>%
+  mutate(response_var = recode(response_var, !!!response_var_mapping))
+
+# Merge the data frames 
+merged_effect_size <- left_join(effect_size_no_fill_long, effect_size_fill_filter, 
+        by = c("Study_ID", "response_var", "year", "Effect_size_pair"),
+        suffix = c("_no_fill", "_fill"))
+
+
+# Perform a linear regression
+regression_result <- lm(Effect_size_no_fill ~ Effect_size_fill, data = merged_effect_size)
+
+# Create the plot with equation and R² value
+regression_plot <- ggplot(merged_effect_size, aes(x = Effect_size_no_fill, y = Effect_size_fill)) +
+  geom_point() +  # Add points
+  geom_smooth(method = "lm", col = "blue") +  # Add regression line
+  stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+               label.x = "left", formula = y ~ x, parse = TRUE, size = 5) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "black") +  # Add 1:1 dashed line
+  labs(
+    title = "Impact of Gap Filling on Effect size",
+    x = "Effect Size Fill",
+    y = "Effect Size No Fill"
+  ) +
+  theme_bw()  # Use a minimal theme
+
+# Print the plot
+print(regression_plot)
+
+
+  
+
+```
+
+
+
+
+
+
+
+
+

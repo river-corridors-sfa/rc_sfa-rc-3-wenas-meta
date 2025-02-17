@@ -222,6 +222,141 @@ burn_severity_thresholds <- burn_severity %>%
 
 ```
 
+### Plot burn severity bar graph for low/moderate/high for each fire 
+```{r}
+severity_distribution <- fire_names %>% 
+  distinct(fire_name, .keep_all = TRUE) %>% 
+  dplyr::select(fire_name, fire_year, mtbs_id, dnbr_path, fire_shape_path) %>% 
+  filter(fire_name != "clovermist") %>% 
+  filter(fire_name != "jumping_branch") %>% 
+  filter(fire_name != "matt") %>% 
+  filter(fire_name != "rocky") %>% 
+  filter(fire_name != "safety_harbor")
+
+# Chat GPT take 1.0
+# Function to classify dNBR values based on thresholds for a specific fire
+classify_dnbr <- function(dnbr_value, thresholds) {
+  classification <- thresholds %>%
+    filter(min <= dnbr_value & dnbr_value <= max)
+  
+  if (nrow(classification) == 0) {
+    return(NA)
+  } else {
+    return(classification$Burn_Severity)
+  }
+}
+
+# Initialize a data frame to store the classification distribution of each fire
+fire_distributions <- setNames(data.frame(matrix(ncol = 4, nrow = nrow(severity_distribution))), 
+                               c('Unburned to Low', 'Low', 'Moderate', 'High'))
+rownames(fire_distributions) <- severity_distribution$fire_name
+
+# Process each fire entry
+for (i in 1:nrow(severity_distribution)) {
+  dnbr_path <- severity_distribution$dnbr_path[i]
+  fire_shape_path <- severity_distribution$fire_shape_path[i]
+  current_fire_name <- severity_distribution$fire_name[i]
+
+
+  # Get the thresholds for the current fire
+  fire_thresholds <- thresholds %>%
+    filter(fire_name == current_fire_name)
+
+  # Load the dNBR raster
+  dnbr_raster <- raster(dnbr_path)
+  
+  # Load the fire perimeter shapefile
+  fire_shape <- st_read(fire_shape_path)
+  fire_shape <- st_transform(fire_shape, crs(dnbr_raster))
+  
+  # Clip the dNBR raster using the fire perimeter
+  dnbr_clipped <- mask(dnbr_raster, fire_shape)
+  
+  # Flatten the clipped raster matrix and drop NA values
+  dnbr_values <- values(dnbr_clipped)
+  dnbr_values <- dnbr_values[!is.na(dnbr_values)]
+  
+  # Classify the dNBR values using the specific thresholds for the fire
+  dnbr_classes <- sapply(dnbr_values, classify_dnbr, thresholds = fire_thresholds)
+  
+  # Count classification occurrences
+  counts <- table(factor(dnbr_classes, levels = c("Unburned to Low", "Low", "Moderate", "High")))
+  fire_distributions[current_fire_name,] <- counts
+}
+
+# Convert the results to a long format data frame for plotting
+fire_distributions <- as.data.frame(t(apply(fire_distributions, 1, function(row) row / sum(row))))
+fire_distributions <- fire_distributions %>%
+  mutate(fire_name = rownames(fire_distributions)) %>%
+  tidyr::pivot_longer(cols = -fire_name, names_to = "severity", values_to = "proportion")
+
+# Caldor:
+  # Unburned to Low: 0.1787
+  # Low: 0.2701
+  # Moderate: 0.2403
+  # High: 0.305
+# Clovermist:
+  # Unburned to Low: 0.3332
+  # Low: 0.1927
+  # Moderate: 0.1812
+  # High: 0.2695
+# Hayman:
+  # Unburned to Low: 0.2098
+  # Low: 0.1262
+  # Moderate: 0.2232
+  # High: 0.4339
+
+caldor_rows <- data.frame(
+  fire_name = rep("caldor", 4),
+  severity = c("Unburned to Low", "Low", "Moderate", "High"), 
+  proportion = c(0.1787, 0.2701, 0.2403, 0.3050),
+  stringsAsFactors = FALSE
+)
+
+clovermist_rows <- data.frame(
+  fire_name = rep("clovermist", 4),
+  severity = c("Unburned to Low", "Low", "Moderate", "High"), 
+  proportion = c(0.3332, 0.1927, 0.1812, 0.2695),
+  stringsAsFactors = FALSE
+)
+
+hayman_rows <- data.frame(
+  fire_name = rep("hayman", 4),
+  severity = c("Unburned to Low", "Low", "Moderate", "High"), 
+  proportion = c(0.2098, 0.1262, 0.2232, 0.4339),
+  stringsAsFactors = FALSE
+)
+
+manual_df <-  rbind(caldor_rows, clovermist_rows, hayman_rows)
+
+fire_distributions <- rbind(fire_distributions, manual_df)
+
+
+# Define the order for the severity levels
+severity_levels <- c("High", "Moderate", "Low", "Unburned to Low")
+
+# Define custom labels for fire names
+fire_labels <- c("Angora", "Caldor", "Clovermist", "Fourmile Canyon", 
+                 "Gaviota", "Hayman", "High Park", "Mosquito", "Pole Creek",
+                 "Rampage Complex", "Red Bench", "Wragg")
+
+
+# Plot the distribution
+ggplot(fire_distributions, aes(x = fire_name, y = proportion, fill = factor(severity, levels = severity_levels))) +
+  geom_bar(stat = "identity", position = "stack", color = "black") +
+  scale_fill_manual(values = c("Unburned to Low" = "#31a354", "Low" = "#5ab4ac", "Moderate" = "#fec44f", "High" = "#de2d26"),
+                    name = "Severity") +
+  scale_x_discrete(labels = fire_labels) +
+  theme_bw(base_size = 15) +
+  theme(panel.background = element_rect(fill = "white", color = NA),
+        plot.background = element_rect(fill = "white", color = NA),
+        axis.text.x = element_text(angle = -90, hjust = 0.5, size = 12)) +
+  labs(title = paste("Burn Severity Distribution"), x = "Fire Name", y = "% of Burn Area")
+
+
+
+```
+
 The burned sites from the Crandall paper (Benjamin Slough, Payson, Spanish Fork lower, Spanish Fork Upper) need to be replaced becuase there were multiple fires that make up a "Megafire" so the one shape file that is included in this for loop doesnt account for the other fires. I will do this manually down below and calculate the DNBR values separately and then manually add them in. 
 
 # ================== Checking sites individually that maybe don't make sense =========
@@ -730,6 +865,17 @@ doc_filter <- DNBR_model %>%
 ```
 
 
+#### Burn severity across low, moderate, high for each wildfire ####
+
+```{r read in fire_names data frame}
+head(fire_names)
+# How many unique fires are in our analysis 
+unique(fire_names$fire_name) # 14
+
+
+
+
+```
 
 
 
