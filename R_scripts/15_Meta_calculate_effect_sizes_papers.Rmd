@@ -405,19 +405,8 @@ control_impact <- control_impact %>%
 
 ```
 
-# Load in Effect Size 
-```{r}
-# Read in the old effect size data frame
-effect_size_fill <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"))
-
-# down select columns of interest. 
-mast_es_fill <- effect_size_fill %>% 
-  dplyr::select(Study_ID, response_var, year, Effect_size_pair, Effect_size) %>% 
-  filter(Study_ID == "Mast & Clow; 2008")
-  
-```
-
-### Mast & Clow; 2008 
+### Mast & Clow; 2008
+This chunk runs 100 iterations of the down-selected approach and then plots the upper and lower bounds time series with the real data overlain that we will use in the supplemental 
 ```{r}
 # Pivot DOC and NO3 (and their respective units) into one column
 control_long <- control_impact %>%
@@ -510,14 +499,14 @@ downselect_convert_and_fill <- function() {
   
 }
 
-
 # Perform the down-selection, conversion, and gap filling 100 times and store the results
 downselected_filled_list <- replicate(100, downselect_convert_and_fill(), simplify = FALSE)
 
 # Combine the results into one data frame with an additional column to distinguish the iterations
 combined_df_filled <- bind_rows(downselected_filled_list, .id = 'iteration') %>% select(iteration, Study_ID, Pair, Site, Sampling_Date, DOC_Interp, NO3_Interp)
 
-write_csv(combined_df_filled, here("initial_plots", "15_Meta_calculate_effect_sizes_papers", "mast_iteration.csv"))
+# Write out as csv 
+# write_csv(combined_df_filled, here("initial_plots", "15_Meta_calculate_effect_sizes_papers", "mast_iteration.csv"))
 
 # Compute the mean values for each iteration
 mean_df <- combined_df_filled %>%
@@ -525,7 +514,6 @@ mean_df <- combined_df_filled %>%
   summarize(mean_DOC_Interp = mean(DOC_Interp, na.rm = TRUE),
             mean_NO3_Interp = mean(NO3_Interp, na.rm = TRUE))
 
-library(ggridges)
 # Ensure iteration is a factor
 combined_df_filled$iteration <- as.factor(combined_df_filled$iteration)
 
@@ -534,9 +522,6 @@ ggplot(combined_df_filled) +
   geom_density(aes(x = DOC_Interp, group = iteration), alpha = 0.001) +
   theme_minimal()
 
-
-
-### CHAT GPT ###
 # Calculate mean and standard deviation for each date
 summary_stats <- combined_df_filled %>%
   group_by(Sampling_Date) %>%
@@ -626,49 +611,122 @@ ggplot(combined_df_filled, aes(x = Sampling_Date)) +
 
 ```
 
-# Gap filling for Mast 
+# Load in Effect Size for Mast that was for full gap filling
 ```{r}
-# Ensure no NA values in Sampling_Date for creating sequences
-combined_df_clean <- combined_df %>%
-  filter(!is.na(Sampling_Date))
+# Read in the old effect size data frame
+effect_size_fill <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"))
 
-# Gap filling and interpolation
-combined_df_fill <-  combined_df %>% 
-  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>% 
-  group_by(Study_ID, Site) 
+# down select columns of interest. 
+mast_es_fill <- effect_size_fill %>% 
+  dplyr::select(Study_ID, response_var, year, Effect_size_pair, Effect_size) %>% 
+  filter(Study_ID == "Mast & Clow; 2008")
+  
+```
 
-# Ensure Sampling_Date is in Date format and no NA dates present
-combined_df_clean <- combined_df %>%
-  filter(!is.na(Sampling_Date) & !is.infinite(Sampling_Date))
+# Calculate Effect Size for the 100-iteration down-selecting for Mast & Clow
+```{r}
+# add watershed area back in to calculate effect size 
+combined_df_filled <- combined_df_filled %>% 
+  mutate(Area_watershed_km = case_when(
+      Site == 'Pinchot' ~ 47.3,
+      Site == 'Coal' ~ 96.4
+    ))
 
-# Check the structure to confirm dates are valid
-str(combined_df_clean)
+# Pivot longer to get DOC and NO3 in one column
+iteration_long <- combined_df_filled %>%
+  pivot_longer(
+    cols = DOC_Interp:NO3_Interp,
+    names_to = "response_var",
+    values_to = "concentration",
+    values_drop_na = TRUE
+  )
 
-# Convert Sampling_Date to Date type
-combined_df_clean <- combined_df_clean %>%
-  mutate(Sampling_Date = as.Date(Sampling_Date, format = "%Y-%m-%d"))
+# Calculate temporal normalization for each iteration 
+yearly_iteration <- iteration_long %>%
+  group_by(iteration, Study_ID, response_var, Pair, year = year(Sampling_Date)) %>% 
+  mutate(meanConc = mean(concentration, na.rm = TRUE),
+         TempNorm = meanConc / Area_watershed_km) %>% 
+  select(iteration, Study_ID, response_var, Pair, year, meanConc, TempNorm)
 
-str(combined_df_clean)
+# Create control_treatment data frame structure
+control_treatment <- yearly_iteration %>%
+  group_by(iteration, Study_ID, response_var, Pair, year, Burn_Unburn = ifelse(Pair == "Control", "Unburn", "Burn")) %>%
+  summarize(Xe = sum(TempNorm[Burn_Unburn == "Burn"], na.rm = TRUE),
+            Xc = sum(TempNorm[Burn_Unburn == "Unburn"], na.rm = TRUE), .groups = 'drop')
 
-combined_df_fill <- combined_df_clean %>% 
-  group_by(Study_ID, Site) %>% 
-  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
-  fill(Study_ID:Time_Since_Fire) %>%
-  fill(Study_ID, Site) %>%
-  ungroup() %>%
-  group_by(Site) %>%
-  mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
-         DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
-  fill(Study_ID:Time_Since_Fire)
+# Make data frame wide so we can divide by columns 
+control_treatment_wide <- control_treatment %>%
+  group_by(iteration, Study_ID, response_var, year) %>%
+  summarize(
+    Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
+    Xc = sum(Xc[Pair == "Control"], na.rm = TRUE),
+    .groups = 'drop'
+  )
 
-control_impact_fill <- control_impact_fill %>% 
-  mutate(year = year(Sampling_Date),
-         month = month(Sampling_Date),
-         day = day(Sampling_Date))
+# Calculate the effect size 
+effect_size_iteration <- control_treatment_wide %>%
+  group_by(iteration, Study_ID, response_var, year) %>%
+  mutate(lnR1 = log(Xe1 / Xc)) %>%
+  summarize(across(starts_with("lnR"), mean, na.rm = TRUE), .groups = 'drop')
 
 
 ```
 
+# Compare the effect sizes for each iteration and the full fill
+```{r}
+# Ensure the appropriate columns are factors
+effect_size_iteration$response_var <- as.factor(effect_size_iteration$response_var)
+
+mast_es_fill$response_var <- as.factor(mast_es_fill$response_var)
+
+# Merge data frames
+iteration_filled_es <- effect_size_iteration %>%
+  inner_join(mast_es_fill, by = c("Study_ID", "response_var", "year")) %>%
+  rename(Effect_size1 = lnR1,
+         Effect_size2 = Effect_size)
+
+library(broom)
+
+# Function to perform linear regression and extract R-squared value
+get_r_squared <- function(df) {
+  model <- lm(Effect_size2 ~ Effect_size1, data = df)
+  summary(model)$r.squared
+}
+
+# Apply the function to each iteration
+r_squared_values <- iteration_filled_es %>%
+  group_by(iteration) %>%
+  summarize(r_squared = get_r_squared(cur_data()), .groups = 'drop')
+
+# Calculate average and standard deviation of R-squared values
+r_squared_summary <- r_squared_values %>%
+  summarize(mean_r_squared = mean(r_squared, na.rm = TRUE),
+            sd_r_squared = sd(r_squared, na.rm = TRUE))
+
+print(r_squared_summary)
+
+# Calculate mean and confidence interval
+mean_r_squared <- mean(r_squared_values$r_squared, na.rm = TRUE)
+
+ci_r_squared <- qt(0.975, df = nrow(r_squared_values) - 1) * sd(r_squared_values$r_squared) / sqrt(nrow(r_squared_values))
+
+ggplot(r_squared_values, aes(x = "", y = r_squared)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.5) +
+  labs(title = "R-squared Values Across Iterations",
+       x = "",
+       y = "R-squared Value") +
+  theme_bw()
+
+median(r_squared_values$r_squared)
+
+```
+
+
+
+
+
+############################# REST OF STUDIES ################################
 # Downselecting to 5 observations per year for each study
 # Original workflow. I might add this to the graveyard part of the script
 ```{r}
@@ -1008,45 +1066,6 @@ ggsave("ds_ES.pdf",
 
 ```
 
-# Density plot of randomly downselected points
-```{r}
-
-
-
-
-
-
-
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1101,52 +1120,46 @@ print(regression_plot)
 
 ```
 
-# 20% different
+########################## SCRIPT GRAVEYARD ##################################
+# Full gap filling for Mast
 ```{r}
-merged_filter <- merged_effect_size %>% 
-  na.omit()
+# Ensure no NA values in Sampling_Date for creating sequences
+combined_df_clean <- combined_df %>%
+  filter(!is.na(Sampling_Date))
 
-# Calculate the percentage difference and filter the data frame
-merged_filter_diff <- merged_filter %>%
-  mutate(
-    absolute_diff = abs(Effect_size_full_fill - Effect_size_downselected_fill),
-    percentage_diff = (absolute_diff / abs(Effect_size_full_fill)) * 100
-  ) %>%
-  filter(percentage_diff > 40)
+# Gap filling and interpolation
+combined_df_fill <-  combined_df %>% 
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>% 
+  group_by(Study_ID, Site) 
 
-# View the resulting data frame with differences greater than 20%
-print(merged_filter_diff)
+# Ensure Sampling_Date is in Date format and no NA dates present
+combined_df_clean <- combined_df %>%
+  filter(!is.na(Sampling_Date) & !is.infinite(Sampling_Date))
+
+# Check the structure to confirm dates are valid
+str(combined_df_clean)
+
+# Convert Sampling_Date to Date type
+combined_df_clean <- combined_df_clean %>%
+  mutate(Sampling_Date = as.Date(Sampling_Date, format = "%Y-%m-%d"))
+
+str(combined_df_clean)
+
+combined_df_fill <- combined_df_clean %>% 
+  group_by(Study_ID, Site) %>% 
+  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
+  fill(Study_ID:Time_Since_Fire) %>%
+  fill(Study_ID, Site) %>%
+  ungroup() %>%
+  group_by(Site) %>%
+  mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
+  fill(Study_ID:Time_Since_Fire)
+
+control_impact_fill <- control_impact_fill %>% 
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
 
 
 ```
-
-# t-test
-```{r}
-# Function to apply a Wilcoxon signed-rank test for each observation
-compare_effect_sizes <- function(full, downselected) {
-  test_result <- wilcox.test(full, downselected, paired = TRUE)
-  return(test_result$p.value)
-}
-
-# Apply the function to each observation
-merged_filter_with_p_values <- merged_filter %>%
-  rowwise() %>%
-  mutate(
-    p_value = compare_effect_sizes(Effect_size_full_fill, Effect_size_downselected_fill),
-    significant = p_value < 0.05
-  )
-
-# Check results
-print(merged_filter_with_p_values)
-
-# Filter observations that are statistically significant with p < 0.05
-significant_observations <- merged_filter_with_p_values %>%
-  filter(significant == TRUE)
-
-# View significant observations
-print(significant_observations)
-
-
-
-```
-
