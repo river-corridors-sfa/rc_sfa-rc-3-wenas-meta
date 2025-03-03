@@ -12,6 +12,8 @@ This will placate the reviewers that are critical of the gap filling technique.
 
 Script Workflow:
 
+Approach 1:
+
 Step 1) Load in results from burned and unburned watersheds from each study.  
 
 *Step 2) calculate our pseudo yield metric: mg-DOC/L*km^2*yr ????* 
@@ -19,6 +21,18 @@ Step 1) Load in results from burned and unburned watersheds from each study.
 Step 3) Calculate the effect size for each watershed: ln[R] = Xburn/Xunburn
 
 Step 4) Compare effect sizes from this approach to the old approach to see how similar they are. 
+
+Approach 2:
+
+Step 1) Find a paper with high temporal frequency data reporting
+
+Step 2) Cut data in half and create a vector of random non-repeating #s between 1 and a 100 
+
+Step 3) Compare the gap filling values with the random values reported.
+
+Step 4) Repeat with coarse frequency study. 
+
+
 
 
 # Status: in progress
@@ -312,8 +326,696 @@ regression_plot <- ggplot(merged_effect_size, aes(x = Effect_size_no_fill, y = E
 # Print the plot
 print(regression_plot)
 
+ggsave("Gap_NOGAP_ES.pdf",
+       path = here("initial_plots", "15_Meta_calculate_effect_sizes_papers"),
+       width = 6, height = 4, units = "in")
 
+```
+
+
+### Approach 2 ###
+
+## Read in libraries 
+```{r Jake/Mac Load Packages and}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+library(tidyverse)
+library(here)
+library(forecastML)
+library(zoo)
+library(hrbrthemes)
+library(viridis)
+library(ggpmisc)
+library(RobustLinearReg)
+
+```
+
+### Load in meta data ###
+```{r load in publications}
+studies_file_list <- list.files(
+  path = here("inputs", "Studies", "meta_final"), 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv, 
+                                     na = c('-9999', 'N/A'),
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE))
+
+
+summary_df <- meta_df %>%
+  group_by(Study_ID, Site) %>%
+  summarise(n = n())
+
+summary_df_high <- summary_df %>% 
+  filter(n > 100)
+# Coombs & Melack; 2013    Arroyo Hondo         111
+# Coombs & Melack; 2013    Gaviota              104
+# Coombs & Melack; 2013    San Onofre           124
+  # Coombs & Melack had data extracted from a figure
+# Mast & Clow; 2008        Coal                 174
+# Mast & Clow; 2008.       Pinchot              186
+  # Mast & Clow had data extracted from a figure. 
+
+# Let's use Mast and Clow because it is 1 burn and 1 unburn. 
+  # Down select the Mast and Clow samples to 5. Gap fill. Calculate effect size and compare it to gap fill of the original approach. 
+
+
+# filter studies that have a lot of observations
+control_impact <- meta_df %>% 
+  group_by(Study_ID, Pair) %>% 
+  filter(n() > 50) %>% 
+  ungroup()
+
+# Ensure Sampling_Date is in Date format and extract the year (if not already done)
+control_impact <- control_impact %>%
+  mutate(Sampling_Date = ymd(Sampling_Date),
+         Year = year(Sampling_Date))
+
+
+```
+
+# Load in Effect Size 
+```{r}
+# Read in the old effect size data frame
+effect_size_fill <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"))
+
+# down select columns of interest. 
+mast_es_fill <- effect_size_fill %>% 
+  dplyr::select(Study_ID, response_var, year, Effect_size_pair, Effect_size) %>% 
+  filter(Study_ID == "Mast & Clow; 2008")
   
+```
+
+### Mast & Clow; 2008 
+```{r}
+# Pivot DOC and NO3 (and their respective units) into one column
+control_long <- control_impact %>%
+  pivot_longer(
+    cols = c(DOC, NO3),
+    names_to = "analyte",
+    values_to = "value",
+    values_drop_na = TRUE
+  ) %>%
+  pivot_longer(
+    cols = c(DOC_unit, NO3_unit),
+    names_to = "analyte_unit",
+    names_pattern = "(DOC|NO3)_unit",
+    values_to = "unit"
+  ) %>%
+  filter(
+    (analyte == "DOC" & analyte_unit == "DOC") |
+    (analyte == "NO3" & analyte_unit == "NO3")
+  ) %>%
+  select(-analyte_unit)
+
+mast_long <- control_long %>% 
+  filter(Study_ID == "Mast & Clow; 2008")
+
+# Function to sample a maximum of 5 rows from each group
+sample_max_5 <- function(df) {
+  if (nrow(df) > 5) {
+    return(df %>% slice_sample(n = 5))
+  } else {
+    return(df)
+  }
+}
+
+
+# Function to perform the down-selection, unit conversion, and gap filling
+downselect_convert_and_fill <- function() {
+  downselected_df <- mast_long %>%
+    group_by(Study_ID, Pair, Year, analyte) %>%
+    group_split() %>%
+    map_df(sample_max_5) %>%
+    ungroup()
+  
+  converted_df <- downselected_df %>%
+    mutate(
+      # Standardize Area_watershed to kilometers
+      Area_watershed_km = case_when(
+        Area_unit == 'ha' ~ Area_watershed * 0.01,
+        Area_unit == 'km' ~ Area_watershed
+      ),
+      # Standardize DOC values
+      DOC_mg_C_L = case_when(
+        analyte == 'DOC' & unit == 'mg_C_L' ~ value,
+        analyte == 'DOC' & unit == 'mg_L' ~ value,
+        analyte == 'DOC' & unit == 'um' ~ value * 0.01201
+      ),
+      DOC_uM_C = case_when(
+        analyte == 'DOC' & unit == 'um' ~ value,
+        analyte == 'DOC' & unit == 'mg_C_L' ~ value * 83.2639467,
+        analyte == 'DOC' & unit == 'mg_L' ~ value * 83.2639467
+      ),
+      # Standardize NO3 values
+      NO3_mg_N_L = case_when(
+        analyte == 'NO3' & unit == 'um' ~ value * 0.014007,
+        analyte == 'NO3' & unit == 'umol_L' ~ value * 0.014007,
+        analyte == 'NO3' & unit == 'umol_NO2_NO3_L' ~ value * 0.014007,
+        analyte == 'NO3' & unit == 'mg_N_L' ~ value,
+        analyte == 'NO3' & unit == 'ug_N_L' ~ value * 0.001,
+        analyte == 'NO3' & unit == 'mg_L' ~ value * 0.22590478
+      ),
+      NO3_uM_N = case_when(
+        analyte == 'NO3' & unit == 'um' ~ value,
+        analyte == 'NO3' & unit == 'umol_L' ~ value,
+        analyte == 'NO3' & unit == 'umol_NO2_NO3_L' ~ value,
+        analyte == 'NO3' & unit == 'mg_L' ~ value * 16.127729,
+        analyte == 'NO3' & unit == 'mg_N_L' ~ value * 3.64145101,
+        analyte == 'NO3' & unit == 'ug_N_L' ~ value * 0.22594948
+      )
+    )
+  
+ # Gap filling
+  converted_df %>%
+    group_by(Study_ID, Pair, Year, Site) %>%
+    complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>%
+    fill(Study_ID:Time_Since_Fire) %>%
+    ungroup() %>%
+    group_by(Site) %>%
+    mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
+           DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
+    fill(Study_ID:Time_Since_Fire)
+  
+}
+
+
+# Perform the down-selection, conversion, and gap filling 100 times and store the results
+downselected_filled_list <- replicate(100, downselect_convert_and_fill(), simplify = FALSE)
+
+# Combine the results into one data frame with an additional column to distinguish the iterations
+combined_df_filled <- bind_rows(downselected_filled_list, .id = 'iteration') %>% select(iteration, Study_ID, Pair, Site, Sampling_Date, DOC_Interp, NO3_Interp)
+
+write_csv(combined_df_filled, here("initial_plots", "15_Meta_calculate_effect_sizes_papers", "mast_iteration.csv"))
+
+# Compute the mean values for each iteration
+mean_df <- combined_df_filled %>%
+  group_by(iteration) %>%
+  summarize(mean_DOC_Interp = mean(DOC_Interp, na.rm = TRUE),
+            mean_NO3_Interp = mean(NO3_Interp, na.rm = TRUE))
+
+library(ggridges)
+# Ensure iteration is a factor
+combined_df_filled$iteration <- as.factor(combined_df_filled$iteration)
+
+# Plot density plot: PR
+ggplot(combined_df_filled) +
+  geom_density(aes(x = DOC_Interp, group = iteration), alpha = 0.001) +
+  theme_minimal()
+
+
+
+### CHAT GPT ###
+# Calculate mean and standard deviation for each date
+summary_stats <- combined_df_filled %>%
+  group_by(Sampling_Date) %>%
+  summarize(mean_DOC_Interp = mean(DOC_Interp, na.rm = TRUE),
+            sd_DOC_Interp = sd(DOC_Interp, na.rm = TRUE))
+
+summary_stats <- summary_stats %>%
+  mutate(lower_bound = mean_DOC_Interp - sd_DOC_Interp,
+         upper_bound = mean_DOC_Interp + sd_DOC_Interp)
+
+ggplot(combined_df_filled, aes(x = Sampling_Date)) +
+  geom_ribbon(data = summary_stats, aes(ymin = lower_bound, ymax = upper_bound), fill = "grey80", alpha = 0.5) +
+  geom_line(data = summary_stats, aes(y = mean_DOC_Interp), color = "blue", size = 1) +
+  labs(title = "Time Series of DOC Interpolated Values with Distribution Ribbon",
+       x = "Sampling Date",
+       y = "Interpolated DOC Values (mg_C/L)") +
+  theme_bw()
+
+### Now I want to plot the actual data on top 
+# extract discrete observations from the Mast & Clow paper 2008.
+mast_discrete <- control_long %>% 
+  filter(Study_ID == "Mast & Clow; 2008")
+
+# Change the units
+mast_discrete_units <- mast_discrete %>% 
+  mutate(
+    # Standardize Area_watershed to kilometers
+    Area_watershed_km = case_when(
+      Area_unit == 'ha' ~ Area_watershed * 0.01,
+      Area_unit == 'km' ~ Area_watershed
+    ),
+    # Standardize DOC values
+    DOC_mg_C_L = case_when(
+      analyte == 'DOC' & unit == 'mg_C_L' ~ value,
+      analyte == 'DOC' & unit == 'mg_L' ~ value,
+      analyte == 'DOC' & unit == 'um' ~ value * 0.01201
+    ),
+    # Standardize NO3 values
+    NO3_mg_N_L = case_when(
+      analyte == 'NO3' & unit == 'um' ~ value * 0.014007,
+      analyte == 'NO3' & unit == 'umol_L' ~ value * 0.014007,
+      analyte == 'NO3' & unit == 'umol_NO2_NO3_L' ~ value * 0.014007,
+      analyte == 'NO3' & unit == 'mg_N_L' ~ value,
+      analyte == 'NO3' & unit == 'ug_N_L' ~ value * 0.001,
+      analyte == 'NO3' & unit == 'mg_L' ~ value * 0.22590478
+    )
+  )
+
+# Select columns of interest
+mast_discrete_DOC <- mast_discrete_units %>%
+  filter(Study_ID == "Mast & Clow; 2008") %>% 
+  select(Study_ID, Pair, Site, Sampling_Date, DOC_mg_C_L) %>% 
+  na.omit()
+
+# Plot on top of each other
+ggplot(combined_df_filled, aes(x = Sampling_Date)) +
+  geom_ribbon(data = summary_stats, aes(ymin = lower_bound, ymax = upper_bound), fill = "grey80", alpha = 0.5) +
+  geom_line(data = summary_stats, aes(y = mean_DOC_Interp), color = "blue", size = 1) +
+  geom_point(data = mast_discrete_DOC, aes(y = DOC_mg_C_L), color = "red", size = 1, alpha = 1.5) +
+  labs(title = "Time Series of DOC Interpolated Values with Distribution Ribbon",
+       x = "Sampling Date",
+       y = "Interpolated DOC Values (mg_C/L)") +
+  theme_bw()
+
+# # separate out the time columns 
+# time_format <- combined_df %>% 
+#   dplyr::select(Study_ID, Sampling_Date) %>% 
+#   mutate(Sampling_Date = as.character(Sampling_Date))
+# 
+# # merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
+# combined_df <- combined_df %>% 
+#   mutate(Sampling_Date = time_format$Sampling_Date)
+# 
+# # changing the structure of the concentrations
+# combined_df <- combined_df %>% 
+#   mutate(year = year(Sampling_Date),
+#          month = month(Sampling_Date),
+#          day = day(Sampling_Date))
+# 
+# 
+# # Test to see if worked as expected
+# # test_filter <- combined_df %>% 
+# #   select(iteration, Study_ID, Pair, Sampling_Date, DOC_mg_C_L, NO3_mg_N_L)
+# 
+# site_data <- combined_df %>% 
+#   dplyr::select(Study_ID, Pair, latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
+
+```
+
+# Gap filling for Mast 
+```{r}
+# Ensure no NA values in Sampling_Date for creating sequences
+combined_df_clean <- combined_df %>%
+  filter(!is.na(Sampling_Date))
+
+# Gap filling and interpolation
+combined_df_fill <-  combined_df %>% 
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>% 
+  group_by(Study_ID, Site) 
+
+# Ensure Sampling_Date is in Date format and no NA dates present
+combined_df_clean <- combined_df %>%
+  filter(!is.na(Sampling_Date) & !is.infinite(Sampling_Date))
+
+# Check the structure to confirm dates are valid
+str(combined_df_clean)
+
+# Convert Sampling_Date to Date type
+combined_df_clean <- combined_df_clean %>%
+  mutate(Sampling_Date = as.Date(Sampling_Date, format = "%Y-%m-%d"))
+
+str(combined_df_clean)
+
+combined_df_fill <- combined_df_clean %>% 
+  group_by(Study_ID, Site) %>% 
+  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
+  fill(Study_ID:Time_Since_Fire) %>%
+  fill(Study_ID, Site) %>%
+  ungroup() %>%
+  group_by(Site) %>%
+  mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
+  fill(Study_ID:Time_Since_Fire)
+
+control_impact_fill <- control_impact_fill %>% 
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+
+
+```
+
+# Downselecting to 5 observations per year for each study
+# Original workflow. I might add this to the graveyard part of the script
+```{r}
+# Group by Study_ID, Pair, Year, and analyte, then apply the sampling function
+# downselected_df <- control_long %>%
+#   group_by(Study_ID, Pair, Year, analyte) %>%
+#   group_split() %>%
+#   map_df(sample_max_5) %>%
+#   ungroup()  # Remove grouping after sampling
+
+# separate out the time columns 
+# time_format <- downselected_df %>% 
+#   dplyr::select(Study_ID, Sampling_Date) %>% 
+#   mutate(Sampling_Date = as.character(Sampling_Date))
+# 
+# # merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
+# downselected_df <- downselected_df %>% 
+#   mutate(Sampling_Date = time_format$Sampling_Date)
+# 
+# 
+# # changing the structure of the concentrations
+# downselected_df <- downselected_df %>% 
+#   mutate(year = year(Sampling_Date),
+#          month = month(Sampling_Date),
+#          day = day(Sampling_Date))
+# 
+# # Transform the downselected data frame based on units
+# control_impact_units <- downselected_df %>%
+#   mutate(
+#     # Standardize Area_watershed to kilometers
+#     Area_watershed_km = case_when(
+#       Area_unit == 'ha' ~ Area_watershed * 0.01,
+#       Area_unit == 'km' ~ Area_watershed
+#     ),
+#     # Standardize DOC values
+#     DOC_mg_C_L = case_when(
+#       analyte == 'DOC' & unit == 'mg_C_L' ~ value,
+#       analyte == 'DOC' & unit == 'mg_L' ~ value,
+#       analyte == 'DOC' & unit == 'um' ~ value * 0.01201
+#     ),
+#     DOC_uM_C = case_when(
+#       analyte == 'DOC' & unit == 'um' ~ value,
+#       analyte == 'DOC' & unit == 'mg_C_L' ~ value * 83.2639467,
+#       analyte == 'DOC' & unit == 'mg_L' ~ value * 83.2639467
+#     ),
+#     # Standardize NO3 values
+#     NO3_mg_N_L = case_when(
+#       analyte == 'NO3' & unit == 'um' ~ value * 0.014007,
+#       analyte == 'NO3' & unit == 'umol_L' ~ value * 0.014007,
+#       analyte == 'NO3' & unit == 'umol_NO2_NO3_L' ~ value * 0.014007,
+#       analyte == 'NO3' & unit == 'mg_N_L' ~ value,
+#       analyte == 'NO3' & unit == 'ug_N_L' ~ value * 0.001,
+#       analyte == 'NO3' & unit == 'mg_L' ~ value * 0.22590478
+#     ),
+#     NO3_uM_N = case_when(
+#       analyte == 'NO3' & unit == 'um' ~ value,
+#       analyte == 'NO3' & unit == 'umol_L' ~ value,
+#       analyte == 'NO3' & unit == 'umol_NO2_NO3_L' ~ value,
+#       analyte == 'NO3' & unit == 'mg_L' ~ value * 16.127729,
+#       analyte == 'NO3' & unit == 'mg_N_L' ~ value * 3.64145101,
+#       analyte == 'NO3' & unit == 'ug_N_L' ~ value * 0.22594948
+#     )
+#   )
+# 
+# site_data <- control_impact_units %>% 
+#   dplyr::select(Study_ID, Pair, latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
+
+```
+
+
+# downselected gap fill for all sites 
+```{r}
+# Ensure no NA values in Sampling_Date for creating sequences
+control_impact_units_clean <- control_impact_units %>%
+  filter(!is.na(Sampling_Date))
+
+# Gap filling and interpolation
+control_impact_fill <-  control_impact_units %>% 
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Time_Since_Fire", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>% 
+  group_by(Study_ID, Site) 
+
+# Ensure Sampling_Date is in Date format and no NA dates present
+control_impact_units_clean <- control_impact_fill %>%
+  filter(!is.na(Sampling_Date) & !is.infinite(Sampling_Date))
+
+# Check the structure to confirm dates are valid
+str(control_impact_units_clean)
+
+# Convert Sampling_Date to Date type
+control_impact_units_clean <- control_impact_units_clean %>%
+  mutate(Sampling_Date = as.Date(Sampling_Date, format = "%Y-%m-%d"))
+
+str(control_impact_units_clean)
+
+control_impact_fill <- control_impact_units_clean %>% 
+  group_by(Study_ID, Site) %>% 
+  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
+  fill(Study_ID:Time_Since_Fire) %>%
+  fill(Study_ID, Site) %>%
+  ungroup() %>%
+  group_by(Site) %>%
+  mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
+  fill(Study_ID:Time_Since_Fire)
+
+control_impact_fill <- control_impact_fill %>% 
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+
+```
+
+# Summary stats on downselection
+```{r Summary}
+# What I am looking for here is to see if the code is actually only using 5 observations per year to perform the gap fill. Essentially checking to see if its working and it looks like it is. 
+ds_summary <- control_impact_fill %>%
+  group_by(Study_ID, Pair, year, NO3_mg_N_L, DOC_mg_C_L, Sampling_Date) %>%
+  summarise(n = n()) 
+
+
+# Plot mast
+mast_ds_fill <- control_impact_fill %>% 
+  filter(Study_ID == "Mast & Clow; 2008") %>% 
+  select(Study_ID, Pair, Site, Sampling_Date, DOC_mg_C_L, DOC_Interp)
+
+ggplot(mast_ds_fill) +
+  geom_line(aes(x = Sampling_Date, y = DOC_Interp)) +
+  geom_point(aes(x = Sampling_Date, y = DOC_mg_C_L), color = "red") +
+  facet_wrap(~ Pair, scales = "free") +
+  theme_bw()
+
+ggsave("mast_ds_fill.pdf",
+       path = here("initial_plots", "15_Meta_calculate_effect_sizes_papers"),
+       width = 6, height = 4, units = "in")
+
+
+# extract discrete observations from the Mast & Clow paper 2008.
+mast_discrete <- control_long %>% 
+  filter(Study_ID == "Mast & Clow; 2008")
+
+# Change the units
+mast_discrete_units <- mast_discrete %>% 
+  mutate(
+    # Standardize Area_watershed to kilometers
+    Area_watershed_km = case_when(
+      Area_unit == 'ha' ~ Area_watershed * 0.01,
+      Area_unit == 'km' ~ Area_watershed
+    ),
+    # Standardize DOC values
+    DOC_mg_C_L = case_when(
+      analyte == 'DOC' & unit == 'mg_C_L' ~ value,
+      analyte == 'DOC' & unit == 'mg_L' ~ value,
+      analyte == 'DOC' & unit == 'um' ~ value * 0.01201
+    ),
+    # Standardize NO3 values
+    NO3_mg_N_L = case_when(
+      analyte == 'NO3' & unit == 'um' ~ value * 0.014007,
+      analyte == 'NO3' & unit == 'umol_L' ~ value * 0.014007,
+      analyte == 'NO3' & unit == 'umol_NO2_NO3_L' ~ value * 0.014007,
+      analyte == 'NO3' & unit == 'mg_N_L' ~ value,
+      analyte == 'NO3' & unit == 'ug_N_L' ~ value * 0.001,
+      analyte == 'NO3' & unit == 'mg_L' ~ value * 0.22590478
+    )
+  )
+
+# Select columns of interest
+mast_discrete_DOC <- mast_discrete_units %>%
+  filter(Study_ID == "Mast & Clow; 2008") %>% 
+  select(Study_ID, Pair, Site, Sampling_Date, DOC_mg_C_L) %>% 
+  na.omit()
+
+# Plot on top of each other
+ggplot() +
+  geom_point(data = mast_discrete_DOC, aes(x = Sampling_Date, y = DOC_mg_C_L)) + # discrete point
+  geom_line(data = mast_ds_fill, aes(x = Sampling_Date, y = DOC_Interp)) + # interpolated points
+  geom_point(data = mast_ds_fill, aes(x = Sampling_Date, y = DOC_mg_C_L), color = "red") + # down-selected points
+  facet_wrap(~ Pair, scales = "free") +
+  theme_bw()
+  
+
+```
+
+
+# Calculate Effect size on the downselected dataframe 
+```{r}
+# pivoting to make the responses in one column
+metadata_long <- control_impact_fill %>%
+  pivot_longer(
+    cols = NO3_Interp:DOC_Interp,
+    names_to = "response_var",
+    values_to = "concentration",
+    values_drop_na = TRUE
+  )
+
+# aggregate by year 
+yearly_mean_site <-  metadata_long %>%
+  group_by(Study_ID, response_var, Pair, year) %>% 
+  summarize(meanConc = mean(concentration)) %>% 
+  left_join(site_data) %>% 
+  group_by(year) %>% 
+  distinct(meanConc, .keep_all = TRUE) %>% 
+  mutate(TempNorm = meanConc / Area_watershed_km) 
+
+yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
+
+# Taking out Hauer and Spencer and Hickenbottom because they have mutliple controls and that is different than the rest of these sites
+one_control <- yearly_mean_site %>%
+  filter(Study_ID != "Hauer & Spencer 1998", Study_ID != "Hickenbottom et al. 2023") %>%
+  mutate(TempNorm = as.numeric(TempNorm))  
+
+# Creating a control and treatment column for the temporal normalization 
+control_treatment <- one_control %>%
+  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate) %>%
+  dplyr::summarize(Xe = sum(TempNorm[Burn_Unburn == "Burn"], na.rm = TRUE),
+                   Xc = sum(TempNorm[Burn_Unburn == "Unburn"], na.rm = TRUE)) 
+
+# Creating an individual column for each site and merging them into one row. 
+control_treatment_wide <- control_treatment %>%
+  dplyr::select(-Pair) %>%
+  group_by(Study_ID, response_var, Climate, year) %>%
+  summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
+            Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
+            Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
+            Xe4 = sum(Xe[Pair == "Site_4"], na.rm = TRUE),
+            Xe5 = sum(Xe[Pair == "Site_5"], na.rm = TRUE),
+            Xc = sum(Xc[Pair == "Control"], na.rm = TRUE))
+
+
+# Calculating effect size: ln((MeanBurn/MeanUnburn)) for all the sites with only one control 
+effect_size <- control_treatment_wide %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  mutate(lnR1 = log(Xe1/Xc),
+         lnR2 = log(Xe2/Xc),
+         lnR3 = log(Xe3/Xc),
+         lnR4 = log(Xe4/Xc),
+         lnR5 = log(Xe5/Xc))
+
+
+# This is doing the same thing as chunk before where we are creating a column header for each individual site but doing it for the studies that have multiple controls. 
+multiple_control <- yearly_mean_site %>% 
+  filter(Study_ID == "Hauer & Spencer 1998" | Study_ID == "Hickenbottom et al. 2023") %>%
+  mutate(TempNorm = as.numeric(TempNorm))
+
+
+
+multiple_control_treatment <- multiple_control %>%
+  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate) %>%
+  dplyr::summarize(Xe = sum(TempNorm[Burn_Unburn == "Burn"], na.rm = TRUE),
+                   Xc = sum(TempNorm[Burn_Unburn == "Unburn"], na.rm = TRUE)) # Creating a control and treatment column for the temporal normalization 
+
+multiple_control_treatment_wide <- multiple_control_treatment %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
+            Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
+            Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
+            Xe4 = sum(Xe[Pair == "Site_4"], na.rm = TRUE),
+            Xe5 = sum(Xe[Pair == "Site_5"], na.rm = TRUE),
+            Xc345 = sum(Xc[Pair == "Control_3_4_5"], na.rm = TRUE),
+            Xc2 = sum(Xc[Pair == "Control_2"], na.rm = TRUE),
+            Xc = sum(Xc[Pair == "Control_1"], na.rm = TRUE)) 
+
+
+effect_size_multiple <- multiple_control_treatment_wide %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  mutate(lnR1 = log(Xe1/Xc),
+         lnR2 = log(Xe2/Xc2),
+         lnR3 = log(Xe3/Xc345),
+         lnR4 = log(Xe4/Xc345),
+         lnR5 = log(Xe5/Xc345)) %>% 
+  ungroup()
+
+# Adding columns to match brie_test_stats
+effect_size <-effect_size %>% 
+  add_column(Xc345 = NA,
+             Xc2 = NA) %>% 
+  ungroup()
+
+# combining Hauer and Hickenbottom back into the mix 
+effect_size_no_fill <- effect_size %>% 
+  add_row(effect_size_multiple)
+
+effect_size_no_fill_filter <- effect_size_no_fill %>% 
+  dplyr::select(Study_ID, response_var, year, lnR1:lnR5)
+
+downselected_es_long <- effect_size_no_fill_filter %>% 
+  pivot_longer(
+    cols = lnR1:lnR5,
+    names_to = "Effect_size_pair",
+    values_to = "Effect_size",
+    values_drop_na = TRUE
+  ) %>% 
+  filter(is.finite(Effect_size))
+
+# only select columns of interest
+downselected_es <- downselected_es_long %>% 
+  select(Study_ID, response_var, year, Effect_size_pair, Effect_size)
+
+# only select columns of interest
+es_full <- effect_size_fill %>% 
+  select(Study_ID, response_var, year, Effect_size_pair, Effect_size)
+
+```
+
+# Plot comparison between downselected effect size and full
+```{r}
+# Merge the data frames 
+merged_effect_size <- left_join(es_full, downselected_es, 
+        by = c("Study_ID", "response_var", "year", "Effect_size_pair"),
+        suffix = c("_full_fill", "_downselected_fill"))
+
+
+# Perform a linear regression
+regression_result <- lm(Effect_size_full_fill ~ Effect_size_downselected_fill, data = merged_effect_size)
+
+# Create the plot with equation and R² value
+regression_plot <- ggplot(merged_effect_size, aes(x = Effect_size_full_fill, y = Effect_size_downselected_fill)) +
+  xlim(-3,3) +
+  geom_point() +  # Add points
+  geom_smooth(method = "lm", col = "blue") +  # Add regression line
+  stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+               label.x = "left", formula = y ~ x, parse = TRUE, size = 5) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "black") +  # Add 1:1 dashed line
+  labs(
+    title = "Impact of downselection on Effect size",
+    x = "Effect Size Full Fill",
+    y = "Effect Size Downselected Fill"
+  ) +
+  theme_bw()  # Use a minimal theme
+
+# Print the plot
+print(regression_plot)
+
+ggsave("ds_ES.pdf",
+       path = here("initial_plots", "15_Meta_calculate_effect_sizes_papers"),
+       width = 6, height = 4, units = "in")
+
+
+```
+
+# Density plot of randomly downselected points
+```{r}
+
+
+
+
+
+
 
 ```
 
@@ -324,4 +1026,127 @@ print(regression_plot)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Why are some sites working vs. others?
+```{r stats}
+# Filter out rows with NA values in Effect_size_downselected_fill
+filtered_merged_effect_size <- merged_effect_size %>%
+  filter(!is.na(Effect_size_downselected_fill))
+
+# Perform a linear regression on the filtered data
+regression_result <- lm(Effect_size_full_fill ~ Effect_size_downselected_fill, data = filtered_merged_effect_size)
+
+# Add residuals and absolute residuals to the filtered data frame
+filtered_merged_effect_size <- filtered_merged_effect_size %>%
+  mutate(
+    residuals = residuals(regression_result),
+    abs_residuals = abs(residuals)
+  )
+
+# Determine a threshold for identifying outliers, e.g., top 2% largest residuals
+threshold <- quantile(filtered_merged_effect_size$abs_residuals, 0.9, na.rm = TRUE)
+
+# Identify outliers
+outliers <- filtered_merged_effect_size %>%
+  filter(abs_residuals > threshold)
+
+# View the outliers
+print(outliers)
+
+# Optionally, print the information about the outliers for further investigation
+print(outliers %>% select(Study_ID, response_var, year, Effect_size_full_fill, Effect_size_downselected_fill, residuals))
+
+# Create the plot with equation and R² value, highlighting outliers
+regression_plot <- ggplot(filtered_merged_effect_size, aes(x = Effect_size_full_fill, y = Effect_size_downselected_fill)) +
+  geom_point(aes(color = abs_residuals > threshold)) +  # Add points and color outliers
+  geom_smooth(method = "lm", col = "blue") +  # Add regression line
+  stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+               label.x = "left", formula = y ~ x, parse = TRUE, size = 5) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "black") +  # Add 1:1 dashed line
+  labs(
+    title = "Impact of downselection on Effect size",
+    x = "Effect Size Full Fill",
+    y = "Effect Size Downselected Fill"
+  ) +
+  scale_color_manual(values = c("black", "red")) + 
+  theme_bw()  # Use a minimal theme
+
+# Print the plot
+print(regression_plot)
+
+
+
+```
+
+# 20% different
+```{r}
+merged_filter <- merged_effect_size %>% 
+  na.omit()
+
+# Calculate the percentage difference and filter the data frame
+merged_filter_diff <- merged_filter %>%
+  mutate(
+    absolute_diff = abs(Effect_size_full_fill - Effect_size_downselected_fill),
+    percentage_diff = (absolute_diff / abs(Effect_size_full_fill)) * 100
+  ) %>%
+  filter(percentage_diff > 40)
+
+# View the resulting data frame with differences greater than 20%
+print(merged_filter_diff)
+
+
+```
+
+# t-test
+```{r}
+# Function to apply a Wilcoxon signed-rank test for each observation
+compare_effect_sizes <- function(full, downselected) {
+  test_result <- wilcox.test(full, downselected, paired = TRUE)
+  return(test_result$p.value)
+}
+
+# Apply the function to each observation
+merged_filter_with_p_values <- merged_filter %>%
+  rowwise() %>%
+  mutate(
+    p_value = compare_effect_sizes(Effect_size_full_fill, Effect_size_downselected_fill),
+    significant = p_value < 0.05
+  )
+
+# Check results
+print(merged_filter_with_p_values)
+
+# Filter observations that are statistically significant with p < 0.05
+significant_observations <- merged_filter_with_p_values %>%
+  filter(significant == TRUE)
+
+# View significant observations
+print(significant_observations)
+
+
+
+```
 
