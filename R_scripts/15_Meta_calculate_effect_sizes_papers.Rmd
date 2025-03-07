@@ -518,22 +518,33 @@ mean_df <- combined_df_filled %>%
 combined_df_filled$iteration <- as.factor(combined_df_filled$iteration)
 
 # Plot density plot: PR
+# DOC
 ggplot(combined_df_filled) +
   geom_density(aes(x = DOC_Interp, group = iteration), alpha = 0.001) +
+  theme_minimal()
+
+# NO3
+ggplot(combined_df_filled) +
+  geom_density(aes(x = NO3_Interp, group = iteration), alpha = 0.001) +
   theme_minimal()
 
 # Calculate mean and standard deviation for each date
 summary_stats <- combined_df_filled %>%
   group_by(Sampling_Date) %>%
   summarize(mean_DOC_Interp = mean(DOC_Interp, na.rm = TRUE),
-            sd_DOC_Interp = sd(DOC_Interp, na.rm = TRUE))
+            sd_DOC_Interp = sd(DOC_Interp, na.rm = TRUE),
+            mean_NO3_Interp = mean(NO3_Interp, na.rm = TRUE),
+            sd_NO3_Interp = sd(NO3_Interp, na.rm = TRUE))
 
 summary_stats <- summary_stats %>%
-  mutate(lower_bound = mean_DOC_Interp - sd_DOC_Interp,
-         upper_bound = mean_DOC_Interp + sd_DOC_Interp)
+  mutate(lower_bound_DOC = mean_DOC_Interp - sd_DOC_Interp,
+         upper_bound_DOC = mean_DOC_Interp + sd_DOC_Interp,
+         lower_bound_NO3 = mean_NO3_Interp - sd_NO3_Interp,
+         upper_bound_NO3 = mean_NO3_Interp + sd_NO3_Interp)
 
+# DOC
 ggplot(combined_df_filled, aes(x = Sampling_Date)) +
-  geom_ribbon(data = summary_stats, aes(ymin = lower_bound, ymax = upper_bound), fill = "grey80", alpha = 0.5) +
+  geom_ribbon(data = summary_stats, aes(ymin = lower_bound_DOC, ymax = upper_bound_DOC), fill = "grey80", alpha = 0.5) +
   geom_line(data = summary_stats, aes(y = mean_DOC_Interp), color = "blue", size = 1) +
   labs(title = "Time Series of DOC Interpolated Values with Distribution Ribbon",
        x = "Sampling Date",
@@ -578,13 +589,47 @@ mast_discrete_DOC <- mast_discrete_units %>%
 
 # Plot on top of each other
 ggplot(combined_df_filled, aes(x = Sampling_Date)) +
-  geom_ribbon(data = summary_stats, aes(ymin = lower_bound, ymax = upper_bound), fill = "grey80", alpha = 0.5) +
+  geom_ribbon(data = summary_stats, aes(ymin = lower_bound_DOC, ymax = upper_bound_DOC), fill = "grey80", alpha = 0.5) +
   geom_line(data = summary_stats, aes(y = mean_DOC_Interp), color = "blue", size = 1) +
   geom_point(data = mast_discrete_DOC, aes(y = DOC_mg_C_L), color = "red", size = 1, alpha = 1.5) +
   labs(title = "Time Series of DOC Interpolated Values with Distribution Ribbon",
        x = "Sampling Date",
        y = "Interpolated DOC Values (mg_C/L)") +
   theme_bw()
+
+ggsave("mast_ds_discrete_iteration.pdf",
+       path = here("initial_plots", "15_Meta_calculate_effect_sizes_papers"),
+       width = 6, height = 4, units = "in")
+
+# NO3
+ggplot(combined_df_filled, aes(x = Sampling_Date)) +
+  geom_ribbon(data = summary_stats, aes(ymin = lower_bound_NO3, ymax = upper_bound_NO3), fill = "grey80", alpha = 0.5) +
+  geom_line(data = summary_stats, aes(y = mean_NO3_Interp), color = "blue", size = 1) +
+  labs(title = "Time Series of NO3 Interpolated Values with Distribution Ribbon",
+       x = "Sampling Date",
+       y = "Interpolated NO3 Values (mg_N/L)") +
+  theme_bw()
+
+# Select columns of interest
+mast_discrete_NO3 <- mast_discrete_units %>%
+  filter(Study_ID == "Mast & Clow; 2008") %>% 
+  select(Study_ID, Pair, Site, Sampling_Date, NO3_mg_N_L) %>% 
+  na.omit()
+
+# Plot on top of each other
+ggplot(combined_df_filled, aes(x = Sampling_Date)) +
+  geom_ribbon(data = summary_stats, aes(ymin = lower_bound_NO3, ymax = upper_bound_NO3), fill = "grey80", alpha = 0.5) +
+  geom_line(data = summary_stats, aes(y = mean_NO3_Interp), color = "blue", size = 1) +
+  geom_point(data = mast_discrete_NO3, aes(y = NO3_mg_N_L), color = "red", size = 1, alpha = 1.5) +
+  labs(title = "Time Series of NO3 Interpolated Values with Distribution Ribbon",
+       x = "Sampling Date",
+       y = "Interpolated NO3 Values (mg_N/L)") +
+  theme_bw()
+
+ggsave("mast_ds_discrete_iteration_no3.pdf",
+       path = here("initial_plots", "15_Meta_calculate_effect_sizes_papers"),
+       width = 6, height = 4, units = "in")
+
 
 # # separate out the time columns 
 # time_format <- combined_df %>% 
@@ -695,11 +740,12 @@ get_r_squared <- function(df) {
 
 # Apply the function to each iteration
 r_squared_values <- iteration_filled_es %>%
-  group_by(iteration) %>%
+  group_by(response_var, iteration) %>%
   summarize(r_squared = get_r_squared(cur_data()), .groups = 'drop')
 
 # Calculate average and standard deviation of R-squared values
 r_squared_summary <- r_squared_values %>%
+  group_by(response_var) %>% 
   summarize(mean_r_squared = mean(r_squared, na.rm = TRUE),
             sd_r_squared = sd(r_squared, na.rm = TRUE))
 
@@ -719,6 +765,58 @@ ggplot(r_squared_values, aes(x = "", y = r_squared)) +
   theme_bw()
 
 median(r_squared_values$r_squared)
+
+
+# TAKING INTO ACCOUNT DOC AND NO3
+# Calculate mean and confidence interval for each response variable
+
+# Ensure the appropriate columns are factors
+effect_size_iteration$response_var <- as.factor(effect_size_iteration$response_var)
+mast_es_fill$response_var <- as.factor(mast_es_fill$response_var)
+
+# Merge data frames
+merged_data <- effect_size_iteration %>%
+  inner_join(mast_es_fill, by = c("Study_ID", "response_var", "year")) %>%
+  rename(Effect_size1 = lnR1, Effect_size2 = Effect_size)
+
+# Function to perform linear regression and extract R-squared value
+get_r_squared <- function(df) {
+  model <- lm(Effect_size1 ~ Effect_size2, data = df)
+  summary(model)$r.squared
+}
+
+options(scipen = 999)
+# Apply the function to each iteration and each response_var
+r_squared_values <- merged_data %>%
+  group_by(iteration, response_var) %>%
+  summarize(r_squared = get_r_squared(cur_data()), .groups = 'drop')
+
+# Calculate mean and confidence interval for each response variable
+r_squared_summary <- r_squared_values %>%
+  group_by(response_var) %>%
+  summarize(
+    mean_r_squared = mean(r_squared, na.rm = TRUE),
+    se_r_squared = sd(r_squared, na.rm = TRUE) / sqrt(n()),
+    ci_lower = mean_r_squared - qt(0.975, df = n() - 1) * se_r_squared,
+    ci_upper = mean_r_squared + qt(0.975, df = n() - 1) * se_r_squared
+  )
+  
+# Print the summary
+print(r_squared_summary)
+
+# Plot R-squared values using boxplot with geom_jitter and error bars
+ggplot(r_squared_values, aes(x = response_var, y = r_squared)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.5) +
+  labs(title = "Distribution of R-squared Values Across Iterations",
+       x = "Response Variable",
+       y = "R-squared Value") +
+  theme_minimal()
+
+# ggsave("mast_r2_ws.pdf",
+#        path = here("initial_plots", "15_Meta_calculate_effect_sizes_papers"),
+#        width = 6, height = 4, units = "in")
+
 
 ```
 
@@ -1033,7 +1131,7 @@ es_full <- effect_size_fill %>%
 # Plot comparison between downselected effect size and full
 ```{r}
 # Merge the data frames 
-merged_effect_size <- left_join(es_full, downselected_es, 
+merged_effect_size <- left_join(effect_size_fill, downselected_es, 
         by = c("Study_ID", "response_var", "year", "Effect_size_pair"),
         suffix = c("_full_fill", "_downselected_fill"))
 
@@ -1163,3 +1261,174 @@ control_impact_fill <- control_impact_fill %>%
 
 
 ```
+
+
+############################# SCRIPT GRAVEYARD ###############################
+Coombs & Melack study is in here because it is a time series of a week worth of data so there really isnt a data interpolation. 
+### Coombs & Melack ###
+This will be the same workflow as above that we did for Mast
+```{r}
+coombs_long <- control_long %>% 
+  filter(Study_ID == "Coombs & Melack; 2013")
+
+# Function to sample a maximum of 5 rows from each group
+sample_max_5 <- function(df) {
+  if (nrow(df) > 5) {
+    return(df %>% slice_sample(n = 5))
+  } else {
+    return(df)
+  }
+}
+
+
+# Function to perform the down-selection, unit conversion, and gap filling
+downselect_convert_and_fill <- function() {
+  downselected_df <- coombs_long %>%
+    group_by(Study_ID, Pair, Year, analyte) %>%
+    group_split() %>%
+    map_df(sample_max_5) %>%
+    ungroup()
+  
+  converted_df <- downselected_df %>%
+    mutate(
+      # Standardize Area_watershed to kilometers
+      Area_watershed_km = case_when(
+        Area_unit == 'ha' ~ Area_watershed * 0.01,
+        Area_unit == 'km' ~ Area_watershed
+      ),
+      # Standardize DOC values
+      DOC_mg_C_L = case_when(
+        analyte == 'DOC' & unit == 'mg_C_L' ~ value,
+        analyte == 'DOC' & unit == 'mg_L' ~ value,
+        analyte == 'DOC' & unit == 'um' ~ value * 0.01201
+      ),
+      DOC_uM_C = case_when(
+        analyte == 'DOC' & unit == 'um' ~ value,
+        analyte == 'DOC' & unit == 'mg_C_L' ~ value * 83.2639467,
+        analyte == 'DOC' & unit == 'mg_L' ~ value * 83.2639467
+      ),
+      # Standardize NO3 values
+      NO3_mg_N_L = case_when(
+        analyte == 'NO3' & unit == 'um' ~ value * 0.014007,
+        analyte == 'NO3' & unit == 'umol_L' ~ value * 0.014007,
+        analyte == 'NO3' & unit == 'umol_NO2_NO3_L' ~ value * 0.014007,
+        analyte == 'NO3' & unit == 'mg_N_L' ~ value,
+        analyte == 'NO3' & unit == 'ug_N_L' ~ value * 0.001,
+        analyte == 'NO3' & unit == 'mg_L' ~ value * 0.22590478
+      ),
+      NO3_uM_N = case_when(
+        analyte == 'NO3' & unit == 'um' ~ value,
+        analyte == 'NO3' & unit == 'umol_L' ~ value,
+        analyte == 'NO3' & unit == 'umol_NO2_NO3_L' ~ value,
+        analyte == 'NO3' & unit == 'mg_L' ~ value * 16.127729,
+        analyte == 'NO3' & unit == 'mg_N_L' ~ value * 3.64145101,
+        analyte == 'NO3' & unit == 'ug_N_L' ~ value * 0.22594948
+      )
+    )
+  
+ # Gap filling
+  converted_df %>%
+    group_by(Study_ID, Pair, Year, Site) %>%
+    complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>%
+    fill(Study_ID:Time_Since_Fire) %>%
+    ungroup() %>%
+    group_by(Site) %>%
+    mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
+           DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
+    fill(Study_ID:Time_Since_Fire)
+  
+}
+
+# Perform the down-selection, conversion, and gap filling 100 times and store the results
+downselected_filled_list <- replicate(100, downselect_convert_and_fill(), simplify = FALSE)
+
+# Combine the results into one data frame with an additional column to distinguish the iterations
+combined_df_filled <- bind_rows(downselected_filled_list, .id = 'iteration') %>% select(iteration, Study_ID, Pair, Site, Sampling_Date, NO3_Interp)
+
+# Write out as csv 
+# write_csv(combined_df_filled, here("initial_plots", "15_Meta_calculate_effect_sizes_papers", "coombs_iteration.csv"))
+
+# Compute the mean values for each iteration
+mean_df <- combined_df_filled %>%
+  group_by(iteration, Pair) %>%
+  summarize(mean_NO3_Interp = mean(NO3_Interp, na.rm = TRUE))
+
+# Ensure iteration is a factor
+combined_df_filled$iteration <- as.factor(combined_df_filled$iteration)
+
+# Plot density plot: PR
+ggplot(combined_df_filled) +
+  geom_density(aes(x = NO3_Interp, group = iteration), alpha = 0.001) +
+  facet_wrap(~Pair, scales = "free") +
+  theme_minimal()
+
+# Calculate mean and standard deviation for each date
+summary_stats <- combined_df_filled %>%
+  group_by(Sampling_Date, Pair) %>%
+  summarize(mean_NO3_Interp = mean(NO3_Interp, na.rm = TRUE),
+            sd_NO3_Interp = sd(NO3_Interp, na.rm = TRUE))
+
+summary_stats <- summary_stats %>%
+  mutate(lower_bound = mean_NO3_Interp - sd_NO3_Interp,
+         upper_bound = mean_NO3_Interp + sd_NO3_Interp)
+
+ggplot(combined_df_filled, aes(x = Sampling_Date)) +
+  geom_ribbon(data = summary_stats, aes(ymin = lower_bound, ymax = upper_bound), fill = "grey80", alpha = 0.5) +
+  geom_line(data = summary_stats, aes(y = mean_NO3_Interp), color = "blue", size = 1) +
+  facet_wrap(~Pair, scales = "free") +
+  labs(title = "Time Series of NO3 Interpolated Values with Distribution Ribbon",
+       x = "Sampling Date",
+       y = "Interpolated NO3 Values (mg_N/L)") +
+  theme_bw()
+
+### Now I want to plot the actual data on top 
+# extract discrete observations from the Mast & Clow paper 2008.
+coombs_discrete <- control_long %>% 
+  filter(Study_ID == "Coombs & Melack; 2013")
+
+# Change the units
+coombs_discrete_units <- coombs_discrete %>% 
+  mutate(
+    # Standardize Area_watershed to kilometers
+    Area_watershed_km = case_when(
+      Area_unit == 'ha' ~ Area_watershed * 0.01,
+      Area_unit == 'km' ~ Area_watershed
+    ),
+    # Standardize DOC values
+    DOC_mg_C_L = case_when(
+      analyte == 'DOC' & unit == 'mg_C_L' ~ value,
+      analyte == 'DOC' & unit == 'mg_L' ~ value,
+      analyte == 'DOC' & unit == 'um' ~ value * 0.01201
+    ),
+    # Standardize NO3 values
+    NO3_mg_N_L = case_when(
+      analyte == 'NO3' & unit == 'um' ~ value * 0.014007,
+      analyte == 'NO3' & unit == 'umol_L' ~ value * 0.014007,
+      analyte == 'NO3' & unit == 'umol_NO2_NO3_L' ~ value * 0.014007,
+      analyte == 'NO3' & unit == 'mg_N_L' ~ value,
+      analyte == 'NO3' & unit == 'ug_N_L' ~ value * 0.001,
+      analyte == 'NO3' & unit == 'mg_L' ~ value * 0.22590478
+    )
+  )
+
+# Select columns of interest
+coombs_discrete_NO3 <- coombs_discrete_units %>%
+  filter(Study_ID == "Coombs & Melack; 2013") %>% 
+  select(Study_ID, Pair, Site, Sampling_Date, NO3_mg_N_L) %>% 
+  na.omit()
+
+# Plot on top of each other
+ggplot(combined_df_filled, aes(x = Sampling_Date)) +
+  geom_ribbon(data = summary_stats, aes(ymin = lower_bound, ymax = upper_bound), fill = "grey80", alpha = 0.5) +
+  geom_line(data = summary_stats, aes(y = mean_NO3_Interp), color = "blue", size = 1) +
+  geom_point(data = coombs_discrete_NO3, aes(y = NO3_mg_N_L), color = "red", size = 1, alpha = 1.5) +
+  facet_wrap(~Pair, scales = "free") +
+  labs(title = "Time Series of NO3 Interpolated Values with Distribution Ribbon",
+       x = "Sampling Date",
+       y = "Interpolated NO3 Values (mg_C/L)") +
+  theme_bw()
+
+```
+
+
+

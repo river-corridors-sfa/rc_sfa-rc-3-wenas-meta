@@ -251,12 +251,10 @@ To download the data that you want, be sure to update the `epa_categories` vecto
 # NLCD2001HiSlope
   # All the same as NLCD for 2001
 
+#NOTE: the getStreamCat is setup to extract ALL of the variables available on StreamCat, the user will have to modify the epa_categories function input to extract all the variables of interest. 
 
 sites_stream_cat <- getStreamCat(sites = sites,
-                                 epa_categories = c("NLCD2001MidSlope", "NLCD2004MidSlope",
-                                                    "NLCD2006MidSlope", "NLCD2008MidSlope",
-                                                    "NLCD2011MidSlope", "NLCD2013MidSlope",
-                                                    "NLCD2016MidSlope", "NLCD2019MidSlope"),
+                                 epa_categories = c("STATSGO_Set1"),
                                  save = FALSE)
 
 # sites_stream_cat <- getStreamCat(sites = sites,
@@ -264,7 +262,7 @@ sites_stream_cat <- getStreamCat(sites = sites,
 #                       epa_categories = c("FirePerimeters", "Elevation", "NADP", "RefStreamTempPred", "MTBS", "Runoff", "STATSGO_Set1", "STATSGO_Set2", "Lithology", "PRISM_1991_2020", "sw_flux", "NLCD2001"),
 #                       save = FALSE)
 
-#NOTE: the getStreamCat is setup to extract ALL of the variables available on StreamCat, the user will have to modify the epa_categories function input to extract all the variables of interest. 
+
 
 ```
 
@@ -596,12 +594,99 @@ write_csv(MTBS_all, here("Output_for_analysis", "06_Meta_geospatial_extraction_w
 
 ```
 
-Export all the data.
 
-```{r}
 
+# Updated workflow for pulling streamcat data 3/7/2025 from *https://github.com/river-corridors-sfa/Geospatial_variables/blob/main/Example_Code/geospatial_extraction_with_comids_RCSFA_all_sites.Rmd*
+
+# StreamCat data extractions
+
+This section uses the R package [StreamCat Tools](https://github.com/USEPA/StreamCatTools?tab=readme-ov-file). Consult GitHub for information regarding package citation. 
+```{r cat,echo = T, warning = FALSE, comment = F, message = FALSE, results='hide'}
+# install from GitHub the first time
+library(remotes)
+#install_github("USEPA/StreamCatTools", build_vignettes=FALSE)
+library(StreamCatTools)
+
+# Get parameters available and subset the list of variables of interest
+params <- sc_get_params(param='name')
+# Land cover classes
+nlcd2019 = unique(params[grep('2019',params)])
+nlcd2019 = nlcd2019[3:length(nlcd2019)]
+
+# Extract data
+# need to add each metric manually
+  # rckdep = Mean Bedrock Depth - Mean depth (cm) to bedrock of soils (STATSGO within AOI)
+df <- sc_get_data(metric ='rckdep',
+aoi = 'ws', comid = sites$comid,
+showAreaSqKm = TRUE, showPctFull = TRUE)
+
+# Join the mean bedrock depth dataframe with our comids
+bedrock <- right_join(df, site_watersheds, by = "comid") %>% 
+  select(site, comid, everything()) %>% 
+  select(!geometry) %>% 
+  rename(Site = site)
+
+# Read in lithology data frame we created earlier to merge the bedrock data in there as well
+lithology <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "lithology.csv"))
+
+# Join by site and comid
+bedrock <- full_join(bedrock, lithology, by = c("Site", "comid"))
+
+# Write out as the lithology csv
+write_csv(bedrock, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "lithology_2.0.csv"))
 
 ```
+
+# I have to rebuild the RF data frame to include the updated bedrock data
+```{r}
+BFI <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "BFI.csv"))
+
+burn_percentage <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "burn_percentage.csv"))
+
+climate <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "temp_precip.csv"))
+
+forest_lost <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "forest_lost.csv"))
+
+lithology <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "lithology_2.0.csv"))
+
+MAST <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "stream_temp.csv"))
+
+NWetdep <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "NWetdep_2008.csv"))
+
+runoff <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "runoff.csv"))
+
+stats_go <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "OM_perm.csv"))
+
+# Merge all the watershed characteristic data frames together #
+watershed_dfs <- list(BFI, burn_percentage, climate, forest_lost, lithology, MAST, NWetdep, runoff, stats_go)
+
+# Use reduce to successively full_join all data frames
+RF_data_intermediate <- reduce(watershed_dfs, full_join, by = c("Site", "comid"))
+
+# Merge MTBS severity with the rest of the geospatial data
+MTBS_data <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids",
+                                 "MTBS_severity.csv")) %>%
+  mutate(Site = str_replace_all(Site, "_", " "))
+
+merged_df <- full_join(RF_data_intermediate, MTBS_data)
+
+# write_csv(merged_df, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "random_forest_data.csv"))
+
+# Merge NLCD (land cover data) with the rest of the geospatial data
+NLCD_data <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids",
+                                 "NLCD_2001_2019.csv")) %>%
+  mutate(Site = str_replace_all(Site, "_", " "))
+
+merged_df_2 <- full_join(merged_df, NLCD_data)
+
+write_csv(merged_df_2, here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids", "random_forest_data_new.csv"))
+
+```
+
+
+
+
+
 
 # Pulling additional geospatial data not in StreamCat
 

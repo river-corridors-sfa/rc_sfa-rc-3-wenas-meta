@@ -49,19 +49,19 @@ library(here)
 ```{r read in csv's}
 ## Read in effect datasets
 no3 <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"), na = c('-9999', 'N/A')) %>% 
-  clean_names() %>% 
+  clean_names() %>%
   rename("dependent" = effect_size) %>%
-  dplyr::select(dependent, climate, totdasqkm, maxelevsmo, slope, tmean9120ws, om_ws, bfi_ws, perm_ws, #runoff_ws, 
+  dplyr::select(dependent, climate, totdasqkm, maxelevsmo, slope, tmean9120ws, om_ws, bfi_ws, perm_ws, rck_dep_ws,
                 burn_percentage, mean_dnbr, time_since_fire) %>%
-  mutate(mean_dnbr = as.numeric(mean_dnbr)) %>% 
-  na.omit() 
+  mutate(mean_dnbr = as.numeric(mean_dnbr)) %>%
+  na.omit()
   
 
 
 doc <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"), na = c('-9999', 'N/A')) %>% 
   clean_names() %>% 
   rename("dependent" = effect_size) %>% 
-  dplyr::select(dependent, climate, totdasqkm, maxelevsmo, slope, tmean9120ws, om_ws, bfi_ws, perm_ws, #runoff_ws, 
+  dplyr::select(dependent, climate, totdasqkm, maxelevsmo, slope, tmean9120ws, om_ws, bfi_ws, perm_ws, rck_dep_ws, 
                 burn_percentage, mean_dnbr, time_since_fire) %>% 
   mutate(mean_dnbr = as.numeric(mean_dnbr)) %>% 
   na.omit() 
@@ -179,7 +179,15 @@ ggsave("Effect_Size_Random_Forest.pdf",
 
 ```
 
+# Peter code in TEAMs
+```{r}
+no3 <- read_csv(paste0(path, "no3_meta_random_forest.csv")) %>%  
+clean_names() %>% rename("dependent" = effect_size) %>%  
+dplyr::select(-c(minelevraw, minelevsmo, elevfixed)) %>% 
+ mutate(white_noise = rnorm(1:n(), mean = 0, sd = 1))
 
+
+```
 
 
 
