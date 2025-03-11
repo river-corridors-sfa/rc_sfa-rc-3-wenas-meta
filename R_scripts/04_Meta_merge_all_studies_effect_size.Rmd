@@ -163,6 +163,8 @@ control_impact_fill <- control_impact_fill %>%
          month = month(Sampling_Date),
          day = day(Sampling_Date))
   
+write_csv(control_impact_fill, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "gap_fill.csv"))
+
 
 ```
 

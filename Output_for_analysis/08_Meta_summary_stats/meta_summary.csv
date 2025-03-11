@@ -1,0 +1,312 @@
+Study_ID,Site,analyte,Time_Since_Fire,n
+Abbott et al. 2021,BS.10,DOC,10,2
+Abbott et al. 2021,BS.10,DOC,11,3
+Abbott et al. 2021,BS.10,NO3,10,2
+Abbott et al. 2021,BS.10,NO3,11,3
+Abbott et al. 2021,BS.11,DOC,10,3
+Abbott et al. 2021,BS.11,DOC,11,3
+Abbott et al. 2021,BS.11,NO3,10,3
+Abbott et al. 2021,BS.11,NO3,11,3
+Abbott et al. 2021,BS.12,DOC,10,3
+Abbott et al. 2021,BS.12,DOC,11,3
+Abbott et al. 2021,BS.12,NO3,10,3
+Abbott et al. 2021,BS.12,NO3,11,3
+Abbott et al. 2021,BS.19,DOC,10,3
+Abbott et al. 2021,BS.19,DOC,11,3
+Abbott et al. 2021,BS.19,NO3,10,3
+Abbott et al. 2021,BS.19,NO3,11,3
+Abbott et al. 2021,BS.22,DOC,10,2
+Abbott et al. 2021,BS.22,DOC,11,3
+Abbott et al. 2021,BS.22,NO3,10,2
+Abbott et al. 2021,BS.22,NO3,11,3
+Abbott et al. 2021,BS.24,DOC,10,1
+Abbott et al. 2021,BS.24,DOC,11,3
+Abbott et al. 2021,BS.24,NO3,10,1
+Abbott et al. 2021,BS.24,NO3,11,3
+Abbott et al. 2021,BS.25,DOC,10,2
+Abbott et al. 2021,BS.25,DOC,11,3
+Abbott et al. 2021,BS.25,NO3,10,2
+Abbott et al. 2021,BS.25,NO3,11,3
+Abbott et al. 2021,BS.29,DOC,10,1
+Abbott et al. 2021,BS.29,DOC,11,3
+Abbott et al. 2021,BS.29,NO3,10,1
+Abbott et al. 2021,BS.29,NO3,11,3
+Abbott et al. 2021,BS.30,DOC,10,1
+Abbott et al. 2021,BS.30,DOC,11,3
+Abbott et al. 2021,BS.30,NO3,10,1
+Abbott et al. 2021,BS.30,NO3,11,3
+Abbott et al. 2021,BS.32,DOC,10,2
+Abbott et al. 2021,BS.32,DOC,11,3
+Abbott et al. 2021,BS.32,NO3,10,2
+Abbott et al. 2021,BS.32,NO3,11,3
+Abbott et al. 2021,BS.34,DOC,10,2
+Abbott et al. 2021,BS.34,DOC,11,3
+Abbott et al. 2021,BS.34,NO3,10,2
+Abbott et al. 2021,BS.34,NO3,11,3
+Abbott et al. 2021,BS.38,DOC,10,2
+Abbott et al. 2021,BS.38,DOC,11,3
+Abbott et al. 2021,BS.38,NO3,10,2
+Abbott et al. 2021,BS.38,NO3,11,3
+Abbott et al. 2021,BS.40,DOC,10,2
+Abbott et al. 2021,BS.40,DOC,11,3
+Abbott et al. 2021,BS.40,NO3,10,2
+Abbott et al. 2021,BS.40,NO3,11,3
+Abbott et al. 2021,BS.42,DOC,10,2
+Abbott et al. 2021,BS.42,DOC,11,3
+Abbott et al. 2021,BS.42,NO3,10,2
+Abbott et al. 2021,BS.42,NO3,11,2
+Abbott et al. 2021,BS.44,DOC,10,2
+Abbott et al. 2021,BS.44,DOC,11,3
+Abbott et al. 2021,BS.44,NO3,10,2
+Abbott et al. 2021,BS.44,NO3,11,2
+Abbott et al. 2021,BS.45,DOC,10,2
+Abbott et al. 2021,BS.45,DOC,11,3
+Abbott et al. 2021,BS.45,NO3,10,2
+Abbott et al. 2021,BS.45,NO3,11,1
+Abbott et al. 2021,BS.49,DOC,10,2
+Abbott et al. 2021,BS.49,DOC,11,3
+Abbott et al. 2021,BS.49,NO3,10,2
+Abbott et al. 2021,BS.49,NO3,11,3
+Abbott et al. 2021,BS.51,DOC,10,2
+Abbott et al. 2021,BS.51,DOC,11,3
+Abbott et al. 2021,BS.51,NO3,10,2
+Abbott et al. 2021,BS.51,NO3,11,3
+Abbott et al. 2021,BS.53,DOC,10,3
+Abbott et al. 2021,BS.53,DOC,11,3
+Abbott et al. 2021,BS.53,NO3,10,3
+Abbott et al. 2021,BS.53,NO3,11,3
+Abbott et al. 2021,BS.55,DOC,10,3
+Abbott et al. 2021,BS.55,DOC,11,3
+Abbott et al. 2021,BS.55,NO3,10,3
+Abbott et al. 2021,BS.55,NO3,11,3
+Abbott et al. 2021,BS.56,DOC,10,3
+Abbott et al. 2021,BS.56,DOC,11,3
+Abbott et al. 2021,BS.56,NO3,10,3
+Abbott et al. 2021,BS.56,NO3,11,3
+Abbott et al. 2021,BS.58,DOC,10,3
+Abbott et al. 2021,BS.58,DOC,11,3
+Abbott et al. 2021,BS.58,NO3,10,3
+Abbott et al. 2021,BS.58,NO3,11,3
+Abbott et al. 2021,BS.70,DOC,10,1
+Abbott et al. 2021,BS.70,NO3,10,1
+Burd et al 2018,Notawohka Creek,DOC,3,16
+Burd et al 2018,Scotty Creek,DOC,3,15
+Coombs & Melack; 2013,Arroyo Hondo,NO3,0,5
+Coombs & Melack; 2013,Arroyo Hondo,NO3,1,5
+Coombs & Melack; 2013,Gaviota,NO3,0,6
+Coombs & Melack; 2013,Gaviota,NO3,1,5
+Coombs & Melack; 2013,Rattlesnake,NO3,0,6
+Coombs & Melack; 2013,Rattlesnake,NO3,1,5
+Coombs & Melack; 2013,San Onofre,NO3,0,5
+Coombs & Melack; 2013,San Onofre,NO3,1,5
+Crandall et al. 2021,Benjamin Slough,DOC,0,7
+Crandall et al. 2021,Benjamin Slough,NO3,0,11
+Crandall et al. 2021,Dry Creek,DOC,0,8
+Crandall et al. 2021,Dry Creek,NO3,0,11
+Crandall et al. 2021,Hobble Creek Lower,DOC,0,7
+Crandall et al. 2021,Hobble Creek Lower,NO3,0,12
+Crandall et al. 2021,Hobble Creek Upper,DOC,0,2
+Crandall et al. 2021,Mill Race,DOC,0,2
+Crandall et al. 2021,Mill Race,NO3,0,1
+Crandall et al. 2021,Payson,DOC,0,5
+Crandall et al. 2021,Payson,NO3,0,10
+Crandall et al. 2021,Provo River,DOC,0,8
+Crandall et al. 2021,Provo River,NO3,0,12
+Crandall et al. 2021,Spanish Fork Lower,DOC,0,6
+Crandall et al. 2021,Spanish Fork Lower,NO3,0,9
+Crandall et al. 2021,Spanish Fork Upper,DOC,0,8
+Crandall et al. 2021,Spanish Fork Upper,NO3,0,11
+Gerla & Galloway; 1998,Crow Creek,NO3,1,14
+Gerla & Galloway; 1998,Crow Creek,NO3,2,11
+Gerla & Galloway; 1998,Crow Creek,NO3,3,12
+Gerla & Galloway; 1998,Crow Creek,NO3,4,12
+Gerla & Galloway; 1998,Crow Creek,NO3,5,12
+Gerla & Galloway; 1998,Jones Creek,NO3,1,14
+Gerla & Galloway; 1998,Jones Creek,NO3,2,11
+Gerla & Galloway; 1998,Jones Creek,NO3,3,12
+Gerla & Galloway; 1998,Jones Creek,NO3,4,12
+Gerla & Galloway; 1998,Jones Creek,NO3,5,12
+Gluns & Toews; 1989,East Fork,NO3,0,5
+Gluns & Toews; 1989,East Fork,NO3,1,13
+Gluns & Toews; 1989,East Fork,NO3,2,17
+Gluns & Toews; 1989,East Fork,NO3,3,12
+Gluns & Toews; 1989,Middle Fork,NO3,0,5
+Gluns & Toews; 1989,Middle Fork,NO3,1,14
+Gluns & Toews; 1989,Middle Fork,NO3,2,14
+Gluns & Toews; 1989,Middle Fork,NO3,3,9
+Gluns & Toews; 1989,West Fork,NO3,0,4
+Gluns & Toews; 1989,West Fork,NO3,1,14
+Gluns & Toews; 1989,West Fork,NO3,2,13
+Gluns & Toews; 1989,West Fork,NO3,3,14
+Hauer & Spencer 1998,Akokala_Creek,NO3,1,5
+Hauer & Spencer 1998,Akokala_Creek,NO3,2,5
+Hauer & Spencer 1998,Akokala_Creek,NO3,3,4
+Hauer & Spencer 1998,Akokala_Creek,NO3,5,5
+Hauer & Spencer 1998,Bowman_Creek,NO3,3,4
+Hauer & Spencer 1998,Bowman_Creek,NO3,5,5
+Hauer & Spencer 1998,Coal_Creek,NO3,1,5
+Hauer & Spencer 1998,Coal_Creek,NO3,3,4
+Hauer & Spencer 1998,Coal_Creek,NO3,5,5
+Hauer & Spencer 1998,Logging_Creek,NO3,1,9
+Hauer & Spencer 1998,Logging_Creek,NO3,2,10
+Hauer & Spencer 1998,Logging_Creek,NO3,3,8
+Hauer & Spencer 1998,Logging_Creek,NO3,5,9
+Hauer & Spencer 1998,Quartz_Creek,NO3,1,5
+Hauer & Spencer 1998,Quartz_Creek,NO3,2,5
+Hauer & Spencer 1998,Quartz_Creek,NO3,3,4
+Hauer & Spencer 1998,Red_Bench_Creek,NO3,1,5
+Hauer & Spencer 1998,Red_Bench_Creek,NO3,3,4
+Hauer & Spencer 1998,Red_Bench_Creek,NO3,5,5
+Hauer & Spencer 1998,Red_Meadow_Creek,NO3,1,5
+Hauer & Spencer 1998,Red_Meadow_Creek,NO3,3,4
+Hauer & Spencer 1998,Red_Meadow_Creek,NO3,5,5
+Hauer & Spencer 1998,Wally_Creek ,NO3,1,5
+Hauer & Spencer 1998,Wally_Creek ,NO3,3,4
+Hauer & Spencer 1998,Wally_Creek ,NO3,5,5
+Hickenbottom et al. 2023,Cold_Creek,DOC,0,2
+Hickenbottom et al. 2023,Cold_Creek,DOC,1,11
+Hickenbottom et al. 2023,Cold_Creek,NO3,0,2
+Hickenbottom et al. 2023,Cold_Creek,NO3,1,11
+Hickenbottom et al. 2023,Middle_Fork,DOC,0,4
+Hickenbottom et al. 2023,Middle_Fork,NO3,0,4
+Hickenbottom et al. 2023,North_Fork,DOC,0,4
+Hickenbottom et al. 2023,North_Fork,NO3,0,4
+Hickenbottom et al. 2023,Trout_Creek,DOC,0,13
+Hickenbottom et al. 2023,Trout_Creek,DOC,1,74
+Hickenbottom et al. 2023,Trout_Creek,DOC,2,38
+Hickenbottom et al. 2023,Trout_Creek,NO3,0,13
+Hickenbottom et al. 2023,Trout_Creek,NO3,1,74
+Hickenbottom et al. 2023,Trout_Creek,NO3,2,38
+Mast & Clow; 2008,Coal,DOC,1,31
+Mast & Clow; 2008,Coal,DOC,2,19
+Mast & Clow; 2008,Coal,DOC,3,21
+Mast & Clow; 2008,Coal,DOC,4,10
+Mast & Clow; 2008,Coal,NO3,1,31
+Mast & Clow; 2008,Coal,NO3,2,26
+Mast & Clow; 2008,Coal,NO3,3,21
+Mast & Clow; 2008,Coal,NO3,4,13
+Mast & Clow; 2008,Fish Creek,NO3,1,1
+Mast & Clow; 2008,Fish Creek,NO3,2,17
+Mast & Clow; 2008,Fish Creek,NO3,3,16
+Mast & Clow; 2008,Fish Creek,NO3,4,9
+Mast & Clow; 2008,Lower MacDonald Creek,NO3,2,19
+Mast & Clow; 2008,Lower MacDonald Creek,NO3,3,16
+Mast & Clow; 2008,Lower MacDonald Creek,NO3,4,9
+Mast & Clow; 2008,Pinchot,DOC,1,35
+Mast & Clow; 2008,Pinchot,DOC,2,18
+Mast & Clow; 2008,Pinchot,DOC,3,17
+Mast & Clow; 2008,Pinchot,DOC,4,11
+Mast & Clow; 2008,Pinchot,NO3,1,35
+Mast & Clow; 2008,Pinchot,NO3,2,33
+Mast & Clow; 2008,Pinchot,NO3,3,18
+Mast & Clow; 2008,Pinchot,NO3,4,16
+Mast & Clow; 2008,Upper MacDonald Creek,NO3,2,17
+Mast & Clow; 2008,Upper MacDonald Creek,NO3,3,15
+Mast & Clow; 2008,Upper MacDonald Creek,NO3,4,9
+Murphy et al. 2018,DS1,DOC,0,52
+Murphy et al. 2018,DS1,DOC,1,8
+Murphy et al. 2018,DS1,DOC,2,26
+Murphy et al. 2018,DS1,DOC,3,25
+Murphy et al. 2018,DS1,DOC,4,18
+Murphy et al. 2018,DS1,DOC,5,14
+Murphy et al. 2018,DS1,NO3,0,52
+Murphy et al. 2018,DS1,NO3,1,8
+Murphy et al. 2018,DS1,NO3,2,26
+Murphy et al. 2018,DS1,NO3,3,25
+Murphy et al. 2018,DS1,NO3,4,18
+Murphy et al. 2018,DS1,NO3,5,14
+Murphy et al. 2018,DS2,DOC,0,51
+Murphy et al. 2018,DS2,DOC,1,8
+Murphy et al. 2018,DS2,DOC,2,31
+Murphy et al. 2018,DS2,DOC,3,28
+Murphy et al. 2018,DS2,DOC,4,17
+Murphy et al. 2018,DS2,DOC,5,10
+Murphy et al. 2018,DS2,NO3,0,52
+Murphy et al. 2018,DS2,NO3,1,8
+Murphy et al. 2018,DS2,NO3,2,31
+Murphy et al. 2018,DS2,NO3,3,28
+Murphy et al. 2018,DS2,NO3,4,17
+Murphy et al. 2018,DS2,NO3,5,10
+Murphy et al. 2018,DS3,DOC,0,47
+Murphy et al. 2018,DS3,DOC,1,8
+Murphy et al. 2018,DS3,DOC,2,29
+Murphy et al. 2018,DS3,DOC,3,28
+Murphy et al. 2018,DS3,DOC,4,19
+Murphy et al. 2018,DS3,DOC,5,15
+Murphy et al. 2018,DS3,NO3,0,47
+Murphy et al. 2018,DS3,NO3,1,8
+Murphy et al. 2018,DS3,NO3,2,29
+Murphy et al. 2018,DS3,NO3,3,28
+Murphy et al. 2018,DS3,NO3,4,19
+Murphy et al. 2018,DS3,NO3,5,15
+Murphy et al. 2018,US1,DOC,0,48
+Murphy et al. 2018,US1,DOC,1,8
+Murphy et al. 2018,US1,DOC,2,27
+Murphy et al. 2018,US1,DOC,3,28
+Murphy et al. 2018,US1,DOC,4,18
+Murphy et al. 2018,US1,DOC,5,14
+Murphy et al. 2018,US1,NO3,0,49
+Murphy et al. 2018,US1,NO3,1,8
+Murphy et al. 2018,US1,NO3,2,27
+Murphy et al. 2018,US1,NO3,3,28
+Murphy et al. 2018,US1,NO3,4,18
+Murphy et al. 2018,US1,NO3,5,14
+Neary & Currier; 1982,Crane Creek,NO3,0,23
+Neary & Currier; 1982,Crane Creek,NO3,1,5
+Neary & Currier; 1982,Wash Branch,NO3,0,23
+Neary & Currier; 1982,Wash Branch,NO3,1,4
+Oliver et al. 2012,Site_1,NO3,1,13
+Oliver et al. 2012,Site_1,NO3,2,7
+Oliver et al. 2012,Site_2,NO3,0,3
+Oliver et al. 2012,Site_2,NO3,1,15
+Oliver et al. 2012,Site_2,NO3,2,13
+Oliver et al. 2012,Site_3,NO3,0,5
+Oliver et al. 2012,Site_3,NO3,1,29
+Oliver et al. 2012,Site_3,NO3,2,15
+Oliver et al. 2012,Site_4,NO3,1,30
+Oliver et al. 2012,Site_4,NO3,2,11
+Rhea et al. 2021,B1,DOC,5,6
+Rhea et al. 2021,B1,NO3,5,6
+Rhea et al. 2021,B2,DOC,15,5
+Rhea et al. 2021,B2,NO3,15,5
+Rhea et al. 2021,B3,DOC,15,6
+Rhea et al. 2021,B3,NO3,15,6
+Rhea et al. 2021,U1,DOC,5,6
+Rhea et al. 2021,U1,NO3,5,6
+Rhea et al. 2021,U3,DOC,15,2
+Rhea et al. 2021,U3,NO3,15,2
+Tiedemann; 1973,Camas Creek,NO3,0,3
+Tiedemann; 1973,Camas Creek,NO3,1,12
+Tiedemann; 1973,Camas Creek,NO3,2,6
+Tiedemann; 1973,Grade Creek,NO3,0,3
+Tiedemann; 1973,Grade Creek,NO3,1,12
+Tiedemann; 1973,Grade Creek,NO3,2,6
+Uzun et al. 2020,Reference First Rainy Season,DOC,1,3
+Uzun et al. 2020,Reference Second Rainy Season,DOC,2,12
+Uzun et al. 2020,Reference Second Rainy Season,NO3,2,12
+Uzun et al. 2020,Reference Subsequent Flush,DOC,1,3
+Uzun et al. 2020,Reference Subsequent Flush,NO3,1,2
+Uzun et al. 2020,Rocky Fire First Rainy Season Initial Flush,DOC,1,7
+Uzun et al. 2020,Rocky Fire First Rainy Season Subsequent Flush,DOC,1,7
+Uzun et al. 2020,Rocky Fire Second Rainy Season,DOC,2,14
+Uzun et al. 2020,Rocky Fire Second Rainy Season,NO3,2,14
+Uzun et al. 2020,Wragg Fire First Rainy Season Initial Flush,DOC,1,9
+Uzun et al. 2020,Wragg Fire First Rainy Season Initial Flush,NO3,1,2
+Uzun et al. 2020,Wragg Fire First Rainy Season Subsequent Flush,DOC,1,8
+Uzun et al. 2020,Wragg Fire Second Rainy Season,DOC,2,15
+Uzun et al. 2020,Wragg Fire Second Rainy Season,NO3,2,15
+Wagner et al. 2015,PBR,DOC,1,10
+Wagner et al. 2015,PNF,DOC,1,10
+Wagner et al. 2015,PSF,DOC,1,10
+Writer et al. 2014,PBR,DOC,0,4
+Writer et al. 2014,PBR,DOC,1,4
+Writer et al. 2014,PBR,NO3,0,3
+Writer et al. 2014,PBR,NO3,1,4
+Writer et al. 2014,PNF,DOC,0,8
+Writer et al. 2014,PNF,DOC,1,4
+Writer et al. 2014,PNF,NO3,0,4
+Writer et al. 2014,PNF,NO3,1,3
+Writer et al. 2014,PSF,DOC,0,4
+Writer et al. 2014,PSF,DOC,1,4
+Writer et al. 2014,PSF,NO3,0,1
+Writer et al. 2014,PSF,NO3,1,4

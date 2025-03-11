@@ -332,7 +332,7 @@ ggsave("Gap_NOGAP_ES.pdf",
 
 ```
 
-
+# ======================================================================
 ### Approach 2 ###
 
 ## Read in libraries 
@@ -372,9 +372,46 @@ meta_df <-do.call("rbind", lapply(studies_file_list,
                                      stringsAsFactors=FALSE, 
                                      header=T, blank.lines.skip = TRUE, fill=TRUE))
 
+# # of DOC and NO3 samples pulled for each study
+  # How many samples are available each year 
+meta_df_long <- meta_df %>% 
+  select(Study_ID, Pair, Site, Sampling_Date, Time_Since_Fire, DOC, NO3) %>% 
+  filter(Study_ID != "Murphy et al. 2015")
 
+meta_df_long <- meta_df_long %>%
+  pivot_longer(
+    cols = c(DOC, NO3),
+    names_to = "analyte",
+    values_to = "value",
+    values_drop_na = TRUE
+  )
+
+
+summary_df_long <- meta_df_long %>% 
+  group_by(Study_ID, analyte) %>% 
+  summarise(n = n())
+
+unique_long <- meta_df_long %>% 
+  group_by(Study_ID, analyte, Pair) %>% 
+  distinct(Sampling_Date, .keep_all = TRUE)
+
+summary_unique <- unique_long %>% 
+  group_by(Study_ID, analyte) %>% 
+  summarise(n = n())
+
+summary_tsf <- unique_long %>% 
+  group_by(Study_ID, analyte, Time_Since_Fire) %>% 
+  summarise(n = n())
+
+summary_site_tsf <- unique_long %>% 
+  group_by(Study_ID, Site, analyte, Time_Since_Fire) %>% 
+  summarise(n = n())
+
+write_csv(summary_site_tsf, here("Output_for_analysis", "08_Meta_summary_stats", "meta_summary.csv"))
+
+# RETURN TO NORMAL WORKFLOW 
 summary_df <- meta_df %>%
-  group_by(Study_ID, Site) %>%
+  group_by(Study_ID) %>%
   summarise(n = n())
 
 summary_df_high <- summary_df %>% 
@@ -821,12 +858,110 @@ ggplot(r_squared_values, aes(x = response_var, y = r_squared)) +
 ```
 
 
+# ======================================================================
+#### STEP 3 ###
+Plot the gap filled data on top of the interpolated data for each study
+
+## Read in libraries 
+```{r Jake/Mac Load Packages}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+library(tidyverse)
+library(here)
+library(forecastML)
+library(zoo)
+library(hrbrthemes)
+library(viridis)
+library(ggpmisc)
+library(RobustLinearReg)
+
+```
+
+### Load in meta data 
+```{r load in publications}
+studies_file_list <- list.files(
+  path = here("inputs", "Studies", "meta_final"), 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv, 
+                                     na = c('-9999', 'N/A'),
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE))
+
+```
+
+# Load in gap-filled data
+```{r}
+# Gap-fill interpolated data
+gap_fill <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "gap_fill.csv"))
+
+# Plot Burd to see if it works
+burd_interp <- gap_fill %>% 
+  filter(Study_ID == "Burd et al 2018")
+
+ggplot(burd_interp) +
+  geom_line(aes(x = Sampling_Date, y = DOC_Interp, color = Pair)) +
+  facet_wrap(~Pair, scales = "free") +
+  theme_bw()
+
+
+# Filter out Burd observed points
+burd_no_gap <- meta_df %>% 
+  filter(Study_ID == "Burd et al 2018") %>% 
+  mutate(Sampling_Date = ymd(Sampling_Date))
+
+# Plot no gap fill
+ggplot(burd_no_gap) +
+  geom_point(aes(x = Sampling_Date, y = DOC, color = Pair)) +
+  facet_wrap(~Pair, scales = "free") +
+  theme_bw()
+
+# Plot on top of each other
+ggplot() +
+  geom_point(data = burd_interp, aes(x = Sampling_Date, y = DOC_Interp), alpha = 0.5, color = "grey") +
+  geom_point(data = burd_no_gap, aes(x = Sampling_Date, y = DOC), size = 1.5, color = "red") +
+  facet_wrap(~Pair, scales = "free") +
+  theme_bw()
+  
 
 
 
-############################# REST OF STUDIES ################################
-# Downselecting to 5 observations per year for each study
-# Original workflow. I might add this to the graveyard part of the script
+  geom_point(data = burd_interp, aes(x = Sampling_Date, y = DOC_Interp), color = "blue") +
+  facet_wrap(~Pair, scales = "free") +
+  theme_bw()
+
+
+# Plot on top of each other
+ggplot(combined_df_filled, aes(x = Sampling_Date)) +
+  geom_ribbon(data = summary_stats, aes(ymin = lower_bound_NO3, ymax = upper_bound_NO3), fill = "grey80", alpha = 0.5) +
+  geom_line(data = summary_stats, aes(y = mean_NO3_Interp), color = "blue", size = 1) +
+  geom_point(data = mast_discrete_NO3, aes(y = NO3_mg_N_L), color = "red", size = 1, alpha = 1.5)
+  
+```
+
+
+
+
+
+
+
+
+
+# ======================================================================
+## REST OF STUDIES ##
+Downselecting to 5 observations per year for each study
+Original workflow. I might add this to the graveyard part of the script
 ```{r}
 # Group by Study_ID, Pair, Year, and analyte, then apply the sampling function
 # downselected_df <- control_long %>%

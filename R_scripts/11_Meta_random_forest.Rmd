@@ -53,7 +53,8 @@ no3 <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_r
   rename("dependent" = effect_size) %>%
   dplyr::select(dependent, climate, totdasqkm, maxelevsmo, slope, tmean9120ws, om_ws, bfi_ws, perm_ws, rck_dep_ws,
                 burn_percentage, mean_dnbr, time_since_fire) %>%
-  mutate(mean_dnbr = as.numeric(mean_dnbr)) %>%
+  mutate(mean_dnbr = as.numeric(mean_dnbr),
+         white_noise = rnorm(1:n(), mean = 0, sd = 1)) %>%
   na.omit()
   
 
@@ -63,7 +64,8 @@ doc <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_r
   rename("dependent" = effect_size) %>% 
   dplyr::select(dependent, climate, totdasqkm, maxelevsmo, slope, tmean9120ws, om_ws, bfi_ws, perm_ws, rck_dep_ws, 
                 burn_percentage, mean_dnbr, time_since_fire) %>% 
-  mutate(mean_dnbr = as.numeric(mean_dnbr)) %>% 
+  mutate(mean_dnbr = as.numeric(mean_dnbr),
+         white_noise = rnorm(1:n(), mean = 0, sd = 1)) %>% 
   na.omit() 
   
 
@@ -112,24 +114,49 @@ plot_fi <- function(data){
 
 ```
 
-```{r correlation matrix}
-df %>% filter(analyte == "doc") %>% 
-  drop_na() %>% 
-  cor()
-
-```
 
 # Plot FI for effect sizes
 ```{r plot Feature importance}
 ## Create a dataset of variable importance
-df <- bind_rows(plot_fi(no3) %>% mutate(analyte = "no3"), 
-          plot_fi(doc) %>% mutate(analyte = "doc")) %>% 
-  group_by(analyte) %>% 
-  mutate(fi = raw_fi / sum(raw_fi),
-         fi100 = fi * 100)
+# Old code with no white noise included. 
+# df <- bind_rows(plot_fi(no3) %>% mutate(analyte = "no3"), 
+#           plot_fi(doc) %>% mutate(analyte = "doc")) %>% 
+#   group_by(analyte) %>% 
+#   mutate(fi = raw_fi / sum(raw_fi),
+#          fi100 = fi * 100)
+# 
+# write_csv(df, here("Output_for_analysis", "11_Random_forest", "Random_Forest_Effect_Size_Fig_data.csv"))
 
-write_csv(df, here("Output_for_analysis", "11_Random_forest", "Random_Forest_Effect_Size_Fig_data.csv"))
+replicate_plot_fi <- function(parameter, analyte){
+  replicate(100, plot_fi(parameter), simplify = FALSE) %>% 
+    bind_rows() %>% 
+    group_by(predictor) %>% 
+    summarize(mean_fi = mean(raw_fi, na.rm = T), 
+              min_fi = min(raw_fi, na.rm = T), 
+              max_fi = max(raw_fi, na.rm = T)) %>% 
+    ungroup() %>%
+    mutate(analyte = analyte)
+}
 
+
+# JSC Testing here 
+# @PETER this is what i've been messing with
+doc_eb <- replicate_plot_fi(doc, "doc")
+no3_eb <- replicate_plot_fi(no3, "no3")
+
+# Mutate each column at a time
+df <- bind_rows(doc_eb, no3_eb)
+
+df_test <- df %>% 
+  mutate(mean_fi = mean_fi / sum(mean_fi)) %>% 
+  mutate(min_fi = min_fi / sum(min_fi)) %>% 
+  mutate(max_fi = max_fi / sum(max_fi))
+
+# BACK TO NORMAL WORKFLOW
+pr <- bind_rows(replicate_plot_fi(no3, "no3"),
+                    replicate_plot_fi(doc, "doc")) %>%  
+  group_by(analyte) %>%
+  mutate(across(contains("_fi"), ~ . / sum(.)))
 
 ## Set up a color palette
 var_colors <- PNWColors::pnw_palette("Bay", n = length(unique(df$predictor)))
@@ -141,14 +168,17 @@ var_colors <- PNWColors::pnw_palette("Bay", n = length(unique(df$predictor)))
 # minelevsmo - Minimum elevation (smoothed) in centimeters
 # slope - Slope of flowline (meters/meters) based on smoothed elevations
 # time_since_fire - time since fire 
+# Mean Bedrock depth - RckDep
 # totdasqkm -Total upstream catchment area from downstream end of flowline.
+
 
 dose.labs <- c("DOC", "Nitrate")
 names(dose.labs) <- c("doc", "no3")
 
-ggplot(df, aes(fi * 100, 
-               reorder(predictor, fi), fill = predictor)) + 
-  geom_col(alpha = 0.8, show.legend = F, width = 0.7) + 
+ggplot(df, aes(mean_fi * 100, 
+               reorder(predictor, mean_fi), fill = predictor)) + 
+  geom_col(alpha = 0.8, show.legend = F, width = 0.7) +
+  geom_errorbar(aes(xmin = min_fi * 100, xmax = max_fi * 100, width = 0.2)) +
   facet_wrap(~analyte, nrow = 1, labeller = labeller(analyte = dose.labs)) + 
   scale_fill_manual(values = var_colors) + 
   labs(x = "Feature Importance (%)", 
@@ -162,32 +192,102 @@ ggplot(df, aes(fi * 100,
                             "maxelevsmo" = "Max Watershed Elevation",
                             "burn_percentage" = "Burn Percentage", 
                             "climate" = "Koppen Climate Classification",
-                            # "maxelevsmo" = "Max Elevation",
-                            # "minelevsmo" = "Minimum Elevation",
+                            "rck_dep_ws" = "Mean Bedrock Depth",
+                            "white_noise" = "White Noise",
                             "slope" = "Catchment Slope",
                             "time_since_fire" = "Time Since Fire",
                             "totdasqkm" = "Catchment Area")) +
   theme_bw()
                             
 
-ggsave("Effect_Size_Random_Forest.pdf",
+ggsave("Effect_Size_Random_Forest_white_noise.pdf",
        path = here("initial_plots", "11_Meta_random_forest"),
        width = 5.5, height = 3,  units = "in")
 
 # including white noise. You put in a random variable. You feed that in as a predictor. If white noise has higher feature importance than any of these variables. The concern there is, we dont want to add anything that doesn't address the comment. 
 
+# white noise is greater than climate, tmean, rck_dep, burn percentage, perm, om, watershed area, bfi for doc
+  # white noise is greater than rck_dep, om, bp, perm, watershed area, bfi
+
+# white noise is greater than slope and watershed area for no3
+
+
+# Plot only with variables that are greater than white noise.  
+# Calculate the white noise mean_fi for each analyte
+white_noise_values <- df %>% 
+  filter(predictor == "white_noise") %>% 
+  select(analyte, mean_fi)
+
+# Filter the data to include only variables with mean_fi greater than white noise value for each analyte
+filtered_df <- df %>%
+  inner_join(white_noise_values, by = "analyte", suffix = c("", "_white_noise")) %>%
+  filter(mean_fi > mean_fi_white_noise)
+
+# Plotting
+ggplot(filtered_df, aes(mean_fi * 100, reorder(predictor, mean_fi), fill = predictor)) + 
+  geom_col(alpha = 0.8, show.legend = F, width = 0.7) +
+  geom_errorbar(aes(xmin = min_fi * 100, xmax = max_fi * 100, width = 0.2)) +
+  facet_wrap(~analyte, nrow = 1, labeller = labeller(analyte = dose.labs)) + 
+  scale_fill_manual(values = var_colors) + 
+  labs(x = "Feature Importance (%)", y = "", fill = "") +
+  scale_y_discrete(labels = c(
+    "bfi_ws" = "Baseflow Index",
+    "runoff_ws" = "Runoff",
+    "perm_ws" = "Soil Permeability",
+    "tmean9120ws" = "Mean Annual Air Temperature",
+    "mean_dnbr" = "Burn Severity",
+    "om_ws" = "Organic Matter",
+    "maxelevsmo" = "Max Watershed Elevation",
+    "burn_percentage" = "Burn Percentage", 
+    "climate" = "Koppen Climate Classification",
+    "rck_dep_ws" = "Mean Bedrock Depth",
+    "white_noise" = "White Noise",
+    "slope" = "Catchment Slope",
+    "time_since_fire" = "Time Since Fire",
+    "totdasqkm" = "Catchment Area"
+  )) +
+  theme_bw()
+
+## Take 2 ##
+# Calculate the white noise mean_fi for each analyte
+white_noise_values <- df %>% 
+  filter(predictor == "white_noise") %>% 
+  select(analyte, mean_fi) %>%
+  rename(white_noise_fi = mean_fi)
+
+# Filter the data to include only variables with mean_fi greater than the white noise value for each analyte
+filtered_df <- df %>%
+  inner_join(white_noise_values, by = "analyte") %>%
+  filter(mean_fi > white_noise_fi) %>%
+  select(-white_noise_fi)
+
+# Plotting
+ggplot(filtered_df, aes(mean_fi * 100, reorder(predictor, mean_fi), fill = predictor)) + 
+  geom_col(alpha = 0.8, show.legend = F, width = 0.7) +
+  geom_errorbar(aes(xmin = min_fi * 100, xmax = max_fi * 100, width = 0.2)) +
+  facet_wrap(~ analyte, nrow = 1, scales = "free_y", labeller = labeller(analyte = dose.labs)) + 
+  scale_fill_manual(values = var_colors) + 
+  labs(x = "Feature Importance (%)", y = "", fill = "") +
+  scale_y_discrete(labels = c(
+    "bfi_ws" = "Baseflow Index",
+    "runoff_ws" = "Runoff",
+    "perm_ws" = "Soil Permeability",
+    "tmean9120ws" = "Mean Annual Air Temperature",
+    "mean_dnbr" = "Burn Severity",
+    "om_ws" = "Organic Matter",
+    "maxelevsmo" = "Max Watershed Elevation",
+    "burn_percentage" = "Burn Percentage", 
+    "climate" = "Koppen Climate Classification",
+    "rck_dep_ws" = "Mean Bedrock Depth",
+    "white_noise" = "White Noise",
+    "slope" = "Catchment Slope",
+    "time_since_fire" = "Time Since Fire",
+    "totdasqkm" = "Catchment Area"
+  )) +
+  theme_bw()
 
 ```
 
-# Peter code in TEAMs
-```{r}
-no3 <- read_csv(paste0(path, "no3_meta_random_forest.csv")) %>%  
-clean_names() %>% rename("dependent" = effect_size) %>%  
-dplyr::select(-c(minelevraw, minelevsmo, elevfixed)) %>% 
- mutate(white_noise = rnorm(1:n(), mean = 0, sd = 1))
-
-
-```
 
 
 
