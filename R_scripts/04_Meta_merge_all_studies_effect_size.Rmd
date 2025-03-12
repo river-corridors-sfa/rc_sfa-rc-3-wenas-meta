@@ -143,7 +143,7 @@ site_data_unique <- site_data %>%
 ```
 
 # =============================================================================
-### CHAT 
+# Gap Filling 
 ```{r}
 # Step 1: Prepare the Data and Calculate Days Between Samples
 control_impact_units <- control_impact_units %>%
@@ -223,36 +223,10 @@ write_csv(daily_time_series_filter, here("Output_for_analysis", "04_Meta_merge_a
 
 ```
 
-### Gap filling ###
-```{r - gap fill}
-# filling in daily time series and interpolating by study and site
-control_impact_fill <-  control_impact_units %>% 
-  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
-  group_by(Study_ID, Site) %>%
-  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
-  fill(Study_ID:Burn_Unburn) %>%
-  fill(Study_ID, Site) %>%
-  ungroup() %>%
-  group_by(Site) %>%
-  mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
-         DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
-  fill(Study_ID:Burn_Unburn)
-
-
-control_impact_fill <- control_impact_fill %>% 
-  mutate(year = year(Sampling_Date),
-         month = month(Sampling_Date),
-         day = day(Sampling_Date))
-  
-write_csv(control_impact_fill, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "gap_fill.csv"))
-
-
-```
-
 
 ```{r calculating the temporal normalized data}
 # pivoting to make the responses in one column
-metadata_long <- control_impact_fill %>%
+metadata_long <- daily_time_series_filter %>%
   pivot_longer(
     cols = NO3_Interp:DOC_Interp,
     names_to = "response_var",
@@ -495,10 +469,42 @@ yearly_effect_size_combine_long_out <- yearly_effect_size_combine_long %>%
   mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
 
 
-write_csv(yearly_effect_size_combine_long_out, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"))
+write_csv(yearly_effect_size_combine_long_out, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_UPDATED.csv"))
 
 unique(yearly_effect_size_combine_long_out$Study_ID)
 
+```
+
+# ================================= TO DELETE LATER ==============================
+```{r}
+old_es <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"))
+
+
+# Merge the data frames 
+merged_effect_size <- left_join(old_es, yearly_effect_size_combine_long_out, 
+        by = c("Study_ID", "response_var", "year", "Effect_size_pair"),
+        suffix = c("_old", "_new"))
+
+
+# Perform a linear regression
+regression_result <- lm(Effect_size_old ~ Effect_size_new, data = merged_effect_size)
+
+# Create the plot with equation and R² value
+regression_plot <- ggplot(merged_effect_size, aes(x = Effect_size_old, y = Effect_size_new)) +
+  xlim(-3,3) +
+  geom_point() +  # Add points
+  geom_smooth(method = "lm", col = "blue") +  # Add regression line
+  stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+               label.x = "left", formula = y ~ x, parse = TRUE, size = 5) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "black") +  # Add 1:1 dashed line
+  labs(
+    title = "Impact of gaps in data",
+    x = "Effect Size old",
+    y = "Effect Size new"
+  ) +
+  theme_bw()  # Use a minimal theme
+
+regression_plot
 ```
 
 
@@ -946,7 +952,32 @@ ggsave("NO3_Percent_Difference_Scatter.pdf",
 
 
 
+#=============================== SCRIPT GRAVEYARD ===============================
+### Gap filling ###
+```{r - gap fill}
+# # filling in daily time series and interpolating by study and site
+# control_impact_fill <-  control_impact_units %>% 
+#   dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+#   group_by(Study_ID, Site) %>%
+#   complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
+#   fill(Study_ID:Burn_Unburn) %>%
+#   fill(Study_ID, Site) %>%
+#   ungroup() %>%
+#   group_by(Site) %>%
+#   mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
+#          DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
+#   fill(Study_ID:Burn_Unburn)
+# 
+# 
+# control_impact_fill <- control_impact_fill %>% 
+#   mutate(year = year(Sampling_Date),
+#          month = month(Sampling_Date),
+#          day = day(Sampling_Date))
+#   
+# write_csv(control_impact_fill, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "gap_fill.csv"))
 
+
+```
 
 
 
