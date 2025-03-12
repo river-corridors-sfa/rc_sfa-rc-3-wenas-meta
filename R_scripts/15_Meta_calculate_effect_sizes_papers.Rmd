@@ -899,22 +899,375 @@ meta_df <-do.call("rbind", lapply(studies_file_list,
                                      stringsAsFactors=FALSE, 
                                      header=T, blank.lines.skip = TRUE, fill=TRUE))
 
+options(max.print = 40)
+# Filtering by only the control vs.impact studies to make sure we have no paper that is included that is any other study design. 
+
+# Crandall is filtered out because the burned and reference sites are not paired so I do that is a separate script and will read that csv in later to merge to this dataframe to get the more accurate effect size calculations 
+
+# The studies that monitor streams more than 5 years following a wildfire are also excluded for this initial code and will be added in later.  
+
+control_impact <- meta_df %>% 
+  filter(Design_Control_Burn_Pre_Post == "Control_Reference_vs_Impact",
+         Study_ID != "Crandall et al. 2021",
+         Study_ID != "Murphy et al. 2015",
+         Mean_Median_or_IndividualSample == "Individual",
+         as.numeric(Time_Since_Fire) < 6)
+
+# separate out the time columns 
+time_format <- control_impact %>% 
+  dplyr::select(Study_ID, Sampling_Date) %>% 
+  mutate(Sampling_Date = as.character(Sampling_Date))
+
+# merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
+control_impact <- control_impact %>% 
+  mutate(Sampling_Date = time_format$Sampling_Date)
+
+
+# changing the structure of the concentrations
+control_impact <- control_impact %>% 
+  mutate(DOC = as.numeric(DOC),
+         NO3 = as.numeric(NO3), 
+         Sampling_Date = ymd(Sampling_Date))
+
+control_impact <- control_impact %>% 
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+
+# Changing the units to make sure everything is consistent in mg_N_L or mg_C_L
+control_impact_units <- control_impact %>% 
+  mutate(Area_watershed_km = case_when(Area_unit == 'ha' ~ Area_watershed * .01,
+                                       Area_unit == 'km' ~ print(Area_watershed)),
+         
+         DOC_mg_C_L = case_when(DOC_unit == 'mg_C_L' ~ print(DOC),
+                                DOC_unit == 'mg_L' ~ print(DOC),
+                                DOC_unit == 'um' ~ DOC * 0.01201),
+         
+         NO3_mg_N_L = case_when(NO3_unit == 'um' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_NO2_NO3_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'mg_N_L' ~ print(NO3),
+                                NO3_unit == 'ug_N_L' ~ NO3 * .001, 
+                                NO3_unit == 'mg_L' ~ NO3 * 0.225904780),
+         
+         DOC_uM_C = case_when(DOC_unit == 'um' ~ print(DOC),
+                              DOC_unit == 'mg_C_L' ~ DOC * 83.2639467,
+                              DOC_unit == 'mg_L' ~ DOC * 83.2639467),
+
+         NO3_uM_N = case_when(NO3_unit == 'um' ~ print(NO3),
+                              NO3_unit == 'umol_L' ~ print(NO3),
+                              NO3_unit == 'umol_NO2_NO3_L' ~ print(NO3),
+                              NO3_unit == 'mg_L' ~ NO3 * 16.127729,
+                              NO3_unit == 'mg_N_L' ~ NO3 * 3.64145101,
+                              NO3_unit == 'ug_N_L' ~ NO3 * 0.22594948))
+
 ```
+
+### DOC 
 
 # Load in gap-filled data
 ```{r}
 # Gap-fill interpolated data
 gap_fill <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "gap_fill.csv"))
 
-# Plot Burd to see if it works
-burd_interp <- gap_fill %>% 
-  filter(Study_ID == "Burd et al 2018")
+# Define the directory where the plots will be saved
+output_directory <- "~/GitHub/rc_sfa-rc-3-wenas-meta/initial_plots/15_Meta_calculate_effect_sizes_papers/gap_fill/DOC"
 
-ggplot(burd_interp) +
-  geom_line(aes(x = Sampling_Date, y = DOC_Interp, color = Pair)) +
+# Loop over each unique Study_ID
+unique_study_ids <- unique(gap_fill$Study_ID)
+
+for(study_id in unique_study_ids) {
+  # Subset the data for the current Study_ID
+  subset_gap_fill <- gap_fill %>% filter(Study_ID == study_id) %>% 
+    filter(Pair %in% c("Control", "Control_1", "Control_2", "Site_1", "Site_2", "Site_3"))
+  subset_control_impact_units <- control_impact_units %>% filter(Study_ID == study_id) %>% 
+    filter(Pair %in% c("Control", "Control_1", "Control_2", "Site_1", "Site_2", "Site_3"))
+  
+      # Modify DOC_Interp values for specific Study_ID and time windows
+  if (study_id == "Hickenbottom et al. 2023") {
+    subset_gap_fill <- subset_gap_fill %>%
+      mutate(DOC_Interp = ifelse(
+        (Pair == "Control_1" & Sampling_Date >= as.Date("2021-10-06") & Sampling_Date <= as.Date("2022-04-18")) |
+        (Pair == "Site_1" & Sampling_Date >= as.Date("2022-04-01") & Sampling_Date <= as.Date("2022-07-02")) |
+        (Pair == "Site_1" & Sampling_Date >= as.Date("2022-09-20") & Sampling_Date <= as.Date("2023-04-04")),
+        NA,
+        DOC_Interp
+      ))
+  }
+  
+  # Check if there are any non-NA DOC values before plotting
+  if (all(is.na(subset_gap_fill$DOC_Interp)) && all(is.na(subset_control_impact_units$DOC_mg_C_L))) {
+    next  # Skip this iteration of the loop if all DOC values are NA
+  }
+  
+  # Create the plot
+  plot <- ggplot() +
+    geom_point(data = subset_gap_fill, aes(x = Sampling_Date, y = DOC_Interp), color = "grey", alpha = 0.7) +
+    geom_point(data = subset_control_impact_units, aes(x = Sampling_Date, y = DOC_mg_C_L), color = "red", size = 1.5) +
+    facet_wrap(~Pair, scales = "free") +
+    labs(title = paste(study_id, "DOC Data Comparison"),
+         x = "Sampling Date",
+         y = "DOC Concentration",
+         color = "Data Source") +
+    theme_bw()
+  
+  # Save the plot
+  ggsave(filename = file.path(output_directory, paste0(study_id, "_DOC_gap_fill_plot.png")), plot = plot, width = 10, height = 7)
+}
+
+
+
+ # works
+  # Burd - check 
+  # Hickenbottom
+  # Mast & Clow
+  # Murphy et al. 2018
+  # Rhea?
+  # Uzun
+  # Wagner
+  # Writer
+
+# Doesn't work:
+  # Coombs & Melack - doesnt have DOC
+  # Gerla & Galloway - doesnt have DOC
+  # Gluns & Toews - doesnt have DOC
+  # Hauer & Spencer - doesnt have DOC
+  # Neary & Currier - doesnt have DOC
+  # Oliver - doesnt have DOC
+  # Tiedemann - doesnt have DOC
+  
+
+
+```
+
+### NO3
+
+# Load in gap-filled data
+```{r}
+# Define the directory where the plots will be saved
+output_directory <- "~/GitHub/rc_sfa-rc-3-wenas-meta/initial_plots/15_Meta_calculate_effect_sizes_papers/gap_fill/NO3"
+
+# Loop over each unique Study_ID
+unique_study_ids <- unique(gap_fill$Study_ID)
+
+for(study_id in unique_study_ids) {
+  # Subset the data for the current Study_ID
+  subset_gap_fill <- gap_fill %>% filter(Study_ID == study_id) %>% 
+    filter(Pair %in% c("Control", "Control_1", "Control_2", "Site_1", "Site_2", "Site_3"))
+  subset_control_impact_units <- control_impact_units %>% filter(Study_ID == study_id) %>% 
+    filter(Pair %in% c("Control", "Control_1", "Control_2", "Site_1", "Site_2", "Site_3"))
+  
+  #     # Modify DOC_Interp values for specific Study_ID and time windows
+  # if (study_id == "Hickenbottom et al. 2023") {
+  #   subset_gap_fill <- subset_gap_fill %>%
+  #     mutate(DOC_Interp = ifelse(
+  #       (Pair == "Control_1" & Sampling_Date >= as.Date("2021-10-06") & Sampling_Date <= as.Date("2022-04-18")) |
+  #       (Pair == "Site_1" & Sampling_Date >= as.Date("2022-04-01") & Sampling_Date <= as.Date("2022-07-02")) |
+  #       (Pair == "Site_1" & Sampling_Date >= as.Date("2022-09-20") & Sampling_Date <= as.Date("2023-04-04")),
+  #       NA,
+  #       DOC_Interp
+  #     ))
+  # }
+  
+  # Check if there are any non-NA DOC values before plotting
+  if (all(is.na(subset_gap_fill$NO3_Interp)) && all(is.na(subset_control_impact_units$NO3_mg_N_L))) {
+    next  # Skip this iteration of the loop if all DOC values are NA
+  }
+  
+  # Create the plot
+  plot <- ggplot() +
+    geom_point(data = subset_gap_fill, aes(x = Sampling_Date, y = NO3_Interp), color = "grey", alpha = 0.7) +
+    geom_point(data = subset_control_impact_units, aes(x = Sampling_Date, y = NO3_mg_N_L), color = "red", size = 1.5) +
+    facet_wrap(~Pair, scales = "free") +
+    labs(title = paste(study_id, "NO3 Data Comparison"),
+         x = "Sampling Date",
+         y = "NO3 Concentration",
+         color = "Data Source") +
+    theme_bw()
+  
+  # Save the plot
+  ggsave(filename = file.path(output_directory, paste0(study_id, "_NO3_gap_fill_plot.png")), plot = plot, width = 10, height = 7)
+}
+
+
+
+ # works
+  # Burd - check 
+  # Hickenbottom
+  # Mast & Clow
+  # Murphy et al. 2018
+  # Rhea?
+  # Uzun
+  # Wagner
+  # Writer
+
+# Doesn't work:
+  # Coombs & Melack - doesnt have DOC
+  # Gerla & Galloway - doesnt have DOC
+  # Gluns & Toews - doesnt have DOC
+  # Hauer & Spencer - doesnt have DOC
+  # Neary & Currier - doesnt have DOC
+  # Oliver - doesnt have DOC
+  # Tiedemann - doesnt have DOC
+  
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### SCRIPT GRAVEYARD
+# Hickenbottom TEST
+```{r}
+# Plot Hickenbottom to see if it works
+hicken_interp <- gap_fill %>% 
+  filter(Study_ID == "Hickenbottom et al. 2023")
+
+#plot
+ggplot(hicken_interp) +
+  geom_line(aes(x = Sampling_Date, y = DOC_Interp), color = "grey") +
   facet_wrap(~Pair, scales = "free") +
   theme_bw()
 
+# observed
+hicken_no_gap <- meta_df %>% 
+  filter(Study_ID == "Hickenbottom et al. 2023") %>% 
+  mutate(Sampling_Date = ymd(Sampling_Date))
+
+# Plot no gap fill
+ggplot(hicken_no_gap) +
+  geom_point(aes(x = Sampling_Date, y = DOC, color = Pair)) +
+  facet_wrap(~Pair, scales = "free") +
+  theme_bw()
+
+# looks like there is a gap of more than 50 days for Hickenbottom. Lets fill and remove interpolated data that is greater than 50 days. 
+hicken_impact_units <- control_impact_units %>% 
+   filter(Study_ID == "Hickenbottom et al. 2023")
+
+hicken_impact_fill <- hicken_impact_units %>%
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+  group_by(Study_ID, Site) %>%
+  arrange(Sampling_Date) %>%
+  mutate(
+     # Calculate the difference in days between consecutive sampling dates
+    day_diff = c(0, diff(Sampling_Date)),
+  # Create a group identifier based on gaps greater than 50 days
+    fill_group = (case_when(day_diff > 50 ~ 1, TRUE ~ 0))
+  ) %>%
+  group_by(Study_ID, Site, fill_group) %>%
+  # Now fill in the missing dates only within valid groups
+  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>%
+  fill(Study_ID:Burn_Unburn) %>%
+  ungroup() %>%
+  group_by(Site, fill_group) %>%
+  mutate(
+    # Apply interpolation within groups where the dates are not too far apart
+    NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
+    DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)
+  ) %>%
+  ungroup() %>%
+  fill(Study_ID:Burn_Unburn) %>%
+  select(-day_diff, -fill_group)  # Optionally remove intermediate columns
+
+
+# Plot to see if this worked:
+ggplot(hicken_impact_fill) +
+  geom_line(aes(x = Sampling_Date, y = DOC_Interp), color = "grey") +
+  facet_wrap(~Pair, scales = "free") +
+  theme_bw()
+
+## TAKE 2 ##
+
+hicken_impact_fill <- hicken_impact_units %>%
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+  group_by(Study_ID, Site) %>%
+  arrange(Sampling_Date) %>%
+  mutate(
+    # Calculate the difference in days between consecutive sampling dates
+    day_diff = c(0, diff(Sampling_Date)),
+    # Create a group identifier based on gaps greater than 50 days
+    is_big_gap = (case_when(day_diff > 50 ~ 1, TRUE ~ 0))
+  ) %>%
+  group_by(Study_ID, Site) %>%
+  mutate(
+    fill_group = cumsum(is_big_gap)
+  ) %>%
+  group_by(Study_ID, Site, fill_group) %>%
+  # Fill in the missing dates within each valid group
+  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>%
+  fill(Study_ID:Burn_Unburn) %>%
+  ungroup() %>%
+  group_by(Site, fill_group) %>%
+  mutate(
+    # Apply interpolation only for groups without big gaps (where fill_group is 0)
+    NO3_Interp = if_else(fill_group == 0, na.approx(NO3_mg_N_L, na.rm = FALSE), as.numeric(NA)),
+    DOC_Interp = if_else(fill_group == 0, na.approx(DOC_mg_C_L, na.rm = FALSE), as.numeric(NA))
+  ) %>%
+  ungroup() %>%
+  fill(Study_ID:Burn_Unburn) %>%
+  select(-day_diff, -is_big_gap, -fill_group)  # Optionally remove intermediate columns
+
+# Plot to see if this worked:
+ggplot(hicken_impact_fill) +
+  geom_line(aes(x = Sampling_Date, y = DOC_Interp), color = "grey") +
+  facet_wrap(~Pair, scales = "free") +
+  theme_bw()
+
+## TAKE 3 ###
+
+hicken_impact_fill <- hicken_impact_units %>%
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+  group_by(Study_ID, Site) %>%
+  arrange(Sampling_Date) %>%
+  mutate(
+    # Calculate the difference in days between consecutive sampling dates
+    day_diff = c(0, diff(Sampling_Date)),
+    # Create a group identifier based on gaps greater than 50 days
+    is_big_gap = case_when(day_diff > 50 ~ 1, TRUE ~ 0),
+    # A running count of valid fill groups
+    fill_group = cumsum(is_big_gap)
+  ) %>%
+  # Complete the sequence of missing dates within each valid group
+  group_by(Study_ID, Site, fill_group) %>%
+  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>%
+  ungroup() %>%
+  group_by(Study_ID, Site) %>%
+  fill(Study_ID:Burn_Unburn) %>%
+  ungroup() %>%
+  # Interpolate values only within valid groups, ensuring we reset where necessary
+  group_by(Study_ID, Site, fill_group) %>%
+  mutate(
+    NO3_Interp = if_else(max(is_big_gap) == 1, as.numeric(NA), na.approx(NO3_mg_N_L, na.rm = FALSE)),
+    DOC_Interp = if_else(max(is_big_gap) == 1, as.numeric(NA), na.approx(DOC_mg_C_L, na.rm = FALSE))
+  ) %>%
+  ungroup() %>%
+  fill(Study_ID:Burn_Unburn) %>%
+  select(-day_diff, -is_big_gap, -fill_group)  # Optionally remove intermediate columns
+
+# Display the structure of the final result to verify the outcome
+print(head(hicken_impact_fill))
+
+
+  
+
+```
+
+# Burd TEST
+```{r}
+# Plot Burd to see if it works
+burd_interp <- gap_fill %>% 
+  filter(Study_ID == "Burd et al 2018")
 
 # Filter out Burd observed points
 burd_no_gap <- meta_df %>% 
@@ -933,20 +1286,6 @@ ggplot() +
   geom_point(data = burd_no_gap, aes(x = Sampling_Date, y = DOC), size = 1.5, color = "red") +
   facet_wrap(~Pair, scales = "free") +
   theme_bw()
-  
-
-
-
-  geom_point(data = burd_interp, aes(x = Sampling_Date, y = DOC_Interp), color = "blue") +
-  facet_wrap(~Pair, scales = "free") +
-  theme_bw()
-
-
-# Plot on top of each other
-ggplot(combined_df_filled, aes(x = Sampling_Date)) +
-  geom_ribbon(data = summary_stats, aes(ymin = lower_bound_NO3, ymax = upper_bound_NO3), fill = "grey80", alpha = 0.5) +
-  geom_line(data = summary_stats, aes(y = mean_NO3_Interp), color = "blue", size = 1) +
-  geom_point(data = mast_discrete_NO3, aes(y = NO3_mg_N_L), color = "red", size = 1, alpha = 1.5)
   
 ```
 
