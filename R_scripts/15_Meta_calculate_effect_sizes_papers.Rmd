@@ -971,7 +971,7 @@ control_impact_units <- control_impact %>%
 gap_fill <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "gap_fill.csv"))
 
 # Define the directory where the plots will be saved
-output_directory <- "~/GitHub/rc_sfa-rc-3-wenas-meta/initial_plots/15_Meta_calculate_effect_sizes_papers/gap_fill/DOC"
+output_directory <- "~/GitHub/rc_sfa-rc-3-wenas-meta/initial_plots/15_Meta_calculate_effect_sizes_papers/gap_fill/DOC/"
 
 # Loop over each unique Study_ID
 unique_study_ids <- unique(gap_fill$Study_ID)
@@ -979,21 +979,9 @@ unique_study_ids <- unique(gap_fill$Study_ID)
 for(study_id in unique_study_ids) {
   # Subset the data for the current Study_ID
   subset_gap_fill <- gap_fill %>% filter(Study_ID == study_id) %>% 
-    filter(Pair %in% c("Control", "Control_1", "Control_2", "Site_1", "Site_2", "Site_3"))
+    filter(Pair %in% c("Control", "Control_1", "Control_2", "Site_1", "Site_2", "Site_3", "Site_4"))
   subset_control_impact_units <- control_impact_units %>% filter(Study_ID == study_id) %>% 
-    filter(Pair %in% c("Control", "Control_1", "Control_2", "Site_1", "Site_2", "Site_3"))
-  
-      # Modify DOC_Interp values for specific Study_ID and time windows
-  if (study_id == "Hickenbottom et al. 2023") {
-    subset_gap_fill <- subset_gap_fill %>%
-      mutate(DOC_Interp = ifelse(
-        (Pair == "Control_1" & Sampling_Date >= as.Date("2021-10-06") & Sampling_Date <= as.Date("2022-04-18")) |
-        (Pair == "Site_1" & Sampling_Date >= as.Date("2022-04-01") & Sampling_Date <= as.Date("2022-07-02")) |
-        (Pair == "Site_1" & Sampling_Date >= as.Date("2022-09-20") & Sampling_Date <= as.Date("2023-04-04")),
-        NA,
-        DOC_Interp
-      ))
-  }
+    filter(Pair %in% c("Control", "Control_1", "Control_2", "Site_1", "Site_2", "Site_3", "Site_4"))
   
   # Check if there are any non-NA DOC values before plotting
   if (all(is.na(subset_gap_fill$DOC_Interp)) && all(is.na(subset_control_impact_units$DOC_mg_C_L))) {
@@ -1015,29 +1003,6 @@ for(study_id in unique_study_ids) {
   ggsave(filename = file.path(output_directory, paste0(study_id, "_DOC_gap_fill_plot.png")), plot = plot, width = 10, height = 7)
 }
 
-
-
- # works
-  # Burd - check 
-  # Hickenbottom
-  # Mast & Clow
-  # Murphy et al. 2018
-  # Rhea?
-  # Uzun
-  # Wagner
-  # Writer
-
-# Doesn't work:
-  # Coombs & Melack - doesnt have DOC
-  # Gerla & Galloway - doesnt have DOC
-  # Gluns & Toews - doesnt have DOC
-  # Hauer & Spencer - doesnt have DOC
-  # Neary & Currier - doesnt have DOC
-  # Oliver - doesnt have DOC
-  # Tiedemann - doesnt have DOC
-  
-
-
 ```
 
 ### NO3
@@ -1056,18 +1021,6 @@ for(study_id in unique_study_ids) {
     filter(Pair %in% c("Control", "Control_1", "Control_2", "Site_1", "Site_2", "Site_3"))
   subset_control_impact_units <- control_impact_units %>% filter(Study_ID == study_id) %>% 
     filter(Pair %in% c("Control", "Control_1", "Control_2", "Site_1", "Site_2", "Site_3"))
-  
-  #     # Modify DOC_Interp values for specific Study_ID and time windows
-  # if (study_id == "Hickenbottom et al. 2023") {
-  #   subset_gap_fill <- subset_gap_fill %>%
-  #     mutate(DOC_Interp = ifelse(
-  #       (Pair == "Control_1" & Sampling_Date >= as.Date("2021-10-06") & Sampling_Date <= as.Date("2022-04-18")) |
-  #       (Pair == "Site_1" & Sampling_Date >= as.Date("2022-04-01") & Sampling_Date <= as.Date("2022-07-02")) |
-  #       (Pair == "Site_1" & Sampling_Date >= as.Date("2022-09-20") & Sampling_Date <= as.Date("2023-04-04")),
-  #       NA,
-  #       DOC_Interp
-  #     ))
-  # }
   
   # Check if there are any non-NA DOC values before plotting
   if (all(is.na(subset_gap_fill$NO3_Interp)) && all(is.na(subset_control_impact_units$NO3_mg_N_L))) {
@@ -1088,29 +1041,6 @@ for(study_id in unique_study_ids) {
   # Save the plot
   ggsave(filename = file.path(output_directory, paste0(study_id, "_NO3_gap_fill_plot.png")), plot = plot, width = 10, height = 7)
 }
-
-
-
- # works
-  # Burd - check 
-  # Hickenbottom
-  # Mast & Clow
-  # Murphy et al. 2018
-  # Rhea?
-  # Uzun
-  # Wagner
-  # Writer
-
-# Doesn't work:
-  # Coombs & Melack - doesnt have DOC
-  # Gerla & Galloway - doesnt have DOC
-  # Gluns & Toews - doesnt have DOC
-  # Hauer & Spencer - doesnt have DOC
-  # Neary & Currier - doesnt have DOC
-  # Oliver - doesnt have DOC
-  # Tiedemann - doesnt have DOC
-  
-
 
 ```
 

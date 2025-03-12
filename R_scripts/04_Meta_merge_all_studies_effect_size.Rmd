@@ -142,6 +142,87 @@ site_data_unique <- site_data %>%
 
 ```
 
+# =============================================================================
+### CHAT 
+```{r}
+# Step 1: Prepare the Data and Calculate Days Between Samples
+control_impact_units <- control_impact_units %>%
+  mutate(Sampling_Date = as.Date(Sampling_Date)) %>%
+  group_by(Study_ID, Site, Pair) %>%
+  arrange(Sampling_Date) %>%
+  mutate(Days_Between_Samples = c(NA, diff(Sampling_Date)),
+         Large_Gap_Flag = ifelse(Days_Between_Samples > 50, TRUE, FALSE))
+
+
+# Step 2: Create a Complete Daily Time Series for Each Study_ID and Site
+create_time_series <- function(df) {
+  all_dates <- tibble(Sampling_Date = seq(min(df$Sampling_Date, na.rm = TRUE), max(df$Sampling_Date, na.rm = TRUE), by = "day"))
+  merged_data <- all_dates %>% left_join(df, by = "Sampling_Date")
+  return(merged_data)
+}
+
+daily_time_series <- control_impact_units %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(data = map(data, create_time_series)) %>%
+  unnest(cols = c(data)) %>%
+  arrange(Study_ID, Site, Pair, Sampling_Date)
+
+# Step 3: Fill the Large_Gap_Flag Based on Surrounding Values
+fill_gap_flags <- function(data) {
+  data <- data %>%
+    arrange(Sampling_Date) %>%
+    mutate(Large_Gap_Flag = zoo::na.locf(Large_Gap_Flag, na.rm = FALSE, fromLast = TRUE),
+           Large_Gap_Flag = zoo::na.locf(Large_Gap_Flag, na.rm = FALSE))
+  return(data)
+}
+
+daily_time_series <- daily_time_series %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(data = map(data, fill_gap_flags)) %>%
+  unnest(cols = c(data))
+
+# Step 4: Interpolate Values Based on the Updated Large_Gap_Flag
+interpolate_values_based_on_flag <- function(data, analyte) {
+  data <- data %>%
+    arrange(Sampling_Date) %>%
+    mutate(!!paste0(analyte, "_Interp") := ifelse(Large_Gap_Flag, NA, zoo::na.approx(get(analyte), na.rm = FALSE, maxgap = 50)))
+  return(data)
+}
+
+daily_time_series <- daily_time_series %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(
+    data = map(data, ~ interpolate_values_based_on_flag(.x, "DOC_mg_C_L")),
+    data = map(data, ~ interpolate_values_based_on_flag(.x, "NO3_mg_N_L"))
+  ) %>%
+  unnest(cols = c(data))
+
+daily_time_series <- daily_time_series %>%
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+
+# Rename columns to fit downstream workflow
+daily_time_series <- daily_time_series %>% 
+  rename(DOC_Interp = "DOC_mg_C_L_Interp",
+         NO3_Interp = "NO3_mg_N_L_Interp")
+
+# Filter to columns of interest
+daily_time_series_filter <-  daily_time_series %>% 
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L", "DOC_Interp", "NO3_Interp", "year", "month", "day")
+
+# Fill
+daily_time_series_filter <- daily_time_series_filter %>% 
+  fill(latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
+
+write_csv(daily_time_series_filter, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "gap_fill.csv"))
+
+
+```
+
 ### Gap filling ###
 ```{r - gap fill}
 # filling in daily time series and interpolating by study and site
