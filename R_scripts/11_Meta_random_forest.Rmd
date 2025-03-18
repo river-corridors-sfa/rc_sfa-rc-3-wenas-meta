@@ -148,9 +148,8 @@ no3_eb <- replicate_plot_fi(no3, "no3")
 df <- bind_rows(doc_eb, no3_eb)
 
 df_test <- df %>% 
-  mutate(mean_fi = mean_fi / sum(mean_fi)) %>% 
-  mutate(min_fi = min_fi / sum(min_fi)) %>% 
-  mutate(max_fi = max_fi / sum(max_fi))
+  group_by(analyte) %>%
+  mutate(across(contains("_fi"), ~ . / sum(.)))
 
 # BACK TO NORMAL WORKFLOW
 pr <- bind_rows(replicate_plot_fi(no3, "no3"),
@@ -175,7 +174,7 @@ var_colors <- PNWColors::pnw_palette("Bay", n = length(unique(df$predictor)))
 dose.labs <- c("DOC", "Nitrate")
 names(dose.labs) <- c("doc", "no3")
 
-ggplot(df, aes(mean_fi * 100, 
+ggplot(df_test, aes(mean_fi * 100, 
                reorder(predictor, mean_fi), fill = predictor)) + 
   geom_col(alpha = 0.8, show.legend = F, width = 0.7) +
   geom_errorbar(aes(xmin = min_fi * 100, xmax = max_fi * 100, width = 0.2)) +
@@ -214,12 +213,12 @@ ggsave("Effect_Size_Random_Forest_white_noise.pdf",
 
 # Plot only with variables that are greater than white noise.  
 # Calculate the white noise mean_fi for each analyte
-white_noise_values <- df %>% 
+white_noise_values <- df_test %>% 
   filter(predictor == "white_noise") %>% 
   select(analyte, mean_fi)
 
 # Filter the data to include only variables with mean_fi greater than white noise value for each analyte
-filtered_df <- df %>%
+filtered_df <- df_test %>%
   inner_join(white_noise_values, by = "analyte", suffix = c("", "_white_noise")) %>%
   filter(mean_fi > mean_fi_white_noise)
 
@@ -247,6 +246,10 @@ ggplot(filtered_df, aes(mean_fi * 100, reorder(predictor, mean_fi), fill = predi
     "totdasqkm" = "Catchment Area"
   )) +
   theme_bw()
+
+ggsave("Effect_Size_Random_Forest_variables_less_than_white_noise.pdf",
+       path = here("initial_plots", "11_Meta_random_forest"),
+       width = 5.5, height = 3,  units = "in")
 
 ## Take 2 ##
 # Calculate the white noise mean_fi for each analyte

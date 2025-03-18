@@ -143,7 +143,7 @@ site_data_unique <- site_data %>%
 ```
 
 # =============================================================================
-# Gap Filling 
+# Gap Filling - 50 days
 ```{r}
 # Step 1: Prepare the Data and Calculate Days Between Samples
 control_impact_units <- control_impact_units %>%
@@ -223,7 +223,332 @@ write_csv(daily_time_series_filter, here("Output_for_analysis", "04_Meta_merge_a
 
 ```
 
+# =============================================================================
+# Gap Filling - 10 days
+```{r}
+# Step 1: Prepare the Data and Calculate Days Between Samples
+control_impact_units <- control_impact_units %>%
+  mutate(Sampling_Date = as.Date(Sampling_Date)) %>%
+  group_by(Study_ID, Site, Pair) %>%
+  arrange(Sampling_Date) %>%
+  mutate(Days_Between_Samples = c(NA, diff(Sampling_Date)),
+         Large_Gap_Flag = ifelse(Days_Between_Samples > 10, TRUE, FALSE))
 
+
+# Step 2: Create a Complete Daily Time Series for Each Study_ID and Site
+create_time_series <- function(df) {
+  all_dates <- tibble(Sampling_Date = seq(min(df$Sampling_Date, na.rm = TRUE), max(df$Sampling_Date, na.rm = TRUE), by = "day"))
+  merged_data <- all_dates %>% left_join(df, by = "Sampling_Date")
+  return(merged_data)
+}
+
+daily_time_series <- control_impact_units %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(data = map(data, create_time_series)) %>%
+  unnest(cols = c(data)) %>%
+  arrange(Study_ID, Site, Pair, Sampling_Date)
+
+# Step 3: Fill the Large_Gap_Flag Based on Surrounding Values
+fill_gap_flags <- function(data) {
+  data <- data %>%
+    arrange(Sampling_Date) %>%
+    mutate(Large_Gap_Flag = zoo::na.locf(Large_Gap_Flag, na.rm = FALSE, fromLast = TRUE),
+           Large_Gap_Flag = zoo::na.locf(Large_Gap_Flag, na.rm = FALSE))
+  return(data)
+}
+
+daily_time_series <- daily_time_series %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(data = map(data, fill_gap_flags)) %>%
+  unnest(cols = c(data))
+
+# Step 4: Interpolate Values Based on the Updated Large_Gap_Flag
+interpolate_values_based_on_flag <- function(data, analyte) {
+  data <- data %>%
+    arrange(Sampling_Date) %>%
+    mutate(!!paste0(analyte, "_Interp") := ifelse(Large_Gap_Flag, NA, zoo::na.approx(get(analyte), na.rm = FALSE, maxgap = 10)))
+  return(data)
+}
+
+daily_time_series <- daily_time_series %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(
+    data = map(data, ~ interpolate_values_based_on_flag(.x, "DOC_mg_C_L")),
+    data = map(data, ~ interpolate_values_based_on_flag(.x, "NO3_mg_N_L"))
+  ) %>%
+  unnest(cols = c(data))
+
+daily_time_series <- daily_time_series %>%
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+
+# Rename columns to fit downstream workflow
+daily_time_series <- daily_time_series %>% 
+  rename(DOC_Interp = "DOC_mg_C_L_Interp",
+         NO3_Interp = "NO3_mg_N_L_Interp")
+
+# Filter to columns of interest
+daily_time_series_filter <-  daily_time_series %>% 
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L", "DOC_Interp", "NO3_Interp", "year", "month", "day")
+
+# Fill
+daily_time_series_filter <- daily_time_series_filter %>% 
+  fill(latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
+
+write_csv(daily_time_series_filter, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "gap_fill_10.csv"))
+
+
+```
+
+# =============================================================================
+# Gap Filling - 20 days
+```{r}
+# Step 1: Prepare the Data and Calculate Days Between Samples
+control_impact_units <- control_impact_units %>%
+  mutate(Sampling_Date = as.Date(Sampling_Date)) %>%
+  group_by(Study_ID, Site, Pair) %>%
+  arrange(Sampling_Date) %>%
+  mutate(Days_Between_Samples = c(NA, diff(Sampling_Date)),
+         Large_Gap_Flag = ifelse(Days_Between_Samples > 20, TRUE, FALSE))
+
+
+# Step 2: Create a Complete Daily Time Series for Each Study_ID and Site
+create_time_series <- function(df) {
+  all_dates <- tibble(Sampling_Date = seq(min(df$Sampling_Date, na.rm = TRUE), max(df$Sampling_Date, na.rm = TRUE), by = "day"))
+  merged_data <- all_dates %>% left_join(df, by = "Sampling_Date")
+  return(merged_data)
+}
+
+daily_time_series <- control_impact_units %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(data = map(data, create_time_series)) %>%
+  unnest(cols = c(data)) %>%
+  arrange(Study_ID, Site, Pair, Sampling_Date)
+
+# Step 3: Fill the Large_Gap_Flag Based on Surrounding Values
+fill_gap_flags <- function(data) {
+  data <- data %>%
+    arrange(Sampling_Date) %>%
+    mutate(Large_Gap_Flag = zoo::na.locf(Large_Gap_Flag, na.rm = FALSE, fromLast = TRUE),
+           Large_Gap_Flag = zoo::na.locf(Large_Gap_Flag, na.rm = FALSE))
+  return(data)
+}
+
+daily_time_series <- daily_time_series %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(data = map(data, fill_gap_flags)) %>%
+  unnest(cols = c(data))
+
+# Step 4: Interpolate Values Based on the Updated Large_Gap_Flag
+interpolate_values_based_on_flag <- function(data, analyte) {
+  data <- data %>%
+    arrange(Sampling_Date) %>%
+    mutate(!!paste0(analyte, "_Interp") := ifelse(Large_Gap_Flag, NA, zoo::na.approx(get(analyte), na.rm = FALSE, maxgap = 20)))
+  return(data)
+}
+
+daily_time_series <- daily_time_series %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(
+    data = map(data, ~ interpolate_values_based_on_flag(.x, "DOC_mg_C_L")),
+    data = map(data, ~ interpolate_values_based_on_flag(.x, "NO3_mg_N_L"))
+  ) %>%
+  unnest(cols = c(data))
+
+daily_time_series <- daily_time_series %>%
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+
+# Rename columns to fit downstream workflow
+daily_time_series <- daily_time_series %>% 
+  rename(DOC_Interp = "DOC_mg_C_L_Interp",
+         NO3_Interp = "NO3_mg_N_L_Interp")
+
+# Filter to columns of interest
+daily_time_series_filter <-  daily_time_series %>% 
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L", "DOC_Interp", "NO3_Interp", "year", "month", "day")
+
+# Fill
+daily_time_series_filter <- daily_time_series_filter %>% 
+  fill(latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
+
+write_csv(daily_time_series_filter, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "gap_fill_20.csv"))
+
+
+```
+
+# =============================================================================
+# Gap Filling - 30 days
+```{r}
+# Step 1: Prepare the Data and Calculate Days Between Samples
+control_impact_units <- control_impact_units %>%
+  mutate(Sampling_Date = as.Date(Sampling_Date)) %>%
+  group_by(Study_ID, Site, Pair) %>%
+  arrange(Sampling_Date) %>%
+  mutate(Days_Between_Samples = c(NA, diff(Sampling_Date)),
+         Large_Gap_Flag = ifelse(Days_Between_Samples > 30, TRUE, FALSE))
+
+
+# Step 2: Create a Complete Daily Time Series for Each Study_ID and Site
+create_time_series <- function(df) {
+  all_dates <- tibble(Sampling_Date = seq(min(df$Sampling_Date, na.rm = TRUE), max(df$Sampling_Date, na.rm = TRUE), by = "day"))
+  merged_data <- all_dates %>% left_join(df, by = "Sampling_Date")
+  return(merged_data)
+}
+
+daily_time_series <- control_impact_units %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(data = map(data, create_time_series)) %>%
+  unnest(cols = c(data)) %>%
+  arrange(Study_ID, Site, Pair, Sampling_Date)
+
+# Step 3: Fill the Large_Gap_Flag Based on Surrounding Values
+fill_gap_flags <- function(data) {
+  data <- data %>%
+    arrange(Sampling_Date) %>%
+    mutate(Large_Gap_Flag = zoo::na.locf(Large_Gap_Flag, na.rm = FALSE, fromLast = TRUE),
+           Large_Gap_Flag = zoo::na.locf(Large_Gap_Flag, na.rm = FALSE))
+  return(data)
+}
+
+daily_time_series <- daily_time_series %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(data = map(data, fill_gap_flags)) %>%
+  unnest(cols = c(data))
+
+# Step 4: Interpolate Values Based on the Updated Large_Gap_Flag
+interpolate_values_based_on_flag <- function(data, analyte) {
+  data <- data %>%
+    arrange(Sampling_Date) %>%
+    mutate(!!paste0(analyte, "_Interp") := ifelse(Large_Gap_Flag, NA, zoo::na.approx(get(analyte), na.rm = FALSE, maxgap = 30)))
+  return(data)
+}
+
+daily_time_series <- daily_time_series %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(
+    data = map(data, ~ interpolate_values_based_on_flag(.x, "DOC_mg_C_L")),
+    data = map(data, ~ interpolate_values_based_on_flag(.x, "NO3_mg_N_L"))
+  ) %>%
+  unnest(cols = c(data))
+
+daily_time_series <- daily_time_series %>%
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+
+# Rename columns to fit downstream workflow
+daily_time_series <- daily_time_series %>% 
+  rename(DOC_Interp = "DOC_mg_C_L_Interp",
+         NO3_Interp = "NO3_mg_N_L_Interp")
+
+# Filter to columns of interest
+daily_time_series_filter <-  daily_time_series %>% 
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L", "DOC_Interp", "NO3_Interp", "year", "month", "day")
+
+# Fill
+daily_time_series_filter <- daily_time_series_filter %>% 
+  fill(latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
+
+write_csv(daily_time_series_filter, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "gap_fill_30.csv"))
+
+
+```
+
+# =============================================================================
+# Gap Filling - 40 days
+```{r}
+# Step 1: Prepare the Data and Calculate Days Between Samples
+control_impact_units <- control_impact_units %>%
+  mutate(Sampling_Date = as.Date(Sampling_Date)) %>%
+  group_by(Study_ID, Site, Pair) %>%
+  arrange(Sampling_Date) %>%
+  mutate(Days_Between_Samples = c(NA, diff(Sampling_Date)),
+         Large_Gap_Flag = ifelse(Days_Between_Samples > 40, TRUE, FALSE))
+
+
+# Step 2: Create a Complete Daily Time Series for Each Study_ID and Site
+create_time_series <- function(df) {
+  all_dates <- tibble(Sampling_Date = seq(min(df$Sampling_Date, na.rm = TRUE), max(df$Sampling_Date, na.rm = TRUE), by = "day"))
+  merged_data <- all_dates %>% left_join(df, by = "Sampling_Date")
+  return(merged_data)
+}
+
+daily_time_series <- control_impact_units %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(data = map(data, create_time_series)) %>%
+  unnest(cols = c(data)) %>%
+  arrange(Study_ID, Site, Pair, Sampling_Date)
+
+# Step 3: Fill the Large_Gap_Flag Based on Surrounding Values
+fill_gap_flags <- function(data) {
+  data <- data %>%
+    arrange(Sampling_Date) %>%
+    mutate(Large_Gap_Flag = zoo::na.locf(Large_Gap_Flag, na.rm = FALSE, fromLast = TRUE),
+           Large_Gap_Flag = zoo::na.locf(Large_Gap_Flag, na.rm = FALSE))
+  return(data)
+}
+
+daily_time_series <- daily_time_series %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(data = map(data, fill_gap_flags)) %>%
+  unnest(cols = c(data))
+
+# Step 4: Interpolate Values Based on the Updated Large_Gap_Flag
+interpolate_values_based_on_flag <- function(data, analyte) {
+  data <- data %>%
+    arrange(Sampling_Date) %>%
+    mutate(!!paste0(analyte, "_Interp") := ifelse(Large_Gap_Flag, NA, zoo::na.approx(get(analyte), na.rm = FALSE, maxgap = 40)))
+  return(data)
+}
+
+daily_time_series <- daily_time_series %>%
+  group_by(Study_ID, Site, Pair) %>%
+  nest() %>%
+  mutate(
+    data = map(data, ~ interpolate_values_based_on_flag(.x, "DOC_mg_C_L")),
+    data = map(data, ~ interpolate_values_based_on_flag(.x, "NO3_mg_N_L"))
+  ) %>%
+  unnest(cols = c(data))
+
+daily_time_series <- daily_time_series %>%
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+
+# Rename columns to fit downstream workflow
+daily_time_series <- daily_time_series %>% 
+  rename(DOC_Interp = "DOC_mg_C_L_Interp",
+         NO3_Interp = "NO3_mg_N_L_Interp")
+
+# Filter to columns of interest
+daily_time_series_filter <-  daily_time_series %>% 
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L", "DOC_Interp", "NO3_Interp", "year", "month", "day")
+
+# Fill
+daily_time_series_filter <- daily_time_series_filter %>% 
+  fill(latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
+
+write_csv(daily_time_series_filter, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "gap_fill_40.csv"))
+
+
+```
+
+
+# Resume
 ```{r calculating the temporal normalized data}
 # pivoting to make the responses in one column
 metadata_long <- daily_time_series_filter %>%
@@ -248,8 +573,7 @@ yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
 
 ```
 
-
-
+#### Plotting Functions ###
 ```{r - plotting functions}
 # Plotting #
 vn = expression(paste(""*N*O[3]^"-"))
@@ -469,9 +793,86 @@ yearly_effect_size_combine_long_out <- yearly_effect_size_combine_long %>%
   mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
 
 
-write_csv(yearly_effect_size_combine_long_out, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_UPDATED.csv"))
+write_csv(yearly_effect_size_combine_long_out, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_40days.csv"))
 
 unique(yearly_effect_size_combine_long_out$Study_ID)
+
+```
+
+# ================================= Compare Thresholds ============================
+```{r}
+es_10 <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_10days.csv")) %>% 
+  select(Study_ID, response_var, Effect_size_pair, Effect_size) %>% 
+  rename(Effect_size_10 = Effect_size)
+
+es_20 <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_20days.csv")) %>% 
+  select(Study_ID, response_var, Effect_size_pair, Effect_size) %>% 
+  rename(Effect_size_20 = Effect_size)
+
+es_30 <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_30days.csv")) %>% 
+  select(Study_ID, response_var, Effect_size_pair, Effect_size) %>% 
+  rename(Effect_size_30 = Effect_size)
+
+es_40 <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_40days.csv")) %>% 
+  select(Study_ID, response_var, Effect_size_pair, Effect_size) %>% 
+  rename(Effect_size_40 = Effect_size)
+
+es_50 <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_UPDATED.csv")) %>% 
+  select(Study_ID, response_var, Effect_size_pair, Effect_size) %>% 
+  rename(Effect_size_50 = Effect_size)
+
+
+# TAKE 1 #
+library(ggtukey)
+ 
+merged_df <- bind_rows(es_10, es_20, es_30, es_40, es_50)
+
+merged_df_long <- merged_df %>% 
+  pivot_longer(
+    cols = Effect_size_10:Effect_size_50,
+    names_to = "Gaps",
+    values_to = "Effect_Size",
+    values_drop_na = TRUE,
+  )
+
+# Plot 
+ggplot(merged_df_long, aes(x = Gaps, y = Effect_Size)) +
+  geom_boxplot() +
+  geom_jitter(alpha = 0.05) +
+  scale_x_discrete(labels = c("Effect_size_10" = "10", "Effect_size_20" = "20", "Effect_size_30" = "30", "Effect_size_40" = "40", "Effect_size_50" = "50")) +
+  facet_wrap(~response_var, scales = "free") +
+  theme_bw()
+
+# Geom_tukey
+ggplot(merged_df_long, aes(x = Gaps, y = Effect_Size)) +
+  geom_boxplot() +
+  geom_jitter(alpha = 0.05) +
+  geom_tukey(where = "whisker") +
+  scale_x_discrete(labels = c("Effect_size_10" = "10", "Effect_size_20" = "20", "Effect_size_30" = "30", "Effect_size_40" = "40", "Effect_size_50" = "50")) +
+  facet_wrap(~response_var, scales = "free") +
+  theme_bw()
+
+ggsave("interp_threshold_comp.pdf",
+       here("initial_plots", "04_Meta_merge_all_studies_effect_size"),
+       width = 10, height = 8, units = "in")
+
+
+# Summary stats to make sure merge worked:
+summary_10 <- es_10 %>% 
+  group_by(response_var) %>% 
+  summarise(mean = mean(Effect_size_10))
+
+print(summary_10)
+
+# Compare to the grouped one
+summary_all <- merged_df_long %>% 
+  group_by(response_var, Gaps) %>% 
+  summarise(mean = mean(Effect_Size))
+print(summary_all)
+
+# These are the same!
+
+###
 
 ```
 
