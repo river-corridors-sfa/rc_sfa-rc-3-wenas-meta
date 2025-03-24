@@ -107,7 +107,7 @@ combined_results_filter <- combined_results_filter %>%
                                    zone == "4" ~ "High",
                                    zone == "5" ~ "Increased Greeness"))
 
-write.csv(combined_results_filter, here("Output_for_analysis", "13_Meta_calculate_thresholds_per_fire", "Fire_thresholds.csv"))
+write_csv(combined_results_filter, here("Output_for_analysis", "13_Meta_calculate_thresholds_per_fire", "Fire_thresholds.csv"))
 
 ```
 
