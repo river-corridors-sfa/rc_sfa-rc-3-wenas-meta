@@ -270,7 +270,7 @@ dev.off()
 cor_matrix_filtered_doc <- ifelse(abs(cor_matrix_doc) > 0.3, cor_matrix_doc, NA)
 
 # Export the filtered correlation matrix to a CSV file
-write.csv(cor_matrix_filtered_doc, here("Output_for_analysis", "08_Meta_summary_stats", "doc_RF_lith.csv"), row.names = TRUE)
+# write.csv(cor_matrix_filtered_doc, here("Output_for_analysis", "08_Meta_summary_stats", "doc_RF_lith.csv"), row.names = TRUE)
 
 ```
 
@@ -461,7 +461,7 @@ dev.off()
 cor_matrix_filtered_doc <- ifelse(abs(cor_matrix_doc) > 0.3, cor_matrix_doc, NA)
 
 # Export the filtered correlation matrix to a CSV file
-write.csv(cor_matrix_filtered_doc, here("Output_for_analysis", "08_Meta_summary_stats", "doc_filtered_correlation_matrix.csv"), row.names = TRUE)
+# write.csv(cor_matrix_filtered_doc_tibble, here("Output_for_analysis", "08_Meta_summary_stats", "doc_filtered_correlation_matrix.csv"), row.names = TRUE)
 
 # Variables to keep for the random forest model (based on correlation matrix - anything > 0.3 is deemed co-correlated and dropped)
 # totdasqkm
