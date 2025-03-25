@@ -8,8 +8,6 @@ editor_options:
 
 The purpose of this script is to calculate the effect sizes from the results directly from the paper rather than from our gap filling technique and then comparing to see if they are similar or not. 
 
-This will placate the reviewers that are critical of the gap filling technique. 
-
 Script Workflow:
 
 Approach 1:
