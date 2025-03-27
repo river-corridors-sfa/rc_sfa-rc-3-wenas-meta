@@ -1,461 +1,461 @@
-Column_or_Row_Name,Unit,Definition,Data_Type,header_count,files
-AG,percentage,The percentage or amount of agricultural land in the surrounding watershed area.,numeric,2,"doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Area_unit,hectare square kilometer,"Unit of measurement that applies to the ""Area_watershed"" column in the data package.",text,19,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, gap_fill_take_two.csv"
-Area_watershed,hectare square kilometer,The total upstream catchment area from downstream end of flowline.,numeric,20,"Fire_name_Lat_Long.csv, Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, gap_fill_take_two.csv"
-Area_watershed_km,square kilometer,The total upstream catchment area from downstream end of flowline in square kilometers.,numeric,14,"crandall_conc_fill.csv, crandall_temp_norm.csv, Abbott_conc_fill.csv, Abbott_temp_norm.csv, Rhea_conc_fill.csv, Rhea_temp_norm.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv, DOC_temp_norm_fig_data.csv, NO3_temp_norm_fig_data.csv"
-BFIWs,percentage,"Base flow is the component of streamflow that can be attributed to ground-water discharge into streams. The BFI is the ratio of base flow to total flow, expressed as a percentage, within AOI.",numeric,5,"BFI.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Biome,N/A,"The broad classification of a geographic area according to environmental conditions based on the Koppen climate classification as defined in the ""Climate"" column header.",text,17,"Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, Percent_Difference.csv, TSF_ES_Fig_data.csv, TSF_PD_DOC_Fig_data.csv, TSF_PD_NO3_Fig_data.csv, Burn_percentage_ES_fig_data.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv, Burn_severity_ES_fig_data.csv"
-Burn_Severity,N/A,Burn severity classification for each wildfire (Increased Greeness; Unburned to Low; Low; Moderate; High).,text,1,Fire_thresholds.csv
-Burn_Type,N/A,Indicates what type of burn occurred in the publication (prescribed or natural).,text,1,Sites_meta_data.csv
-Burn_Unburn,N/A,Indicates whether the site is affected by the wildfire or not.,text,37,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, Watershed_area.csv, crandall_conc_fill.csv, crandall_temp_norm.csv, Abbott_conc_fill.csv, Abbott_temp_norm.csv, Rhea_conc_fill.csv, Rhea_temp_norm.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv, DOC_CV_temp_norm_fig_data.csv, DOC_temp_norm_fig_data.csv, doc_yield_meta_random_forest.csv, NO3_CV_temp_norm_fig_data.csv, NO3_temp_norm_fig_data.csv, no3_yield_meta_random_forest.csv"
-CVconc,milligrams per liter carbon milligrams per liter nitrogen,The coefficient of variation (CV) for analyte concentrations (dissolved organic carbon or nitrate).,numeric,2,"DOC_CV_temp_norm_fig_data.csv, NO3_CV_temp_norm_fig_data.csv"
-Climate,N/A,A three digit identifier from the Koppen climate classification.,text,56,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, crandall_conc_fill.csv, Crandall_effect_size.csv, crandall_temp_norm.csv, Abbott_conc_fill.csv, Abbott_effect_size.csv, Abbott_temp_norm.csv, Rhea_conc_fill.csv, Rhea_effect_size.csv, Rhea_temp_norm.csv, Climate_ES_CIs.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv, Percent_Difference.csv, TSF_ES_Fig_data.csv, TSF_PD_DOC_Fig_data.csv, TSF_PD_NO3_Fig_data.csv, Burn_percentage_ES_fig_data.csv, doc_meta_random_forest 1.39.32 PM.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv, DOC_temp_norm_fig_data.csv, doc_yield_meta_random_forest.csv, NO3_temp_norm_fig_data.csv, no3_yield_meta_random_forest.csv, Burn_severity_ES_fig_data.csv"
-Closest_USGS_gauge,N/A,Indicates where the closes United States Geological Survey (USGS) stream gauge is located relative to the site monitored in the publication.,text,1,Sites_meta_data.csv
-Column_or_Row_Name,N/A,Column or row headers from each csv file in the dataset.,text,1,Cavaiani_2024_Metaanalysis_dd.csv
-Count,N/A,Number of observations for each site within each study used in the meta-analysis.,numeric,1,watershed_count_per_year.csv
-DOC,N/A,"The reported dissolved organic carbon (DOC) concentrations from the publication. See ""DOC_unit"" for the unit of the dissolved organic carbon value.",text; numeric,20,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, Sites_meta_data.csv, gap_fill_take_two.csv"
-DOC_Interp,milligrams per liter carbon,The interpolated dissolved organic carbon concentration using the gap_fill function within R.,numeric,10,"mast_iteration.csv, crandall_conc_fill.csv, Abbott_conc_fill.csv, Rhea_conc_fill.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv"
-DOC_mg_C_L,milligrams per liter carbon,The reported dissolved organic carbon concentrations as milligrams per liter as carbon (C).,numeric,9,"crandall_conc_fill.csv, Abbott_conc_fill.csv, Rhea_conc_fill.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv"
-DOC_uM_C,micromolar per liter carbon,The reported dissolved organic carbon concentrations as micromolar per liter as carbon (C).,numeric,1,gap_fill_take_two.csv
-DOC_unit,N/A,"The unit of measurement that the publication reports and applies to the ""DOC"" column in the data package.",text,19,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, gap_fill_take_two.csv"
-DOI,N/A,"The Digital Object Identifier (DOI) is used to uniquely identify an article or document, and to provide it with a permanent web address (URL).",text,20,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, Sites_meta_data.csv, gap_fill_take_two.csv"
-Data_Found,N/A,A designation to where the data were found within the publication.,text,19,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, gap_fill_take_two.csv"
-Data_Type,N/A,Type of data (numeric; text; date; time; datetime).,text,1,Cavaiani_2024_Metaanalysis_dd.csv
-Data_citations,N/A,Indicates where the data used within in the publication are located/published or where data were extracted from within a publication if it was not originally reported by the authors.,text,1,Sites_meta_data.csv
-Data_collection_years,YYYY,Years data was collected for each study.,text,1,Fire_name_Lat_Long.csv
-Days_Between_Samples,DD,Amount of days in between discrete sampling for each site within each study.,numeric,1,gap_fill_take_two.csv
-Definition,N/A,Description of the information in a given column or row in the dataset.,text,1,Cavaiani_2024_Metaanalysis_dd.csv
-Design_Control_Burn_Pre_Post,N/A,"The methodological study design for the publication which can either be a ""Control_Burn"" approach or a ""Pre_Post"" approach.",text,19,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, gap_fill_take_two.csv"
-Discharge,N/A,Indicates whether the publication includes or reports discharge data within their publication.,text,1,Sites_meta_data.csv
-Discharge_notes,N/A,Free text field to record notes related to discharge data reported the publication.,text,1,Sites_meta_data.csv
-Ecosystem,N/A,The ecosystem type where the study was conducted.,text,1,Sites_meta_data.csv
-Effect_size,N/A,The proportional differences between burned and unburned in-stream solute concentrations. This is a calculation and the response variable in many of our statistical analyses.,numeric,25,"Crandall_effect_size.csv, Abbott_effect_size.csv, Rhea_effect_size.csv, Climate_ES_CIs.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, Percent_Difference.csv, TSF_ES_CIs.csv, TSF_ES_Fig_data.csv, TSF_PD_DOC_Fig_data.csv, TSF_PD_NO3_Fig_data.csv, Burn_percentage_ES_CIs.csv, Burn_percentage_ES_fig_data.csv, doc_meta_random_forest 1.39.32 PM.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv, Burn_severity_ES_CIs.csv, Burn_severity_ES_fig_data.csv"
-Effect_size_pair,N/A,Indicates which watershed pair was used for the effect size calculation.,text,20,"Fire_name_Lat_Long.csv, Crandall_effect_size.csv, Abbott_effect_size.csv, Rhea_effect_size.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, Percent_Difference.csv, TSF_ES_Fig_data.csv, TSF_PD_DOC_Fig_data.csv, TSF_PD_NO3_Fig_data.csv, Burn_percentage_ES_fig_data.csv, severity_clip.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv, Burn_severity_ES_fig_data.csv"
-Exact_Date_Extracted,N/A,Designates if the publication reported exact dates associated with their water sampling or not. Results that are included in a figure with coarse time-frames would be designated as no.,text,1,Sites_meta_data.csv
-Exclusion,N/A,Explanation for why a publication was not included in the final analysis.,text,1,Sites_meta_data.csv
-File_Description,N/A,A brief description of the files in the data package.,text,1,Cavaiani_2024_Metaanalysis_flmd.csv
-File_Name,N/A,Name of files in the data package.,text,1,Cavaiani_2024_Metaanalysis_flmd.csv
-File_Path,N/A,File path within the data package.,text,1,Cavaiani_2024_Metaanalysis_flmd.csv
-Fire_N/Ame,N/A,The name of the fire that was investigated in each publication. This is the same as Fire_name.,text,1,Fire_name_Lat_Long.csv
-Fire_name,N/A,The name of the fire that was investigated in each publication.,text,5,"Map_input.csv, Sites_meta_data.csv, Watershed_area.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv"
-Fire_year,YYYY,The year the fire occurred that was investigated in each publication.,text,4,"Fire_name_Lat_Long.csv, Sites_meta_data.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv"
-Forest,percentage,The percentage or amount of Forest land in the surrounding watershed area.,numeric,2,"doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Grassland,percentage,The percentage or amount of Grassland land in the surrounding watershed area.,numeric,2,"doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Have_HUC,N/A,Denotes if the watershed that is being monitored in the publication has an associated hydrologic unit code (HUC).,text,1,Fire_name_Lat_Long.csv
-High_Severity,percentage,Percentage of high severity burn within each area of interest.,numeric,1,severity_clip.csv
-In_git_studies_folder,N/A,Denotes if the publication was used and exported into the final publication analysis.,text,1,Sites_meta_data.csv
-Included,N/A,Indicates whether a study was incorporated in the final analysis or not.,logical,1,Sites_meta_data.csv
-InorgNWetDep_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for inorganic nitrogen wet deposition from nitrate and ammonium for 2008 in kg of N/ha/yr, within AOI.",numeric,5,"NWetdep_2008.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Large_Gap_Flag,N/A,TRUE or FALSE indicating whether the time in between discrete samples satisfies the rule of greater than 50 days.,logical,1,gap_fill_take_two.csv
-Low_Severity,percentage,Percentage of low severity burn within each area of interest.,numeric,1,severity_clip.csv
-MAST_2008,degrees,Mean annual stream temperature for 2008 within area of interest.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, stream_temp.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-MAST_2009,degrees,Mean annual stream temperature for 2009 within area of interest.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, stream_temp.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-MAST_2013,degrees,Mean annual stream temperature for 2013 within area of interest.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, stream_temp.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-MAST_2014,degrees,Mean annual stream temperature for 2014 within area of interest.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, stream_temp.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-MSST_2008,degrees,Mean summer stream temperature for 2008 within area of interest.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, stream_temp.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-MSST_2009,degrees,Mean summer stream temperature for 2009 within area of interest.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, stream_temp.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-MSST_2013,degrees,Mean summer stream temperature for 2013 within area of interest.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, stream_temp.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-MSST_2014,degrees,Mean summer stream temperature for 2014 within area of interest.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, stream_temp.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-MTBS_1986Ws,percentage,Monitoring trends in burn severity for a watershed in 1986.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_1987Ws,percentage,Monitoring trends in burn severity for a watershed in 1987.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_1988Ws,percentage,Monitoring trends in burn severity for a watershed in 1988.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_1989Ws,percentage,Monitoring trends in burn severity for a watershed in 1989.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_1990Ws,percentage,Monitoring trends in burn severity for a watershed in 1990.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_1991Ws,percentage,Monitoring trends in burn severity for a watershed in 1991.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_1992Ws,percentage,Monitoring trends in burn severity for a watershed in 1992.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_1993Ws,percentage,Monitoring trends in burn severity for a watershed in 1993.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_1994Ws,percentage,Monitoring trends in burn severity for a watershed in 1994.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_1995Ws,percentage,Monitoring trends in burn severity for a watershed in 1995.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_1996Ws,percentage,Monitoring trends in burn severity for a watershed in 1996.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_1997Ws,percentage,Monitoring trends in burn severity for a watershed in 1997.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_1998Ws,percentage,Monitoring trends in burn severity for a watershed in 1998.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_1999Ws,percentage,Monitoring trends in burn severity for a watershed in 1999.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2000Ws,percentage,Monitoring trends in burn severity for a watershed in 2000.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2001Ws,percentage,Monitoring trends in burn severity for a watershed in 2001.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2002Ws,percentage,Monitoring trends in burn severity for a watershed in 2002.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2003Ws,percentage,Monitoring trends in burn severity for a watershed in 2003.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2004Ws,percentage,Monitoring trends in burn severity for a watershed in 2004.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2005Ws,percentage,Monitoring trends in burn severity for a watershed in 2005.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2006Ws,percentage,Monitoring trends in burn severity for a watershed in 2006.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2007Ws,percentage,Monitoring trends in burn severity for a watershed in 2007.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2008Ws,percentage,Monitoring trends in burn severity for a watershed in 2008.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2009Ws,percentage,Monitoring trends in burn severity for a watershed in 2009.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2010Ws,percentage,Monitoring trends in burn severity for a watershed in 2010.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2011Ws,percentage,Monitoring trends in burn severity for a watershed in 2011.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2012Ws,percentage,Monitoring trends in burn severity for a watershed in 2012.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2013Ws,percentage,Monitoring trends in burn severity for a watershed in 2013.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2014Ws,percentage,Monitoring trends in burn severity for a watershed in 2014.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2015Ws,percentage,Monitoring trends in burn severity for a watershed in 2015.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2016Ws,percentage,Monitoring trends in burn severity for a watershed in 2016.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MTBS_2017Ws,percentage,Monitoring trends in burn severity for a watershed in 2017.,numeric,4,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv"
-MWST_2008,degrees,Mean winter stream temperature for each area of interest for 2008.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, stream_temp.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-MWST_2009,degrees,Mean winter stream temperature for each area of interest for 2009.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, stream_temp.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-MWST_2013,degrees,Mean winter stream temperature for each area of interest for 2013.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, stream_temp.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-MWST_2014,degrees,Mean winter stream temperature for each area of interest for 2014.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, stream_temp.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Mean_Median_or_IndividualSample,N/A,Identifies if the solute concentration reported in the publication was a mean; median or an individual sample.,text,19,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, gap_fill_take_two.csv"
-Missing_Value_Codes,N/A,"Cells with missing data are represented with a missing value code rather than an empty cell. This column describes which missing value codes were used. The recommendation for numeric data is ""-9999"" and for character data is ""N/A"".",text,1,Cavaiani_2024_Metaanalysis_flmd.csv
-Moderate_Severity,percentage,Percentage of moderate severity burn within each area of interest.,numeric,1,severity_clip.csv
-NH4_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for ammonium ion concentration wet deposition for 2008 in kg of NH4/ha/yr, within AOI.",numeric,5,"NWetdep_2008.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-NO3,N/A,"The reported nitrate (NO3) concentrations from each publication. See ""NO3_unit"" for the unit of the nitrate value.",text; numeric,20,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, Sites_meta_data.csv, gap_fill_take_two.csv"
-NO3_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for nitrate ion concentration wet deposition for 2008 in kg of NO3/ha/yr, within AOI.",numeric,5,"NWetdep_2008.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-NO3_Interp,milligrams per liter nitrogen,The interpolated nitrate concentration using the gap_fill function within R.,numeric,11,"coombs_iteration.csv, mast_iteration.csv, crandall_conc_fill.csv, Abbott_conc_fill.csv, Rhea_conc_fill.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv"
-NO3_mg_N_L,milligrams per liter nitrogen,The reported nitrate concentrations as milligrams per liter as nitrogen (N).,numeric,9,"crandall_conc_fill.csv, Abbott_conc_fill.csv, Rhea_conc_fill.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv"
-NO3_uM_N,micromolar per liter Nitrate,The reported nitrate-N concentrations as micromolar per liter nitrate-N.,numeric,1,gap_fill_take_two.csv
-NO3_unit,N/A,"The unit of measurement that the publication reports and applies to the ""NO3"" column in the data package.",text,19,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, gap_fill_take_two.csv"
-Notes,N/A,Free text field to record notes related to data extraction process.,text,20,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, Sites_meta_data.csv, gap_fill_take_two.csv"
-Number_of_Study_Sites,N/A,Number of study sites for each study.,numeric,1,Sites_meta_data.csv
-OmWs,percentage,Mean organic matter content (percent by weight) of soils (STATSGO) within AOI.,numeric,5,"OM_perm.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Pair,N/A,The designation for each site to identify if it was a burned watershed or an unburned watershed and which site it is being compared to.,text,34,"coombs_iteration.csv, mast_iteration.csv, Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, crandall_conc_fill.csv, crandall_temp_norm.csv, Abbott_conc_fill.csv, Abbott_temp_norm.csv, Rhea_conc_fill.csv, Rhea_temp_norm.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv, DOC_temp_norm_fig_data.csv, NO3_temp_norm_fig_data.csv"
-PctAlkIntruVolWs,percentage,Percentage of AOI area classified as lithology type: alkaline intrusive volcanic rock.,numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctAlluvCoastWs,percentage,Percentage of AOI area classified as lithology type: alluvium and fine-textured coastal zone sediment.,numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctBl2001,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2001.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctBl2004,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2004.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctBl2006,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2006.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctBl2008,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2008.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctBl2011,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2011.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctBl2013,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2013.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctBl2016,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2016.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctBl2019,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2019.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctCarbResidWs,percentage,Percentage of AOI area classified as lithology type: carbonate residual material.,numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctCoastCrsWs,percentage,"Percentage of AOI area classified as lithology type: coastal zone sediment, coarse-textured.",numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctColluvSedWs,percentage,Percentage of AOI area classified as lithology type: colluvial sediment.,numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctConif2001,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2001.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctConif2004,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2004.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctConif2006,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2006.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctConif2008,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2008.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctConif2011,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2011.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctConif2013,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2013.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctConif2016,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2016.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctConif2019,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2019.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctCrop2001,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2001.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctCrop2004,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2004.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctCrop2006,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2006.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctCrop2008,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2008.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctCrop2011,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2011.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctCrop2013,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2013.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctCrop2016,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2016.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctCrop2019,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2019.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctDecid2001,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2001.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctDecid2004,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2004.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctDecid2006,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2006.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctDecid2008,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2008.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctDecid2011,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2011.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctDecid2013,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2013.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctDecid2016,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2016.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctDecid2019,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2018.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctEolCrsWs,percentage,"Percentage of AOI area classified as lithology type: eolian sediment, coarse-textured (sand dunes).",numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctEolFineWs,percentage,"Percentage of AOI area classified as lithology type: eolian sediment, fine-textured (glacial loess).",numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctExtruVolWs,percentage,Percentage of AOI area classified as lithology type: extrusive volcanic rock.,numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctFire2000Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2000.,numeric,5,"forest_lost.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctFire2001Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2001.,numeric,5,"forest_lost.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctFire2002Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2002.,numeric,5,"forest_lost.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctFire2003Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2003.,numeric,5,"forest_lost.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctFire2004Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2004.,numeric,5,"forest_lost.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctFire2005Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2005.,numeric,5,"forest_lost.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctFire2006Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2006.,numeric,5,"forest_lost.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctFire2007Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2007.,numeric,5,"forest_lost.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctFire2008Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2008.,numeric,5,"forest_lost.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctFire2009Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2009.,numeric,5,"forest_lost.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctFire2010Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2010.,numeric,5,"forest_lost.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctGlacLakeCrsWs,percentage,"Percentage of AOI area classified as lithology type: glacial outwash and glacial lake sediment, coarse-textured.",numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctGlacLakeFineWs,percentage,"Percentage of AOI area classified as lithology type: glacial lake sediment, fine-textured.",numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctGlacTilClayWs,percentage,"Percentage of AOI area classified as lithology type: glacial till, clayey.",numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctGlacTilCrsWs,percentage,"Percentage of AOI area classified as lithology type: glacial till, coarse-textured.",numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctGlacTilLoamWs,percentage,"Percentage of AOI area classified as lithology type: glacial till, loamy.",numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctGrs2001,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2001.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctGrs2004,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2004.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctGrs2006,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2006.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctGrs2008,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2008.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctGrs2011,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2011.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctGrs2013,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2013.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctGrs2016,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2016.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctGrs2019,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2019.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctHbWet2001,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2001.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctHbWet2004,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2004.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctHbWet2006,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2006.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctHbWet2008,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2008.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctHbWet2011,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2011.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctHbWet2013,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2013.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctHbWet2016,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2016.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctHbWet2019,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2019.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctHigh Burn SeverityWs_1984,percentage,Percentage of AOI area classified as high severity for 1984,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_1985,percentage,Percentage of AOI area classified as high severity for 1985,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_1986,percentage,Percentage of AOI area classified as high severity for 1986,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_1987,percentage,Percentage of AOI area classified as high severity for 1987,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_1988,percentage,Percentage of AOI area classified as high severity for 1988,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_1989,percentage,Percentage of AOI area classified as high severity for 1989,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_1990,percentage,Percentage of AOI area classified as high severity for 1990,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_1991,percentage,Percentage of AOI area classified as high severity for 1991,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_1992,percentage,Percentage of AOI area classified as high severity for 1992,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_1993,percentage,Percentage of AOI area classified as high severity for 1993,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_1994,percentage,Percentage of AOI area classified as high severity for 1994,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_1995,percentage,Percentage of AOI area classified as high severity for 1995,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_1996,percentage,Percentage of AOI area classified as high severity for 1996,numeric,1,MTBS_severity_1996_2001.csv
-PctHigh Burn SeverityWs_1997,percentage,Percentage of AOI area classified as high severity for 1997,numeric,1,MTBS_severity_1996_2001.csv
-PctHigh Burn SeverityWs_1998,percentage,Percentage of AOI area classified as high severity for 1998,numeric,1,MTBS_severity_1996_2001.csv
-PctHigh Burn SeverityWs_1999,percentage,Percentage of AOI area classified as high severity for 1999,numeric,1,MTBS_severity_1996_2001.csv
-PctHigh Burn SeverityWs_2000,percentage,Percentage of AOI area classified as high severity for 2000,numeric,1,MTBS_severity_1996_2001.csv
-PctHigh Burn SeverityWs_2001,percentage,Percentage of AOI area classified as high severity for 2001,numeric,1,MTBS_severity_1996_2001.csv
-PctHigh Burn SeverityWs_2002,percentage,Percentage of AOI area classified as high severity for 2002,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2003,percentage,Percentage of AOI area classified as high severity for 2003,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2004,percentage,Percentage of AOI area classified as high severity for 2004,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2005,percentage,Percentage of AOI area classified as high severity for 2005,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2006,percentage,Percentage of AOI area classified as high severity for 2006,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2007,percentage,Percentage of AOI area classified as high severity for 2007,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2008,percentage,Percentage of AOI area classified as high severity for 2008,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2009,percentage,Percentage of AOI area classified as high severity for 2009,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2010,percentage,Percentage of AOI area classified as high severity for 2010,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2011,percentage,Percentage of AOI area classified as high severity for 2011,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2012,percentage,Percentage of AOI area classified as high severity for 2012,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2013,percentage,Percentage of AOI area classified as high severity for 2013,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2014,percentage,Percentage of AOI area classified as high severity for 2014,numeric,6,"MTBS_severity_2014_2017.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2015,percentage,Percentage of AOI area classified as high severity for 2015,numeric,6,"MTBS_severity_2014_2017.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2016,percentage,Percentage of AOI area classified as high severity for 2016,numeric,6,"MTBS_severity_2014_2017.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2017,percentage,Percentage of AOI area classified as high severity for 2017,numeric,6,"MTBS_severity_2014_2017.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHigh Burn SeverityWs_2018,percentage,Percentage of AOI area classified as high severity for 2018,numeric,6,"MTBS_severity_2018.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctHydricWs,percentage,"Percentage of AOI area classified as lithology type: hydric, peat and muck",numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctIce2001,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2001.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctIce2004,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2004.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctIce2006,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2006.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctIce2008,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2008.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctIce2011,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2011.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctIce2013,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2013.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctIce2016,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2016.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctIce2019,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2019.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctLow Burn SeverityWs_1984,percentage,Percentage of AOI area classified as low severity for 1984,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_1985,percentage,Percentage of AOI area classified as low severity for 1985,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_1986,percentage,Percentage of AOI area classified as low severity for 1986,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_1987,percentage,Percentage of AOI area classified as low severity for 1987,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_1988,percentage,Percentage of AOI area classified as low severity for 1988,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_1989,percentage,Percentage of AOI area classified as low severity for 1989,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_1990,percentage,Percentage of AOI area classified as low severity for 1990,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_1991,percentage,Percentage of AOI area classified as low severity for 1991,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_1992,percentage,Percentage of AOI area classified as low severity for 1992,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_1993,percentage,Percentage of AOI area classified as low severity for 1993,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_1994,percentage,Percentage of AOI area classified as low severity for 1994,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_1995,percentage,Percentage of AOI area classified as low severity for 1995,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_1996,percentage,Percentage of AOI area classified as low severity for 1996,numeric,1,MTBS_severity_1996_2001.csv
-PctLow Burn SeverityWs_1997,percentage,Percentage of AOI area classified as low severity for 1997,numeric,1,MTBS_severity_1996_2001.csv
-PctLow Burn SeverityWs_1998,percentage,Percentage of AOI area classified as low severity for 1998,numeric,1,MTBS_severity_1996_2001.csv
-PctLow Burn SeverityWs_1999,percentage,Percentage of AOI area classified as low severity for 1999,numeric,1,MTBS_severity_1996_2001.csv
-PctLow Burn SeverityWs_2000,percentage,Percentage of AOI area classified as low severity for 2000,numeric,1,MTBS_severity_1996_2001.csv
-PctLow Burn SeverityWs_2001,percentage,Percentage of AOI area classified as low severity for 2001,numeric,1,MTBS_severity_1996_2001.csv
-PctLow Burn SeverityWs_2002,percentage,Percentage of AOI area classified as low severity for 2002,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2003,percentage,Percentage of AOI area classified as low severity for 2003,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2004,percentage,Percentage of AOI area classified as low severity for 2004,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2005,percentage,Percentage of AOI area classified as low severity for 2005,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2006,percentage,Percentage of AOI area classified as low severity for 2006,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2007,percentage,Percentage of AOI area classified as low severity for 2007,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2008,percentage,Percentage of AOI area classified as low severity for 2008,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2009,percentage,Percentage of AOI area classified as low severity for 2009,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2010,percentage,Percentage of AOI area classified as low severity for 2010,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2011,percentage,Percentage of AOI area classified as low severity for 2011,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2012,percentage,Percentage of AOI area classified as low severity for 2012,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2013,percentage,Percentage of AOI area classified as low severity for 2013,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2014,percentage,Percentage of AOI area classified as low severity for 2014,numeric,6,"MTBS_severity_2014_2017.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2015,percentage,Percentage of AOI area classified as low severity for 2015,numeric,6,"MTBS_severity_2014_2017.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2016,percentage,Percentage of AOI area classified as low severity for 2016,numeric,6,"MTBS_severity_2014_2017.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2017,percentage,Percentage of AOI area classified as low severity for 2017,numeric,6,"MTBS_severity_2014_2017.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctLow Burn SeverityWs_2018,percentage,Percentage of AOI area classified as low severity for 2018,numeric,6,"MTBS_severity_2018.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_1984,percentage,Percentage of AOI area classified as moderate severity for 1984,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_1985,percentage,Percentage of AOI area classified as moderate severity for 1985,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_1986,percentage,Percentage of AOI area classified as moderate severity for 1986,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_1987,percentage,Percentage of AOI area classified as moderate severity for 1987,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_1988,percentage,Percentage of AOI area classified as moderate severity for 1988,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_1989,percentage,Percentage of AOI area classified as moderate severity for 1989,numeric,6,"MTBS_severity_1984_1989.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_1990,percentage,Percentage of AOI area classified as moderate severity for 1990,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_1991,percentage,Percentage of AOI area classified as moderate severity for 1991,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_1992,percentage,Percentage of AOI area classified as moderate severity for 1992,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_1993,percentage,Percentage of AOI area classified as moderate severity for 1993,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_1994,percentage,Percentage of AOI area classified as moderate severity for 1994,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_1995,percentage,Percentage of AOI area classified as moderate severity for 1995,numeric,6,"MTBS_severity_1990_1995.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_1996,percentage,Percentage of AOI area classified as moderate severity for 1996,numeric,1,MTBS_severity_1996_2001.csv
-PctModerate Burn SeverityWs_1997,percentage,Percentage of AOI area classified as moderate severity for 1997,numeric,1,MTBS_severity_1996_2001.csv
-PctModerate Burn SeverityWs_1998,percentage,Percentage of AOI area classified as moderate severity for 1998,numeric,1,MTBS_severity_1996_2001.csv
-PctModerate Burn SeverityWs_1999,percentage,Percentage of AOI area classified as moderate severity for 1999,numeric,1,MTBS_severity_1996_2001.csv
-PctModerate Burn SeverityWs_2000,percentage,Percentage of AOI area classified as moderate severity for 2000,numeric,1,MTBS_severity_1996_2001.csv
-PctModerate Burn SeverityWs_2001,percentage,Percentage of AOI area classified as moderate severity for 2001,numeric,1,MTBS_severity_1996_2001.csv
-PctModerate Burn SeverityWs_2002,percentage,Percentage of AOI area classified as moderate severity for 2002,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2003,percentage,Percentage of AOI area classified as moderate severity for 2003,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2004,percentage,Percentage of AOI area classified as moderate severity for 2004,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2005,percentage,Percentage of AOI area classified as moderate severity for 2005,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2006,percentage,Percentage of AOI area classified as moderate severity for 2006,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2007,percentage,Percentage of AOI area classified as moderate severity for 2007,numeric,6,"MTBS_severity_2007_2002.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2008,percentage,Percentage of AOI area classified as moderate severity for 2008,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2009,percentage,Percentage of AOI area classified as moderate severity for 2009,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2010,percentage,Percentage of AOI area classified as moderate severity for 2010,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2011,percentage,Percentage of AOI area classified as moderate severity for 2011,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2012,percentage,Percentage of AOI area classified as moderate severity for 2012,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2013,percentage,Percentage of AOI area classified as moderate severity for 2013,numeric,6,"MTBS_severity_2008_2013.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2014,percentage,Percentage of AOI area classified as moderate severity for 2014,numeric,6,"MTBS_severity_2014_2017.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2015,percentage,Percentage of AOI area classified as moderate severity for 2015,numeric,6,"MTBS_severity_2014_2017.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2016,percentage,Percentage of AOI area classified as moderate severity for 2016,numeric,6,"MTBS_severity_2014_2017.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2017,percentage,Percentage of AOI area classified as moderate severity for 2017,numeric,6,"MTBS_severity_2014_2017.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctModerate Burn SeverityWs_2018,percentage,Percentage of AOI area classified as moderate severity for 2018,numeric,6,"MTBS_severity_2018.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctNonCarbResidWs,percentage,Percentage of AOI area classified as lithology type: non-carbonate residual material.,numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctOw2001,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2001.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctOw2004,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2004.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctOw2006,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2006.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctOw2008,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2008.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctOw2011,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2011.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctOw2013,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2013.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctOw2016,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2016.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctOw2019,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2019.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctSalLakeWs,percentage,Percentage of AOI area classified as lithology type: saline like sediment.,numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctShrb2001,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2001,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctShrb2004,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2004,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctShrb2006,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2006,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctShrb2008,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2008,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctShrb2011,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2011,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctShrb2013,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2013,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctShrb2016,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2016,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctShrb2019,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2019,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctSilicicWs,percentage,Percentage of AOI area classified as lithology type: silicic residual material.,numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctUrbHi2001,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2001.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbHi2004,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2004.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbHi2006,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2006.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbHi2008,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2008.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbHi2011,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2011.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbHi2013,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2013.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbHi2016,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2016.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbHi2019,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2019.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbLo2001,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2001.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbLo2004,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2004.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbLo2006,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2006.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbLo2008,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2008.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbLo2011,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2011.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbLo2013,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2013.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbLo2016,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2016.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbLo2019,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2019.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbMd2001,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2001.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbMd2004,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2004.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbMd2006,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2006.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbMd2008,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2008.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbMd2011,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2011.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbMd2013,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2013.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbMd2016,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2016.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbMd2019,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2019.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbOp2001,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2001.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbOp2004,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2004.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbOp2006,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2006.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbOp2008,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2008.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbOp2011,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2011.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbOp2013,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2013.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbOp2016,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2016.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctUrbOp2019,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2019.",numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctWaterWs,percentage,Percentage of AOI area classified as lithology type: water.,numeric,6,"lithology.csv, lithology_2.0.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-PctWdWet2001,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2001.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctWdWet2004,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2004.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctWdWet2006,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2006.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctWdWet2008,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2008.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctWdWet2011,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2011.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctWdWet2013,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2013.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctWdWet2016,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2016.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-PctWdWet2019,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2019.,numeric,3,"NLCD_2001_2019.csv, random_forest_data.csv, random_forest_data_new.csv"
-Percent_Difference,percentage,The percent difference in analyte concentration between the burned and the unburned watershed.,numeric,4,"Percent_Difference.csv, TSF_PD_CIs.csv, TSF_PD_DOC_Fig_data.csv, TSF_PD_NO3_Fig_data.csv"
-PermWs,centimeters per hour,Mean permeability (centimeters per hour) of soils (STATSGO) within AOI.,numeric,5,"OM_perm.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Precip9120Ws,millimeter,PRISM climate data - 30-year normal mean precipitation (mm): Annual period: 1991-2020 within the AOI.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, temp_precip.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Publication_Year,YYYY,The year the publication was published and released.,numeric,1,Sites_meta_data.csv
-Q_Extracted,N/A,Indicates how and where discharge (Q) data were extracted from.,text,1,Sites_meta_data.csv
-Q_df_in_git,N/A,Indicates whether the discharge (Q) data frame is included within the repository.,text,1,Sites_meta_data.csv
-RckDepWs,centimeters,Mean depth (centimeters) to bedrock of soils (STATSGO) within AOI.,numeric,5,"OM_perm.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Reports_Burn_Percentage,N/A,Indicates whether the publication reports burn percentage for each watershed they include in their study.,text,1,Fire_name_Lat_Long.csv
-Reports_Coords,N/A,Indicates whether the publication reports latitude and longitude coordinates for each watersheds they include in their study.,text,1,Fire_name_Lat_Long.csv
-Reports_Size,N/A,Indicates whether the publication reports watershed area for each watershed they include in their study.,text,1,Fire_name_Lat_Long.csv
-RunoffWs,millimeter,Mean runoff (millimeters) within AOI.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, runoff.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-STDEV_DOC,N/A,Standard deviation of the concentration for each analyte and within each watershed for dissolved organic carbon (DOC).,numeric,19,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, gap_fill_take_two.csv"
-STDEV_NO3,N/A,Standard deviation of the concentration for each analyte and within each watershed for nitrate (NO3).,text,19,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, gap_fill_take_two.csv"
-STDEV_NO3,N/A,Standard deviation of the concentration for each analyte and within each watershed for nitrate (NO3).,logical,19,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, gap_fill_take_two.csv"
-STER_DOC,N/A,Standard error of the concentration for each analyte and within each watershed for dissolved organic carbon (DOC).,numeric,19,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, gap_fill_take_two.csv"
-STER_NO3,N/A,Standard error of the concentration for each analyte and within each watershed for nitrate (NO3).,numeric,19,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, gap_fill_take_two.csv"
-Sample_Freq,N/A,Indicates the frequency at which samples were taken within each publication.,text,1,Sites_meta_data.csv
-Sampling_Date,YYYY-MM-DD,Date of discrete sampling events.,Date,29,"coombs_iteration.csv, mast_iteration.csv, Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, crandall_conc_fill.csv, Abbott_conc_fill.csv, Rhea_conc_fill.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv"
-Sampling_Resolution,N/A,Indicates how often water samples were taken in each publication.,text,1,Sites_meta_data.csv
-Sampling_exact_days,N/A,Indicates whether discrete water sampling days were reported in individual publications.,text,1,Sites_meta_data.csv
-Severity_Category,N/A,"Burn severity classification for each wildfire (low, moderate, high).",text,1,severity_clip.csv
-Site,N/A,Name of site that was monitored or sampled from the publication.,text,77,"coombs_iteration.csv, mast_iteration.csv, Fire_name_Lat_Long.csv, fire_watershed_lat_long_comids.csv, meta_lat_long_comids.csv, watershed_lat_long.csv, Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, Watershed_area.csv, crandall_conc_fill.csv, crandall_temp_norm.csv, Abbott_conc_fill.csv, Abbott_temp_norm.csv, Rhea_conc_fill.csv, Rhea_temp_norm.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv, geospatial_data.csv, meta_comids.csv, MTBS_severity_1984_1989.csv, MTBS_severity_1990_1995.csv, MTBS_severity_1996_2001.csv, MTBS_severity_2007_2002.csv, MTBS_severity_2008_2013.csv, MTBS_severity_2014_2017.csv, MTBS_severity_2018.csv, BFI.csv, burn_percentage.csv, forest_lost.csv, Geospatial_data_2024-02-15.csv, lithology.csv, lithology_2.0.csv, MTBS_severity.csv, NLCD_2001_2019.csv, NWetdep_2008.csv, OM_perm.csv, random_forest_data.csv, random_forest_data_new.csv, runoff.csv, stream_temp.csv, temp_precip.csv, Burn_percentage_ES_fig_data.csv, doc_meta_random_forest 1.39.32 PM.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, severity_clip.csv, doc_meta_random_forest.csv, meta_summary.csv, no3_meta_random_forest.csv, DOC_temp_norm_fig_data.csv, doc_yield_meta_random_forest.csv, NO3_temp_norm_fig_data.csv, no3_yield_meta_random_forest.csv, Burn_severity_ES_fig_data.csv, DNBR_Severity.csv, watershed_count_per_year.csv, placeholder.csv"
-Standard,N/A,ESS-DIVE Reporting Format or other standard applied to the data file.,text,1,Cavaiani_2024_Metaanalysis_flmd.csv
-State,N/A,Indicates which state the publication was located in.,text,2,"Map_input.csv, effect_size_geospatial_fire_lat_long.csv"
-Study_Duration_yrs,years,The length of the study duration in years.,numeric,1,Sites_meta_data.csv
-Study_ID,N/A,The shorthand in-text citation of the publication.,text,63,"coombs_iteration.csv, mast_iteration.csv, Fire_name_Lat_Long.csv, Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, Map_input.csv, Sites_meta_data.csv, Watershed_area.csv, crandall_conc_fill.csv, Crandall_effect_size.csv, crandall_temp_norm.csv, Abbott_conc_fill.csv, Abbott_effect_size.csv, Abbott_temp_norm.csv, Rhea_conc_fill.csv, Rhea_effect_size.csv, Rhea_temp_norm.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv, Percent_Difference.csv, TSF_ES_Fig_data.csv, TSF_PD_DOC_Fig_data.csv, TSF_PD_NO3_Fig_data.csv, Burn_percentage_ES_fig_data.csv, doc_meta_random_forest 1.39.32 PM.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, severity_clip.csv, doc_meta_random_forest.csv, meta_summary.csv, no3_meta_random_forest.csv, DOC_CV_temp_norm_fig_data.csv, DOC_temp_norm_fig_data.csv, NO3_CV_temp_norm_fig_data.csv, NO3_temp_norm_fig_data.csv, Burn_severity_ES_fig_data.csv"
-Study_design,N/A,Indicates which study design was used within each publication. Examples include: pre_post; control_burn.,text,1,Sites_meta_data.csv
-TSF,years,Time-lag (time-since-fire; TSF) between when sampling and the wildfire occurred.,text,1,Sites_meta_data.csv
-TempNorm,milligrams analyte per liter per square kilometer per year,Pseudo yield metric we calculated that normalized for watershed area by year for each watershed.,numeric,7,"crandall_temp_norm.csv, Abbott_temp_norm.csv, Rhea_temp_norm.csv, DOC_temp_norm_fig_data.csv, doc_yield_meta_random_forest.csv, NO3_temp_norm_fig_data.csv, no3_yield_meta_random_forest.csv"
-Time_Since_Fire,years,The lag time between when sampling occurred relative to when the wildfire occurred.,text; numeric,46,"Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, crandall_conc_fill.csv, Abbott_conc_fill.csv, Rhea_conc_fill.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, gap_fill_take_two.csv, Percent_Difference.csv, TSF_ES_CIs.csv, TSF_ES_Fig_data.csv, TSF_PD_CIs.csv, TSF_PD_DOC_Fig_data.csv, TSF_PD_NO3_Fig_data.csv, Burn_percentage_ES_fig_data.csv, doc_meta_random_forest 1.39.32 PM.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, meta_summary.csv, no3_meta_random_forest.csv, doc_yield_meta_random_forest.csv, no3_yield_meta_random_forest.csv, Burn_severity_ES_fig_data.csv, watershed_count_per_year.csv"
-Title,N/A,The title of the publication.,text,1,Sites_meta_data.csv
-Tmax9120Ws,degrees,PRISM climate data - 30-year normal maximum temperature (CÂ°): Annual period: 1991-2020 within the AOI.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, temp_precip.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Tmean9120Ws,degrees,PRISM climate data - 30-year normal mean temperature (CÂ°): Annual period: 1991-2020 within the AOI.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, temp_precip.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Tmin9120Ws,degrees,PRISM climate data - 30-year normal minimum temperature (CÂ°): Annual period: 1991-2020 within the AOI.,numeric,5,"random_forest_data.csv, random_forest_data_new.csv, temp_precip.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Type,N/A,The study design type.,text,1,Sites_meta_data.csv
-Unit,N/A,Unit of measurement that applies to a given column in the data package.,text,1,Cavaiani_2024_Metaanalysis_dd.csv
-Urban,percentage,The percentage or amount of urban land in the surrounding watershed area.,numeric,2,"doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Vegetation,N/A,General type of vegetation present in the study site area reported within the publication,text,1,Sites_meta_data.csv
-Vegetation_year_pull,YYYY,Year pulled for MTBS data. ,text; date,3,"Fire_name_Lat_Long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Watershed_Area,N/A,Indicates whether studies reported watershed area within the publication.,text,1,Sites_meta_data.csv
-Watershed_Size_km,square kilometer,Size of the watershed in square kilometers.,numeric,1,Watershed_area.csv
-Wetland,square kilometer,The percentage or amount of wetland land in the surrounding watershed area.,numeric,2,"doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Where,N/A,A generalizable location of where the study took place. Examples include: states; territories; countries.,text,1,Sites_meta_data.csv
-WtDepWs,percentage,Mean seasonal water table depth (centimeters) of soils (STATSGO) within AOI .,numeric,5,"OM_perm.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-Xc,N/A,Pseudo yield metric calculated for the reference watershed when a publication only included one reference.,numeric,11,"Crandall_effect_size.csv, Abbott_effect_size.csv, Rhea_effect_size.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, TSF_ES_Fig_data.csv"
-Xc2,N/A,Pseudo yield metric calculated for the second reference watershed and compared to a specific burned watershed when the publication included more than one reference site.,numeric,9,"Crandall_effect_size.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, TSF_ES_Fig_data.csv"
-Xc34,N/A,Pseudo yield metric calculated for the reference watershed and compared to two burned watersheds when a publication compared multiple burns to one reference watershed.,numeric,9,"Crandall_effect_size.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, TSF_ES_Fig_data.csv"
-Xc345,N/A,Pseudo yield metric calculated for the reference watershed and compared to multiple burned watersheds when a publication compared multiple burns to one reference watershed.,numeric,8,"Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, TSF_ES_Fig_data.csv"
-Xe1,N/A,Pseudo yield metric calculated for the first burned watershed.,numeric,11,"Crandall_effect_size.csv, Abbott_effect_size.csv, Rhea_effect_size.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, TSF_ES_Fig_data.csv"
-Xe2,N/A,Pseudo yield metric calculated for the second burned watershed if included.,numeric,10,"Crandall_effect_size.csv, Rhea_effect_size.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, TSF_ES_Fig_data.csv"
-Xe3,N/A,Pseudo yield metric calculated for the third burned watershed if included.,numeric,10,"Crandall_effect_size.csv, Rhea_effect_size.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, TSF_ES_Fig_data.csv"
-Xe4,N/A,Pseudo yield metric calculated for the fourth burned watershed if included.,numeric,9,"Crandall_effect_size.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, TSF_ES_Fig_data.csv"
-Xe5,N/A,Pseudo yield metric calculated for the fifth burned watershed if included.,numeric,8,"Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, TSF_ES_Fig_data.csv"
-analyte,N/A,Indicates which analyte is being measured (Dissolved organic carbon (DOC) or nitrate (NO3)).,text,2,"meta_summary.csv, Random_Forest_Effect_Size_Fig_data.csv"
-burn_percentage,percentage,The proportion of the watershed that was burned by a wildfire.,numeric,11,"Fire_name_Lat_Long.csv, Watershed_area.csv, Burn_percentage_ES_fig_data.csv, doc_meta_random_forest 1.39.32 PM.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv, doc_yield_meta_random_forest.csv, no3_yield_meta_random_forest.csv, Burn_severity_ES_fig_data.csv"
-burn_percentage_group,percentage,Grouped burn percentages in 10% intervals.,numeric,2,"Burn_percentage_ES_CIs.csv, Burn_percentage_ES_fig_data.csv"
-burn_severity_category,N/A,Burn severity classification.,text,5,"doc_meta_random_forest.csv, no3_meta_random_forest.csv, Burn_severity_ES_CIs.csv, Burn_severity_ES_fig_data.csv, DNBR_Severity.csv"
-catareasqkm,square kilometer,Catchment area in square kilometers.,numeric,4,"lithology_2.0.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-catareasqkmrp100,square kilometer,Catchment area in square 100 kilometers.,numeric,4,"lithology_2.0.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-comid,N/A,The NHDPlus Version 2 common identifier (COMID) which is a unique identifier for the watershed associated with the location of the water sample.,numeric,32,"fire_watershed_lat_long_comids.csv, meta_lat_long_comids.csv, watershed_lat_long.csv, geospatial_data.csv, meta_comids.csv, MTBS_severity_1984_1989.csv, MTBS_severity_1990_1995.csv, MTBS_severity_1996_2001.csv, MTBS_severity_2007_2002.csv, MTBS_severity_2008_2013.csv, MTBS_severity_2014_2017.csv, MTBS_severity_2018.csv, BFI.csv, burn_percentage.csv, forest_lost.csv, Geospatial_data_2024-02-15.csv, lithology.csv, lithology_2.0.csv, MTBS_severity.csv, NLCD_2001_2019.csv, NWetdep_2008.csv, OM_perm.csv, random_forest_data.csv, random_forest_data_new.csv, runoff.csv, stream_temp.csv, temp_precip.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv, placeholder.csv"
-day,N/A,Numeric day between discrete observations used for gap filling interpolation method.,numeric,6,"gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv"
-elevfixed,N/A,Flag indicating that the downstream elevation is fixed (i.e. not smoothed).,numeric,10,"geospatial_data.csv, burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest 1.39.32 PM.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-fi,percentage,Feature Importance (FI) determined by Random Forest models.,numeric,1,Random_Forest_Effect_Size_Fig_data.csv
-fi100,percentage,Feature Importance (FI) percentage determined by Random Forest models.,numeric,1,Random_Forest_Effect_Size_Fig_data.csv
-fire_name,N/A,Name of the fire.,text,4,"fire_watershed_lat_long_comids.csv, Fire_thresholds.csv, Burn_severity_ES_fig_data.csv, DNBR_Severity.csv"
-fire_year,YYYY,Year of fire.,numeric,1,fire_watershed_lat_long_comids.csv
-geometry,decimal degrees WGS1984,Geographic coordinates of each study site.,text,11,"fire_watershed_lat_long_comids.csv, meta_lat_long_comids.csv, geospatial_data.csv, meta_comids.csv, MTBS_severity_2018.csv, Geospatial_data_2024-02-15.csv, MTBS_severity.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-group,N/A,A unique number identifier that is associated with a United States state.,numeric,2,"Map_input.csv, effect_size_geospatial_fire_lat_long.csv"
-grouped_percentage,N/A,A unique number indicating which 10 percent interval the burn_percentage_group falls into (1-10). For example a 5 percent burn extent falls within the 0-10 percent burn_percentage_group which would be indicated in this column as 1.,numeric,1,Burn_percentage_ES_fig_data.csv
-iteration,N/A,Gap filling iteration.,numeric,2,"coombs_iteration.csv, mast_iteration.csv"
-latitude,decimal degrees WGS1984,Site latitude.,numeric,40,"Fire_name_Lat_Long.csv, fire_watershed_lat_long_comids.csv, meta_lat_long_comids.csv, watershed_lat_long.csv, Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, Map_input.csv, Sites_meta_data.csv, crandall_conc_fill.csv, crandall_temp_norm.csv, Abbott_conc_fill.csv, Abbott_temp_norm.csv, Rhea_conc_fill.csv, Rhea_temp_norm.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv, effect_size_geospatial_fire_lat_long.csv, DOC_temp_norm_fig_data.csv, NO3_temp_norm_fig_data.csv, placeholder.csv"
-logTempNorm,N/A,Effect size calculation for the temporal normalization.,numeric,2,"DOC_temp_norm_fig_data.csv, NO3_temp_norm_fig_data.csv"
-longitude,decimal degrees WGS1984,Site longitude.,numeric,40,"Fire_name_Lat_Long.csv, fire_watershed_lat_long_comids.csv, meta_lat_long_comids.csv, watershed_lat_long.csv, Abbott_et_al_2021.csv, Burd_et_al_2018.csv, Coombs_Melack_2013.csv, Crandall_et_al_2021.csv, Gerla_Galloway_1998.csv, Gluns_Toews_1989.csv, Hauer_Spencer_1998.csv, Hickenbottom_et_al_2023.csv, Mast_Clow_2008.csv, Murphy_et_al_2015.csv, Murphy_et_al_2018.csv, Neary_Currier_1982.csv, Oliver_et_al_2012.csv, Rhea_et_al_2021.csv, Tiedemann_1973.csv, Uzun_et_al_2020.csv, Wagner_et_al_2015.csv, Writer_et_al_2014.csv, Map_input.csv, Sites_meta_data.csv, crandall_conc_fill.csv, crandall_temp_norm.csv, Abbott_conc_fill.csv, Abbott_temp_norm.csv, Rhea_conc_fill.csv, Rhea_temp_norm.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv, effect_size_geospatial_fire_lat_long.csv, DOC_temp_norm_fig_data.csv, NO3_temp_norm_fig_data.csv, placeholder.csv"
-lower_ci_effect,N/A,Lower confidence interval (CI) effect. The lower end of the 95 percent confidence interval calculated within each variable bin (climates; burn percentage; time since fire bins).,numeric,5,"Climate_ES_CIs.csv, TSF_ES_CIs.csv, TSF_PD_CIs.csv, Burn_percentage_ES_CIs.csv, Burn_severity_ES_CIs.csv"
-max,N/A,Max dNBR value for a certain burn severity category.,numeric,1,Fire_thresholds.csv
-maxelevraw,centimeters,Maximum elevation (unsmoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,8,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-maxelevsmo,centimeters,Maximum elevation (smoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,12,"geospatial_data.csv, burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest 1.39.32 PM.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv, doc_yield_meta_random_forest.csv, no3_yield_meta_random_forest.csv"
-meanConc,milligrams per liter carbon milligrams per liter nitrogen,Mean concentration of analytes (dissolved organic carbon or nitrate) for each publication.,numeric,7,"crandall_temp_norm.csv, Abbott_temp_norm.csv, Rhea_temp_norm.csv, DOC_CV_temp_norm_fig_data.csv, DOC_temp_norm_fig_data.csv, NO3_CV_temp_norm_fig_data.csv, NO3_temp_norm_fig_data.csv"
-mean_dnbr,N/A,Mean normalized burn ratio value to determine burn severity categories.,numeric,4,"doc_meta_random_forest.csv, no3_meta_random_forest.csv, Burn_severity_ES_fig_data.csv, DNBR_Severity.csv"
-mean_effect,N/A,The mean effect size within each variable bin (climates; burn percentage groups; or time since fire bins).,numeric,5,"Climate_ES_CIs.csv, TSF_ES_CIs.csv, TSF_PD_CIs.csv, Burn_percentage_ES_CIs.csv, Burn_severity_ES_CIs.csv"
-min,N/A,Minimum dNBR value for a certain burn severity category.,numeric,1,Fire_thresholds.csv
-minelevraw,centimeters,Minimum elevation (unsmoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,10,"geospatial_data.csv, burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest 1.39.32 PM.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-minelevsmo,centimeters,Maximum elevation (smoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,12,"geospatial_data.csv, burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest 1.39.32 PM.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv, doc_yield_meta_random_forest.csv, no3_yield_meta_random_forest.csv"
-month,N/A,Month of year that sample was taken.,numeric,6,"gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv"
-mtbs_id,N/A,Unique fire identified pulled from MTBS.,text,1,fire_watershed_lat_long_comids.csv
-n,N/A,Number of observations for each site within each study used in the meta-analysis.,numeric,1,meta_summary.csv
-n_effect,N/A,Number of observations within each variable class (climate; time since fire; burn percentage).,numeric,5,"Climate_ES_CIs.csv, TSF_ES_CIs.csv, TSF_PD_CIs.csv, Burn_percentage_ES_CIs.csv, Burn_severity_ES_CIs.csv"
-number_of_burn,N/A,Number of burned watersheds included and monitored in each publication.,numeric,2,"Map_input.csv, effect_size_geospatial_fire_lat_long.csv"
-number_of_pairs,N/A,Number of paired watersheds included in each publication.,numeric,1,Map_input.csv
-number_of_reference,N/A,Number of unburned watersheds included and monitored in each publication.,numeric,1,Map_input.csv
-number_of_sites,N/A,Number of total sites included and monitored in each publication.,numeric,1,Map_input.csv
-predictor,N/A,Predictor variables included in the random forest model (climate; totdasqkm; maxelevsmo; slope; burn_percentage; time_since_fire).,text,1,Random_Forest_Effect_Size_Fig_data.csv
-raw_fi,percentage,Raw feature importance (FI) output from the random forest model.,numeric,1,Random_Forest_Effect_Size_Fig_data.csv
-rckdepws,percentage,Mean depth (centimeters) to bedrock of soils (STATSGO) within AOI.,numeric,4,"lithology_2.0.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-response_var,N/A,Associates effect size with the proper analyte (dissolved organic carbon (DOC) or nitrate (NO3)).,text,32,"Crandall_effect_size.csv, crandall_temp_norm.csv, Abbott_effect_size.csv, Abbott_temp_norm.csv, Rhea_effect_size.csv, Rhea_temp_norm.csv, Climate_ES_CIs.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, Percent_Difference.csv, TSF_ES_CIs.csv, TSF_ES_Fig_data.csv, TSF_PD_CIs.csv, TSF_PD_DOC_Fig_data.csv, TSF_PD_NO3_Fig_data.csv, Burn_percentage_ES_CIs.csv, Burn_percentage_ES_fig_data.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv, DOC_CV_temp_norm_fig_data.csv, DOC_temp_norm_fig_data.csv, NO3_CV_temp_norm_fig_data.csv, NO3_temp_norm_fig_data.csv, Burn_severity_ES_CIs.csv, Burn_severity_ES_fig_data.csv"
-sd_effect,N/A,Standard deviation of the effect within each variable class.,numeric,5,"Climate_ES_CIs.csv, TSF_ES_CIs.csv, TSF_PD_CIs.csv, Burn_percentage_ES_CIs.csv, Burn_severity_ES_CIs.csv"
-sdconc,milligrams per liter carbon milligrams per liter nitrogen,Standard deviation of the concentration for each analyte and within each watershed.,numeric,2,"DOC_CV_temp_norm_fig_data.csv, NO3_CV_temp_norm_fig_data.csv"
-se_effect,N/A,Standard error of the effect within each variable class.,numeric,5,"Climate_ES_CIs.csv, TSF_ES_CIs.csv, TSF_PD_CIs.csv, Burn_percentage_ES_CIs.csv, Burn_severity_ES_CIs.csv"
-slope,degrees,Slope of flowline (meters per meters) based on smoothed elevations extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,12,"geospatial_data.csv, burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest 1.39.32 PM.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv, doc_yield_meta_random_forest.csv, no3_yield_meta_random_forest.csv"
-streamorde,N/A,Modified Strahler Stream Order extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,8,"burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-totdasqkm,square kilometer,Total upstream catchment area from downstream end of flowline extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric,12,"geospatial_data.csv, burn_percentage.csv, Geospatial_data_2024-02-15.csv, random_forest_data.csv, random_forest_data_new.csv, doc_meta_random_forest 1.39.32 PM.csv, effect_size_geospatial_fire.csv, effect_size_geospatial_fire_lat_long.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv, doc_yield_meta_random_forest.csv, no3_yield_meta_random_forest.csv"
-upper_ci_effect,N/A,Upper confidence interval (CI) effect. The upper end of the 95 percent confidence interval calculated within each variable bin (climates; burn percentage; time since fire bins),numeric,5,"Climate_ES_CIs.csv, TSF_ES_CIs.csv, TSF_PD_CIs.csv, Burn_percentage_ES_CIs.csv, Burn_severity_ES_CIs.csv"
-wsareasqkm,square kilometer,Watershed area.,numeric,4,"lithology_2.0.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-wsareasqkmrp100,square kilometer,Watershed area in 100-kilometer squared.,numeric,4,"lithology_2.0.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-wspctfull,percentage,Full watershed percentage for each area of interest.,numeric,4,"lithology_2.0.csv, random_forest_data_new.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv"
-year,YYYY,Year when the fire took place.,text; date,27,"Crandall_effect_size.csv, crandall_temp_norm.csv, Abbott_effect_size.csv, Abbott_temp_norm.csv, Rhea_effect_size.csv, Rhea_temp_norm.csv, Climate_ES_Fig_data.csv, Effect_Size.csv, Effect_Size_10days.csv, Effect_Size_20days.csv, Effect_Size_30days.csv, Effect_Size_40days.csv, Effect_Size_UPDATED.csv, gap_fill.csv, gap_fill_10.csv, gap_fill_20.csv, gap_fill_30.csv, gap_fill_40.csv, gap_fill_take_two.csv, TSF_ES_Fig_data.csv, Burn_percentage_ES_fig_data.csv, severity_clip.csv, doc_meta_random_forest.csv, no3_meta_random_forest.csv, DOC_temp_norm_fig_data.csv, NO3_temp_norm_fig_data.csv, Burn_severity_ES_fig_data.csv"
-zone,N/A,Categorical value for burn severity thresholds.,numeric,1,Fire_thresholds.csv
+Column_or_Row_Name,Unit,Definition,Data_Type
+AG,percentage,The percentage or amount of agricultural land in the surrounding watershed area.,numeric
+Area_unit,hectare square kilometer,"Unit of measurement that applies to the ""Area_watershed"" column in the data package.",text
+Area_watershed,hectare square kilometer,The total upstream catchment area from downstream end of flowline.,numeric
+Area_watershed_km,square kilometer,The total upstream catchment area from downstream end of flowline in square kilometers.,numeric
+BFIWs,percentage,"Base flow is the component of streamflow that can be attributed to ground-water discharge into streams. The BFI is the ratio of base flow to total flow, expressed as a percentage, within AOI.",numeric
+Biome,N/A,"The broad classification of a geographic area according to environmental conditions based on the Koppen climate classification as defined in the ""Climate"" column header.",text
+Burn_Severity,N/A,Burn severity classification for each wildfire (Increased Greeness; Unburned to Low; Low; Moderate; High).,text
+Burn_Type,N/A,Indicates what type of burn occurred in the publication (prescribed or natural).,text
+Burn_Unburn,N/A,Indicates whether the site is affected by the wildfire or not.,text
+CVconc,milligrams per liter carbon milligrams per liter nitrogen,The coefficient of variation (CV) for analyte concentrations (dissolved organic carbon or nitrate).,numeric
+Climate,N/A,A three digit identifier from the Koppen climate classification.,text
+Closest_USGS_gauge,N/A,Indicates where the closes United States Geological Survey (USGS) stream gauge is located relative to the site monitored in the publication.,text
+Column_or_Row_Name,N/A,Column or row headers from each csv file in the dataset.,text
+Count,N/A,Number of observations for each site within each study used in the meta-analysis.,numeric
+DOC,N/A,"The reported dissolved organic carbon (DOC) concentrations from the publication. See ""DOC_unit"" for the unit of the dissolved organic carbon value.",text; numeric
+DOC_Interp,milligrams per liter carbon,The interpolated dissolved organic carbon concentration using the gap_fill function within R.,numeric
+DOC_mg_C_L,milligrams per liter carbon,The reported dissolved organic carbon concentrations as milligrams per liter as carbon (C).,numeric
+DOC_uM_C,micromolar per liter carbon,The reported dissolved organic carbon concentrations as micromolar per liter as carbon (C).,numeric
+DOC_unit,N/A,"The unit of measurement that the publication reports and applies to the ""DOC"" column in the data package.",text
+DOI,N/A,"The Digital Object Identifier (DOI) is used to uniquely identify an article or document, and to provide it with a permanent web address (URL).",text
+Data_Found,N/A,A designation to where the data were found within the publication.,text
+Data_Type,N/A,Type of data (numeric; text; date; time; datetime).,text
+Data_citations,N/A,Indicates where the data used within in the publication are located/published or where data were extracted from within a publication if it was not originally reported by the authors.,text
+Data_collection_years,YYYY,Years data was collected for each study.,text
+Days_Between_Samples,DD,Amount of days in between discrete sampling for each site within each study.,numeric
+Definition,N/A,Description of the information in a given column or row in the dataset.,text
+Design_Control_Burn_Pre_Post,N/A,"The methodological study design for the publication which can either be a ""Control_Burn"" approach or a ""Pre_Post"" approach.",text
+Discharge,N/A,Indicates whether the publication includes or reports discharge data within their publication.,text
+Discharge_notes,N/A,Free text field to record notes related to discharge data reported the publication.,text
+Ecosystem,N/A,The ecosystem type where the study was conducted.,text
+Effect_size,N/A,The proportional differences between burned and unburned in-stream solute concentrations. This is a calculation and the response variable in many of our statistical analyses.,numeric
+Effect_size_pair,N/A,Indicates which watershed pair was used for the effect size calculation.,text
+Exact_Date_Extracted,N/A,Designates if the publication reported exact dates associated with their water sampling or not. Results that are included in a figure with coarse time-frames would be designated as no.,text
+Exclusion,N/A,Explanation for why a publication was not included in the final analysis.,text
+File_Description,N/A,A brief description of the files in the data package.,text
+File_Name,N/A,Name of files in the data package.,text
+File_Path,N/A,File path within the data package.,text
+Fire_N/Ame,N/A,The name of the fire that was investigated in each publication. This is the same as Fire_name.,text
+Fire_name,N/A,The name of the fire that was investigated in each publication.,text
+Fire_year,YYYY,The year the fire occurred that was investigated in each publication.,text
+Forest,percentage,The percentage or amount of Forest land in the surrounding watershed area.,numeric
+Grassland,percentage,The percentage or amount of Grassland land in the surrounding watershed area.,numeric
+Have_HUC,N/A,Denotes if the watershed that is being monitored in the publication has an associated hydrologic unit code (HUC).,text
+High_Severity,percentage,Percentage of high severity burn within each area of interest.,numeric
+In_git_studies_folder,N/A,Denotes if the publication was used and exported into the final publication analysis.,text
+Included,N/A,Indicates whether a study was incorporated in the final analysis or not.,logical
+InorgNWetDep_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for inorganic nitrogen wet deposition from nitrate and ammonium for 2008 in kg of N/ha/yr, within AOI.",numeric
+Large_Gap_Flag,N/A,TRUE or FALSE indicating whether the time in between discrete samples satisfies the rule of greater than 50 days.,logical
+Low_Severity,percentage,Percentage of low severity burn within each area of interest.,numeric
+MAST_2008,degrees,Mean annual stream temperature for 2008 within area of interest.,numeric
+MAST_2009,degrees,Mean annual stream temperature for 2009 within area of interest.,numeric
+MAST_2013,degrees,Mean annual stream temperature for 2013 within area of interest.,numeric
+MAST_2014,degrees,Mean annual stream temperature for 2014 within area of interest.,numeric
+MSST_2008,degrees,Mean summer stream temperature for 2008 within area of interest.,numeric
+MSST_2009,degrees,Mean summer stream temperature for 2009 within area of interest.,numeric
+MSST_2013,degrees,Mean summer stream temperature for 2013 within area of interest.,numeric
+MSST_2014,degrees,Mean summer stream temperature for 2014 within area of interest.,numeric
+MTBS_1986Ws,percentage,Monitoring trends in burn severity for a watershed in 1986.,numeric
+MTBS_1987Ws,percentage,Monitoring trends in burn severity for a watershed in 1987.,numeric
+MTBS_1988Ws,percentage,Monitoring trends in burn severity for a watershed in 1988.,numeric
+MTBS_1989Ws,percentage,Monitoring trends in burn severity for a watershed in 1989.,numeric
+MTBS_1990Ws,percentage,Monitoring trends in burn severity for a watershed in 1990.,numeric
+MTBS_1991Ws,percentage,Monitoring trends in burn severity for a watershed in 1991.,numeric
+MTBS_1992Ws,percentage,Monitoring trends in burn severity for a watershed in 1992.,numeric
+MTBS_1993Ws,percentage,Monitoring trends in burn severity for a watershed in 1993.,numeric
+MTBS_1994Ws,percentage,Monitoring trends in burn severity for a watershed in 1994.,numeric
+MTBS_1995Ws,percentage,Monitoring trends in burn severity for a watershed in 1995.,numeric
+MTBS_1996Ws,percentage,Monitoring trends in burn severity for a watershed in 1996.,numeric
+MTBS_1997Ws,percentage,Monitoring trends in burn severity for a watershed in 1997.,numeric
+MTBS_1998Ws,percentage,Monitoring trends in burn severity for a watershed in 1998.,numeric
+MTBS_1999Ws,percentage,Monitoring trends in burn severity for a watershed in 1999.,numeric
+MTBS_2000Ws,percentage,Monitoring trends in burn severity for a watershed in 2000.,numeric
+MTBS_2001Ws,percentage,Monitoring trends in burn severity for a watershed in 2001.,numeric
+MTBS_2002Ws,percentage,Monitoring trends in burn severity for a watershed in 2002.,numeric
+MTBS_2003Ws,percentage,Monitoring trends in burn severity for a watershed in 2003.,numeric
+MTBS_2004Ws,percentage,Monitoring trends in burn severity for a watershed in 2004.,numeric
+MTBS_2005Ws,percentage,Monitoring trends in burn severity for a watershed in 2005.,numeric
+MTBS_2006Ws,percentage,Monitoring trends in burn severity for a watershed in 2006.,numeric
+MTBS_2007Ws,percentage,Monitoring trends in burn severity for a watershed in 2007.,numeric
+MTBS_2008Ws,percentage,Monitoring trends in burn severity for a watershed in 2008.,numeric
+MTBS_2009Ws,percentage,Monitoring trends in burn severity for a watershed in 2009.,numeric
+MTBS_2010Ws,percentage,Monitoring trends in burn severity for a watershed in 2010.,numeric
+MTBS_2011Ws,percentage,Monitoring trends in burn severity for a watershed in 2011.,numeric
+MTBS_2012Ws,percentage,Monitoring trends in burn severity for a watershed in 2012.,numeric
+MTBS_2013Ws,percentage,Monitoring trends in burn severity for a watershed in 2013.,numeric
+MTBS_2014Ws,percentage,Monitoring trends in burn severity for a watershed in 2014.,numeric
+MTBS_2015Ws,percentage,Monitoring trends in burn severity for a watershed in 2015.,numeric
+MTBS_2016Ws,percentage,Monitoring trends in burn severity for a watershed in 2016.,numeric
+MTBS_2017Ws,percentage,Monitoring trends in burn severity for a watershed in 2017.,numeric
+MWST_2008,degrees,Mean winter stream temperature for each area of interest for 2008.,numeric
+MWST_2009,degrees,Mean winter stream temperature for each area of interest for 2009.,numeric
+MWST_2013,degrees,Mean winter stream temperature for each area of interest for 2013.,numeric
+MWST_2014,degrees,Mean winter stream temperature for each area of interest for 2014.,numeric
+Mean_Median_or_IndividualSample,N/A,Identifies if the solute concentration reported in the publication was a mean; median or an individual sample.,text
+Missing_Value_Codes,N/A,"Cells with missing data are represented with a missing value code rather than an empty cell. This column describes which missing value codes were used. The recommendation for numeric data is ""-9999"" and for character data is ""N/A"".",text
+Moderate_Severity,percentage,Percentage of moderate severity burn within each area of interest.,numeric
+NH4_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for ammonium ion concentration wet deposition for 2008 in kg of NH4/ha/yr, within AOI.",numeric
+NO3,N/A,"The reported nitrate (NO3) concentrations from each publication. See ""NO3_unit"" for the unit of the nitrate value.",text; numeric
+NO3_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for nitrate ion concentration wet deposition for 2008 in kg of NO3/ha/yr, within AOI.",numeric
+NO3_Interp,milligrams per liter nitrogen,The interpolated nitrate concentration using the gap_fill function within R.,numeric
+NO3_mg_N_L,milligrams per liter nitrogen,The reported nitrate concentrations as milligrams per liter as nitrogen (N).,numeric
+NO3_uM_N,micromolar per liter Nitrate,The reported nitrate-N concentrations as micromolar per liter nitrate-N.,numeric
+NO3_unit,N/A,"The unit of measurement that the publication reports and applies to the ""NO3"" column in the data package.",text
+Notes,N/A,Free text field to record notes related to data extraction process.,text
+Number_of_Study_Sites,N/A,Number of study sites for each study.,numeric
+OmWs,percentage,Mean organic matter content (percent by weight) of soils (STATSGO) within AOI.,numeric
+Pair,N/A,The designation for each site to identify if it was a burned watershed or an unburned watershed and which site it is being compared to.,text
+PctAlkIntruVolWs,percentage,Percentage of AOI area classified as lithology type: alkaline intrusive volcanic rock.,numeric
+PctAlluvCoastWs,percentage,Percentage of AOI area classified as lithology type: alluvium and fine-textured coastal zone sediment.,numeric
+PctBl2001,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2001.,numeric
+PctBl2004,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2004.,numeric
+PctBl2006,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2006.,numeric
+PctBl2008,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2008.,numeric
+PctBl2011,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2011.,numeric
+PctBl2013,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2013.,numeric
+PctBl2016,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2016.,numeric
+PctBl2019,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2019.,numeric
+PctCarbResidWs,percentage,Percentage of AOI area classified as lithology type: carbonate residual material.,numeric
+PctCoastCrsWs,percentage,"Percentage of AOI area classified as lithology type: coastal zone sediment, coarse-textured.",numeric
+PctColluvSedWs,percentage,Percentage of AOI area classified as lithology type: colluvial sediment.,numeric
+PctConif2001,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2001.,numeric
+PctConif2004,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2004.,numeric
+PctConif2006,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2006.,numeric
+PctConif2008,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2008.,numeric
+PctConif2011,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2011.,numeric
+PctConif2013,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2013.,numeric
+PctConif2016,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2016.,numeric
+PctConif2019,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2019.,numeric
+PctCrop2001,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2001.,numeric
+PctCrop2004,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2004.,numeric
+PctCrop2006,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2006.,numeric
+PctCrop2008,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2008.,numeric
+PctCrop2011,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2011.,numeric
+PctCrop2013,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2013.,numeric
+PctCrop2016,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2016.,numeric
+PctCrop2019,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2019.,numeric
+PctDecid2001,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2001.,numeric
+PctDecid2004,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2004.,numeric
+PctDecid2006,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2006.,numeric
+PctDecid2008,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2008.,numeric
+PctDecid2011,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2011.,numeric
+PctDecid2013,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2013.,numeric
+PctDecid2016,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2016.,numeric
+PctDecid2019,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2018.,numeric
+PctEolCrsWs,percentage,"Percentage of AOI area classified as lithology type: eolian sediment, coarse-textured (sand dunes).",numeric
+PctEolFineWs,percentage,"Percentage of AOI area classified as lithology type: eolian sediment, fine-textured (glacial loess).",numeric
+PctExtruVolWs,percentage,Percentage of AOI area classified as lithology type: extrusive volcanic rock.,numeric
+PctFire2000Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2000.,numeric
+PctFire2001Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2001.,numeric
+PctFire2002Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2002.,numeric
+PctFire2003Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2003.,numeric
+PctFire2004Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2004.,numeric
+PctFire2005Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2005.,numeric
+PctFire2006Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2006.,numeric
+PctFire2007Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2007.,numeric
+PctFire2008Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2008.,numeric
+PctFire2009Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2009.,numeric
+PctFire2010Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2010.,numeric
+PctGlacLakeCrsWs,percentage,"Percentage of AOI area classified as lithology type: glacial outwash and glacial lake sediment, coarse-textured.",numeric
+PctGlacLakeFineWs,percentage,"Percentage of AOI area classified as lithology type: glacial lake sediment, fine-textured.",numeric
+PctGlacTilClayWs,percentage,"Percentage of AOI area classified as lithology type: glacial till, clayey.",numeric
+PctGlacTilCrsWs,percentage,"Percentage of AOI area classified as lithology type: glacial till, coarse-textured.",numeric
+PctGlacTilLoamWs,percentage,"Percentage of AOI area classified as lithology type: glacial till, loamy.",numeric
+PctGrs2001,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2001.,numeric
+PctGrs2004,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2004.,numeric
+PctGrs2006,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2006.,numeric
+PctGrs2008,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2008.,numeric
+PctGrs2011,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2011.,numeric
+PctGrs2013,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2013.,numeric
+PctGrs2016,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2016.,numeric
+PctGrs2019,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2019.,numeric
+PctHbWet2001,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2001.,numeric
+PctHbWet2004,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2004.,numeric
+PctHbWet2006,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2006.,numeric
+PctHbWet2008,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2008.,numeric
+PctHbWet2011,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2011.,numeric
+PctHbWet2013,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2013.,numeric
+PctHbWet2016,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2016.,numeric
+PctHbWet2019,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2019.,numeric
+PctHigh Burn SeverityWs_1984,percentage,Percentage of AOI area classified as high severity for 1984,numeric
+PctHigh Burn SeverityWs_1985,percentage,Percentage of AOI area classified as high severity for 1985,numeric
+PctHigh Burn SeverityWs_1986,percentage,Percentage of AOI area classified as high severity for 1986,numeric
+PctHigh Burn SeverityWs_1987,percentage,Percentage of AOI area classified as high severity for 1987,numeric
+PctHigh Burn SeverityWs_1988,percentage,Percentage of AOI area classified as high severity for 1988,numeric
+PctHigh Burn SeverityWs_1989,percentage,Percentage of AOI area classified as high severity for 1989,numeric
+PctHigh Burn SeverityWs_1990,percentage,Percentage of AOI area classified as high severity for 1990,numeric
+PctHigh Burn SeverityWs_1991,percentage,Percentage of AOI area classified as high severity for 1991,numeric
+PctHigh Burn SeverityWs_1992,percentage,Percentage of AOI area classified as high severity for 1992,numeric
+PctHigh Burn SeverityWs_1993,percentage,Percentage of AOI area classified as high severity for 1993,numeric
+PctHigh Burn SeverityWs_1994,percentage,Percentage of AOI area classified as high severity for 1994,numeric
+PctHigh Burn SeverityWs_1995,percentage,Percentage of AOI area classified as high severity for 1995,numeric
+PctHigh Burn SeverityWs_1996,percentage,Percentage of AOI area classified as high severity for 1996,numeric
+PctHigh Burn SeverityWs_1997,percentage,Percentage of AOI area classified as high severity for 1997,numeric
+PctHigh Burn SeverityWs_1998,percentage,Percentage of AOI area classified as high severity for 1998,numeric
+PctHigh Burn SeverityWs_1999,percentage,Percentage of AOI area classified as high severity for 1999,numeric
+PctHigh Burn SeverityWs_2000,percentage,Percentage of AOI area classified as high severity for 2000,numeric
+PctHigh Burn SeverityWs_2001,percentage,Percentage of AOI area classified as high severity for 2001,numeric
+PctHigh Burn SeverityWs_2002,percentage,Percentage of AOI area classified as high severity for 2002,numeric
+PctHigh Burn SeverityWs_2003,percentage,Percentage of AOI area classified as high severity for 2003,numeric
+PctHigh Burn SeverityWs_2004,percentage,Percentage of AOI area classified as high severity for 2004,numeric
+PctHigh Burn SeverityWs_2005,percentage,Percentage of AOI area classified as high severity for 2005,numeric
+PctHigh Burn SeverityWs_2006,percentage,Percentage of AOI area classified as high severity for 2006,numeric
+PctHigh Burn SeverityWs_2007,percentage,Percentage of AOI area classified as high severity for 2007,numeric
+PctHigh Burn SeverityWs_2008,percentage,Percentage of AOI area classified as high severity for 2008,numeric
+PctHigh Burn SeverityWs_2009,percentage,Percentage of AOI area classified as high severity for 2009,numeric
+PctHigh Burn SeverityWs_2010,percentage,Percentage of AOI area classified as high severity for 2010,numeric
+PctHigh Burn SeverityWs_2011,percentage,Percentage of AOI area classified as high severity for 2011,numeric
+PctHigh Burn SeverityWs_2012,percentage,Percentage of AOI area classified as high severity for 2012,numeric
+PctHigh Burn SeverityWs_2013,percentage,Percentage of AOI area classified as high severity for 2013,numeric
+PctHigh Burn SeverityWs_2014,percentage,Percentage of AOI area classified as high severity for 2014,numeric
+PctHigh Burn SeverityWs_2015,percentage,Percentage of AOI area classified as high severity for 2015,numeric
+PctHigh Burn SeverityWs_2016,percentage,Percentage of AOI area classified as high severity for 2016,numeric
+PctHigh Burn SeverityWs_2017,percentage,Percentage of AOI area classified as high severity for 2017,numeric
+PctHigh Burn SeverityWs_2018,percentage,Percentage of AOI area classified as high severity for 2018,numeric
+PctHydricWs,percentage,"Percentage of AOI area classified as lithology type: hydric, peat and muck",numeric
+PctIce2001,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2001.,numeric
+PctIce2004,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2004.,numeric
+PctIce2006,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2006.,numeric
+PctIce2008,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2008.,numeric
+PctIce2011,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2011.,numeric
+PctIce2013,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2013.,numeric
+PctIce2016,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2016.,numeric
+PctIce2019,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2019.,numeric
+PctLow Burn SeverityWs_1984,percentage,Percentage of AOI area classified as low severity for 1984,numeric
+PctLow Burn SeverityWs_1985,percentage,Percentage of AOI area classified as low severity for 1985,numeric
+PctLow Burn SeverityWs_1986,percentage,Percentage of AOI area classified as low severity for 1986,numeric
+PctLow Burn SeverityWs_1987,percentage,Percentage of AOI area classified as low severity for 1987,numeric
+PctLow Burn SeverityWs_1988,percentage,Percentage of AOI area classified as low severity for 1988,numeric
+PctLow Burn SeverityWs_1989,percentage,Percentage of AOI area classified as low severity for 1989,numeric
+PctLow Burn SeverityWs_1990,percentage,Percentage of AOI area classified as low severity for 1990,numeric
+PctLow Burn SeverityWs_1991,percentage,Percentage of AOI area classified as low severity for 1991,numeric
+PctLow Burn SeverityWs_1992,percentage,Percentage of AOI area classified as low severity for 1992,numeric
+PctLow Burn SeverityWs_1993,percentage,Percentage of AOI area classified as low severity for 1993,numeric
+PctLow Burn SeverityWs_1994,percentage,Percentage of AOI area classified as low severity for 1994,numeric
+PctLow Burn SeverityWs_1995,percentage,Percentage of AOI area classified as low severity for 1995,numeric
+PctLow Burn SeverityWs_1996,percentage,Percentage of AOI area classified as low severity for 1996,numeric
+PctLow Burn SeverityWs_1997,percentage,Percentage of AOI area classified as low severity for 1997,numeric
+PctLow Burn SeverityWs_1998,percentage,Percentage of AOI area classified as low severity for 1998,numeric
+PctLow Burn SeverityWs_1999,percentage,Percentage of AOI area classified as low severity for 1999,numeric
+PctLow Burn SeverityWs_2000,percentage,Percentage of AOI area classified as low severity for 2000,numeric
+PctLow Burn SeverityWs_2001,percentage,Percentage of AOI area classified as low severity for 2001,numeric
+PctLow Burn SeverityWs_2002,percentage,Percentage of AOI area classified as low severity for 2002,numeric
+PctLow Burn SeverityWs_2003,percentage,Percentage of AOI area classified as low severity for 2003,numeric
+PctLow Burn SeverityWs_2004,percentage,Percentage of AOI area classified as low severity for 2004,numeric
+PctLow Burn SeverityWs_2005,percentage,Percentage of AOI area classified as low severity for 2005,numeric
+PctLow Burn SeverityWs_2006,percentage,Percentage of AOI area classified as low severity for 2006,numeric
+PctLow Burn SeverityWs_2007,percentage,Percentage of AOI area classified as low severity for 2007,numeric
+PctLow Burn SeverityWs_2008,percentage,Percentage of AOI area classified as low severity for 2008,numeric
+PctLow Burn SeverityWs_2009,percentage,Percentage of AOI area classified as low severity for 2009,numeric
+PctLow Burn SeverityWs_2010,percentage,Percentage of AOI area classified as low severity for 2010,numeric
+PctLow Burn SeverityWs_2011,percentage,Percentage of AOI area classified as low severity for 2011,numeric
+PctLow Burn SeverityWs_2012,percentage,Percentage of AOI area classified as low severity for 2012,numeric
+PctLow Burn SeverityWs_2013,percentage,Percentage of AOI area classified as low severity for 2013,numeric
+PctLow Burn SeverityWs_2014,percentage,Percentage of AOI area classified as low severity for 2014,numeric
+PctLow Burn SeverityWs_2015,percentage,Percentage of AOI area classified as low severity for 2015,numeric
+PctLow Burn SeverityWs_2016,percentage,Percentage of AOI area classified as low severity for 2016,numeric
+PctLow Burn SeverityWs_2017,percentage,Percentage of AOI area classified as low severity for 2017,numeric
+PctLow Burn SeverityWs_2018,percentage,Percentage of AOI area classified as low severity for 2018,numeric
+PctModerate Burn SeverityWs_1984,percentage,Percentage of AOI area classified as moderate severity for 1984,numeric
+PctModerate Burn SeverityWs_1985,percentage,Percentage of AOI area classified as moderate severity for 1985,numeric
+PctModerate Burn SeverityWs_1986,percentage,Percentage of AOI area classified as moderate severity for 1986,numeric
+PctModerate Burn SeverityWs_1987,percentage,Percentage of AOI area classified as moderate severity for 1987,numeric
+PctModerate Burn SeverityWs_1988,percentage,Percentage of AOI area classified as moderate severity for 1988,numeric
+PctModerate Burn SeverityWs_1989,percentage,Percentage of AOI area classified as moderate severity for 1989,numeric
+PctModerate Burn SeverityWs_1990,percentage,Percentage of AOI area classified as moderate severity for 1990,numeric
+PctModerate Burn SeverityWs_1991,percentage,Percentage of AOI area classified as moderate severity for 1991,numeric
+PctModerate Burn SeverityWs_1992,percentage,Percentage of AOI area classified as moderate severity for 1992,numeric
+PctModerate Burn SeverityWs_1993,percentage,Percentage of AOI area classified as moderate severity for 1993,numeric
+PctModerate Burn SeverityWs_1994,percentage,Percentage of AOI area classified as moderate severity for 1994,numeric
+PctModerate Burn SeverityWs_1995,percentage,Percentage of AOI area classified as moderate severity for 1995,numeric
+PctModerate Burn SeverityWs_1996,percentage,Percentage of AOI area classified as moderate severity for 1996,numeric
+PctModerate Burn SeverityWs_1997,percentage,Percentage of AOI area classified as moderate severity for 1997,numeric
+PctModerate Burn SeverityWs_1998,percentage,Percentage of AOI area classified as moderate severity for 1998,numeric
+PctModerate Burn SeverityWs_1999,percentage,Percentage of AOI area classified as moderate severity for 1999,numeric
+PctModerate Burn SeverityWs_2000,percentage,Percentage of AOI area classified as moderate severity for 2000,numeric
+PctModerate Burn SeverityWs_2001,percentage,Percentage of AOI area classified as moderate severity for 2001,numeric
+PctModerate Burn SeverityWs_2002,percentage,Percentage of AOI area classified as moderate severity for 2002,numeric
+PctModerate Burn SeverityWs_2003,percentage,Percentage of AOI area classified as moderate severity for 2003,numeric
+PctModerate Burn SeverityWs_2004,percentage,Percentage of AOI area classified as moderate severity for 2004,numeric
+PctModerate Burn SeverityWs_2005,percentage,Percentage of AOI area classified as moderate severity for 2005,numeric
+PctModerate Burn SeverityWs_2006,percentage,Percentage of AOI area classified as moderate severity for 2006,numeric
+PctModerate Burn SeverityWs_2007,percentage,Percentage of AOI area classified as moderate severity for 2007,numeric
+PctModerate Burn SeverityWs_2008,percentage,Percentage of AOI area classified as moderate severity for 2008,numeric
+PctModerate Burn SeverityWs_2009,percentage,Percentage of AOI area classified as moderate severity for 2009,numeric
+PctModerate Burn SeverityWs_2010,percentage,Percentage of AOI area classified as moderate severity for 2010,numeric
+PctModerate Burn SeverityWs_2011,percentage,Percentage of AOI area classified as moderate severity for 2011,numeric
+PctModerate Burn SeverityWs_2012,percentage,Percentage of AOI area classified as moderate severity for 2012,numeric
+PctModerate Burn SeverityWs_2013,percentage,Percentage of AOI area classified as moderate severity for 2013,numeric
+PctModerate Burn SeverityWs_2014,percentage,Percentage of AOI area classified as moderate severity for 2014,numeric
+PctModerate Burn SeverityWs_2015,percentage,Percentage of AOI area classified as moderate severity for 2015,numeric
+PctModerate Burn SeverityWs_2016,percentage,Percentage of AOI area classified as moderate severity for 2016,numeric
+PctModerate Burn SeverityWs_2017,percentage,Percentage of AOI area classified as moderate severity for 2017,numeric
+PctModerate Burn SeverityWs_2018,percentage,Percentage of AOI area classified as moderate severity for 2018,numeric
+PctNonCarbResidWs,percentage,Percentage of AOI area classified as lithology type: non-carbonate residual material.,numeric
+PctOw2001,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2001.,numeric
+PctOw2004,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2004.,numeric
+PctOw2006,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2006.,numeric
+PctOw2008,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2008.,numeric
+PctOw2011,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2011.,numeric
+PctOw2013,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2013.,numeric
+PctOw2016,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2016.,numeric
+PctOw2019,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2019.,numeric
+PctSalLakeWs,percentage,Percentage of AOI area classified as lithology type: saline like sediment.,numeric
+PctShrb2001,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2001,numeric
+PctShrb2004,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2004,numeric
+PctShrb2006,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2006,numeric
+PctShrb2008,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2008,numeric
+PctShrb2011,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2011,numeric
+PctShrb2013,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2013,numeric
+PctShrb2016,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2016,numeric
+PctShrb2019,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2019,numeric
+PctSilicicWs,percentage,Percentage of AOI area classified as lithology type: silicic residual material.,numeric
+PctUrbHi2001,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2001.",numeric
+PctUrbHi2004,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2004.",numeric
+PctUrbHi2006,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2006.",numeric
+PctUrbHi2008,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2008.",numeric
+PctUrbHi2011,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2011.",numeric
+PctUrbHi2013,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2013.",numeric
+PctUrbHi2016,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2016.",numeric
+PctUrbHi2019,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2019.",numeric
+PctUrbLo2001,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2001.",numeric
+PctUrbLo2004,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2004.",numeric
+PctUrbLo2006,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2006.",numeric
+PctUrbLo2008,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2008.",numeric
+PctUrbLo2011,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2011.",numeric
+PctUrbLo2013,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2013.",numeric
+PctUrbLo2016,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2016.",numeric
+PctUrbLo2019,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2019.",numeric
+PctUrbMd2001,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2001.",numeric
+PctUrbMd2004,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2004.",numeric
+PctUrbMd2006,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2006.",numeric
+PctUrbMd2008,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2008.",numeric
+PctUrbMd2011,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2011.",numeric
+PctUrbMd2013,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2013.",numeric
+PctUrbMd2016,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2016.",numeric
+PctUrbMd2019,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2019.",numeric
+PctUrbOp2001,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2001.",numeric
+PctUrbOp2004,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2004.",numeric
+PctUrbOp2006,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2006.",numeric
+PctUrbOp2008,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2008.",numeric
+PctUrbOp2011,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2011.",numeric
+PctUrbOp2013,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2013.",numeric
+PctUrbOp2016,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2016.",numeric
+PctUrbOp2019,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2019.",numeric
+PctWaterWs,percentage,Percentage of AOI area classified as lithology type: water.,numeric
+PctWdWet2001,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2001.,numeric
+PctWdWet2004,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2004.,numeric
+PctWdWet2006,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2006.,numeric
+PctWdWet2008,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2008.,numeric
+PctWdWet2011,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2011.,numeric
+PctWdWet2013,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2013.,numeric
+PctWdWet2016,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2016.,numeric
+PctWdWet2019,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2019.,numeric
+Percent_Difference,percentage,The percent difference in analyte concentration between the burned and the unburned watershed.,numeric
+PermWs,centimeters per hour,Mean permeability (centimeters per hour) of soils (STATSGO) within AOI.,numeric
+Precip9120Ws,millimeter,PRISM climate data - 30-year normal mean precipitation (mm): Annual period: 1991-2020 within the AOI.,numeric
+Publication_Year,YYYY,The year the publication was published and released.,numeric
+Q_Extracted,N/A,Indicates how and where discharge (Q) data were extracted from.,text
+Q_df_in_git,N/A,Indicates whether the discharge (Q) data frame is included within the repository.,text
+RckDepWs,centimeters,Mean depth (centimeters) to bedrock of soils (STATSGO) within AOI.,numeric
+Reports_Burn_Percentage,N/A,Indicates whether the publication reports burn percentage for each watershed they include in their study.,text
+Reports_Coords,N/A,Indicates whether the publication reports latitude and longitude coordinates for each watersheds they include in their study.,text
+Reports_Size,N/A,Indicates whether the publication reports watershed area for each watershed they include in their study.,text
+RunoffWs,millimeter,Mean runoff (millimeters) within AOI.,numeric
+STDEV_DOC,N/A,Standard deviation of the concentration for each analyte and within each watershed for dissolved organic carbon (DOC).,numeric
+STDEV_NO3,N/A,Standard deviation of the concentration for each analyte and within each watershed for nitrate (NO3).,text
+STDEV_NO3,N/A,Standard deviation of the concentration for each analyte and within each watershed for nitrate (NO3).,logical
+STER_DOC,N/A,Standard error of the concentration for each analyte and within each watershed for dissolved organic carbon (DOC).,numeric
+STER_NO3,N/A,Standard error of the concentration for each analyte and within each watershed for nitrate (NO3).,numeric
+Sample_Freq,N/A,Indicates the frequency at which samples were taken within each publication.,text
+Sampling_Date,YYYY-MM-DD,Date of discrete sampling events.,Date
+Sampling_Resolution,N/A,Indicates how often water samples were taken in each publication.,text
+Sampling_exact_days,N/A,Indicates whether discrete water sampling days were reported in individual publications.,text
+Severity_Category,N/A,"Burn severity classification for each wildfire (low, moderate, high).",text
+Site,N/A,Name of site that was monitored or sampled from the publication.,text
+Standard,N/A,ESS-DIVE Reporting Format or other standard applied to the data file.,text
+State,N/A,Indicates which state the publication was located in.,text
+Study_Duration_yrs,years,The length of the study duration in years.,numeric
+Study_ID,N/A,The shorthand in-text citation of the publication.,text
+Study_design,N/A,Indicates which study design was used within each publication. Examples include: pre_post; control_burn.,text
+TSF,years,Time-lag (time-since-fire; TSF) between when sampling and the wildfire occurred.,text
+TempNorm,milligrams analyte per liter per square kilometer per year,Pseudo yield metric we calculated that normalized for watershed area by year for each watershed.,numeric
+Time_Since_Fire,years,The lag time between when sampling occurred relative to when the wildfire occurred.,text; numeric
+Title,N/A,The title of the publication.,text
+Tmax9120Ws,degrees,PRISM climate data - 30-year normal maximum temperature (CÂ°): Annual period: 1991-2020 within the AOI.,numeric
+Tmean9120Ws,degrees,PRISM climate data - 30-year normal mean temperature (CÂ°): Annual period: 1991-2020 within the AOI.,numeric
+Tmin9120Ws,degrees,PRISM climate data - 30-year normal minimum temperature (CÂ°): Annual period: 1991-2020 within the AOI.,numeric
+Type,N/A,The study design type.,text
+Unit,N/A,Unit of measurement that applies to a given column in the data package.,text
+Urban,percentage,The percentage or amount of urban land in the surrounding watershed area.,numeric
+Vegetation,N/A,General type of vegetation present in the study site area reported within the publication,text
+Vegetation_year_pull,YYYY,Year pulled for MTBS data. ,text; date
+Watershed_Area,N/A,Indicates whether studies reported watershed area within the publication.,text
+Watershed_Size_km,square kilometer,Size of the watershed in square kilometers.,numeric
+Wetland,square kilometer,The percentage or amount of wetland land in the surrounding watershed area.,numeric
+Where,N/A,A generalizable location of where the study took place. Examples include: states; territories; countries.,text
+WtDepWs,percentage,Mean seasonal water table depth (centimeters) of soils (STATSGO) within AOI .,numeric
+Xc,N/A,Pseudo yield metric calculated for the reference watershed when a publication only included one reference.,numeric
+Xc2,N/A,Pseudo yield metric calculated for the second reference watershed and compared to a specific burned watershed when the publication included more than one reference site.,numeric
+Xc34,N/A,Pseudo yield metric calculated for the reference watershed and compared to two burned watersheds when a publication compared multiple burns to one reference watershed.,numeric
+Xc345,N/A,Pseudo yield metric calculated for the reference watershed and compared to multiple burned watersheds when a publication compared multiple burns to one reference watershed.,numeric
+Xe1,N/A,Pseudo yield metric calculated for the first burned watershed.,numeric
+Xe2,N/A,Pseudo yield metric calculated for the second burned watershed if included.,numeric
+Xe3,N/A,Pseudo yield metric calculated for the third burned watershed if included.,numeric
+Xe4,N/A,Pseudo yield metric calculated for the fourth burned watershed if included.,numeric
+Xe5,N/A,Pseudo yield metric calculated for the fifth burned watershed if included.,numeric
+analyte,N/A,Indicates which analyte is being measured (Dissolved organic carbon (DOC) or nitrate (NO3)).,text
+burn_percentage,percentage,The proportion of the watershed that was burned by a wildfire.,numeric
+burn_percentage_group,percentage,Grouped burn percentages in 10% intervals.,numeric
+burn_severity_category,N/A,Burn severity classification.,text
+catareasqkm,square kilometer,Catchment area in square kilometers.,numeric
+catareasqkmrp100,square kilometer,Catchment area in square 100 kilometers.,numeric
+comid,N/A,The NHDPlus Version 2 common identifier (COMID) which is a unique identifier for the watershed associated with the location of the water sample.,numeric
+day,N/A,Numeric day between discrete observations used for gap filling interpolation method.,numeric
+elevfixed,N/A,Flag indicating that the downstream elevation is fixed (i.e. not smoothed).,numeric
+fi,percentage,Feature Importance (FI) determined by Random Forest models.,numeric
+fi100,percentage,Feature Importance (FI) percentage determined by Random Forest models.,numeric
+fire_name,N/A,Name of the fire.,text
+fire_year,YYYY,Year of fire.,numeric
+geometry,decimal degrees WGS1984,Geographic coordinates of each study site.,text
+group,N/A,A unique number identifier that is associated with a United States state.,numeric
+grouped_percentage,N/A,A unique number indicating which 10 percent interval the burn_percentage_group falls into (1-10). For example a 5 percent burn extent falls within the 0-10 percent burn_percentage_group which would be indicated in this column as 1.,numeric
+iteration,N/A,Gap filling iteration.,numeric
+latitude,decimal degrees WGS1984,Site latitude.,numeric
+logTempNorm,N/A,Effect size calculation for the temporal normalization.,numeric
+longitude,decimal degrees WGS1984,Site longitude.,numeric
+lower_ci_effect,N/A,Lower confidence interval (CI) effect. The lower end of the 95 percent confidence interval calculated within each variable bin (climates; burn percentage; time since fire bins).,numeric
+max,N/A,Max dNBR value for a certain burn severity category.,numeric
+maxelevraw,centimeters,Maximum elevation (unsmoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric
+maxelevsmo,centimeters,Maximum elevation (smoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric
+meanConc,milligrams per liter carbon milligrams per liter nitrogen,Mean concentration of analytes (dissolved organic carbon or nitrate) for each publication.,numeric
+mean_dnbr,N/A,Mean normalized burn ratio value to determine burn severity categories.,numeric
+mean_effect,N/A,The mean effect size within each variable bin (climates; burn percentage groups; or time since fire bins).,numeric
+min,N/A,Minimum dNBR value for a certain burn severity category.,numeric
+minelevraw,centimeters,Minimum elevation (unsmoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric
+minelevsmo,centimeters,Maximum elevation (smoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric
+month,N/A,Month of year that sample was taken.,numeric
+mtbs_id,N/A,Unique fire identified pulled from MTBS.,text
+n,N/A,Number of observations for each site within each study used in the meta-analysis.,numeric
+n_effect,N/A,Number of observations within each variable class (climate; time since fire; burn percentage).,numeric
+number_of_burn,N/A,Number of burned watersheds included and monitored in each publication.,numeric
+number_of_pairs,N/A,Number of paired watersheds included in each publication.,numeric
+number_of_reference,N/A,Number of unburned watersheds included and monitored in each publication.,numeric
+number_of_sites,N/A,Number of total sites included and monitored in each publication.,numeric
+predictor,N/A,Predictor variables included in the random forest model (climate; totdasqkm; maxelevsmo; slope; burn_percentage; time_since_fire).,text
+raw_fi,percentage,Raw feature importance (FI) output from the random forest model.,numeric
+rckdepws,percentage,Mean depth (centimeters) to bedrock of soils (STATSGO) within AOI.,numeric
+response_var,N/A,Associates effect size with the proper analyte (dissolved organic carbon (DOC) or nitrate (NO3)).,text
+sd_effect,N/A,Standard deviation of the effect within each variable class.,numeric
+sdconc,milligrams per liter carbon milligrams per liter nitrogen,Standard deviation of the concentration for each analyte and within each watershed.,numeric
+se_effect,N/A,Standard error of the effect within each variable class.,numeric
+slope,degrees,Slope of flowline (meters per meters) based on smoothed elevations extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric
+streamorde,N/A,Modified Strahler Stream Order extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric
+totdasqkm,square kilometer,Total upstream catchment area from downstream end of flowline extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric
+upper_ci_effect,N/A,Upper confidence interval (CI) effect. The upper end of the 95 percent confidence interval calculated within each variable bin (climates; burn percentage; time since fire bins),numeric
+wsareasqkm,square kilometer,Watershed area.,numeric
+wsareasqkmrp100,square kilometer,Watershed area in 100-kilometer squared.,numeric
+wspctfull,percentage,Full watershed percentage for each area of interest.,numeric
+year,YYYY,Year when the fire took place.,text; date
+zone,N/A,Categorical value for burn severity thresholds.,numeric
