@@ -390,7 +390,7 @@ Type,N/A,The study design type.,text
 Unit,N/A,Unit of measurement that applies to a given column in the data package.,text
 Urban,percentage,The percentage or amount of urban land in the surrounding watershed area.,numeric
 Vegetation,N/A,General type of vegetation present in the study site area reported within the publication,text
-Vegetation_year_pull,YYYY,Year pulled for MTBS data. ,text; date
+Vegetation_year_pull,YYYY,Year pulled for Monitoring Trends in Burn Severity (MTBS) data. ,text; date
 Watershed_Area,N/A,Indicates whether studies reported watershed area within the publication.,text
 Watershed_Size_km,square kilometer,Size of the watershed in square kilometers.,numeric
 Wetland,square kilometer,The percentage or amount of wetland land in the surrounding watershed area.,numeric
@@ -411,7 +411,7 @@ burn_percentage_group,percentage,Grouped burn percentages in 10% intervals.,nume
 burn_severity_category,N/A,Burn severity classification.,text
 catareasqkm,square kilometer,Catchment area in square kilometers.,numeric
 catareasqkmrp100,square kilometer,Catchment area in square 100 kilometers.,numeric
-comid,N/A,The NHDPlus Version 2 common identifier (COMID) which is a unique identifier for the watershed associated with the location of the water sample.,numeric
+comid,N/A,The national hydrography dataset  (NHDPlus Version 2) common identifier (COMID) which is a unique identifier for the watershed associated with the location of the water sample.,numeric
 day,N/A,Numeric day between discrete observations used for gap filling interpolation method.,numeric
 elevfixed,N/A,Flag indicating that the downstream elevation is fixed (i.e. not smoothed).,numeric
 fi,percentage,Feature Importance (FI) determined by Random Forest models.,numeric
@@ -436,7 +436,7 @@ min,N/A,Minimum dNBR value for a certain burn severity category.,numeric
 minelevraw,centimeters,Minimum elevation (unsmoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric
 minelevsmo,centimeters,Maximum elevation (smoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric
 month,N/A,Month of year that sample was taken.,numeric
-mtbs_id,N/A,Unique fire identified pulled from MTBS.,text
+mtbs_id,N/A,Unique fire identified pulled from Monitoring Trends in Burn Severity (MTBS).,text
 n,N/A,Number of observations for each site within each study used in the meta-analysis.,numeric
 n_effect,N/A,Number of observations within each variable class (climate; time since fire; burn percentage).,numeric
 number_of_burn,N/A,Number of burned watersheds included and monitored in each publication.,numeric
