@@ -3,7 +3,7 @@ AG,percentage,The percentage or amount of agricultural land in the surrounding w
 Area_unit,hectare square kilometer,"Unit of measurement that applies to the ""Area_watershed"" column in the data package.",text
 Area_watershed,hectare square kilometer,The total upstream catchment area from downstream end of flowline.,numeric
 Area_watershed_km,square kilometer,The total upstream catchment area from downstream end of flowline in square kilometers.,numeric
-BFIWs,percentage,"Base flow is the component of streamflow that can be attributed to ground-water discharge into streams. The BFI is the ratio of base flow to total flow, expressed as a percentage, within AOI.",numeric
+BFIWs,percentage,"Base flow is the component of streamflow that can be attributed to ground-water discharge into streams. The baseflow index (BFI) is the ratio of base flow to total flow, expressed as a percentage, within area of interest (AOI).",numeric
 Biome,N/A,"The broad classification of a geographic area according to environmental conditions based on the Koppen climate classification as defined in the ""Climate"" column header.",text
 Burn_Severity,N/A,Burn severity classification for each wildfire (Increased Greeness; Unburned to Low; Low; Moderate; High).,text
 Burn_Type,N/A,Indicates what type of burn occurred in the publication (prescribed or natural).,text
@@ -45,7 +45,7 @@ Have_HUC,N/A,Denotes if the watershed that is being monitored in the publication
 High_Severity,percentage,Percentage of high severity burn within each area of interest.,numeric
 In_git_studies_folder,N/A,Denotes if the publication was used and exported into the final publication analysis.,text
 Included,N/A,Indicates whether a study was incorporated in the final analysis or not.,logical
-InorgNWetDep_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for inorganic nitrogen wet deposition from nitrate and ammonium for 2008 in kg of N/ha/yr, within AOI.",numeric
+InorgNWetDep_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for inorganic nitrogen wet deposition from nitrate and ammonium for 2008 in kg of N/ha/yr, within area of interest (AOI).",numeric
 Large_Gap_Flag,N/A,TRUE or FALSE indicating whether the time in between discrete samples satisfies the rule of greater than 50 days.,logical
 Low_Severity,percentage,Percentage of low severity burn within each area of interest.,numeric
 MAST_2008,degrees,Mean annual stream temperature for 2008 within area of interest.,numeric
@@ -95,274 +95,274 @@ MWST_2014,degrees,Mean winter stream temperature for each area of interest for 2
 Mean_Median_or_IndividualSample,N/A,Identifies if the solute concentration reported in the publication was a mean; median or an individual sample.,text
 Missing_Value_Codes,N/A,"Cells with missing data are represented with a missing value code rather than an empty cell. This column describes which missing value codes were used. The recommendation for numeric data is ""-9999"" and for character data is ""N/A"".",text
 Moderate_Severity,percentage,Percentage of moderate severity burn within each area of interest.,numeric
-NH4_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for ammonium ion concentration wet deposition for 2008 in kg of NH4/ha/yr, within AOI.",numeric
+NH4_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for ammonium ion concentration wet deposition for 2008 in kilograms of ammonium per hectacre per year, within area of interest (AOI).",numeric
 NO3,N/A,"The reported nitrate (NO3) concentrations from each publication. See ""NO3_unit"" for the unit of the nitrate value.",text; numeric
-NO3_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for nitrate ion concentration wet deposition for 2008 in kg of NO3/ha/yr, within AOI.",numeric
+NO3_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for nitrate ion concentration wet deposition for 2008 in kilograms of nitrate (NO3) per hectacre per year, within area of interest (AOI).",numeric
 NO3_Interp,milligrams per liter nitrogen,The interpolated nitrate concentration using the gap_fill function within R.,numeric
 NO3_mg_N_L,milligrams per liter nitrogen,The reported nitrate concentrations as milligrams per liter as nitrogen (N).,numeric
 NO3_uM_N,micromolar per liter Nitrate,The reported nitrate-N concentrations as micromolar per liter nitrate-N.,numeric
 NO3_unit,N/A,"The unit of measurement that the publication reports and applies to the ""NO3"" column in the data package.",text
 Notes,N/A,Free text field to record notes related to data extraction process.,text
 Number_of_Study_Sites,N/A,Number of study sites for each study.,numeric
-OmWs,percentage,Mean organic matter content (percent by weight) of soils (STATSGO) within AOI.,numeric
+OmWs,percentage,Mean organic matter content (percent by weight) of soils (STATSGO) within area of interest (AOI).,numeric
 Pair,N/A,The designation for each site to identify if it was a burned watershed or an unburned watershed and which site it is being compared to.,text
-PctAlkIntruVolWs,percentage,Percentage of AOI area classified as lithology type: alkaline intrusive volcanic rock.,numeric
-PctAlluvCoastWs,percentage,Percentage of AOI area classified as lithology type: alluvium and fine-textured coastal zone sediment.,numeric
-PctBl2001,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2001.,numeric
-PctBl2004,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2004.,numeric
-PctBl2006,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2006.,numeric
-PctBl2008,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2008.,numeric
-PctBl2011,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2011.,numeric
-PctBl2013,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2013.,numeric
-PctBl2016,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2016.,numeric
-PctBl2019,percentage,Percentage of AOI area classified as barren land cover (NLCD class 31) for 2019.,numeric
-PctCarbResidWs,percentage,Percentage of AOI area classified as lithology type: carbonate residual material.,numeric
-PctCoastCrsWs,percentage,"Percentage of AOI area classified as lithology type: coastal zone sediment, coarse-textured.",numeric
-PctColluvSedWs,percentage,Percentage of AOI area classified as lithology type: colluvial sediment.,numeric
-PctConif2001,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2001.,numeric
-PctConif2004,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2004.,numeric
-PctConif2006,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2006.,numeric
-PctConif2008,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2008.,numeric
-PctConif2011,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2011.,numeric
-PctConif2013,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2013.,numeric
-PctConif2016,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2016.,numeric
-PctConif2019,percentage,Percentage of AOI area classified as evergreen forest land cover (NLCD class 42) for 2019.,numeric
-PctCrop2001,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2001.,numeric
-PctCrop2004,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2004.,numeric
-PctCrop2006,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2006.,numeric
-PctCrop2008,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2008.,numeric
-PctCrop2011,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2011.,numeric
-PctCrop2013,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2013.,numeric
-PctCrop2016,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2016.,numeric
-PctCrop2019,percentage,Percentage of AOI area classified as crop land use (NLCD class 82) for 2019.,numeric
-PctDecid2001,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2001.,numeric
-PctDecid2004,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2004.,numeric
-PctDecid2006,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2006.,numeric
-PctDecid2008,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2008.,numeric
-PctDecid2011,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2011.,numeric
-PctDecid2013,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2013.,numeric
-PctDecid2016,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2016.,numeric
-PctDecid2019,percentage,Percentage of AOI area classified as deciduous forest land cover (NLCD class 41) for 2018.,numeric
-PctEolCrsWs,percentage,"Percentage of AOI area classified as lithology type: eolian sediment, coarse-textured (sand dunes).",numeric
-PctEolFineWs,percentage,"Percentage of AOI area classified as lithology type: eolian sediment, fine-textured (glacial loess).",numeric
-PctExtruVolWs,percentage,Percentage of AOI area classified as lithology type: extrusive volcanic rock.,numeric
-PctFire2000Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2000.,numeric
-PctFire2001Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2001.,numeric
-PctFire2002Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2002.,numeric
-PctFire2003Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2003.,numeric
-PctFire2004Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2004.,numeric
-PctFire2005Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2005.,numeric
-PctFire2006Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2006.,numeric
-PctFire2007Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2007.,numeric
-PctFire2008Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2008.,numeric
-PctFire2009Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2009.,numeric
-PctFire2010Ws,percentage,Percentage Forest loss to fire (fire perimeter) within AOI for 2010.,numeric
-PctGlacLakeCrsWs,percentage,"Percentage of AOI area classified as lithology type: glacial outwash and glacial lake sediment, coarse-textured.",numeric
-PctGlacLakeFineWs,percentage,"Percentage of AOI area classified as lithology type: glacial lake sediment, fine-textured.",numeric
-PctGlacTilClayWs,percentage,"Percentage of AOI area classified as lithology type: glacial till, clayey.",numeric
-PctGlacTilCrsWs,percentage,"Percentage of AOI area classified as lithology type: glacial till, coarse-textured.",numeric
-PctGlacTilLoamWs,percentage,"Percentage of AOI area classified as lithology type: glacial till, loamy.",numeric
-PctGrs2001,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2001.,numeric
-PctGrs2004,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2004.,numeric
-PctGrs2006,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2006.,numeric
-PctGrs2008,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2008.,numeric
-PctGrs2011,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2011.,numeric
-PctGrs2013,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2013.,numeric
-PctGrs2016,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2016.,numeric
-PctGrs2019,percentage,Percentage of AOI area classified as grassland/herbaceous land cover (NLCD class 71) for 2019.,numeric
-PctHbWet2001,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2001.,numeric
-PctHbWet2004,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2004.,numeric
-PctHbWet2006,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2006.,numeric
-PctHbWet2008,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2008.,numeric
-PctHbWet2011,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2011.,numeric
-PctHbWet2013,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2013.,numeric
-PctHbWet2016,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2016.,numeric
-PctHbWet2019,percentage,Percentage of AOI area classified as herbaceous wetland land cover (NLCD class 95) for 2019.,numeric
-PctHigh Burn SeverityWs_1984,percentage,Percentage of AOI area classified as high severity for 1984,numeric
-PctHigh Burn SeverityWs_1985,percentage,Percentage of AOI area classified as high severity for 1985,numeric
-PctHigh Burn SeverityWs_1986,percentage,Percentage of AOI area classified as high severity for 1986,numeric
-PctHigh Burn SeverityWs_1987,percentage,Percentage of AOI area classified as high severity for 1987,numeric
-PctHigh Burn SeverityWs_1988,percentage,Percentage of AOI area classified as high severity for 1988,numeric
-PctHigh Burn SeverityWs_1989,percentage,Percentage of AOI area classified as high severity for 1989,numeric
-PctHigh Burn SeverityWs_1990,percentage,Percentage of AOI area classified as high severity for 1990,numeric
-PctHigh Burn SeverityWs_1991,percentage,Percentage of AOI area classified as high severity for 1991,numeric
-PctHigh Burn SeverityWs_1992,percentage,Percentage of AOI area classified as high severity for 1992,numeric
-PctHigh Burn SeverityWs_1993,percentage,Percentage of AOI area classified as high severity for 1993,numeric
-PctHigh Burn SeverityWs_1994,percentage,Percentage of AOI area classified as high severity for 1994,numeric
-PctHigh Burn SeverityWs_1995,percentage,Percentage of AOI area classified as high severity for 1995,numeric
-PctHigh Burn SeverityWs_1996,percentage,Percentage of AOI area classified as high severity for 1996,numeric
-PctHigh Burn SeverityWs_1997,percentage,Percentage of AOI area classified as high severity for 1997,numeric
-PctHigh Burn SeverityWs_1998,percentage,Percentage of AOI area classified as high severity for 1998,numeric
-PctHigh Burn SeverityWs_1999,percentage,Percentage of AOI area classified as high severity for 1999,numeric
-PctHigh Burn SeverityWs_2000,percentage,Percentage of AOI area classified as high severity for 2000,numeric
-PctHigh Burn SeverityWs_2001,percentage,Percentage of AOI area classified as high severity for 2001,numeric
-PctHigh Burn SeverityWs_2002,percentage,Percentage of AOI area classified as high severity for 2002,numeric
-PctHigh Burn SeverityWs_2003,percentage,Percentage of AOI area classified as high severity for 2003,numeric
-PctHigh Burn SeverityWs_2004,percentage,Percentage of AOI area classified as high severity for 2004,numeric
-PctHigh Burn SeverityWs_2005,percentage,Percentage of AOI area classified as high severity for 2005,numeric
-PctHigh Burn SeverityWs_2006,percentage,Percentage of AOI area classified as high severity for 2006,numeric
-PctHigh Burn SeverityWs_2007,percentage,Percentage of AOI area classified as high severity for 2007,numeric
-PctHigh Burn SeverityWs_2008,percentage,Percentage of AOI area classified as high severity for 2008,numeric
-PctHigh Burn SeverityWs_2009,percentage,Percentage of AOI area classified as high severity for 2009,numeric
-PctHigh Burn SeverityWs_2010,percentage,Percentage of AOI area classified as high severity for 2010,numeric
-PctHigh Burn SeverityWs_2011,percentage,Percentage of AOI area classified as high severity for 2011,numeric
-PctHigh Burn SeverityWs_2012,percentage,Percentage of AOI area classified as high severity for 2012,numeric
-PctHigh Burn SeverityWs_2013,percentage,Percentage of AOI area classified as high severity for 2013,numeric
-PctHigh Burn SeverityWs_2014,percentage,Percentage of AOI area classified as high severity for 2014,numeric
-PctHigh Burn SeverityWs_2015,percentage,Percentage of AOI area classified as high severity for 2015,numeric
-PctHigh Burn SeverityWs_2016,percentage,Percentage of AOI area classified as high severity for 2016,numeric
-PctHigh Burn SeverityWs_2017,percentage,Percentage of AOI area classified as high severity for 2017,numeric
-PctHigh Burn SeverityWs_2018,percentage,Percentage of AOI area classified as high severity for 2018,numeric
-PctHydricWs,percentage,"Percentage of AOI area classified as lithology type: hydric, peat and muck",numeric
-PctIce2001,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2001.,numeric
-PctIce2004,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2004.,numeric
-PctIce2006,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2006.,numeric
-PctIce2008,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2008.,numeric
-PctIce2011,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2011.,numeric
-PctIce2013,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2013.,numeric
-PctIce2016,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2016.,numeric
-PctIce2019,percentage,Percentage of AOI area classified as ice/snow land cover (NLCD class 12) for 2019.,numeric
-PctLow Burn SeverityWs_1984,percentage,Percentage of AOI area classified as low severity for 1984,numeric
-PctLow Burn SeverityWs_1985,percentage,Percentage of AOI area classified as low severity for 1985,numeric
-PctLow Burn SeverityWs_1986,percentage,Percentage of AOI area classified as low severity for 1986,numeric
-PctLow Burn SeverityWs_1987,percentage,Percentage of AOI area classified as low severity for 1987,numeric
-PctLow Burn SeverityWs_1988,percentage,Percentage of AOI area classified as low severity for 1988,numeric
-PctLow Burn SeverityWs_1989,percentage,Percentage of AOI area classified as low severity for 1989,numeric
-PctLow Burn SeverityWs_1990,percentage,Percentage of AOI area classified as low severity for 1990,numeric
-PctLow Burn SeverityWs_1991,percentage,Percentage of AOI area classified as low severity for 1991,numeric
-PctLow Burn SeverityWs_1992,percentage,Percentage of AOI area classified as low severity for 1992,numeric
-PctLow Burn SeverityWs_1993,percentage,Percentage of AOI area classified as low severity for 1993,numeric
-PctLow Burn SeverityWs_1994,percentage,Percentage of AOI area classified as low severity for 1994,numeric
-PctLow Burn SeverityWs_1995,percentage,Percentage of AOI area classified as low severity for 1995,numeric
-PctLow Burn SeverityWs_1996,percentage,Percentage of AOI area classified as low severity for 1996,numeric
-PctLow Burn SeverityWs_1997,percentage,Percentage of AOI area classified as low severity for 1997,numeric
-PctLow Burn SeverityWs_1998,percentage,Percentage of AOI area classified as low severity for 1998,numeric
-PctLow Burn SeverityWs_1999,percentage,Percentage of AOI area classified as low severity for 1999,numeric
-PctLow Burn SeverityWs_2000,percentage,Percentage of AOI area classified as low severity for 2000,numeric
-PctLow Burn SeverityWs_2001,percentage,Percentage of AOI area classified as low severity for 2001,numeric
-PctLow Burn SeverityWs_2002,percentage,Percentage of AOI area classified as low severity for 2002,numeric
-PctLow Burn SeverityWs_2003,percentage,Percentage of AOI area classified as low severity for 2003,numeric
-PctLow Burn SeverityWs_2004,percentage,Percentage of AOI area classified as low severity for 2004,numeric
-PctLow Burn SeverityWs_2005,percentage,Percentage of AOI area classified as low severity for 2005,numeric
-PctLow Burn SeverityWs_2006,percentage,Percentage of AOI area classified as low severity for 2006,numeric
-PctLow Burn SeverityWs_2007,percentage,Percentage of AOI area classified as low severity for 2007,numeric
-PctLow Burn SeverityWs_2008,percentage,Percentage of AOI area classified as low severity for 2008,numeric
-PctLow Burn SeverityWs_2009,percentage,Percentage of AOI area classified as low severity for 2009,numeric
-PctLow Burn SeverityWs_2010,percentage,Percentage of AOI area classified as low severity for 2010,numeric
-PctLow Burn SeverityWs_2011,percentage,Percentage of AOI area classified as low severity for 2011,numeric
-PctLow Burn SeverityWs_2012,percentage,Percentage of AOI area classified as low severity for 2012,numeric
-PctLow Burn SeverityWs_2013,percentage,Percentage of AOI area classified as low severity for 2013,numeric
-PctLow Burn SeverityWs_2014,percentage,Percentage of AOI area classified as low severity for 2014,numeric
-PctLow Burn SeverityWs_2015,percentage,Percentage of AOI area classified as low severity for 2015,numeric
-PctLow Burn SeverityWs_2016,percentage,Percentage of AOI area classified as low severity for 2016,numeric
-PctLow Burn SeverityWs_2017,percentage,Percentage of AOI area classified as low severity for 2017,numeric
-PctLow Burn SeverityWs_2018,percentage,Percentage of AOI area classified as low severity for 2018,numeric
-PctModerate Burn SeverityWs_1984,percentage,Percentage of AOI area classified as moderate severity for 1984,numeric
-PctModerate Burn SeverityWs_1985,percentage,Percentage of AOI area classified as moderate severity for 1985,numeric
-PctModerate Burn SeverityWs_1986,percentage,Percentage of AOI area classified as moderate severity for 1986,numeric
-PctModerate Burn SeverityWs_1987,percentage,Percentage of AOI area classified as moderate severity for 1987,numeric
-PctModerate Burn SeverityWs_1988,percentage,Percentage of AOI area classified as moderate severity for 1988,numeric
-PctModerate Burn SeverityWs_1989,percentage,Percentage of AOI area classified as moderate severity for 1989,numeric
-PctModerate Burn SeverityWs_1990,percentage,Percentage of AOI area classified as moderate severity for 1990,numeric
-PctModerate Burn SeverityWs_1991,percentage,Percentage of AOI area classified as moderate severity for 1991,numeric
-PctModerate Burn SeverityWs_1992,percentage,Percentage of AOI area classified as moderate severity for 1992,numeric
-PctModerate Burn SeverityWs_1993,percentage,Percentage of AOI area classified as moderate severity for 1993,numeric
-PctModerate Burn SeverityWs_1994,percentage,Percentage of AOI area classified as moderate severity for 1994,numeric
-PctModerate Burn SeverityWs_1995,percentage,Percentage of AOI area classified as moderate severity for 1995,numeric
-PctModerate Burn SeverityWs_1996,percentage,Percentage of AOI area classified as moderate severity for 1996,numeric
-PctModerate Burn SeverityWs_1997,percentage,Percentage of AOI area classified as moderate severity for 1997,numeric
-PctModerate Burn SeverityWs_1998,percentage,Percentage of AOI area classified as moderate severity for 1998,numeric
-PctModerate Burn SeverityWs_1999,percentage,Percentage of AOI area classified as moderate severity for 1999,numeric
-PctModerate Burn SeverityWs_2000,percentage,Percentage of AOI area classified as moderate severity for 2000,numeric
-PctModerate Burn SeverityWs_2001,percentage,Percentage of AOI area classified as moderate severity for 2001,numeric
-PctModerate Burn SeverityWs_2002,percentage,Percentage of AOI area classified as moderate severity for 2002,numeric
-PctModerate Burn SeverityWs_2003,percentage,Percentage of AOI area classified as moderate severity for 2003,numeric
-PctModerate Burn SeverityWs_2004,percentage,Percentage of AOI area classified as moderate severity for 2004,numeric
-PctModerate Burn SeverityWs_2005,percentage,Percentage of AOI area classified as moderate severity for 2005,numeric
-PctModerate Burn SeverityWs_2006,percentage,Percentage of AOI area classified as moderate severity for 2006,numeric
-PctModerate Burn SeverityWs_2007,percentage,Percentage of AOI area classified as moderate severity for 2007,numeric
-PctModerate Burn SeverityWs_2008,percentage,Percentage of AOI area classified as moderate severity for 2008,numeric
-PctModerate Burn SeverityWs_2009,percentage,Percentage of AOI area classified as moderate severity for 2009,numeric
-PctModerate Burn SeverityWs_2010,percentage,Percentage of AOI area classified as moderate severity for 2010,numeric
-PctModerate Burn SeverityWs_2011,percentage,Percentage of AOI area classified as moderate severity for 2011,numeric
-PctModerate Burn SeverityWs_2012,percentage,Percentage of AOI area classified as moderate severity for 2012,numeric
-PctModerate Burn SeverityWs_2013,percentage,Percentage of AOI area classified as moderate severity for 2013,numeric
-PctModerate Burn SeverityWs_2014,percentage,Percentage of AOI area classified as moderate severity for 2014,numeric
-PctModerate Burn SeverityWs_2015,percentage,Percentage of AOI area classified as moderate severity for 2015,numeric
-PctModerate Burn SeverityWs_2016,percentage,Percentage of AOI area classified as moderate severity for 2016,numeric
-PctModerate Burn SeverityWs_2017,percentage,Percentage of AOI area classified as moderate severity for 2017,numeric
-PctModerate Burn SeverityWs_2018,percentage,Percentage of AOI area classified as moderate severity for 2018,numeric
-PctNonCarbResidWs,percentage,Percentage of AOI area classified as lithology type: non-carbonate residual material.,numeric
-PctOw2001,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2001.,numeric
-PctOw2004,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2004.,numeric
-PctOw2006,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2006.,numeric
-PctOw2008,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2008.,numeric
-PctOw2011,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2011.,numeric
-PctOw2013,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2013.,numeric
-PctOw2016,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2016.,numeric
-PctOw2019,percentage,Percentage of AOI area classified as open water land cover (NLCD class 11) for 2019.,numeric
-PctSalLakeWs,percentage,Percentage of AOI area classified as lithology type: saline like sediment.,numeric
-PctShrb2001,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2001,numeric
-PctShrb2004,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2004,numeric
-PctShrb2006,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2006,numeric
-PctShrb2008,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2008,numeric
-PctShrb2011,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2011,numeric
-PctShrb2013,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2013,numeric
-PctShrb2016,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2016,numeric
-PctShrb2019,percentage,Percentage of AOI area classified as shrub/scrub land cover (NLCD class 52) for 2019,numeric
-PctSilicicWs,percentage,Percentage of AOI area classified as lithology type: silicic residual material.,numeric
-PctUrbHi2001,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2001.",numeric
-PctUrbHi2004,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2004.",numeric
-PctUrbHi2006,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2006.",numeric
-PctUrbHi2008,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2008.",numeric
-PctUrbHi2011,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2011.",numeric
-PctUrbHi2013,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2013.",numeric
-PctUrbHi2016,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2016.",numeric
-PctUrbHi2019,percentage,"Percentage of AOI area classified as developed, high-intensity land use (NLCD class 24) for 2019.",numeric
-PctUrbLo2001,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2001.",numeric
-PctUrbLo2004,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2004.",numeric
-PctUrbLo2006,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2006.",numeric
-PctUrbLo2008,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2008.",numeric
-PctUrbLo2011,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2011.",numeric
-PctUrbLo2013,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2013.",numeric
-PctUrbLo2016,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2016.",numeric
-PctUrbLo2019,percentage,"Percentage of AOI area classified as developed, low-intensity land use (NLCD class 24) for 2019.",numeric
-PctUrbMd2001,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2001.",numeric
-PctUrbMd2004,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2004.",numeric
-PctUrbMd2006,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2006.",numeric
-PctUrbMd2008,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2008.",numeric
-PctUrbMd2011,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2011.",numeric
-PctUrbMd2013,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2013.",numeric
-PctUrbMd2016,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2016.",numeric
-PctUrbMd2019,percentage,"Percentage of AOI area classified as developed, medium-intensity land use (NLCD class 24) for 2019.",numeric
-PctUrbOp2001,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2001.",numeric
-PctUrbOp2004,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2004.",numeric
-PctUrbOp2006,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2006.",numeric
-PctUrbOp2008,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2008.",numeric
-PctUrbOp2011,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2011.",numeric
-PctUrbOp2013,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2013.",numeric
-PctUrbOp2016,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2016.",numeric
-PctUrbOp2019,percentage,"Percentage of AOI area classified as developed, open space land use (NLCD class 21) for 2019.",numeric
-PctWaterWs,percentage,Percentage of AOI area classified as lithology type: water.,numeric
-PctWdWet2001,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2001.,numeric
-PctWdWet2004,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2004.,numeric
-PctWdWet2006,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2006.,numeric
-PctWdWet2008,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2008.,numeric
-PctWdWet2011,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2011.,numeric
-PctWdWet2013,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2013.,numeric
-PctWdWet2016,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2016.,numeric
-PctWdWet2019,percentage,Percentage of AOI area classified as woody wetland land cover (NLCD class 90) for 2019.,numeric
+PctAlkIntruVolWs,percentage,Percentage of area of interest (AOI) area classified as lithology type: alkaline intrusive volcanic rock.,numeric
+PctAlluvCoastWs,percentage,Percentage of area of interest (AOI) area classified as lithology type: alluvium and fine-textured coastal zone sediment.,numeric
+PctBl2001,percentage,Percentage of area of interest (AOI) area classified as barren land cover (national land cover database (NLCD) class 31) for 2001.,numeric
+PctBl2004,percentage,Percentage of area of interest (AOI) area classified as barren land cover (national land cover database (NLCD) class 31) for 2004.,numeric
+PctBl2006,percentage,Percentage of area of interest (AOI) area classified as barren land cover (national land cover database (NLCD) class 31) for 2006.,numeric
+PctBl2008,percentage,Percentage of area of interest (AOI) area classified as barren land cover (national land cover database (NLCD) class 31) for 2008.,numeric
+PctBl2011,percentage,Percentage of area of interest (AOI) area classified as barren land cover (national land cover database (NLCD) class 31) for 2011.,numeric
+PctBl2013,percentage,Percentage of area of interest (AOI) area classified as barren land cover (national land cover database (NLCD) class 31) for 2013.,numeric
+PctBl2016,percentage,Percentage of area of interest (AOI) area classified as barren land cover (national land cover database (NLCD) class 31) for 2016.,numeric
+PctBl2019,percentage,Percentage of area of interest (AOI) area classified as barren land cover (national land cover database (NLCD) class 31) for 2019.,numeric
+PctCarbResidWs,percentage,Percentage of area of interest (AOI) area classified as lithology type: carbonate residual material.,numeric
+PctCoastCrsWs,percentage,"Percentage of area of interest (AOI) area classified as lithology type: coastal zone sediment, coarse-textured.",numeric
+PctColluvSedWs,percentage,Percentage of area of interest (AOI) area classified as lithology type: colluvial sediment.,numeric
+PctConif2001,percentage,Percentage of area of interest (AOI) area classified as evergreen forest land cover (national land cover database (NLCD) class 42) for 2001.,numeric
+PctConif2004,percentage,Percentage of area of interest (AOI) area classified as evergreen forest land cover (national land cover database (NLCD) class 42) for 2004.,numeric
+PctConif2006,percentage,Percentage of area of interest (AOI) area classified as evergreen forest land cover (national land cover database (NLCD) class 42) for 2006.,numeric
+PctConif2008,percentage,Percentage of area of interest (AOI) area classified as evergreen forest land cover (national land cover database (NLCD) class 42) for 2008.,numeric
+PctConif2011,percentage,Percentage of area of interest (AOI) area classified as evergreen forest land cover (national land cover database (NLCD) class 42) for 2011.,numeric
+PctConif2013,percentage,Percentage of area of interest (AOI) area classified as evergreen forest land cover (national land cover database (NLCD) class 42) for 2013.,numeric
+PctConif2016,percentage,Percentage of area of interest (AOI) area classified as evergreen forest land cover (national land cover database (NLCD) class 42) for 2016.,numeric
+PctConif2019,percentage,Percentage of area of interest (AOI) area classified as evergreen forest land cover (national land cover database (NLCD) class 42) for 2019.,numeric
+PctCrop2001,percentage,Percentage of area of interest (AOI) area classified as crop land use (national land cover database (NLCD) class 82) for 2001.,numeric
+PctCrop2004,percentage,Percentage of area of interest (AOI) area classified as crop land use (national land cover database (NLCD) class 82) for 2004.,numeric
+PctCrop2006,percentage,Percentage of area of interest (AOI) area classified as crop land use (national land cover database (NLCD) class 82) for 2006.,numeric
+PctCrop2008,percentage,Percentage of area of interest (AOI) area classified as crop land use (national land cover database (NLCD) class 82) for 2008.,numeric
+PctCrop2011,percentage,Percentage of area of interest (AOI) area classified as crop land use (national land cover database (NLCD) class 82) for 2011.,numeric
+PctCrop2013,percentage,Percentage of area of interest (AOI) area classified as crop land use (national land cover database (NLCD) class 82) for 2013.,numeric
+PctCrop2016,percentage,Percentage of area of interest (AOI) area classified as crop land use (national land cover database (NLCD) class 82) for 2016.,numeric
+PctCrop2019,percentage,Percentage of area of interest (AOI) area classified as crop land use (national land cover database (NLCD) class 82) for 2019.,numeric
+PctDecid2001,percentage,Percentage of area of interest (AOI) area classified as deciduous forest land cover (national land cover database (NLCD) class 41) for 2001.,numeric
+PctDecid2004,percentage,Percentage of area of interest (AOI) area classified as deciduous forest land cover (national land cover database (NLCD) class 41) for 2004.,numeric
+PctDecid2006,percentage,Percentage of area of interest (AOI) area classified as deciduous forest land cover (national land cover database (NLCD) class 41) for 2006.,numeric
+PctDecid2008,percentage,Percentage of area of interest (AOI) area classified as deciduous forest land cover (national land cover database (NLCD) class 41) for 2008.,numeric
+PctDecid2011,percentage,Percentage of area of interest (AOI) area classified as deciduous forest land cover (national land cover database (NLCD) class 41) for 2011.,numeric
+PctDecid2013,percentage,Percentage of area of interest (AOI) area classified as deciduous forest land cover (national land cover database (NLCD) class 41) for 2013.,numeric
+PctDecid2016,percentage,Percentage of area of interest (AOI) area classified as deciduous forest land cover (national land cover database (NLCD) class 41) for 2016.,numeric
+PctDecid2019,percentage,Percentage of area of interest (AOI) area classified as deciduous forest land cover (national land cover database (NLCD) class 41) for 2018.,numeric
+PctEolCrsWs,percentage,"Percentage of area of interest (AOI) area classified as lithology type: eolian sediment, coarse-textured (sand dunes).",numeric
+PctEolFineWs,percentage,"Percentage of area of interest (AOI) area classified as lithology type: eolian sediment, fine-textured (glacial loess).",numeric
+PctExtruVolWs,percentage,Percentage of area of interest (AOI) area classified as lithology type: extrusive volcanic rock.,numeric
+PctFire2000Ws,percentage,Percentage Forest loss to fire (fire perimeter) within area of interest (AOI) for 2000.,numeric
+PctFire2001Ws,percentage,Percentage Forest loss to fire (fire perimeter) within area of interest (AOI) for 2001.,numeric
+PctFire2002Ws,percentage,Percentage Forest loss to fire (fire perimeter) within area of interest (AOI) for 2002.,numeric
+PctFire2003Ws,percentage,Percentage Forest loss to fire (fire perimeter) within area of interest (AOI) for 2003.,numeric
+PctFire2004Ws,percentage,Percentage Forest loss to fire (fire perimeter) within area of interest (AOI) for 2004.,numeric
+PctFire2005Ws,percentage,Percentage Forest loss to fire (fire perimeter) within area of interest (AOI) for 2005.,numeric
+PctFire2006Ws,percentage,Percentage Forest loss to fire (fire perimeter) within area of interest (AOI) for 2006.,numeric
+PctFire2007Ws,percentage,Percentage Forest loss to fire (fire perimeter) within area of interest (AOI) for 2007.,numeric
+PctFire2008Ws,percentage,Percentage Forest loss to fire (fire perimeter) within area of interest (AOI) for 2008.,numeric
+PctFire2009Ws,percentage,Percentage Forest loss to fire (fire perimeter) within area of interest (AOI) for 2009.,numeric
+PctFire2010Ws,percentage,Percentage Forest loss to fire (fire perimeter) within area of interest (AOI) for 2010.,numeric
+PctGlacLakeCrsWs,percentage,"Percentage of area of interest (AOI) area classified as lithology type: glacial outwash and glacial lake sediment, coarse-textured.",numeric
+PctGlacLakeFineWs,percentage,"Percentage of area of interest (AOI) area classified as lithology type: glacial lake sediment, fine-textured.",numeric
+PctGlacTilClayWs,percentage,"Percentage of area of interest (AOI) area classified as lithology type: glacial till, clayey.",numeric
+PctGlacTilCrsWs,percentage,"Percentage of area of interest (AOI) area classified as lithology type: glacial till, coarse-textured.",numeric
+PctGlacTilLoamWs,percentage,"Percentage of area of interest (AOI) area classified as lithology type: glacial till, loamy.",numeric
+PctGrs2001,percentage,Percentage of area of interest (AOI) area classified as grassland/herbaceous land cover (national land cover database (NLCD) class 71) for 2001.,numeric
+PctGrs2004,percentage,Percentage of area of interest (AOI) area classified as grassland/herbaceous land cover (national land cover database (NLCD) class 71) for 2004.,numeric
+PctGrs2006,percentage,Percentage of area of interest (AOI) area classified as grassland/herbaceous land cover (national land cover database (NLCD) class 71) for 2006.,numeric
+PctGrs2008,percentage,Percentage of area of interest (AOI) area classified as grassland/herbaceous land cover (national land cover database (NLCD) class 71) for 2008.,numeric
+PctGrs2011,percentage,Percentage of area of interest (AOI) area classified as grassland/herbaceous land cover (national land cover database (NLCD) class 71) for 2011.,numeric
+PctGrs2013,percentage,Percentage of area of interest (AOI) area classified as grassland/herbaceous land cover (national land cover database (NLCD) class 71) for 2013.,numeric
+PctGrs2016,percentage,Percentage of area of interest (AOI) area classified as grassland/herbaceous land cover (national land cover database (NLCD) class 71) for 2016.,numeric
+PctGrs2019,percentage,Percentage of area of interest (AOI) area classified as grassland/herbaceous land cover (national land cover database (NLCD) class 71) for 2019.,numeric
+PctHbWet2001,percentage,Percentage of area of interest (AOI) area classified as herbaceous wetland land cover (national land cover database (NLCD) class 95) for 2001.,numeric
+PctHbWet2004,percentage,Percentage of area of interest (AOI) area classified as herbaceous wetland land cover (national land cover database (NLCD) class 95) for 2004.,numeric
+PctHbWet2006,percentage,Percentage of area of interest (AOI) area classified as herbaceous wetland land cover (national land cover database (NLCD) class 95) for 2006.,numeric
+PctHbWet2008,percentage,Percentage of area of interest (AOI) area classified as herbaceous wetland land cover (national land cover database (NLCD) class 95) for 2008.,numeric
+PctHbWet2011,percentage,Percentage of area of interest (AOI) area classified as herbaceous wetland land cover (national land cover database (NLCD) class 95) for 2011.,numeric
+PctHbWet2013,percentage,Percentage of area of interest (AOI) area classified as herbaceous wetland land cover (national land cover database (NLCD) class 95) for 2013.,numeric
+PctHbWet2016,percentage,Percentage of area of interest (AOI) area classified as herbaceous wetland land cover (national land cover database (NLCD) class 95) for 2016.,numeric
+PctHbWet2019,percentage,Percentage of area of interest (AOI) area classified as herbaceous wetland land cover (national land cover database (NLCD) class 95) for 2019.,numeric
+PctHigh Burn SeverityWs_1984,percentage,Percentage of area of interest (AOI) area classified as high severity for 1984,numeric
+PctHigh Burn SeverityWs_1985,percentage,Percentage of area of interest (AOI) area classified as high severity for 1985,numeric
+PctHigh Burn SeverityWs_1986,percentage,Percentage of area of interest (AOI) area classified as high severity for 1986,numeric
+PctHigh Burn SeverityWs_1987,percentage,Percentage of area of interest (AOI) area classified as high severity for 1987,numeric
+PctHigh Burn SeverityWs_1988,percentage,Percentage of area of interest (AOI) area classified as high severity for 1988,numeric
+PctHigh Burn SeverityWs_1989,percentage,Percentage of area of interest (AOI) area classified as high severity for 1989,numeric
+PctHigh Burn SeverityWs_1990,percentage,Percentage of area of interest (AOI) area classified as high severity for 1990,numeric
+PctHigh Burn SeverityWs_1991,percentage,Percentage of area of interest (AOI) area classified as high severity for 1991,numeric
+PctHigh Burn SeverityWs_1992,percentage,Percentage of area of interest (AOI) area classified as high severity for 1992,numeric
+PctHigh Burn SeverityWs_1993,percentage,Percentage of area of interest (AOI) area classified as high severity for 1993,numeric
+PctHigh Burn SeverityWs_1994,percentage,Percentage of area of interest (AOI) area classified as high severity for 1994,numeric
+PctHigh Burn SeverityWs_1995,percentage,Percentage of area of interest (AOI) area classified as high severity for 1995,numeric
+PctHigh Burn SeverityWs_1996,percentage,Percentage of area of interest (AOI) area classified as high severity for 1996,numeric
+PctHigh Burn SeverityWs_1997,percentage,Percentage of area of interest (AOI) area classified as high severity for 1997,numeric
+PctHigh Burn SeverityWs_1998,percentage,Percentage of area of interest (AOI) area classified as high severity for 1998,numeric
+PctHigh Burn SeverityWs_1999,percentage,Percentage of area of interest (AOI) area classified as high severity for 1999,numeric
+PctHigh Burn SeverityWs_2000,percentage,Percentage of area of interest (AOI) area classified as high severity for 2000,numeric
+PctHigh Burn SeverityWs_2001,percentage,Percentage of area of interest (AOI) area classified as high severity for 2001,numeric
+PctHigh Burn SeverityWs_2002,percentage,Percentage of area of interest (AOI) area classified as high severity for 2002,numeric
+PctHigh Burn SeverityWs_2003,percentage,Percentage of area of interest (AOI) area classified as high severity for 2003,numeric
+PctHigh Burn SeverityWs_2004,percentage,Percentage of area of interest (AOI) area classified as high severity for 2004,numeric
+PctHigh Burn SeverityWs_2005,percentage,Percentage of area of interest (AOI) area classified as high severity for 2005,numeric
+PctHigh Burn SeverityWs_2006,percentage,Percentage of area of interest (AOI) area classified as high severity for 2006,numeric
+PctHigh Burn SeverityWs_2007,percentage,Percentage of area of interest (AOI) area classified as high severity for 2007,numeric
+PctHigh Burn SeverityWs_2008,percentage,Percentage of area of interest (AOI) area classified as high severity for 2008,numeric
+PctHigh Burn SeverityWs_2009,percentage,Percentage of area of interest (AOI) area classified as high severity for 2009,numeric
+PctHigh Burn SeverityWs_2010,percentage,Percentage of area of interest (AOI) area classified as high severity for 2010,numeric
+PctHigh Burn SeverityWs_2011,percentage,Percentage of area of interest (AOI) area classified as high severity for 2011,numeric
+PctHigh Burn SeverityWs_2012,percentage,Percentage of area of interest (AOI) area classified as high severity for 2012,numeric
+PctHigh Burn SeverityWs_2013,percentage,Percentage of area of interest (AOI) area classified as high severity for 2013,numeric
+PctHigh Burn SeverityWs_2014,percentage,Percentage of area of interest (AOI) area classified as high severity for 2014,numeric
+PctHigh Burn SeverityWs_2015,percentage,Percentage of area of interest (AOI) area classified as high severity for 2015,numeric
+PctHigh Burn SeverityWs_2016,percentage,Percentage of area of interest (AOI) area classified as high severity for 2016,numeric
+PctHigh Burn SeverityWs_2017,percentage,Percentage of area of interest (AOI) area classified as high severity for 2017,numeric
+PctHigh Burn SeverityWs_2018,percentage,Percentage of area of interest (AOI) area classified as high severity for 2018,numeric
+PctHydricWs,percentage,"Percentage of area of interest (AOI) area classified as lithology type: hydric, peat and muck",numeric
+PctIce2001,percentage,Percentage of area of interest (AOI) area classified as ice/snow land cover (national land cover database (NLCD) class 12) for 2001.,numeric
+PctIce2004,percentage,Percentage of area of interest (AOI) area classified as ice/snow land cover (national land cover database (NLCD) class 12) for 2004.,numeric
+PctIce2006,percentage,Percentage of area of interest (AOI) area classified as ice/snow land cover (national land cover database (NLCD) class 12) for 2006.,numeric
+PctIce2008,percentage,Percentage of area of interest (AOI) area classified as ice/snow land cover (national land cover database (NLCD) class 12) for 2008.,numeric
+PctIce2011,percentage,Percentage of area of interest (AOI) area classified as ice/snow land cover (national land cover database (NLCD) class 12) for 2011.,numeric
+PctIce2013,percentage,Percentage of area of interest (AOI) area classified as ice/snow land cover (national land cover database (NLCD) class 12) for 2013.,numeric
+PctIce2016,percentage,Percentage of area of interest (AOI) area classified as ice/snow land cover (national land cover database (NLCD) class 12) for 2016.,numeric
+PctIce2019,percentage,Percentage of area of interest (AOI) area classified as ice/snow land cover (national land cover database (NLCD) class 12) for 2019.,numeric
+PctLow Burn SeverityWs_1984,percentage,Percentage of area of interest (AOI) area classified as low severity for 1984,numeric
+PctLow Burn SeverityWs_1985,percentage,Percentage of area of interest (AOI) area classified as low severity for 1985,numeric
+PctLow Burn SeverityWs_1986,percentage,Percentage of area of interest (AOI) area classified as low severity for 1986,numeric
+PctLow Burn SeverityWs_1987,percentage,Percentage of area of interest (AOI) area classified as low severity for 1987,numeric
+PctLow Burn SeverityWs_1988,percentage,Percentage of area of interest (AOI) area classified as low severity for 1988,numeric
+PctLow Burn SeverityWs_1989,percentage,Percentage of area of interest (AOI) area classified as low severity for 1989,numeric
+PctLow Burn SeverityWs_1990,percentage,Percentage of area of interest (AOI) area classified as low severity for 1990,numeric
+PctLow Burn SeverityWs_1991,percentage,Percentage of area of interest (AOI) area classified as low severity for 1991,numeric
+PctLow Burn SeverityWs_1992,percentage,Percentage of area of interest (AOI) area classified as low severity for 1992,numeric
+PctLow Burn SeverityWs_1993,percentage,Percentage of area of interest (AOI) area classified as low severity for 1993,numeric
+PctLow Burn SeverityWs_1994,percentage,Percentage of area of interest (AOI) area classified as low severity for 1994,numeric
+PctLow Burn SeverityWs_1995,percentage,Percentage of area of interest (AOI) area classified as low severity for 1995,numeric
+PctLow Burn SeverityWs_1996,percentage,Percentage of area of interest (AOI) area classified as low severity for 1996,numeric
+PctLow Burn SeverityWs_1997,percentage,Percentage of area of interest (AOI) area classified as low severity for 1997,numeric
+PctLow Burn SeverityWs_1998,percentage,Percentage of area of interest (AOI) area classified as low severity for 1998,numeric
+PctLow Burn SeverityWs_1999,percentage,Percentage of area of interest (AOI) area classified as low severity for 1999,numeric
+PctLow Burn SeverityWs_2000,percentage,Percentage of area of interest (AOI) area classified as low severity for 2000,numeric
+PctLow Burn SeverityWs_2001,percentage,Percentage of area of interest (AOI) area classified as low severity for 2001,numeric
+PctLow Burn SeverityWs_2002,percentage,Percentage of area of interest (AOI) area classified as low severity for 2002,numeric
+PctLow Burn SeverityWs_2003,percentage,Percentage of area of interest (AOI) area classified as low severity for 2003,numeric
+PctLow Burn SeverityWs_2004,percentage,Percentage of area of interest (AOI) area classified as low severity for 2004,numeric
+PctLow Burn SeverityWs_2005,percentage,Percentage of area of interest (AOI) area classified as low severity for 2005,numeric
+PctLow Burn SeverityWs_2006,percentage,Percentage of area of interest (AOI) area classified as low severity for 2006,numeric
+PctLow Burn SeverityWs_2007,percentage,Percentage of area of interest (AOI) area classified as low severity for 2007,numeric
+PctLow Burn SeverityWs_2008,percentage,Percentage of area of interest (AOI) area classified as low severity for 2008,numeric
+PctLow Burn SeverityWs_2009,percentage,Percentage of area of interest (AOI) area classified as low severity for 2009,numeric
+PctLow Burn SeverityWs_2010,percentage,Percentage of area of interest (AOI) area classified as low severity for 2010,numeric
+PctLow Burn SeverityWs_2011,percentage,Percentage of area of interest (AOI) area classified as low severity for 2011,numeric
+PctLow Burn SeverityWs_2012,percentage,Percentage of area of interest (AOI) area classified as low severity for 2012,numeric
+PctLow Burn SeverityWs_2013,percentage,Percentage of area of interest (AOI) area classified as low severity for 2013,numeric
+PctLow Burn SeverityWs_2014,percentage,Percentage of area of interest (AOI) area classified as low severity for 2014,numeric
+PctLow Burn SeverityWs_2015,percentage,Percentage of area of interest (AOI) area classified as low severity for 2015,numeric
+PctLow Burn SeverityWs_2016,percentage,Percentage of area of interest (AOI) area classified as low severity for 2016,numeric
+PctLow Burn SeverityWs_2017,percentage,Percentage of area of interest (AOI) area classified as low severity for 2017,numeric
+PctLow Burn SeverityWs_2018,percentage,Percentage of area of interest (AOI) area classified as low severity for 2018,numeric
+PctModerate Burn SeverityWs_1984,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1984,numeric
+PctModerate Burn SeverityWs_1985,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1985,numeric
+PctModerate Burn SeverityWs_1986,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1986,numeric
+PctModerate Burn SeverityWs_1987,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1987,numeric
+PctModerate Burn SeverityWs_1988,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1988,numeric
+PctModerate Burn SeverityWs_1989,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1989,numeric
+PctModerate Burn SeverityWs_1990,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1990,numeric
+PctModerate Burn SeverityWs_1991,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1991,numeric
+PctModerate Burn SeverityWs_1992,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1992,numeric
+PctModerate Burn SeverityWs_1993,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1993,numeric
+PctModerate Burn SeverityWs_1994,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1994,numeric
+PctModerate Burn SeverityWs_1995,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1995,numeric
+PctModerate Burn SeverityWs_1996,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1996,numeric
+PctModerate Burn SeverityWs_1997,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1997,numeric
+PctModerate Burn SeverityWs_1998,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1998,numeric
+PctModerate Burn SeverityWs_1999,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 1999,numeric
+PctModerate Burn SeverityWs_2000,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2000,numeric
+PctModerate Burn SeverityWs_2001,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2001,numeric
+PctModerate Burn SeverityWs_2002,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2002,numeric
+PctModerate Burn SeverityWs_2003,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2003,numeric
+PctModerate Burn SeverityWs_2004,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2004,numeric
+PctModerate Burn SeverityWs_2005,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2005,numeric
+PctModerate Burn SeverityWs_2006,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2006,numeric
+PctModerate Burn SeverityWs_2007,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2007,numeric
+PctModerate Burn SeverityWs_2008,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2008,numeric
+PctModerate Burn SeverityWs_2009,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2009,numeric
+PctModerate Burn SeverityWs_2010,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2010,numeric
+PctModerate Burn SeverityWs_2011,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2011,numeric
+PctModerate Burn SeverityWs_2012,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2012,numeric
+PctModerate Burn SeverityWs_2013,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2013,numeric
+PctModerate Burn SeverityWs_2014,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2014,numeric
+PctModerate Burn SeverityWs_2015,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2015,numeric
+PctModerate Burn SeverityWs_2016,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2016,numeric
+PctModerate Burn SeverityWs_2017,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2017,numeric
+PctModerate Burn SeverityWs_2018,percentage,Percentage of area of interest (AOI) area classified as moderate severity for 2018,numeric
+PctNonCarbResidWs,percentage,Percentage of area of interest (AOI) area classified as lithology type: non-carbonate residual material.,numeric
+PctOw2001,percentage,Percentage of area of interest (AOI) area classified as open water land cover (national land cover database (NLCD) class 11) for 2001.,numeric
+PctOw2004,percentage,Percentage of area of interest (AOI) area classified as open water land cover (national land cover database (NLCD) class 11) for 2004.,numeric
+PctOw2006,percentage,Percentage of area of interest (AOI) area classified as open water land cover (national land cover database (NLCD) class 11) for 2006.,numeric
+PctOw2008,percentage,Percentage of area of interest (AOI) area classified as open water land cover (national land cover database (NLCD) class 11) for 2008.,numeric
+PctOw2011,percentage,Percentage of area of interest (AOI) area classified as open water land cover (national land cover database (NLCD) class 11) for 2011.,numeric
+PctOw2013,percentage,Percentage of area of interest (AOI) area classified as open water land cover (national land cover database (NLCD) class 11) for 2013.,numeric
+PctOw2016,percentage,Percentage of area of interest (AOI) area classified as open water land cover (national land cover database (NLCD) class 11) for 2016.,numeric
+PctOw2019,percentage,Percentage of area of interest (AOI) area classified as open water land cover (national land cover database (NLCD) class 11) for 2019.,numeric
+PctSalLakeWs,percentage,Percentage of area of interest (AOI) area classified as lithology type: saline like sediment.,numeric
+PctShrb2001,percentage,Percentage of area of interest (AOI) area classified as shrub/scrub land cover (national land cover database (NLCD) class 52) for 2001,numeric
+PctShrb2004,percentage,Percentage of area of interest (AOI) area classified as shrub/scrub land cover (national land cover database (NLCD) class 52) for 2004,numeric
+PctShrb2006,percentage,Percentage of area of interest (AOI) area classified as shrub/scrub land cover (national land cover database (NLCD) class 52) for 2006,numeric
+PctShrb2008,percentage,Percentage of area of interest (AOI) area classified as shrub/scrub land cover (national land cover database (NLCD) class 52) for 2008,numeric
+PctShrb2011,percentage,Percentage of area of interest (AOI) area classified as shrub/scrub land cover (national land cover database (NLCD) class 52) for 2011,numeric
+PctShrb2013,percentage,Percentage of area of interest (AOI) area classified as shrub/scrub land cover (national land cover database (NLCD) class 52) for 2013,numeric
+PctShrb2016,percentage,Percentage of area of interest (AOI) area classified as shrub/scrub land cover (national land cover database (NLCD) class 52) for 2016,numeric
+PctShrb2019,percentage,Percentage of area of interest (AOI) area classified as shrub/scrub land cover (national land cover database (NLCD) class 52) for 2019,numeric
+PctSilicicWs,percentage,Percentage of area of interest (AOI) area classified as lithology type: silicic residual material.,numeric
+PctUrbHi2001,percentage,"Percentage of area of interest (AOI) area classified as developed, high-intensity land use (national land cover database (NLCD) class 24) for 2001.",numeric
+PctUrbHi2004,percentage,"Percentage of area of interest (AOI) area classified as developed, high-intensity land use (national land cover database (NLCD) class 24) for 2004.",numeric
+PctUrbHi2006,percentage,"Percentage of area of interest (AOI) area classified as developed, high-intensity land use (national land cover database (NLCD) class 24) for 2006.",numeric
+PctUrbHi2008,percentage,"Percentage of area of interest (AOI) area classified as developed, high-intensity land use (national land cover database (NLCD) class 24) for 2008.",numeric
+PctUrbHi2011,percentage,"Percentage of area of interest (AOI) area classified as developed, high-intensity land use (national land cover database (NLCD) class 24) for 2011.",numeric
+PctUrbHi2013,percentage,"Percentage of area of interest (AOI) area classified as developed, high-intensity land use (national land cover database (NLCD) class 24) for 2013.",numeric
+PctUrbHi2016,percentage,"Percentage of area of interest (AOI) area classified as developed, high-intensity land use (national land cover database (NLCD) class 24) for 2016.",numeric
+PctUrbHi2019,percentage,"Percentage of area of interest (AOI) area classified as developed, high-intensity land use (national land cover database (NLCD) class 24) for 2019.",numeric
+PctUrbLo2001,percentage,"Percentage of area of interest (AOI) area classified as developed, low-intensity land use (national land cover database (NLCD) class 24) for 2001.",numeric
+PctUrbLo2004,percentage,"Percentage of area of interest (AOI) area classified as developed, low-intensity land use (national land cover database (NLCD) class 24) for 2004.",numeric
+PctUrbLo2006,percentage,"Percentage of area of interest (AOI) area classified as developed, low-intensity land use (national land cover database (NLCD) class 24) for 2006.",numeric
+PctUrbLo2008,percentage,"Percentage of area of interest (AOI) area classified as developed, low-intensity land use (national land cover database (NLCD) class 24) for 2008.",numeric
+PctUrbLo2011,percentage,"Percentage of area of interest (AOI) area classified as developed, low-intensity land use (national land cover database (NLCD) class 24) for 2011.",numeric
+PctUrbLo2013,percentage,"Percentage of area of interest (AOI) area classified as developed, low-intensity land use (national land cover database (NLCD) class 24) for 2013.",numeric
+PctUrbLo2016,percentage,"Percentage of area of interest (AOI) area classified as developed, low-intensity land use (national land cover database (NLCD) class 24) for 2016.",numeric
+PctUrbLo2019,percentage,"Percentage of area of interest (AOI) area classified as developed, low-intensity land use (national land cover database (NLCD) class 24) for 2019.",numeric
+PctUrbMd2001,percentage,"Percentage of area of interest (AOI) area classified as developed, medium-intensity land use (national land cover database (NLCD) class 24) for 2001.",numeric
+PctUrbMd2004,percentage,"Percentage of area of interest (AOI) area classified as developed, medium-intensity land use (national land cover database (NLCD) class 24) for 2004.",numeric
+PctUrbMd2006,percentage,"Percentage of area of interest (AOI) area classified as developed, medium-intensity land use (national land cover database (NLCD) class 24) for 2006.",numeric
+PctUrbMd2008,percentage,"Percentage of area of interest (AOI) area classified as developed, medium-intensity land use (national land cover database (NLCD) class 24) for 2008.",numeric
+PctUrbMd2011,percentage,"Percentage of area of interest (AOI) area classified as developed, medium-intensity land use (national land cover database (NLCD) class 24) for 2011.",numeric
+PctUrbMd2013,percentage,"Percentage of area of interest (AOI) area classified as developed, medium-intensity land use (national land cover database (NLCD) class 24) for 2013.",numeric
+PctUrbMd2016,percentage,"Percentage of area of interest (AOI) area classified as developed, medium-intensity land use (national land cover database (NLCD) class 24) for 2016.",numeric
+PctUrbMd2019,percentage,"Percentage of area of interest (AOI) area classified as developed, medium-intensity land use (national land cover database (NLCD) class 24) for 2019.",numeric
+PctUrbOp2001,percentage,"Percentage of area of interest (AOI) area classified as developed, open space land use (national land cover database (NLCD) class 21) for 2001.",numeric
+PctUrbOp2004,percentage,"Percentage of area of interest (AOI) area classified as developed, open space land use (national land cover database (NLCD) class 21) for 2004.",numeric
+PctUrbOp2006,percentage,"Percentage of area of interest (AOI) area classified as developed, open space land use (national land cover database (NLCD) class 21) for 2006.",numeric
+PctUrbOp2008,percentage,"Percentage of area of interest (AOI) area classified as developed, open space land use (national land cover database (NLCD) class 21) for 2008.",numeric
+PctUrbOp2011,percentage,"Percentage of area of interest (AOI) area classified as developed, open space land use (national land cover database (NLCD) class 21) for 2011.",numeric
+PctUrbOp2013,percentage,"Percentage of area of interest (AOI) area classified as developed, open space land use (national land cover database (NLCD) class 21) for 2013.",numeric
+PctUrbOp2016,percentage,"Percentage of area of interest (AOI) area classified as developed, open space land use (national land cover database (NLCD) class 21) for 2016.",numeric
+PctUrbOp2019,percentage,"Percentage of area of interest (AOI) area classified as developed, open space land use (national land cover database (NLCD) class 21) for 2019.",numeric
+PctWaterWs,percentage,Percentage of area of interest (AOI) area classified as lithology type: water.,numeric
+PctWdWet2001,percentage,Percentage of area of interest (AOI) area classified as woody wetland land cover (national land cover database (NLCD) class 90) for 2001.,numeric
+PctWdWet2004,percentage,Percentage of area of interest (AOI) area classified as woody wetland land cover (national land cover database (NLCD) class 90) for 2004.,numeric
+PctWdWet2006,percentage,Percentage of area of interest (AOI) area classified as woody wetland land cover (national land cover database (NLCD) class 90) for 2006.,numeric
+PctWdWet2008,percentage,Percentage of area of interest (AOI) area classified as woody wetland land cover (national land cover database (NLCD) class 90) for 2008.,numeric
+PctWdWet2011,percentage,Percentage of area of interest (AOI) area classified as woody wetland land cover (national land cover database (NLCD) class 90) for 2011.,numeric
+PctWdWet2013,percentage,Percentage of area of interest (AOI) area classified as woody wetland land cover (national land cover database (NLCD) class 90) for 2013.,numeric
+PctWdWet2016,percentage,Percentage of area of interest (AOI) area classified as woody wetland land cover (national land cover database (NLCD) class 90) for 2016.,numeric
+PctWdWet2019,percentage,Percentage of area of interest (AOI) area classified as woody wetland land cover (national land cover database (NLCD) class 90) for 2019.,numeric
 Percent_Difference,percentage,The percent difference in analyte concentration between the burned and the unburned watershed.,numeric
-PermWs,centimeters per hour,Mean permeability (centimeters per hour) of soils (STATSGO) within AOI.,numeric
-Precip9120Ws,millimeter,PRISM climate data - 30-year normal mean precipitation (mm): Annual period: 1991-2020 within the AOI.,numeric
+PermWs,centimeters per hour,Mean permeability (centimeters per hour) of soils (STATSGO) within area of interest (AOI).,numeric
+Precip9120Ws,millimeter,Parameter-elevation Regressions on Independent Slopes Model (PRISM) climate data for 30-year normal mean precipitation (mm): Annual period: 1991-2020 within the area of interest (AOI).,numeric
 Publication_Year,YYYY,The year the publication was published and released.,numeric
 Q_Extracted,N/A,Indicates how and where discharge (Q) data were extracted from.,text
 Q_df_in_git,N/A,Indicates whether the discharge (Q) data frame is included within the repository.,text
-RckDepWs,centimeters,Mean depth (centimeters) to bedrock of soils (STATSGO) within AOI.,numeric
+RckDepWs,centimeters,Mean depth (centimeters) to bedrock of soils (STATSGO) within area of interest (AOI).,numeric
 Reports_Burn_Percentage,N/A,Indicates whether the publication reports burn percentage for each watershed they include in their study.,text
 Reports_Coords,N/A,Indicates whether the publication reports latitude and longitude coordinates for each watersheds they include in their study.,text
 Reports_Size,N/A,Indicates whether the publication reports watershed area for each watershed they include in their study.,text
-RunoffWs,millimeter,Mean runoff (millimeters) within AOI.,numeric
+RunoffWs,millimeter,Mean runoff (millimeters) within area of interest (AOI).,numeric
 STDEV_DOC,N/A,Standard deviation of the concentration for each analyte and within each watershed for dissolved organic carbon (DOC).,numeric
 STDEV_NO3,N/A,Standard deviation of the concentration for each analyte and within each watershed for nitrate (NO3).,text
 STDEV_NO3,N/A,Standard deviation of the concentration for each analyte and within each watershed for nitrate (NO3).,logical
@@ -383,9 +383,9 @@ TSF,years,Time-lag (time-since-fire; TSF) between when sampling and the wildfire
 TempNorm,milligrams analyte per liter per square kilometer per year,Pseudo yield metric we calculated that normalized for watershed area by year for each watershed.,numeric
 Time_Since_Fire,years,The lag time between when sampling occurred relative to when the wildfire occurred.,text; numeric
 Title,N/A,The title of the publication.,text
-Tmax9120Ws,degrees,PRISM climate data - 30-year normal maximum temperature (CÂ°): Annual period: 1991-2020 within the AOI.,numeric
-Tmean9120Ws,degrees,PRISM climate data - 30-year normal mean temperature (CÂ°): Annual period: 1991-2020 within the AOI.,numeric
-Tmin9120Ws,degrees,PRISM climate data - 30-year normal minimum temperature (CÂ°): Annual period: 1991-2020 within the AOI.,numeric
+Tmax9120Ws,degrees,Parameter-elevation Regressions on Independent Slopes Model (PRISM) climate data - 30-year normal maximum temperature (degrees celsius): Annual period: 1991-2020 within the area of interest (AOI).,numeric
+Tmean9120Ws,degrees,Parameter-elevation Regressions on Independent Slopes Model (PRISM) climate data - 30-year normal mean temperature (degrees celsius): Annual period: 1991-2020 within the area of interest (AOI).,numeric
+Tmin9120Ws,degrees,Parameter-elevation Regressions on Independent Slopes Model (PRISM) climate data - 30-year normal minimum temperature (degrees celsius): Annual period: 1991-2020 within the area of interest (AOI).,numeric
 Type,N/A,The study design type.,text
 Unit,N/A,Unit of measurement that applies to a given column in the data package.,text
 Urban,percentage,The percentage or amount of urban land in the surrounding watershed area.,numeric
@@ -395,7 +395,7 @@ Watershed_Area,N/A,Indicates whether studies reported watershed area within the 
 Watershed_Size_km,square kilometer,Size of the watershed in square kilometers.,numeric
 Wetland,square kilometer,The percentage or amount of wetland land in the surrounding watershed area.,numeric
 Where,N/A,A generalizable location of where the study took place. Examples include: states; territories; countries.,text
-WtDepWs,percentage,Mean seasonal water table depth (centimeters) of soils (STATSGO) within AOI .,numeric
+WtDepWs,centimeter,Mean seasonal water table depth (centimeters) of soils (STATSGO) within area of interest (AOI) .,numeric
 Xc,N/A,Pseudo yield metric calculated for the reference watershed when a publication only included one reference.,numeric
 Xc2,N/A,Pseudo yield metric calculated for the second reference watershed and compared to a specific burned watershed when the publication included more than one reference site.,numeric
 Xc34,N/A,Pseudo yield metric calculated for the reference watershed and compared to two burned watersheds when a publication compared multiple burns to one reference watershed.,numeric
@@ -426,13 +426,13 @@ latitude,decimal degrees WGS1984,Site latitude.,numeric
 logTempNorm,N/A,Effect size calculation for the temporal normalization.,numeric
 longitude,decimal degrees WGS1984,Site longitude.,numeric
 lower_ci_effect,N/A,Lower confidence interval (CI) effect. The lower end of the 95 percent confidence interval calculated within each variable bin (climates; burn percentage; time since fire bins).,numeric
-max,N/A,Max dNBR value for a certain burn severity category.,numeric
+max,N/A,Max differenced normalized burn ratio (dNBR) value for a certain burn severity category.,numeric
 maxelevraw,centimeters,Maximum elevation (unsmoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric
 maxelevsmo,centimeters,Maximum elevation (smoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric
 meanConc,milligrams per liter carbon milligrams per liter nitrogen,Mean concentration of analytes (dissolved organic carbon or nitrate) for each publication.,numeric
 mean_dnbr,N/A,Mean normalized burn ratio value to determine burn severity categories.,numeric
 mean_effect,N/A,The mean effect size within each variable bin (climates; burn percentage groups; or time since fire bins).,numeric
-min,N/A,Minimum dNBR value for a certain burn severity category.,numeric
+min,N/A,Minimum differenced normalized burn ratio (dNBR) value for a certain burn severity category.,numeric
 minelevraw,centimeters,Minimum elevation (unsmoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric
 minelevsmo,centimeters,Maximum elevation (smoothed) in centimeters extracted from the national hydrography dataset (NHD; https://www.epa.gov/waterdata/nhdplus-national-hydrography-dataset-plus).,numeric
 month,N/A,Month of year that sample was taken.,numeric
@@ -445,7 +445,7 @@ number_of_reference,N/A,Number of unburned watersheds included and monitored in 
 number_of_sites,N/A,Number of total sites included and monitored in each publication.,numeric
 predictor,N/A,Predictor variables included in the random forest model (climate; totdasqkm; maxelevsmo; slope; burn_percentage; time_since_fire).,text
 raw_fi,percentage,Raw feature importance (FI) output from the random forest model.,numeric
-rckdepws,percentage,Mean depth (centimeters) to bedrock of soils (STATSGO) within AOI.,numeric
+rckdepws,centimeter,Mean depth (centimeters) to bedrock of soils (STATSGO) within area of interest (AOI).,numeric
 response_var,N/A,Associates effect size with the proper analyte (dissolved organic carbon (DOC) or nitrate (NO3)).,text
 sd_effect,N/A,Standard deviation of the effect within each variable class.,numeric
 sdconc,milligrams per liter carbon milligrams per liter nitrogen,Standard deviation of the concentration for each analyte and within each watershed.,numeric
