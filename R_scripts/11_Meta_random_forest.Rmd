@@ -148,14 +148,14 @@ no3_eb <- replicate_plot_fi(no3, "no3")
 df <- bind_rows(doc_eb, no3_eb)
 
 df_test <- df %>% 
-  group_by(analyte) %>%
-  mutate(across(contains("_fi"), ~ . / sum(.)))
+  group_by(analyte) %>% 
+  mutate(across(contains("_fi"), ~ . / sum(mean_fi, na.rm = TRUE)))
 
 # BACK TO NORMAL WORKFLOW
-pr <- bind_rows(replicate_plot_fi(no3, "no3"),
-                    replicate_plot_fi(doc, "doc")) %>%  
-  group_by(analyte) %>%
-  mutate(across(contains("_fi"), ~ . / sum(.)))
+# pr <- bind_rows(replicate_plot_fi(no3, "no3"),
+#                     replicate_plot_fi(doc, "doc")) %>%  
+#   group_by(analyte) %>%
+#   mutate(across(contains("_fi"), ~ . / sum(.)))
 
 ## Set up a color palette
 var_colors <- PNWColors::pnw_palette("Bay", n = length(unique(df$predictor)))
@@ -250,44 +250,6 @@ ggplot(filtered_df, aes(mean_fi * 100, reorder(predictor, mean_fi), fill = predi
 ggsave("Effect_Size_Random_Forest_variables_less_than_white_noise.pdf",
        path = here("initial_plots", "11_Meta_random_forest"),
        width = 5.5, height = 3,  units = "in")
-
-## Take 2 ##
-# Calculate the white noise mean_fi for each analyte
-white_noise_values <- df %>% 
-  filter(predictor == "white_noise") %>% 
-  select(analyte, mean_fi) %>%
-  rename(white_noise_fi = mean_fi)
-
-# Filter the data to include only variables with mean_fi greater than the white noise value for each analyte
-filtered_df <- df %>%
-  inner_join(white_noise_values, by = "analyte") %>%
-  filter(mean_fi > white_noise_fi) %>%
-  select(-white_noise_fi)
-
-# Plotting
-ggplot(filtered_df, aes(mean_fi * 100, reorder(predictor, mean_fi), fill = predictor)) + 
-  geom_col(alpha = 0.8, show.legend = F, width = 0.7) +
-  geom_errorbar(aes(xmin = min_fi * 100, xmax = max_fi * 100, width = 0.2)) +
-  facet_wrap(~ analyte, nrow = 1, scales = "free_y", labeller = labeller(analyte = dose.labs)) + 
-  scale_fill_manual(values = var_colors) + 
-  labs(x = "Feature Importance (%)", y = "", fill = "") +
-  scale_y_discrete(labels = c(
-    "bfi_ws" = "Baseflow Index",
-    "runoff_ws" = "Runoff",
-    "perm_ws" = "Soil Permeability",
-    "tmean9120ws" = "Mean Annual Air Temperature",
-    "mean_dnbr" = "Burn Severity",
-    "om_ws" = "Organic Matter",
-    "maxelevsmo" = "Max Watershed Elevation",
-    "burn_percentage" = "Burn Percentage", 
-    "climate" = "Koppen Climate Classification",
-    "rck_dep_ws" = "Mean Bedrock Depth",
-    "white_noise" = "White Noise",
-    "slope" = "Catchment Slope",
-    "time_since_fire" = "Time Since Fire",
-    "totdasqkm" = "Catchment Area"
-  )) +
-  theme_bw()
 
 ```
 
