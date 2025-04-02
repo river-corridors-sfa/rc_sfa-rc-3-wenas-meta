@@ -13,7 +13,7 @@ Climate,N/A,A three digit identifier from the Koppen climate classification.,tex
 Closest_USGS_gauge,N/A,Indicates where the closes United States Geological Survey (USGS) stream gauge is located relative to the site monitored in the publication.,text
 Column_or_Row_Name,N/A,Column or row headers from each csv file in the dataset.,text
 Count,N/A,Number of observations for each site within each study used in the meta-analysis.,numeric
-DOC,N/A,"The reported dissolved organic carbon (DOC) concentrations from the publication. See ""DOC_unit"" for the unit of the dissolved organic carbon value.",text; numeric
+DOC,N/A,"The reported dissolved organic carbon (DOC) concentrations from the publication. See ""DOC_unit"" for the unit of the dissolved organic carbon value.",text
 DOC_Interp,milligrams per liter carbon,The interpolated dissolved organic carbon concentration using the gap_fill function within R.,numeric
 DOC_mg_C_L,milligrams per liter carbon,The reported dissolved organic carbon concentrations as milligrams per liter as carbon (C).,numeric
 DOC_uM_C,micromolar per liter carbon,The reported dissolved organic carbon concentrations as micromolar per liter as carbon (C).,numeric
@@ -96,7 +96,7 @@ Mean_Median_or_IndividualSample,N/A,Identifies if the solute concentration repor
 Missing_Value_Codes,N/A,"Cells with missing data are represented with a missing value code rather than an empty cell. This column describes which missing value codes were used. The recommendation for numeric data is ""-9999"" and for character data is ""N/A"".",text
 Moderate_Severity,percentage,Percentage of moderate severity burn within each area of interest.,numeric
 NH4_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for ammonium ion concentration wet deposition for 2008 in kilograms of ammonium per hectacre per year, within area of interest (AOI).",numeric
-NO3,N/A,"The reported nitrate (NO3) concentrations from each publication. See ""NO3_unit"" for the unit of the nitrate value.",text; numeric
+NO3,N/A,"The reported nitrate (NO3) concentrations from each publication. See ""NO3_unit"" for the unit of the nitrate value.",text
 NO3_2008Ws,kilograms per hectare per year nitrate,"Annual gradient map of precipitation-weighted mean deposition for nitrate ion concentration wet deposition for 2008 in kilograms of nitrate (NO3) per hectacre per year, within area of interest (AOI).",numeric
 NO3_Interp,milligrams per liter nitrogen,The interpolated nitrate concentration using the gap_fill function within R.,numeric
 NO3_mg_N_L,milligrams per liter nitrogen,The reported nitrate concentrations as milligrams per liter as nitrogen (N).,numeric
@@ -381,7 +381,7 @@ Study_ID,N/A,The shorthand in-text citation of the publication.,text
 Study_design,N/A,Indicates which study design was used within each publication. Examples include: pre_post; control_burn.,text
 TSF,years,Time-lag (time-since-fire; TSF) between when sampling and the wildfire occurred.,text
 TempNorm,milligrams analyte per liter per square kilometer per year,Pseudo yield metric we calculated that normalized for watershed area by year for each watershed.,numeric
-Time_Since_Fire,years,The lag time between when sampling occurred relative to when the wildfire occurred.,text; numeric
+Time_Since_Fire,years,The lag time between when sampling occurred relative to when the wildfire occurred.,text
 Title,N/A,The title of the publication.,text
 Tmax9120Ws,degrees,Parameter-elevation Regressions on Independent Slopes Model (PRISM) climate data - 30-year normal maximum temperature (degrees celsius): Annual period: 1991-2020 within the area of interest (AOI).,numeric
 Tmean9120Ws,degrees,Parameter-elevation Regressions on Independent Slopes Model (PRISM) climate data - 30-year normal mean temperature (degrees celsius): Annual period: 1991-2020 within the area of interest (AOI).,numeric
@@ -390,7 +390,7 @@ Type,N/A,The study design type.,text
 Unit,N/A,Unit of measurement that applies to a given column in the data package.,text
 Urban,percentage,The percentage or amount of urban land in the surrounding watershed area.,numeric
 Vegetation,N/A,General type of vegetation present in the study site area reported within the publication,text
-Vegetation_year_pull,YYYY,Year pulled for Monitoring Trends in Burn Severity (MTBS) data. ,text; date
+Vegetation_year_pull,YYYY,Year pulled for Monitoring Trends in Burn Severity (MTBS) data. ,text
 Watershed_Area,N/A,Indicates whether studies reported watershed area within the publication.,text
 Watershed_Size_km,square kilometer,Size of the watershed in square kilometers.,numeric
 Wetland,square kilometer,The percentage or amount of wetland land in the surrounding watershed area.,numeric
@@ -457,5 +457,5 @@ upper_ci_effect,N/A,Upper confidence interval (CI) effect. The upper end of the 
 wsareasqkm,square kilometer,Watershed area.,numeric
 wsareasqkmrp100,square kilometer,Watershed area in 100-kilometer squared.,numeric
 wspctfull,percentage,Full watershed percentage for each area of interest.,numeric
-year,YYYY,Year when the fire took place.,text; date
+year,YYYY,Year when the fire took place.,text
 zone,N/A,Categorical value for burn severity thresholds.,numeric
