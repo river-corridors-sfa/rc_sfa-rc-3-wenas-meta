@@ -142,7 +142,7 @@ PctDecid2008,percentage,Percentage of area of interest (AOI) area classified as 
 PctDecid2011,percentage,Percentage of area of interest (AOI) area classified as deciduous forest land cover (national land cover database (NLCD) class 41) for 2011.,numeric
 PctDecid2013,percentage,Percentage of area of interest (AOI) area classified as deciduous forest land cover (national land cover database (NLCD) class 41) for 2013.,numeric
 PctDecid2016,percentage,Percentage of area of interest (AOI) area classified as deciduous forest land cover (national land cover database (NLCD) class 41) for 2016.,numeric
-PctDecid2019,percentage,Percentage of area of interest (AOI) area classified as deciduous forest land cover (national land cover database (NLCD) class 41) for 2018.,numeric
+PctDecid2019,percentage,Percentage of area of interest (AOI) area classified as deciduous forest land cover (national land cover database (NLCD) class 41) for 2019.,numeric
 PctEolCrsWs,percentage,"Percentage of area of interest (AOI) area classified as lithology type: eolian sediment, coarse-textured (sand dunes).",numeric
 PctEolFineWs,percentage,"Percentage of area of interest (AOI) area classified as lithology type: eolian sediment, fine-textured (glacial loess).",numeric
 PctExtruVolWs,percentage,Percentage of area of interest (AOI) area classified as lithology type: extrusive volcanic rock.,numeric
