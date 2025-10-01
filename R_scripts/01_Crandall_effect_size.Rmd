@@ -2,6 +2,8 @@
 title: "Crandall_paired_effect_Test"
 output: html_document
 date: "2023-11-14"
+editor_options: 
+  chunk_output_type: console
 ---
 The purpose of this script is pair the watersheds in the crandall study for the gap fill to calculate effect size and compare that to the original method of calculating effect size where all the controls get aggredated down and compared to the burn 
 
@@ -28,13 +30,13 @@ Step 3) run script that fills in concentrations for missing days in between disc
 
 rm(list=ls(all=T)) #this clears your Environment
 
-
-library(tidyverse)
-library(here)
-library(forecastML)
-library(zoo)
-library(hrbrthemes)
-library(viridis)
+library(pacman)
+p_load(tidyverse,
+       here,
+       forecastML, 
+       zoo,
+       # hrbrthemes,
+       viridis)
 
 ```
 
@@ -168,9 +170,18 @@ yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
 
 write_csv(yearly_mean_site, here("Output_for_analysis", "01_Crandall_effect_size", "crandall_temp_norm.csv"))
 
+# ## 10/1/2025 - generate a data frame that doesn't normalize by watershed area ##
+# no_area <- metadata_long %>%
+#   group_by(Study_ID, response_var, Pair, year) %>% 
+#   summarize(meanConc = mean(concentration)) %>% 
+#   left_join(site_data) %>% 
+#   group_by(Pair, year) %>%
+#   distinct(meanConc, .keep_all = TRUE) %>%
+#   mutate(TempNorm = meanConc / Area_watershed_km)
+
 ```
 
-#### EFFECT SIZE 
+#### EFFECT SIZE for watershed normalized by area
 ```{r}
 # Bringing the columns back up to match to be able to calculate
 yearly_mean_site_test <- yearly_mean_site %>%
@@ -223,7 +234,72 @@ write_csv(yearly_effect_size_combine_long, here("Output_for_analysis", "01_Crand
 
 ```
 
+#### EFFECT SIZE without watershed area - 10/1/2025
+```{r}
+# Bringing the columns back up to match to be able to calculate
+no_watershed <- yearly_mean_site %>%
+  mutate(meanConc = as.numeric(meanConc))  # Taking out Hauer and Spencer and Hickenbottom because they have mutliple controls and that is different than the rest of these sites
 
+# This is doing the same thing as chunck before where we are creating a column header for each individual site but doing it for the studies that have multiple controls. 
+no_watershed_crandall <- yearly_mean_site %>%
+  mutate(meanConc = as.numeric(meanConc))
+
+
+
+crandall_test_no_watershed <- no_watershed_crandall %>%
+  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate) %>%
+  dplyr::summarize(Xe = sum(meanConc[Burn_Unburn == "Burn"], na.rm = TRUE),
+                   Xc = sum(meanConc[Burn_Unburn == "Unburn"], na.rm = TRUE)) # Creating a control and treatment column for the temporal normalization 
+
+yearly_multiple_control_no_watershed <- crandall_test_no_watershed %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
+            Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
+            Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
+            Xe4 = sum(Xe[Pair == "Site_4"], na.rm = TRUE),
+            Xc34 = sum(Xc[Pair == "Control_3_4"], na.rm = TRUE),
+            Xc2 = sum(Xc[Pair == "Control_2"], na.rm = TRUE),
+            Xc = sum(Xc[Pair == "Control_1"], na.rm = TRUE)) 
+
+
+yearly_effect_multiple_no_watershed <- yearly_multiple_control_no_watershed %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  mutate(lnR1 = log(Xe1/Xc),
+         lnR2 = log(Xe2/Xc2),
+         lnR3 = log(Xe3/Xc34),
+         lnR4 = log(Xe4/Xc34)) %>% 
+  ungroup()
+
+
+# pivoting to make the responses in one column
+# effect size 
+yearly_effect_size_combine_long_no_watershed <- yearly_effect_multiple_no_watershed %>% 
+  pivot_longer(
+    cols = lnR1:lnR4,
+    names_to = "Effect_size_pair",
+    values_to = "Effect_size_no_watershed",
+    values_drop_na = TRUE
+  ) %>% 
+  filter(is.finite(Effect_size_no_watershed))
+
+write_csv(yearly_effect_size_combine_long_no_watershed, here("Output_for_analysis", "01_Crandall_effect_size", "Crandall_effect_size_no_watershed.csv"))
+
+
+```
+
+### EFFECT SIZE COMP BETWEEN NORMALIZATION AND NOT ###
+```{r}
+ES_no_watershed <- yearly_effect_size_combine_long_no_watershed
+
+ES_orig <- read_csv(here("Output_for_analysis", "01_Crandall_effect_size", "Crandall_effect_size.csv"))
+
+ggplot() +
+  geom_point(data = ES_no_watershed, aes(x = Effect_size_pair, y = Effect_size_no_watershed), color = "red") +
+  geom_point(data = ES_orig, aes(x = Effect_size_pair, y = Effect_size), color = "black") +
+  facet_wrap(~response_var, scales = "free") +
+  theme_bw()
+
+```
 
 ####################### DOWNSELECTED APPROACH 2/19/2025 #############################
 ## Temporal Normalization 

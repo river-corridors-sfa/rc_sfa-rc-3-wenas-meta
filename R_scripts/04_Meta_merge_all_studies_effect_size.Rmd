@@ -35,16 +35,15 @@ Step 4) Calculate the effect size for each watershed: ln[R] = Xburn/Xunburn
 
 rm(list=ls(all=T)) #this clears your Environment
 
-
-library(tidyverse)
-library(here)
-library(forecastML)
-library(zoo)
-library(hrbrthemes)
-library(viridis)
-library(ggpmisc)
-library(RobustLinearReg)
-
+library(pacman)
+p_load(tidyverse,
+       here,
+       forecastML, 
+       zoo,
+       # hrbrthemes,
+       viridis, 
+       ggpmisc,
+       RobustLinearReg)
 
 
 ```
@@ -586,7 +585,7 @@ give.n <- function(x){
 
 ```
 
-#### EFFECT SIZE 
+#### EFFECT SIZE for watershed normalized by area
 ```{r - Effect size calculation}
 # Taking out Hauer and Spencer and Hickenbottom because they have mutliple controls and that is different than the rest of these sites
 yearly_mean_site_test <- yearly_mean_site %>%
@@ -618,7 +617,7 @@ yearly_effect_size <- yearly_mean_site_test_3 %>%
          lnR4 = log(Xe4/Xc),
          lnR5 = log(Xe5/Xc))
 
-# This is doing the same thing as chunck before where we are creating a column header for each individual site but doing it for the studies that have multiple controls. 
+# This is doing the same thing as chunk before where we are creating a column header for each individual site but doing it for the studies that have multiple controls. 
 yearly_mean_hauer_hickenbottom <- yearly_mean_site %>%
   filter(Study_ID == "Hauer & Spencer 1998" | Study_ID == "Hickenbottom et al. 2023") %>%
   mutate(TempNorm = as.numeric(TempNorm))
@@ -798,6 +797,273 @@ write_csv(yearly_effect_size_combine_long_out, here("Output_for_analysis", "04_M
 unique(yearly_effect_size_combine_long_out$Study_ID)
 
 ```
+
+####10/1/2025 - EFFECT SIZE without watershed area 
+```{r}
+# Taking out Hauer and Spencer and Hickenbottom because they have mutliple controls and that is different than the rest of these sites
+no_watershed <- yearly_mean_site %>%
+  filter(Study_ID != "Hauer & Spencer 1998", Study_ID != "Hickenbottom et al. 2023") %>%
+  mutate(meanConc = as.numeric(meanConc))  
+
+# Creating a control and treatment column for the temporal normalization
+yearly_mean_site_test_2_no_watershed <- no_watershed %>%
+  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate) %>%
+  dplyr::summarize(Xe = sum(meanConc[Burn_Unburn == "Burn"], na.rm = TRUE),
+                   Xc = sum(meanConc[Burn_Unburn == "Unburn"], na.rm = TRUE)) 
+
+yearly_mean_site_test_3_no_watershed <- yearly_mean_site_test_2_no_watershed %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
+            Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
+            Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
+            Xe4 = sum(Xe[Pair == "Site_4"], na.rm = TRUE),
+            Xe5 = sum(Xe[Pair == "Site_5"], na.rm = TRUE),
+            Xc = sum(Xc[Pair == "Control"], na.rm = TRUE)) # Creating an individual column for each site and merging them into one row.
+
+# Calculating effect size: ln((MeanBurn/MeanUnburn)) for all the sites with only one control 
+yearly_effect_size_no_watershed <- yearly_mean_site_test_3_no_watershed %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  mutate(lnR1 = log(Xe1/Xc),
+         lnR2 = log(Xe2/Xc),
+         lnR3 = log(Xe3/Xc),
+         lnR4 = log(Xe4/Xc),
+         lnR5 = log(Xe5/Xc))
+
+# This is doing the same thing as chunk before where we are creating a column header for each individual site but doing it for the studies that have multiple controls. 
+yearly_mean_hauer_hickenbottom_no_watershed <- yearly_mean_site %>%
+  filter(Study_ID == "Hauer & Spencer 1998" | Study_ID == "Hickenbottom et al. 2023") %>%
+  mutate(meanConc = as.numeric(meanConc))
+
+hauer_hickenbottom_test_no_watershed <- yearly_mean_hauer_hickenbottom_no_watershed %>%
+  group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate) %>%
+  dplyr::summarize(Xe = sum(meanConc[Burn_Unburn == "Burn"], na.rm = TRUE),
+                   Xc = sum(meanConc[Burn_Unburn == "Unburn"], na.rm = TRUE)) # Creating a control and treatment column for the temporal normalization 
+
+yearly_multiple_control_no_watershed <- hauer_hickenbottom_test_no_watershed %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  summarize(Xe1 = sum(Xe[Pair == "Site_1"], na.rm = TRUE),
+            Xe2 = sum(Xe[Pair == "Site_2"], na.rm = TRUE),
+            Xe3 = sum(Xe[Pair == "Site_3"], na.rm = TRUE),
+            Xe4 = sum(Xe[Pair == "Site_4"], na.rm = TRUE),
+            Xe5 = sum(Xe[Pair == "Site_5"], na.rm = TRUE),
+            Xc345 = sum(Xc[Pair == "Control_3_4_5"], na.rm = TRUE),
+            Xc2 = sum(Xc[Pair == "Control_2"], na.rm = TRUE),
+            Xc = sum(Xc[Pair == "Control_1"], na.rm = TRUE)) 
+
+
+yearly_effect_multiple_no_watershed <- yearly_multiple_control_no_watershed %>% 
+  group_by(Study_ID, response_var, Climate, year) %>%
+  mutate(lnR1 = log(Xe1/Xc),
+         lnR2 = log(Xe2/Xc2),
+         lnR3 = log(Xe3/Xc345),
+         lnR4 = log(Xe4/Xc345),
+         lnR5 = log(Xe5/Xc345)) %>% 
+  ungroup()
+
+# Adding columns to match brie_test_stats
+yearly_effect_size_no_watershed <- yearly_effect_size_no_watershed %>% 
+  add_column(Xc345 = NA,
+             Xc2 = NA) %>% 
+  ungroup()
+
+# combining Hauer and Hickenbottom back into the mix 
+yearly_effect_size_combine_no_watershed <- yearly_effect_size_no_watershed %>% 
+  add_row(yearly_effect_multiple_no_watershed)
+
+# Adding in more broad climate 
+unique(yearly_effect_size_combine_no_watershed$Climate)
+
+yearly_effect_size_combine_no_watershed <- yearly_effect_size_combine_no_watershed %>% 
+  mutate(yearly_effect_size_combine_no_watershed, Biome = ifelse(grepl("Dfb|Dfc|Dsb", Climate), "Cold",
+                              ifelse(grepl("Cfb|Csa|Csb|Cfa", Climate), "Temperate",
+                              ifelse(grepl("BSk", Climate), "Arid",
+                              ifelse(grepl("As|Af|Am", Climate), "Tropical",
+                              ifelse(grepl("ET|EF", Climate), "Polar", "Other"))))))
+
+# pivoting to make the responses in one column
+# effect size 
+yearly_effect_size_combine_long_no_watershed <- yearly_effect_size_combine_no_watershed %>% 
+  pivot_longer(
+    cols = lnR1:lnR5,
+    names_to = "Effect_size_pair",
+    values_to = "Effect_size_no_watershed",
+    values_drop_na = TRUE
+  ) %>% 
+  filter(is.finite(Effect_size_no_watershed))
+
+```
+
+# 10/1/2025 - Add in Crandall/Abbott/Rhea
+```{r - combining in studies that were formatted differently so they needed their own script}
+# combine the yearly_effect_size_combine_long with Crandall, Abbott, and Rhea. 
+
+Crandall_effect_size_no_watershed <- read_csv(here("Output_for_analysis", "01_Crandall_effect_size", "Crandall_effect_size_no_watershed.csv"),
+                                na = c('-9999', 'N/A')) 
+
+abbott_effect_size_no_watershed <- read_csv(here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_effect_size_no_watershed.csv"),
+                               na = c('-9999', 'N/A'))
+
+rhea_effect_size_no_watershed <- read_csv(here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_effect_size_no_watershed.csv"),
+                             na = c('-9999', 'N/A'))
+
+
+# Adding columns to yearly_effect_size_combine_long to match Crandall_effect_size and above_five_effect_size 
+yearly_effect_size_combine_long_no_watershed <-yearly_effect_size_combine_long_no_watershed %>% 
+  add_column(Xc34 = NA) %>% 
+  ungroup() %>% 
+  dplyr::select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size_no_watershed)
+
+# Adding columns to Crandall_effect_size to match yearly_effect_size_combine_long and above_five_effect_size 
+Crandall_effect_size_no_watershed <-Crandall_effect_size_no_watershed %>% 
+  add_column(Time_Since_Fire = as.numeric(0),
+             Biome = "Temperate",
+             Xe5 = NA,
+             Xc345 = NA) %>% 
+  ungroup() %>% 
+  dplyr::select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size_no_watershed) 
+
+# Adding columns to abbott_effect_size to match yearly_effect_size_combine_long and Crandall_effect_size 
+abbott_effect_size_no_watershed <-abbott_effect_size_no_watershed %>% 
+  add_column(Xe2 = NA, 
+             Xe3 = NA, 
+             Xe4 = NA, 
+             Xe5 = NA, 
+             Xc2 = NA, 
+             Xc34 = NA,
+             Xc345 = NA, 
+             Biome = NA) %>% 
+  ungroup() %>% 
+  dplyr::select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size_no_watershed) 
+
+# Adding columns to rhea_effect_size to match abbott_effect_size, yearly_effect_size_combine_long and Crandall_effect_size 
+rhea_effect_size_no_watershed <-rhea_effect_size_no_watershed %>% 
+  add_column(Xe4 = NA, 
+             Xe5 = NA, 
+             Xc2 = NA, 
+             Xc34 = NA,
+             Xc345 = NA, 
+             Biome = NA) %>% 
+  ungroup() %>% 
+  dplyr::select(Study_ID, response_var, Climate, year, Xe1, Xe2, Xe3, Xe4, Xe5, Xc, Xc2, Xc34, Xc345, Biome, Effect_size_pair, Effect_size_no_watershed) 
+
+
+# combining all of them back into the mix back into the mix 
+yearly_effect_size_combine_long_no_watershed <- yearly_effect_size_combine_long_no_watershed %>% 
+  add_row(Crandall_effect_size_no_watershed) %>% 
+  add_row(abbott_effect_size_no_watershed) %>% 
+  add_row(rhea_effect_size_no_watershed)
+
+
+### LOOKS LIKE THE TIME SINCE FIRE AND YEARS ARENT PAIRING UP LIKE I WANT THEM TO ####
+# Creating a year column with a dataframe that has TSF accurately 
+TSF_year <- control_impact %>% 
+  mutate(year = year(Sampling_Date)) %>% 
+  dplyr::select(Study_ID, Time_Since_Fire, year) %>% 
+  distinct()
+
+# Joining the TSF and the yearly effect size combine long dataframe 
+yearly_effect_size_combine_long_no_watershed <- left_join(yearly_effect_size_combine_long_no_watershed, TSF_year, by = c("Study_ID", "year")) %>% 
+  distinct(Effect_size_no_watershed, .keep_all = TRUE) 
+
+yearly_effect_size_combine_long_no_watershed$Time_Since_Fire <- as.character(yearly_effect_size_combine_long_no_watershed$Time_Since_Fire) # making time since fire a character 
+
+# Filling in the missing Time Since Fire values because they were originally excluded in the above code 
+yearly_effect_size_combine_long_no_watershed <- yearly_effect_size_combine_long_no_watershed %>% 
+  mutate(Time_Since_Fire = case_when(Study_ID == 'Abbott et al. 2021' & year == "2017" ~ ">10",
+                                     Study_ID == 'Abbott et al. 2021' & year == "2018" ~ ">10",
+                                     Study_ID == 'Hauer & Spencer 1998' & year == "1992" ~ "4",
+                                     Study_ID == 'Rhea et al. 2021' ~ ">10",
+                                     Study_ID == 'Crandall et al. 2021' ~ "0",
+                                  TRUE ~ Time_Since_Fire))
+
+yearly_effect_size_combine_long_no_watershed <- yearly_effect_size_combine_long_no_watershed %>% 
+  mutate(Biome = case_when(Study_ID == 'Abbott et al. 2021' ~ "Cold",
+                           Study_ID == 'Rhea et al. 2021' ~ "Cold",
+                         TRUE ~ Biome))
+
+```
+
+```{r - clean up effect size if there are any mistakes csv}
+manual_effect_size_no_watershed <- yearly_effect_size_combine_long_no_watershed 
+
+manual_effect_size_no_watershed <- manual_effect_size_no_watershed %>% 
+  mutate(Time_Since_Fire = case_when(Study_ID == 'Mast & Clow, 2008' & 
+                                     year == '2003' ~ "0",
+                                     TRUE ~ Time_Since_Fire))
+
+manual_effect_size_no_watershed <- manual_effect_size_no_watershed %>% 
+  mutate(Time_Since_Fire = case_when(Study_ID == 'Murphy et al. 2018' & 
+                                     year == '2011' ~ "1",
+                                     TRUE ~ Time_Since_Fire))
+
+yearly_effect_size_combine_long_no_watershed <- manual_effect_size_no_watershed
+
+yearly_effect_size_combine_long_out_no_watershed <- yearly_effect_size_combine_long_no_watershed %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
+
+
+write_csv(yearly_effect_size_combine_long_out_no_watershed, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_40days_no_watershed.csv"))
+
+unique(yearly_effect_size_combine_long_out_no_watershed$Study_ID)
+
+```
+
+### 10/1/2025 - EFFECT SIZE COMP BETWEEN NORMALIZATION AND NOT ###
+```{r}
+ES_no_watershed <- yearly_effect_size_combine_long_out_no_watershed %>% 
+  select(Study_ID, year, response_var, Effect_size_pair, Effect_size_no_watershed)
+
+ES_orig <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_40days.csv")) %>% 
+  select(Study_ID, year, response_var, Effect_size_pair, Effect_size)
+
+
+# 1. Merge using `inner_join` by Study_ID, response_var, and Effect_size_pair
+merged_data <- ES_orig %>%
+  mutate(Effect_size_no_watershed = ES_no_watershed$Effect_size_no_watershed)
+
+# 2. Filter for Relevant Columns
+comparison_data <- merged_data %>% 
+  select(response_var, Effect_size_no_watershed, Effect_size)
+
+
+# 3. Perform a Regression Analysis
+regression_results <- comparison_data %>%
+  group_by(response_var) %>%
+  summarise(
+    regression = list(lm(Effect_size_no_watershed ~ Effect_size, data = cur_data())),
+    .groups = "drop"
+  )
+
+# 4. Extract and display regression summaries for each response_var
+regression_summaries <- regression_results %>%
+  mutate(summary = map(regression, summary))
+
+# Print summaries for each response_var
+regression_summaries %>%
+  select(response_var, summary) %>%
+  walk(~ {
+    cat("\nResponse Variable:", .x$response_var, "\n")
+    print(.x$summary)
+  })
+
+# 5. Plot
+ggplot(merged_data, aes(x = Effect_size, y = Effect_size_no_watershed)) +
+  geom_point(color = "blue", alpha = 0.6) + # Scatter points
+  geom_smooth(method = "lm", color = "red") + # Regression line
+  facet_wrap(~ response_var, scales = "free") + # Separate panels by response_var
+  labs(
+    title = "Regression Analysis by Response Variable",
+    x = "Effect Size (Original)",
+    y = "Effect Size (No Watershed)"
+  ) +
+  theme_minimal() +
+  theme(strip.text = element_text(size = 12, face = "bold")) # Customize facet labels
+
+
+
+```
+
 
 # ================================= Compare Thresholds ============================
 ```{r}
