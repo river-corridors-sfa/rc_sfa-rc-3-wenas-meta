@@ -244,7 +244,7 @@ blank_spaces <- data.frame(
 p <- ggplot(filtered_df, aes(mean_fi * 100, reorder(predictor, mean_fi), fill = predictor)) +
   geom_col(alpha = 0.8, show.legend = F, width = 0.7) +
   geom_errorbar(aes(xmin = min_fi * 100, xmax = max_fi * 100, width = 0.2)) +
-  facet_wrap(~analyte, nrow = 1, labeller = labeller(analyte = dose.labs)) +
+  facet_grid(normalization~analyte, labeller = labeller(analyte = dose.labs)) + 
   scale_fill_manual(values = var_colors) +
   labs(x = "Feature Importance (%)", y = "", fill = "") +
   scale_y_discrete(labels = c(
