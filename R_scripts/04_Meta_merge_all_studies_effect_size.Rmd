@@ -1011,8 +1011,7 @@ unique(yearly_effect_size_combine_long_out_no_watershed$Study_ID)
 
 ### 10/1/2025 - EFFECT SIZE COMP BETWEEN NORMALIZATION AND NOT ###
 ```{r}
-ES_no_watershed <- yearly_effect_size_combine_long_out_no_watershed %>% 
-  select(Study_ID, year, response_var, Effect_size_pair, Effect_size_no_watershed)
+ES_no_watershed <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_40days_no_watershed.csv")) %>% select(Study_ID, year, response_var, Effect_size_pair, Effect_size_no_watershed)
 
 ES_orig <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_40days.csv")) %>% 
   select(Study_ID, year, response_var, Effect_size_pair, Effect_size)
@@ -1061,6 +1060,18 @@ ggplot(merged_data, aes(x = Effect_size, y = Effect_size_no_watershed)) +
   theme(strip.text = element_text(size = 12, face = "bold")) # Customize facet labels
 
 
+### Build merged data frame ####
+ES_no_watershed <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_40days_no_watershed.csv")) %>% select(Study_ID, response_var, Climate, Biome, Effect_size_no_watershed, Effect_size_pair, Time_Since_Fire)
+
+ES_orig <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size_40days.csv")) %>% select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
+
+# 1. Merge using `inner_join` by Study_ID, response_var, and Effect_size_pair
+merged_data <- ES_orig %>%
+  mutate(Effect_size_no_watershed = ES_no_watershed$Effect_size_no_watershed)
+
+
+# Output the merged data frame for analysis:
+write_csv(merged_data, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_size_orig_nonnormal.csv"))
 
 ```
 
@@ -1142,7 +1153,7 @@ print(summary_all)
 
 ```
 
-# ================================= TO DELETE LATER ==============================
+# ================================= PLOTTING ==========================
 ```{r}
 old_es <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"))
 

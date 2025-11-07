@@ -174,7 +174,7 @@ DNBR_Severity <- read_csv(here("Output_for_analysis", "14_Meta_calculate_burn_se
 random_forest_data <- left_join(random_forest_data, DNBR_Severity, by = "Site")
 
 
-unique(random_forest_data$Site) # supposed to be 24 sites here 
+unique(random_forest_data$Site) # supposed to be 8 sites here 
 
 # removing duplicates
 random_forest_data <- random_forest_data %>% 
@@ -192,6 +192,108 @@ no3_RF <- random_forest_data %>%
   filter(response_var == "NO3_Interp") 
 
 write_csv(no3_RF, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"))
+
+```
+
+# 11/7/25 === Build random forest dataframe with both non-normal and orig ES ======
+### Load in geospatial data 
+```{r}
+# The effect sizes of each study's watershed
+effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_size_orig_nonnormal.csv"), na = c('-9999', 'N/A')) 
+
+# This has site and effect size pair which will merge with the effect size dataframe to get a site name with each effect size.
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>%
+  dplyr::select(Study_ID, Site, Fire_year, Vegetation_year_pull, Effect_size_pair, burn_percentage) %>%
+  rename(year = Fire_year) %>%
+  mutate(Site = str_replace_all(Site, "_", " "))
+
+no_geo_random_forest_data <- full_join(effect_size, study_site_data) %>%
+  na.omit(Effect_size) # this na.omit eliminates all the control sites that dont have an associated effect size.
+
+unique(no_geo_random_forest_data$Site) # Supposed to be 28 sites here
+
+landcover_data_merged <- left_join(no_geo_random_forest_data, landcover_summary) %>% 
+  na.omit(percent_landcover) %>% 
+  arrange(Vegetation_year_pull)
+
+# Now I want to read in the rest of the geospatial data to merge with the above data frame. 
+# Geospatial data 
+geospatial_data <- read_csv(here("Output_for_analysis", "06_Meta_geospatial_extraction_with_comids",
+                                 "random_forest_data_new.csv")) %>%
+  mutate(Site = str_replace_all(Site, "_", " ")) %>% 
+  dplyr::select(!MTBS_1986Ws:MTBS_2017Ws) %>% # Pulled in from study_site_data
+  dplyr::select(!PctOw2001:PctHbWet2019)
+
+
+random_forest_data <- full_join(landcover_data_merged, geospatial_data)%>%
+  na.omit(Effect_size)
+
+# Now add in the burn severity 
+DNBR_Severity <- read_csv(here("Output_for_analysis", "14_Meta_calculate_burn_severity", "DNBR_Severity.csv")) %>% 
+  dplyr::select(Site, mean_dnbr, burn_severity_category)
+
+random_forest_data_2 <- left_join(random_forest_data, DNBR_Severity, by = "Site")
+
+
+unique(random_forest_data_2$Site) # supposed to be 8 sites here 
+
+# removing duplicates
+random_forest_data_3 <- random_forest_data_2 %>% 
+  group_by(Site) %>% 
+  distinct() %>% 
+  ungroup()
+
+write_csv(random_forest_data_3, here("Output_for_analysis", "08_Meta_summary_stats", "random_forest_nonnormal_orig_both_analytes.csv"))
+
+#splitting by analyte
+doc_RF <- random_forest_data_3 %>%
+  filter(response_var == "DOC_Interp")
+
+write_csv(doc_RF, here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest_nonnormal.csv"))
+
+no3_RF <- random_forest_data_3 %>%
+  filter(response_var == "NO3_Interp") 
+
+write_csv(no3_RF, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest_nonnormal.csv"))
+
+
+### Compare original vs. nonnormal merged data frame ####
+# no3_orig <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"), na = c('-9999', 'N/A'))
+# 
+# doc_orig <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"), na = c('-9999', 'N/A'))
+# 
+# # Summarizing row counts for each Study_ID in df1
+# doc_orig_summary <- doc_orig %>%
+#   group_by(Study_ID) %>%
+#   summarise(Row_Count = n())
+# 
+# doc_nonnormal_summary <- doc_RF %>%
+#   group_by(Study_ID) %>%
+#   summarise(Row_Count = n())
+# 
+# # Merging summaries for comparison
+# comparison <- full_join(doc_orig_summary, doc_nonnormal_summary, by = "Study_ID", suffix = c("_df1", "_df2"))
+# 
+# 
+# # Summarizing row counts for each Study_ID in df1
+# no3_orig_summary <- no3_orig %>%
+#   group_by(Study_ID) %>%
+#   summarise(Row_Count = n())
+# 
+# no3_nonnormal_summary <- no3_RF %>%
+#   group_by(Study_ID) %>%
+#   summarise(Row_Count = n())
+# 
+# # Merging summaries for comparison
+# comparison_no3 <- full_join(no3_orig_summary, no3_nonnormal_summary, by = "Study_ID", suffix = c("_df1", "_df2"))
+# 
+# # why does the new data frame have 2 fewer in Murphy et al. 2018
+# doc_RF_murphy <- doc_RF %>% 
+#   filter(Study_ID == "Murphy et al. 2018")
+# 
+# doc_orig_murphy <- doc_orig %>% 
+#   filter(Study_ID == "Murphy et al. 2018")
+
 
 ```
 
