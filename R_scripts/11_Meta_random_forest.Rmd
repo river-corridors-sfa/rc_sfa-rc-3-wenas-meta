@@ -125,7 +125,10 @@ plot_fi <- function(data){
 # write_csv(df, here("Output_for_analysis", "11_Random_forest", "Random_Forest_Effect_Size_Fig_data.csv"))
 
 replicate_plot_fi <- function(parameter, analyte, nn){
-  replicate(100, plot_fi(parameter), simplify = FALSE) %>% 
+  
+  #set.seed(100)
+  
+  replicate(200, plot_fi(parameter), simplify = FALSE) %>% 
     bind_rows() %>% 
     group_by(predictor) %>% 
     summarize(mean_fi = mean(raw_fi, na.rm = T), 
@@ -233,11 +236,11 @@ filtered_df <- df_test %>%
 # Plotting
 # CHAT 1.0 
 # Define the blank spaces
-blank_spaces <- data.frame(
-  analyte = c(rep("doc", 5), "no3"),
-  predictor = c("perm_ws", "tmean9120ws", "om_ws", 
-                "bfi_ws", "burn_percentage", "slope")
-)
+# blank_spaces <- data.frame(
+#   analyte = c(rep("doc", 5), "no3"),
+#   predictor = c("perm_ws", "tmean9120ws", "om_ws", 
+#                 "bfi_ws", "burn_percentage", "slope")
+# )
 
 # Filtered dataset assumed to be 'filtered_df'
 # Original plot with X annotations
@@ -266,29 +269,36 @@ p <- ggplot(filtered_df, aes(mean_fi * 100, reorder(predictor, mean_fi), fill = 
   theme_bw() +
   theme(axis.text.x = element_text(angle = 0, hjust = 1))
 
+blank_spaces <- df_test %>%
+  inner_join(white_noise_values, by = c("analyte", "normalization"), suffix = c("", "_white_noise")) %>%
+  filter(mean_fi <= mean_fi_white_noise) %>% 
+  filter(predictor != "white_noise")
+
+
 # Manually create a data frame for the red X's for missing predictors in the "doc" panel
-blank_spaces <- data.frame(
-  analyte = c(rep("doc", 5), "no3"),
-  predictor = c("perm_ws", "tmean9120ws", "om_ws", 
-                "bfi_ws", "burn_percentage", "slope")
-)
-missing_doc <- data.frame(
-  analyte = c(rep("doc", 5), "no3"),
-  predictor = c("perm_ws", "tmean9120ws", "bfi_ws", "om_ws", "burn_percentage", "slope"),
-  mean_fi = c(0, 0, 0, 0, 0, 0)  # Set mean_fi to 0 to position the X's
-)
+# blank_spaces <- data.frame(
+#   analyte = c(rep("doc", 5), "no3"),
+#   predictor = c("perm_ws", "tmean9120ws", "om_ws", 
+#                 "bfi_ws", "burn_percentage", "slope")
+# )
+# missing_doc <- data.frame(
+#   analyte = c(rep("doc", 5), "no3"),
+#   predictor = c("perm_ws", "tmean9120ws", "bfi_ws", "om_ws", "burn_percentage", "slope"),
+#   mean_fi = c(0, 0, 0, 0, 0, 0)  # Set mean_fi to 0 to position the X's
+# )
 
 # A single frame for the y-values
-predictor_y_mapping <- data.frame(
-  predictor = c("perm_ws", "tmean9120ws", "bfi_ws", "om_ws", "burn_percentage", "slope"),
-  y_position = c(11, 10, 9, 6, 2, 8) # Adjust this multiplyer to move X upwards or downwards
-)
+# predictor_y_mapping <- data.frame(
+#   predictor = c("perm_ws", "tmean9120ws", "bfi_ws", "om_ws", "burn_percentage", "slope"),
+#   y_position = c(11, 10, 9, 6, 2, 8) # Adjust this multiplyer to move X upwards or downwards
+# )
 
 # Add y_position from predictor_y_mapping to missing_doc
-missing_doc <- merge(missing_doc, predictor_y_mapping, by="predictor")
+# missing_doc <- merge(missing_doc, predictor_y_mapping, by="predictor")
 
 # Add red X for cases where predictors are specified as blank for "doc"
-p + geom_text(data = missing_doc, aes(x = mean_fi + 5, y = y_position, label = "X"),
+p + 
+  geom_text(data = blank_spaces, aes(x = mean_fi + 5, label = "X"),
                    color = "red", size = 5, vjust = 0.5)
 
 
