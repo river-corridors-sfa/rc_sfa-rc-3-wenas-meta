@@ -46,9 +46,9 @@ library(here)
 ```
 
 # random forest dataframes # 
-```{r read in csv's}
-## Read in effect datasets
-no3 <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_random_forest.csv"), na = c('-9999', 'N/A')) %>% 
+```{r read in csvs}
+read_data <- function(filename){
+  read_csv(here("Output_for_analysis", "08_Meta_summary_stats", filename), na = c('-9999', 'N/A')) %>% 
   clean_names() %>%
   rename("dependent" = effect_size) %>%
   dplyr::select(dependent, climate, totdasqkm, maxelevsmo, slope, tmean9120ws, om_ws, bfi_ws, perm_ws, rck_dep_ws,
@@ -56,18 +56,15 @@ no3 <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta_r
   mutate(mean_dnbr = as.numeric(mean_dnbr),
          white_noise = rnorm(1:n(), mean = 0, sd = 1)) %>%
   na.omit()
-  
+}
 
-
-doc <- read_csv(here("Output_for_analysis", "08_Meta_summary_stats", "doc_meta_random_forest.csv"), na = c('-9999', 'N/A')) %>% 
-  clean_names() %>% 
-  rename("dependent" = effect_size) %>% 
-  dplyr::select(dependent, climate, totdasqkm, maxelevsmo, slope, tmean9120ws, om_ws, bfi_ws, perm_ws, rck_dep_ws, 
-                burn_percentage, mean_dnbr, time_since_fire) %>% 
-  mutate(mean_dnbr = as.numeric(mean_dnbr),
-         white_noise = rnorm(1:n(), mean = 0, sd = 1)) %>% 
-  na.omit() 
+## Read in normalized effect datasets
+no3 <- read_data("no3_meta_random_forest.csv")
+doc <- read_data("doc_meta_random_forest.csv")
   
+## Add non-normalized data
+no3_nn <- read_data("no3_meta_random_forest_nonnormal.csv")
+doc_nn<- read_data("doc_meta_random_forest_nonnormal.csv")
 
 ## Set ggplot theme
 theme_set(theme_bw())
@@ -127,7 +124,7 @@ plot_fi <- function(data){
 # 
 # write_csv(df, here("Output_for_analysis", "11_Random_forest", "Random_Forest_Effect_Size_Fig_data.csv"))
 
-replicate_plot_fi <- function(parameter, analyte){
+replicate_plot_fi <- function(parameter, analyte, nn){
   replicate(100, plot_fi(parameter), simplify = FALSE) %>% 
     bind_rows() %>% 
     group_by(predictor) %>% 
@@ -135,22 +132,28 @@ replicate_plot_fi <- function(parameter, analyte){
               min_fi = min(raw_fi, na.rm = T), 
               max_fi = max(raw_fi, na.rm = T)) %>% 
     ungroup() %>%
-    mutate(analyte = analyte)
+    mutate(analyte = analyte) %>% 
+    mutate(normalization = nn)
 }
 
 
 # JSC Testing here 
 # @PETER this is what i've been messing with
-doc_eb <- replicate_plot_fi(doc, "doc")
-no3_eb <- replicate_plot_fi(no3, "no3")
+doc_eb <- replicate_plot_fi(doc, "doc", "Normalized")
+no3_eb <- replicate_plot_fi(no3, "no3", "Normalized")
+doc_eb_nn <- replicate_plot_fi(doc_nn, "doc", "Not normalized")
+no3_eb_nn <- replicate_plot_fi(no3_nn, "no3", "Not normalized")
 
 # Mutate each column at a time
-df <- bind_rows(doc_eb, no3_eb)
+df <- bind_rows(doc_eb, no3_eb, doc_eb_nn, no3_eb_nn)
 
 df_test <- df %>% 
   group_by(analyte) %>% 
   mutate(across(contains("_fi"), ~ . / sum(mean_fi, na.rm = TRUE)))
+```
 
+
+```{r white noise}
 # BACK TO NORMAL WORKFLOW
 # pr <- bind_rows(replicate_plot_fi(no3, "no3"),
 #                     replicate_plot_fi(doc, "doc")) %>%  
@@ -178,7 +181,8 @@ ggplot(df_test, aes(mean_fi * 100,
                reorder(predictor, mean_fi), fill = predictor)) + 
   geom_col(alpha = 0.8, show.legend = F, width = 0.7) +
   geom_errorbar(aes(xmin = min_fi * 100, xmax = max_fi * 100, width = 0.2)) +
-  facet_wrap(~analyte, nrow = 1, labeller = labeller(analyte = dose.labs)) + 
+  #facet_wrap(~analyte, nrow = 1, labeller = labeller(analyte = dose.labs)) + 
+  facet_grid(normalization~analyte, labeller = labeller(analyte = dose.labs)) + 
   scale_fill_manual(values = var_colors) + 
   labs(x = "Feature Importance (%)", 
        y = "", fill = "") +
@@ -201,7 +205,7 @@ ggplot(df_test, aes(mean_fi * 100,
 
 ggsave("Effect_Size_Random_Forest_white_noise.pdf",
        path = here("initial_plots", "11_Meta_random_forest"),
-       width = 5.5, height = 3,  units = "in")
+       width = 5.5, height = 6,  units = "in")
 
 # including white noise. You put in a random variable. You feed that in as a predictor. If white noise has higher feature importance than any of these variables. The concern there is, we dont want to add anything that doesn't address the comment. 
 
@@ -215,13 +219,17 @@ ggsave("Effect_Size_Random_Forest_white_noise.pdf",
 # Calculate the white noise mean_fi for each analyte
 white_noise_values <- df_test %>% 
   filter(predictor == "white_noise") %>% 
-  select(analyte, mean_fi)
+  select(analyte, normalization, mean_fi)
 
 # Filter the data to include only variables with mean_fi greater than white noise value for each analyte
 filtered_df <- df_test %>%
-  inner_join(white_noise_values, by = "analyte", suffix = c("", "_white_noise")) %>%
+  inner_join(white_noise_values, by = c("analyte", "normalization"), suffix = c("", "_white_noise")) %>%
   filter(mean_fi > mean_fi_white_noise)
+```
 
+
+
+```{r make plots}
 # Plotting
 # CHAT 1.0 
 # Define the blank spaces
