@@ -304,7 +304,7 @@ p +
 
 ggsave("Effect_Size_Random_Forest_variables_less_than_white_noise.pdf",
        path = here("initial_plots", "11_Meta_random_forest"),
-       width = 5.5, height = 3,  units = "in")
+       width = 5.5, height = 6,  units = "in")
 
 ```
 
