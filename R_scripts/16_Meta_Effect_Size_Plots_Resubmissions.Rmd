@@ -1,0 +1,152 @@
+---
+title: "Updated Meta Analysis Figures"
+author: "AMP"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+The purpose of this script is to run random forests for DOC and NO3 effect sizes using catchment characteristics
+
+Script Workflow:
+
+Step 1) Load in the dataframe from the random forest analysis 
+
+Step 2) Plot it by variables of interest! 
+
+
+# Library download # 
+```{r Load packages}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+require(pacman)
+library(tidyverse)
+library(janitor)
+library(tidymodels)
+library(PNWColors)
+library(ranger)
+library(here)
+library(readr)
+
+```
+
+1. load random forest dataset 
+```{r load data}
+all_data <- read_csv("~/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/08_Meta_summary_stats/random_forest_nonnormal_orig_both_analytes.csv") %>%
+  pivot_longer(
+    cols= c(Effect_size, Effect_size_no_watershed),
+    names_to = "normalization",
+    values_to = "Effect_size"
+  )
+
+```
+
+2. Plot time since fire 
+
+```{r tsf}
+vn = expression(paste(""*N*O[3]^"-"))
+dose.labs <- as_labeller(c("DOC" = "DOC", "NO3" = "Nitrate"))
+
+tsf = all_data %>%
+  mutate(response_var = stringr::str_remove(response_var, "_Interp")) %>%
+   group_by(Time_Since_Fire, response_var, normalization) %>%
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>%
+  mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
+View(tsf)
+
+ tsf_plot = tsf %>% ggplot(aes(Time_Since_Fire, Effect_size, color = normalization))+
+  geom_pointrange(aes(ymin = mean_effect - se_effect, ymax = mean_effect + se_effect,
+                      color = normalization)) +
+  facet_grid(~response_var, labeller = dose.labs) +
+     scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Normalization"),
+                     labels = c('Normalized Effect Size', 'Non-Normalized Effect Size')) +
+  xlab("Time Since Fire") +
+  ylab("Effect Size") +
+    geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+      theme_bw()
+
+tsf_plot
+```
+
+2. plot climate 
+```{r climate}
+vn = expression(paste(""*N*O[3]^"-"))
+dose.labs <- as_labeller(c("DOC" = "DOC", "NO3" = "Nitrate"))
+
+climate <- all_data %>%
+  mutate(response_var = stringr::str_remove(response_var, "_Interp")) %>%
+   group_by(Climate, response_var, normalization) %>%
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>%
+  mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
+View(climate)
+
+climate_plot <- climate %>% 
+  ggplot(aes(Effect_size, Climate, color = normalization))+
+  geom_pointrange(aes(xmin = mean_effect - se_effect, xmax = mean_effect + se_effect,
+                      color = normalization)) +
+  facet_grid(~response_var, labeller = dose.labs) +
+     scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Normalization"),
+                     labels = c('Normalized Effect Size', 'Non-Normalized Effect Size')) +
+  scale_y_discrete(labels=c("Dsb" = "Mediterranean", 
+                            "Dfc" = "Subarctic",
+                            "Dfb" = "Warm-humid",
+                            "Csb" = "Warm-Mediterranean",
+                            "Csa" = "Hot-Mediterranean",
+                            "Cfb" = "Subtropical highland",
+                            "Cfa" = "Humid subtropical",
+                            "BSk" = "Cold semi-arid")) +
+  ylab("Koppen (Climate Classification)") +
+  xlab("Effect Size") +
+    geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
+      theme_bw()
+
+climate_plot
+```
+
+3. plot burn percentage 
+```{r bp}
+vn = expression(paste(""*N*O[3]^"-"))
+dose.labs <- as_labeller(c("DOC" = "DOC", "NO3" = "Nitrate"))
+
+bp <- all_data %>%
+  mutate(response_var = stringr::str_remove(response_var, "_Interp")) %>%
+   group_by(burn_percentage, response_var, normalization) %>%
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>%
+  mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
+View(bp)
+
+bp_plot <- bp %>% 
+  ggplot(aes(Effect_size, burn_percentage, color = normalization))+
+  geom_pointrange(aes(xmin = mean_effect - se_effect, xmax = mean_effect + se_effect,
+                      color = normalization)) +
+  facet_grid(~response_var, labeller = dose.labs) +
+     scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Normalization"),
+                     labels = c('Normalized Effect Size', 'Non-Normalized Effect Size')) +
+  ylab("Burn Percentage") +
+  xlab("Effect Size") +
+    geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
+      theme_bw()
+
+bp_plot
+```
