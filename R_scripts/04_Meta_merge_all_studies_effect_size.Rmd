@@ -803,7 +803,10 @@ unique(yearly_effect_size_combine_long_out$Study_ID)
 # Taking out Hauer and Spencer and Hickenbottom because they have mutliple controls and that is different than the rest of these sites
 no_watershed <- yearly_mean_site %>%
   filter(Study_ID != "Hauer & Spencer 1998", Study_ID != "Hickenbottom et al. 2023") %>%
-  mutate(meanConc = as.numeric(meanConc))  
+  mutate(meanConc = as.numeric(meanConc)) 
+
+write_csv(no_watershed, here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Watershed_area_normalized_vs_non_normalized_differences_in_nitrate_and_DOC.csv"))
+
 
 # Creating a control and treatment column for the temporal normalization
 yearly_mean_site_test_2_no_watershed <- no_watershed %>%
@@ -838,6 +841,11 @@ hauer_hickenbottom_test_no_watershed <- yearly_mean_hauer_hickenbottom_no_waters
   group_by(Study_ID, Pair, year, Burn_Unburn, response_var, Climate) %>%
   dplyr::summarize(Xe = sum(meanConc[Burn_Unburn == "Burn"], na.rm = TRUE),
                    Xc = sum(meanConc[Burn_Unburn == "Unburn"], na.rm = TRUE)) # Creating a control and treatment column for the temporal normalization 
+
+# Include in the no_watershed
+no_watershed2 <- no_watershed %>% 
+  rbind(yearly_mean_hauer_hickenbottom_no_watershed)
+
 
 yearly_multiple_control_no_watershed <- hauer_hickenbottom_test_no_watershed %>% 
   group_by(Study_ID, response_var, Climate, year) %>%

@@ -26,7 +26,7 @@ library(tidyverse)
 library(here)
 library(forecastML)
 library(zoo)
-library(hrbrthemes)
+# library(hrbrthemes)
 library(viridis)
 library(car)
 
@@ -422,7 +422,221 @@ no3_summary <- no3_yearly %>%
 
 ```
 
+# ==============================================================================
+```{r TSF df TEST}
+TSF_ES_Fig_data <- read_csv("Output_for_analysis/04_Meta_merge_all_studies_effect_size/TSF_ES_Fig_data.csv")
 
+sort(unique(TSF_ES_Fig_data$Study_ID)) # 17 studies This matches the df down below but there are only 139 observations here and 237 down there -WHY?
+
+ounted_data <- TSF_ES_Fig_data %>%
+  group_by(Study_ID, response_var) %>%
+  summarise(row_count = n(), .groups = 'drop')
+
+counted_data <- yearly_mean_site %>%
+  group_by(Study_ID, response_var) %>%
+  summarise(row_count = n(), .groups = 'drop')
+
+merged_data <- cbind(ounted_data, counted_data)
+
+```
+
+# 12/19/2025 - resubmission stats
+```{r - report summary stats - non-normalized}
+# This chunk is comparing the meanConc (non-normalized) of DOC and nitrate between burned and unburned watersheds (These values are NOT the effect size, its just the raw conc. averaged per site/year/study_ID)
+
+# Step 1: Run above code until 192 and then remove all the data frames you don't need anymore
+rm(abbott_conc_fill)
+rm(control_impact)
+rm(control_impact_fill)
+rm(control_impact_units)
+rm(crandall_conc_fill)
+rm(meta_df)
+rm(metadata_long)
+rm(rhea_conc_fill)
+rm(site_data)
+rm(site_data_unique)
+rm(storm_list_beta)
+rm(time_format)
+
+View(yearly_mean_site)
+yearly_mean_site <- yearly_mean_site %>% 
+  filter(Study_ID !="Murphy et al. 2015")
+sort(unique(yearly_mean_site$Study_ID)) # 17 studies
+
+# meanConc is the non-normalized mean concentrations of DOC and nitrate for each site and year so I should be able to do the same triage but the response variable is meanConc rather than TempNorm
+
+# group by study_ID, response_var, Burn_Unburn
+metadata_cv <- yearly_mean_site %>% 
+  group_by(Study_ID, response_var, Burn_Unburn) %>% 
+  summarise(meanConc = mean(TempNorm, na.rm = TRUE),
+            sdconc = sd(TempNorm, na.rm = TRUE),
+            CVconc = sdconc/meanConc) # generating CVs
+
+# Separate out DOC 
+doc_cv <- metadata_cv %>% 
+  filter(response_var == "DOC_Interp")
+
+# DOC 
+doc_yearly <- yearly_mean_site %>% 
+  filter(response_var == "DOC_Interp")
+
+# conduct anova test to see if the mean concentrations were different between burn and unburned for the non-normalized data (meanConc)
+one.way.doc <- aov(meanConc ~ Burn_Unburn, data = doc_yearly)
+
+plot(one.way.doc)
+
+# QQ plot is not great. Looks like I should log transform. Lets try that. 
+doc_yearly <- doc_yearly %>% 
+  mutate(logmeanConc = log(meanConc))
+
+log.one.way.doc <- aov(logmeanConc ~ Burn_Unburn, data = doc_yearly)
+plot(log.one.way.doc)
+
+summary(log.one.way.doc) # F-value: 0.757, p-value: 0.387
+
+
+# DOC
+doc_summary <- doc_yearly %>%
+  group_by(Burn_Unburn) %>% 
+  reframe(meanDOC = mean(meanConc),
+            sdDOC = sd(meanConc),
+            range = range(meanConc))
+# Burn mean: 5.464236
+# Burn sd: 7.028624
+# Burn range: [0.8471739:28.6974038]
+
+# Unburn mean: 5.192652
+# Unburn sd: 6.565883
+# Unburn range: [0.4378601:24.5090775]
+
+# The mean NON-NORMALIZED (meanConc) concentrations for DOC (5.46 (mg DOC-C)) for burned and 5.19 (mg DOC-C) for unburned were not significantly different from each other (one-way ANOVA: F-value = 0.757; df = 1,72; p-value = 0.387; Fig. S7).
+
+# NO3
+no3_yearly <- yearly_mean_site %>% 
+  filter(response_var == "NO3_Interp")
+
+# conduct anova test to see if the mean concentrations were different between burn and unburned for the non-normalized data (meanConc)
+one.way.n03 <- aov(meanConc ~ Burn_Unburn, data = no3_yearly)
+
+plot(one.way.n03)
+
+# QQ plot is not great. Looks like I should log transform. Lets try that. 
+no3_yearly <- no3_yearly %>% 
+  mutate(logmeanConc = log(meanConc))
+
+log.one.way.no3 <- aov(logmeanConc ~ Burn_Unburn, data = no3_yearly)
+plot(log.one.way.no3)
+
+summary(log.one.way.no3) # F-value: 7.823, p-value: 0.00579 - Significant?
+
+
+no3_summary <- no3_yearly %>%
+  group_by(Burn_Unburn) %>% 
+  reframe(meanNO3 = mean(TempNorm),
+            sdNO3 = sd(TempNorm),
+            range = range(TempNorm, scientific = F))
+
+# Burn mean: 0.11068395
+# Burn sd: 0.5803534
+# Burn range: [0.000000:4.870437]
+
+# Unburn mean: 0.06131053
+# Unburn sd: 0.2377624
+# Unburn range: [0:1.499988]
+
+```
+
+```{r non-normalized effect size vs. normalized (original) effect size}
+Effect_size_orig_nonnormal <- read_csv("Output_for_analysis/04_Meta_merge_all_studies_effect_size/Effect_size_orig_nonnormal.csv")
+
+sort(unique(Effect_size_orig_nonnormal$Study_ID)) # 17 studies - this is all of them
+
+# Pivot into long format
+long_data <- Effect_size_orig_nonnormal %>%
+  pivot_longer(
+    cols = c(Effect_size, Effect_size_no_watershed), # Columns to pivot
+    names_to = "Effect_type",                      # New column to identify which column the value comes from
+    values_to = "Effect_value"                     # New column to store the values
+  )
+
+# Perform the paired t-test for each response_var
+results <- long_data %>%
+  group_by(response_var) %>%
+  summarise(
+    t_test_result = list(t.test(
+      Effect_value[Effect_type == "Effect_size"],
+      Effect_value[Effect_type == "Effect_size_no_watershed"],
+      paired = TRUE
+    ))
+  )
+
+# View the results
+print(results)
+
+results$t_test_result
+
+# A paired t-test was performed to compare the effect sizes between watershed-influenced and watershed-excluded estimates for dissolved organic carbon (DOC). The analysis revealed a statistically significant difference between the two groups (t = -5.11, df = 43, p < 0.00001), indicating that the mean effect size was significantly lower when watershed influence was excluded. The mean difference was -0.71 (95% CI: -0.99 to -0.43). This suggests that watershed considerations substantially impact the effect sizes for DOC measurements.
+
+# A paired t-test was conducted to compare the effect sizes between watershed-influenced and watershed-excluded estimates for nitrate concentrations. The analysis demonstrated a statistically significant difference between the two groups (t = -2.59, df = 84, p = 0.011), with the mean effect size being lower when watershed influence was excluded. The observed mean difference was -0.29 (95% CI: -0.51 to -0.07). These results suggest that the exclusion of watershed influence has a measurable impact on nitrate effect sizes.
+
+# Non-normalized through time ####
+# Filter data for DOC and nitrate separately
+DOC_data <- Effect_size_orig_nonnormal %>% filter(response_var == "DOC_Interp")
+Nitrate_data <- Effect_size_orig_nonnormal %>% filter(response_var == "NO3_Interp")
+
+# Perform one-way ANOVA for DOC
+DOC_anova <- aov(Effect_size_no_watershed ~ Time_Since_Fire, data = DOC_data)
+summary(DOC_anova)
+
+# A one-way ANOVA was conducted to assess the effect of time since fire on watershed-excluded effect sizes for dissolved organic carbon (DOC). The analysis revealed a significant effect of Time_Since_Fire on Effect_size_no_watershed (F(6, 37) = 4.77, p = 0.001). The results indicate that the influence of fire on DOC effect sizes varies significantly across time since fire, highlighting temporal dynamics in DOC recovery or response after fire events.
+
+# Perform one-way ANOVA for nitrate
+Nitrate_anova <- aov(Effect_size_no_watershed ~ Time_Since_Fire, data = Nitrate_data)
+summary(Nitrate_anova) # F-value: 2.432, p-value: 0.0331
+
+# A one-way ANOVA was conducted to evaluate the effect of time since fire on watershed-excluded effect sizes for nitrate concentrations. The results revealed a statistically significant effect of Time_Since_Fire on Effect_size_no_watershed (F(6, 78) = 2.43, p = 0.033). These findings suggest that the impact of fire on nitrate effect sizes changes significantly over time, indicating temporal variation in nitrate dynamics following fire events.
+
+
+# Non-normalized vs. normalized through time ####
+# Paired t-test for each response_var at each time point
+paired_results <- long_data %>%
+  group_by(response_var, Time_Since_Fire) %>%
+  summarise(
+    t_test = list(t.test(
+      Effect_value[Effect_type == "Effect_size"],
+      Effect_value[Effect_type == "Effect_size_no_watershed"],
+      paired = TRUE
+    ))
+  )
+
+# View results
+print(paired_results)
+
+library(lme4)
+
+# Run linear mixed model for each response_var
+lmer_results <- long_data %>%
+  group_by(response_var) %>%
+  summarise(
+    lmer = list(lmer(
+      Effect_value ~ Effect_type * as.numeric(Time_Since_Fire) + (1|Study_ID),
+      data = cur_data()
+    ))
+  )
+
+# View model summaries
+lmer_summaries <- lmer_results %>%
+  mutate(summary = map(lmer, summary))
+
+print(lmer_summaries)
+
+# "Linear mixed-effects modeling revealed that the watershed-excluded effect sizes for dissolved organic carbon (DOC) were significantly larger overall compared to watershed-influenced effect sizes (Estimate = 0.84, t = 4.47, p < 0.001). However, neither time since fire nor the interaction between effect type and time since fire significantly influenced DOC effect sizes (p > 0.05). These results suggest that while watershed exclusion impacts effect sizes, the temporal response of DOC does not vary significantly with watershed considerations."
+
+# "Linear mixed-effects modeling revealed no significant overall differences between watershed-influenced and watershed-excluded effect sizes for nitrate (Estimate = 0.46, t = 1.72, p = 0.087), though a marginal trend was observed. Neither time since fire (p > 0.05) nor the interaction between Effect_type and Time_Since_Fire (p > 0.05) was significant, indicating limited temporal variation in nitrate effect sizes with respect to watershed exclusion. These results highlight that nitrate dynamics immediately and over time since fire remain relatively stable irrespective of watershed considerations."
+
+
+
+```
 
 
 

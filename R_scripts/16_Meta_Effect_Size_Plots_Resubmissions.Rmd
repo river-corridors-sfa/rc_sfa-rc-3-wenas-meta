@@ -75,6 +75,55 @@ View(tsf)
       theme_bw()
 
 tsf_plot
+
+
+### JSC 12/22/2025 #### 
+# AMP, the above figure only contains data that is included in the RF which is a big subset compared to the TSF subset which should be all the data! Let me plot it out with all the data here to see how that changes.
+
+all_data <- read_csv("Output_for_analysis/08_Meta_summary_stats/random_forest_nonnormal_orig_both_analytes.csv")
+# %>%
+#   pivot_longer(
+#     cols= c(Effect_size, Effect_size_no_watershed),
+#     names_to = "normalization",
+#     values_to = "Effect_size"
+#   )
+
+Effect_size_orig_nonnormal <- read_csv("Output_for_analysis/04_Meta_merge_all_studies_effect_size/Effect_size_orig_nonnormal.csv") %>% 
+  pivot_longer(
+    cols= c(Effect_size, Effect_size_no_watershed),
+    names_to = "normalization",
+    values_to = "Effect_size")
+
+
+vn = expression(paste(""*N*O[3]^"-"))
+dose.labs <- as_labeller(c("DOC" = "DOC", "NO3" = "Nitrate"))
+
+tsf = Effect_size_orig_nonnormal %>%
+  mutate(response_var = stringr::str_remove(response_var, "_Interp")) %>%
+   group_by(Time_Since_Fire, response_var, normalization) %>%
+   summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>%
+  mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
+
+tsf_plot = tsf %>% 
+  ggplot(aes(Time_Since_Fire, Effect_size, color = normalization)) +
+  geom_pointrange(aes(ymin = mean_effect - se_effect, ymax = mean_effect + se_effect,
+                      color = normalization)) +
+  facet_grid(~response_var, labeller = dose.labs) +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Normalization"),
+                     labels = c('Normalized Effect Size', 'Non-Normalized Effect Size')) +
+  xlab("Time Since Fire") +
+  ylab("Effect Size") +
+    geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+      theme_bw()
+
+tsf_plot
+
 ```
 
 2. plot climate 

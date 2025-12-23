@@ -66,6 +66,30 @@ doc <- read_data("doc_meta_random_forest.csv")
 no3_nn <- read_data("no3_meta_random_forest_nonnormal.csv")
 doc_nn<- read_data("doc_meta_random_forest_nonnormal.csv")
 
+# How many studies are included in this analysis
+doc_rf_nn <- read_csv("Output_for_analysis/08_Meta_summary_stats/doc_meta_random_forest_nonnormal.csv")
+
+sort(unique(doc_rf_nn$Study_ID)) # 5 studies
+# X
+# Crandall et al. 2021
+# Mast & Clow; 2008
+# Murphy et al. 2018
+# Wagner et al. 2015
+# Writer et al. 2014
+
+rm(doc_rf_nn)
+
+no3_rf_nn <- read_csv("Output_for_analysis/08_Meta_summary_stats/no3_meta_random_forest_nonnormal.csv")
+
+sort(unique(no3_rf_nn$Study_ID)) # 5 studies
+# Coombs & Melack; 2013
+# Crandall et al. 2021
+# Mast & Clow; 2008
+# Murphy et al. 2018
+# X 
+# Writer et al. 2014
+rm(no3_rf_nn)
+
 ## Set ggplot theme
 theme_set(theme_bw())
 
@@ -153,6 +177,107 @@ df <- bind_rows(doc_eb, no3_eb, doc_eb_nn, no3_eb_nn)
 df_test <- df %>% 
   group_by(analyte) %>% 
   mutate(across(contains("_fi"), ~ . / sum(mean_fi, na.rm = TRUE)))
+
+#### 12/22/2025 ####
+# I want to output the R^2 for the non-normalized vs. normalized 
+# Modified function
+plot_fi <- function(parameter){
+  # Fit the model
+  model <- ranger(dependent ~ ., data = parameter, importance = "impurity")
+  
+  # Extract variable importance and model R²
+  variable_importance <- as_tibble(model$variable.importance, rownames = "predictor") %>% 
+    rename(raw_fi = value)
+  
+  # Add R² to the output
+  variable_importance <- variable_importance %>%
+    mutate(R2 = model$r.squared)
+  
+  return(list(data = variable_importance, R2 = model$r.squared))
+}
+
+replicate_plot_fi <- function(parameter, analyte, nn){
+  
+  # Replicate process and collect results
+  results <- replicate(
+    200,
+    {
+      model_output <- plot_fi(parameter) # Run the plot_fi function
+      if (!is.null(model_output$data)) { # Check if model returns valid data
+        model_output$data %>% 
+          mutate(r_squared = model_output$R2) # Include R² in the results
+      } else {
+        NULL # Return NULL if the model fails
+      }
+    },
+    simplify = FALSE
+  )
+  
+  # Ensure non-null results are bound into a single data frame
+  summary_results <- bind_rows(results) %>% 
+    group_by(predictor) %>% 
+    summarize(mean_fi = mean(raw_fi, na.rm = TRUE),
+              min_fi = min(raw_fi, na.rm = TRUE),
+              max_fi = max(raw_fi, na.rm = TRUE),
+              mean_r_squared = mean(r_squared, na.rm = TRUE)) %>% 
+    ungroup() %>%
+    mutate(analyte = analyte) %>% 
+    mutate(normalization = nn)
+  
+  return(summary_results)
+}
+
+if ("predictor" %in% colnames(results[[1]])) {
+  print("Predictor column exists.")
+} else {
+  stop("predictor column not found in output.")
+}
+
+results <- replicate(
+  200,
+  {
+    model_output <- tryCatch(
+      plot_fi(parameter),
+      error = function(e) NULL # Return NULL if an error occurs
+    )
+    
+    if (!is.null(model_output$data)) {
+      model_output$data %>% 
+        mutate(r_squared = model_output$R2)
+    } else {
+      NULL
+    }
+  },
+  simplify = FALSE
+)
+
+
+# Run replicates for normalized data
+doc_eb <- replicate_plot_fi(doc, "doc", "Normalized")
+no3_eb <- replicate_plot_fi(no3, "no3", "Normalized")
+
+# Run replicates for non-normalized data
+doc_eb_nn <- replicate_plot_fi(doc, "doc", "Non-Normalized")
+no3_eb_nn <- replicate_plot_fi(no3, "no3", "Non-Normalized")
+
+# Combine into one dataframe
+df <- bind_rows(doc_eb, no3_eb, doc_eb_nn, no3_eb_nn)
+
+# Debugging the resulting `df`
+if (!"predictor" %in% colnames(df)) {
+  stop("predictor column missing in the combined dataframe.")
+}
+
+# Calculate mean R² values by normalization
+mean_r2_summary <- df %>%
+  group_by(analyte, normalization) %>%
+  summarize(mean_r_squared = mean(mean_r_squared, na.rm = TRUE))
+
+print(mean_r2_summary)
+
+
+
+
 ```
 
 
