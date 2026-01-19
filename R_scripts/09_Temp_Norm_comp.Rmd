@@ -186,6 +186,9 @@ rhea_conc_fill <- read_csv(here("Output_for_analysis", "03_Rhea_effect_size", "R
 
 yearly_mean_site <- rbind(yearly_mean_site, crandall_conc_fill, abbott_conc_fill, rhea_conc_fill)
 
+write_csv(yearly_mean_site, here("Output_for_analysis", "09_Temp_Norm_comp", "non-normalization_effect_size.csv"))
+
+
 ```
 
 
