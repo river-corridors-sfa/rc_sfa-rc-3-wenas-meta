@@ -29,6 +29,7 @@ library(zoo)
 # library(hrbrthemes)
 library(viridis)
 library(car)
+library(lme4)
 
 ```
 
@@ -591,62 +592,171 @@ for (response in names(anova_results)) {
 
 ```
 
-```{r Non-normalized through time}
+```{r Non-normalized effect size through time}
+#### DOC NON-NORMAL ####
 # Filter data for DOC and nitrate separately
 DOC_data <- Effect_size_orig_nonnormal %>% filter(response_var == "DOC_Interp")
-Nitrate_data <- Effect_size_orig_nonnormal %>% filter(response_var == "NO3_Interp")
 
-# Perform one-way ANOVA for DOC
-DOC_anova <- aov(Effect_size_no_watershed ~ Time_Since_Fire, data = DOC_data)
-summary(DOC_anova)
+# Read in site data to merge the sites to the DOC_data data frame 
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair) %>% 
+  rename(year = Fire_year) %>% 
+  na.omit()
 
-# A one-way ANOVA was conducted to assess the effect of time since fire on watershed-excluded effect sizes for dissolved organic carbon (DOC). The analysis revealed a significant effect of Time_Since_Fire on Effect_size_no_watershed (F(6, 37) = 4.77, p = 0.001). The results indicate that the influence of fire on DOC effect sizes varies significantly across time since fire, highlighting temporal dynamics in DOC recovery or response after fire events.
+unique(sort(study_site_data$Study_ID)) # should be all 17 studies. 
 
-# Perform one-way ANOVA for nitrate
-Nitrate_anova <- aov(Effect_size_no_watershed ~ Time_Since_Fire, data = Nitrate_data)
-summary(Nitrate_anova) # F-value: 2.432, p-value: 0.0331
+DOC_model <- full_join(DOC_data, study_site_data) %>% 
+  filter(!is.na(Effect_size_no_watershed))# joining the TSF dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
 
-# A one-way ANOVA was conducted to evaluate the effect of time since fire on watershed-excluded effect sizes for nitrate concentrations. The results revealed a statistically significant effect of Time_Since_Fire on Effect_size_no_watershed (F(6, 78) = 2.43, p = 0.033). These findings suggest that the impact of fire on nitrate effect sizes changes significantly over time, indicating temporal variation in nitrate dynamics following fire events.
+# Want to make the TSF continuous so I am gonna put actual years to them 
+DOC_model <- DOC_model %>% 
+  group_by(Study_ID) %>% # Group by Study_ID to handle occurrences within the group
+  mutate(
+    occurrence = row_number(), # Create an occurrence tracker within Study_ID
+    Time_Since_Fire = case_when(
+      Study_ID == "Abbott et al. 2021" & occurrence == 1 ~ "10", # First value
+      Study_ID == "Abbott et al. 2021" & occurrence == 2 ~ "11", # Second value
+      TRUE ~ Time_Since_Fire),
+    Time_Since_Fire = case_when(Study_ID == 'Rhea et al. 2021' ~ '15',
+                                     TRUE ~ Time_Since_Fire),
+    Site = case_when(Study_ID == "Abbott et al. 2021" ~ "Burn",
+                                     TRUE ~ Site)) %>%
+  ungroup() %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire))
+  
 
-
-# Non-normalized vs. normalized through time ####
-# Paired t-test for each response_var at each time point
-paired_results <- long_data %>%
-  group_by(response_var, Time_Since_Fire) %>%
-  summarise(
-    t_test = list(t.test(
-      Effect_value[Effect_type == "Effect_size"],
-      Effect_value[Effect_type == "Effect_size_no_watershed"],
-      paired = TRUE
-    ))
-  )
-
-# View results
-print(paired_results)
-
-library(lme4)
-
-# Run linear mixed model for each response_var
-lmer_results <- long_data %>%
-  group_by(response_var) %>%
-  summarise(
-    lmer = list(lmer(
-      Effect_value ~ Effect_type * as.numeric(Time_Since_Fire) + (1|Study_ID),
-      data = cur_data()
-    ))
-  )
-
-# View model summaries
-lmer_summaries <- lmer_results %>%
-  mutate(summary = map(lmer, summary))
-
-print(lmer_summaries)
-
-# "Linear mixed-effects modeling revealed that the watershed-excluded effect sizes for dissolved organic carbon (DOC) were significantly larger overall compared to watershed-influenced effect sizes (Estimate = 0.84, t = 4.47, p < 0.001). However, neither time since fire nor the interaction between effect type and time since fire significantly influenced DOC effect sizes (p > 0.05). These results suggest that while watershed exclusion impacts effect sizes, the temporal response of DOC does not vary significantly with watershed considerations."
-
-# "Linear mixed-effects modeling revealed no significant overall differences between watershed-influenced and watershed-excluded effect sizes for nitrate (Estimate = 0.46, t = 1.72, p = 0.087), though a marginal trend was observed. Neither time since fire (p > 0.05) nor the interaction between Effect_type and Time_Since_Fire (p > 0.05) was significant, indicating limited temporal variation in nitrate effect sizes with respect to watershed exclusion. These results highlight that nitrate dynamics immediately and over time since fire remain relatively stable irrespective of watershed considerations."
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+doc_tsf_mixed_nonnormal <-  lmer(Effect_size_no_watershed ~ Time_Since_Fire + (1 | Site), data = DOC_model)
 
 
+# Check for equal variance
+performance::check_heteroscedasticity(doc_tsf_mixed_nonnormal) #Variance error
+
+# Check for normality
+residuals <- resid(doc_tsf_mixed_nonnormal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.97841, p-value = 0.5004: p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+
+doc_tsf_mixed_nonnormal
+
+summary(doc_tsf_mixed_nonnormal) 
+fixef(doc_tsf_mixed_nonnormal)
+confint(doc_tsf_mixed_nonnormal)
+
+# The fixed effects revealed a significant negative relationship between Time_Since_Fire and Effect_size_no_watershed (t = -5.238, p < 0.05). Specifically, the fixed-effect estimate indicates that for each unit increase in Time_Since_Fire, Effect_size_no_watershed decreases by 0.05603 (± 0.01070 standard error). Additionally, the intercept suggests an initial estimated effect size of 0.40913 (± 0.07692 standard error).
+
+# The random effects analysis showed that variability among sites contributed a variance of 0.06683, with a standard deviation of 0.2585. The residual variance was 0.02049, with a standard deviation of 0.1432. This suggests that site-level differences were modest but contributed meaningfully to the overall model structure.
+
+# Overall, these results demonstrate that Time_Since_Fire has a significant and consistent negative effect on Effect_size_no_watershed, with site-specific variability included as a random effect in the model framework
+
+#### DOC NORMAL (orig) ####
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+doc_tsf_mixed_normal <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = DOC_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_tsf_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.987).
+
+# Check for normality
+residuals <- resid(doc_tsf_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.97094, p-value = 0.2639: p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+doc_tsf_mixed_normal
+
+summary(doc_tsf_mixed_normal) 
+
+# The fixed effects showed a negative relationship between Time_Since_Fire and Effect_size, but the effect was not statistically significant (t = -1.420, p > 0.05). The fixed-effect estimate suggests that for each unit increase in Time_Since_Fire, Effect_size decreases by 0.02677 (± 0.01886 standard error). The intercept value of -0.33942 (± 0.27074 standard error) suggests a slightly negative starting point, but it is also non-significant (t = -1.254).
+
+# The random effects analysis revealed notable variability between sites, with a variance of 1.27387 and a standard deviation of 1.1287. This indicates that site-level differences contribute substantially to the overall variation in Effect_size. In comparison, the residual variance was much smaller at 0.01956, with a standard deviation of 0.1399, suggesting that most of the variability is captured by the random site effect.
+
+# In summary, the analysis did not detect a significant relationship between Time_Since_Fire and Effect_size. However, the random effects highlight substantial variability across study sites, indicating that site-specific factors play a critical role in modulating the observed effect sizes. This underscores the importance of accounting for site-level differences in the analysis.
+
+# DOC model comparison #
+# The nonnormal model (Effect_size_no_watershed) identifies a significant negative effect of Time_Since_Fire on the response variable, while the normal model (Effect_size) does not detect a significant relationship.
+
+# The normal model attributes much greater variability to site-level differences, suggesting that Effect_size varies substantially across sites. The nonnormal model captures less site-level variability, suggesting that Effect_size_no_watershed may better account for systematic site differences. Using Effect_size_no_watershed (nonnormal) emphasizes a significant negative relationship with Time_Since_Fire, whereas using Effect_size (normal) dilutes this relationship due to substantial variability across sites.
+
+#### NO3 NON-NORMAL ####
+Nitrate_data <- Effect_size_orig_nonnormal %>% 
+  filter(response_var == "NO3_Interp")
+
+NO3_model <- full_join(Nitrate_data, study_site_data) %>% 
+  filter(!is.na(Effect_size_no_watershed))# joining the TSF dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
+
+# Want to make the TSF continuous so I am gonna put actual years to them 
+NO3_model <- NO3_model %>% 
+  group_by(Study_ID) %>% # Group by Study_ID to handle occurrences within the group
+  mutate(
+    occurrence = row_number(), # Create an occurrence tracker within Study_ID
+    Time_Since_Fire = case_when(
+      Study_ID == "Abbott et al. 2021" & occurrence == 1 ~ "10", # First value
+      Study_ID == "Abbott et al. 2021" & occurrence == 2 ~ "11", # Second value
+      TRUE ~ Time_Since_Fire),
+    Time_Since_Fire = case_when(Study_ID == 'Rhea et al. 2021' ~ '15',
+                                     TRUE ~ Time_Since_Fire),
+    Site = case_when(Study_ID == "Abbott et al. 2021" ~ "Burn",
+                                     TRUE ~ Site)) %>%
+  ungroup() %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire))
+  
+
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+no3_tsf_mixed_nonnormal <-  lmer(Effect_size_no_watershed ~ Time_Since_Fire + (1 | Site), data = NO3_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_tsf_mixed_nonnormal) # OK: Error variance appears to be homoscedastic (p = 0.287).
+
+# Check for normality
+residuals <- resid(no3_tsf_mixed_nonnormal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.93737, p-value = 0.0003269: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NOT NORMAL?
+
+no3_tsf_mixed_nonnormal
+
+summary(no3_tsf_mixed_nonnormal) 
+fixef(no3_tsf_mixed_nonnormal)
+confint(no3_tsf_mixed_nonnormal)
+
+# The fixed effects revealed a significant positive relationship between Time_Since_Fire and Effect_size_no_watershed (t = 2.694, p < 0.05). Specifically, the fixed-effect estimate indicates that for each unit increase in Time_Since_Fire, Effect_size_no_watershed increases by 0.09152 (± 0.03397 standard error). The intercept indicates an initial estimated effect size of 0.70308 (± 0.17360 standard error).
+
+# The random effects analysis showed that site-level variability contributed a variance of 0.4472, with a standard deviation of 0.6687. The residual variance was higher at 0.5603, with a standard deviation of 0.7485, suggesting that variability within sites was substantial relative to between-site differences.
+
+# In summary, these results demonstrate that Time_Since_Fire has a significant positive effect on Effect_size_no_watershed, with site-specific variability included as a random effect. This positive relationship implies that as time since fire increases, the influence on Effect_size_no_watershed becomes increasingly pronounced.
+
+#### NO3 NORMAL (orig) ####
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+no3_tsf_mixed_normal <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = NO3_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_tsf_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.923).
+
+# Check for normality
+residuals <- resid(no3_tsf_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.95725, p-value = 0.005135: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NOT NORMAL?
+
+no3_tsf_mixed_normal
+
+summary(no3_tsf_mixed_normal) 
+# The fixed effects showed a positive relationship between Time_Since_Fire and Effect_size, although the effect was marginally non-significant (t = 1.827, p > 0.05). The fixed-effect estimate suggests that for each unit increase in Time_Since_Fire, Effect_size increases by 0.08813 (± 0.04824 standard error). The intercept indicates an initial estimated effect size of 0.31320 (± 0.30045 standard error).
+
+# The random effects analysis demonstrated notable variability across sites, with a random-effect variance of 2.1417 and a standard deviation of 1.4634. Residual variance accounted for less variability, with a value of 0.5006 and a standard deviation of 0.7076. This indicates that site-level differences contribute substantially to the variance in Effect_size overall.
+
+# In summary, while the positive relationship between Time_Since_Fire and Effect_size was detectable, the results were marginally non-significant. Site-specific variability was substantial, underscoring the importance of accounting for between-site differences in the analysis.
+
+# * Comparison between normal and non-normal* 
+#The non-normal model (Effect_size_no_watershed) detected a significant positive relationship between Time_Since_Fire and the response variable, while the normal model (Effect_size) did not. This difference suggests that using the non-normalized data may obscure the significance of the relationship, whereas the transformation or adjustments applied to Effect_size_no_watershed make this relationship clearer.
 
 ```
 
