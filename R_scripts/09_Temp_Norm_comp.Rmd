@@ -549,7 +549,7 @@ no3_summary <- no3_yearly %>%
 
 ```
 
-```{r non-normalized effect size vs. normalized (original) effect size}
+```{r normalized/non-normalized DOC and nitrate effect sizes across whole dataset -- ANOVA }
 Effect_size_orig_nonnormal <- read_csv("Output_for_analysis/04_Meta_merge_all_studies_effect_size/Effect_size_orig_nonnormal.csv")
 
 sort(unique(Effect_size_orig_nonnormal$Study_ID)) # 17 studies - this is all of them
@@ -562,27 +562,36 @@ long_data <- Effect_size_orig_nonnormal %>%
     values_to = "Effect_value"                     # New column to store the values
   )
 
-# Perform the paired t-test for each response_var
-results <- long_data %>%
-  group_by(response_var) %>%
-  summarise(
-    t_test_result = list(t.test(
-      Effect_value[Effect_type == "Effect_size"],
-      Effect_value[Effect_type == "Effect_size_no_watershed"],
-      paired = TRUE
-    ))
-  )
+# Create a list to store ANOVA results for each response_var group
+anova_results <- list()
 
-# View the results
-print(results)
+# Perform ANOVA for each unique response_var
+unique_response_vars <- unique(long_data$response_var)
 
-results$t_test_result
+for (response in unique_response_vars) {
+  # Filter data for the current response_var group
+  group_data <- long_data %>% filter(response_var == response)
+  
+  # Perform ANOVA
+  anova_result <- aov(Effect_value ~ Effect_type, data = group_data)
+  
+  # Store the result in the list
+  anova_results[[response]] <- summary(anova_result)
+}
 
-# A paired t-test was performed to compare the effect sizes between watershed-influenced and watershed-excluded estimates for dissolved organic carbon (DOC). The analysis revealed a statistically significant difference between the two groups (t = -5.11, df = 43, p < 0.00001), indicating that the mean effect size was significantly lower when watershed influence was excluded. The mean difference was -0.71 (95% CI: -0.99 to -0.43). This suggests that watershed considerations substantially impact the effect sizes for DOC measurements.
+# Print each ANOVA result by response_var group
+for (response in names(anova_results)) {
+  cat("\nANOVA Results for Response Variable:", response, "\n")
+  print(anova_results[[response]])
+}
 
-# A paired t-test was conducted to compare the effect sizes between watershed-influenced and watershed-excluded estimates for nitrate concentrations. The analysis demonstrated a statistically significant difference between the two groups (t = -2.59, df = 84, p = 0.011), with the mean effect size being lower when watershed influence was excluded. The observed mean difference was -0.29 (95% CI: -0.51 to -0.07). These results suggest that the exclusion of watershed influence has a measurable impact on nitrate effect sizes.
+# The results revealed significant differences between the effect types for `DOC_Interp`, while no significant differences were observed for `NO3_Interp`. For the response variable `DOC_Interp`, the effect type (`Effect_size` vs. `Effect_size_no_watershed`) showed a significant effect on the response (F(1, 86) = 21.23, *p* < 0.001). The mean sum of squares for the effect type was considerably larger (11.15) compared to the residual variance (0.525). These results indicate that the adjustment for watershed markedly influences effect sizes for this response variable.
 
-# Non-normalized through time ####
+# In contrast, for `NO3_Interp`, the ANOVA results showed no significant difference between effect types (F(1, 168) = 2.053, *p* = 0.154). The mean sum of squares for the effect type was considerably smaller (3.49) relative to the residual variance (1.701). This suggests that watershed adjustments do not have a statistically meaningful impact on effect sizes for this response variable.
+
+```
+
+```{r Non-normalized through time}
 # Filter data for DOC and nitrate separately
 DOC_data <- Effect_size_orig_nonnormal %>% filter(response_var == "DOC_Interp")
 Nitrate_data <- Effect_size_orig_nonnormal %>% filter(response_var == "NO3_Interp")
