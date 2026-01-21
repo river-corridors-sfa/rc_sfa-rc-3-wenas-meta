@@ -446,7 +446,7 @@ merged_data <- cbind(ounted_data, counted_data)
 
 ```
 
-# 12/19/2025 - resubmission stats
+# 12/19/2025 - resubmission stats - TSF/Climate/BP - 1/20/2026
 ```{r - report summary stats - non-normalized}
 # This chunk is comparing the meanConc (non-normalized) of DOC and nitrate between burned and unburned watersheds (These values are NOT the effect size, its just the raw conc. averaged per site/year/study_ID)
 
@@ -594,10 +594,13 @@ for (response in names(anova_results)) {
 
 ```
 
-```{r Non-normalized effect size through time}
+```{r Non-normalized effect size - TSF}
+unique(sort(Effect_size_orig_nonnormal$Study_ID)) # all 17 studies included in TSF analysis
+
 #### DOC NON-NORMAL ####
 # Filter data for DOC and nitrate separately
-DOC_data <- Effect_size_orig_nonnormal %>% filter(response_var == "DOC_Interp")
+DOC_data <- Effect_size_orig_nonnormal %>% 
+  filter(response_var == "DOC_Interp")
 
 # Read in site data to merge the sites to the DOC_data data frame 
 study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
@@ -763,6 +766,8 @@ summary(no3_tsf_mixed_normal)
 ```
 
 ```{r Non-normalized effect size - Climate}
+unique(sort(Effect_size_orig_nonnormal$Study_ID)) # all 17 studies included in Climate analysis
+
 #### DOC NON-NORMAL ####
 # perform linear mixed effect model for non-normalized effect size # Site as a random effect 
 doc_climate_mixed_nonnormal <-  lmer(Effect_size_no_watershed ~ as.factor(Climate) + (1 | Site), data = DOC_model)
@@ -863,7 +868,7 @@ boxplot(Effect_size_no_watershed ~ Climate,
   col = "#E7B800",
   border = "black")
 
-#### NO3 NORMAL ####
+#### NO3 NORMAL (orig) ####
 no3_climate_mixed_normal <-  lmer(Effect_size ~ as.factor(Climate) + (1 | Site), data = NO3_model)
 
 # Check for equal variance
@@ -897,6 +902,185 @@ boxplot(Effect_size ~ Climate,
 
 ```
 
+```{r Non-normalized effect size - BP}
+# Clip burn percent from the study_site_data data frame
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
+  rename(year = Fire_year) %>% 
+  filter(!Study_ID == "Murphy et al. 2015") %>% 
+  na.omit()
+
+bp_clip <- study_site_data %>% 
+  dplyr::select(Study_ID, Site, year, Effect_size_pair, burn_percentage)
+
+unique(sort(bp_clip$Study_ID)) # 13 studies included in burn percentage analysis:
+# Burd et al 2018, Coombs & Melack; 2013, Crandall et al. 2021, Gerla & Galloway; 1998, 
+# Gluns & Toews; 1989, Hauer & Spencer 1998, Mast & Clow; 2008, Murphy et al. 2018, 
+# Neary & Currier; 1982, Oliver et al. 2012, Uzun et al. 2020, Wagner et al. 2015, Writer et al. 2014
+
+# Merge with effect size data frame 
+BP_ES <- full_join(bp_clip, Effect_size_orig_nonnormal) %>% 
+  na.omit() %>% 
+  dplyr::select(Study_ID, Site, response_var, Climate, year, Biome, Effect_size_pair, Effect_size, Effect_size_no_watershed, Time_Since_Fire, burn_percentage) # joining the BP dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
+
+# Only DOC 
+DOC_BP_model <- BP_ES %>% 
+  filter(response_var == "DOC_Interp")
+
+#### DOC NON-NORMAL ####
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+doc_bp_mixed_nonnormal <-  lmer(Effect_size_no_watershed ~ burn_percentage + (1 | Site), data = DOC_BP_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_bp_mixed_nonnormal) # Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+
+# Check for normality
+residuals <- resid(doc_bp_mixed_nonnormal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.94196, p-value = 0.04026: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+summary(doc_bp_mixed_nonnormal) 
+
+# Among fixed effects, the intercept was marginally significant (Estimate = 0.252, Std. Error = 0.125, df = 9.09, t = 2.025, p = 0.0733), while the effect of burn percentage was not significant (Estimate = 0.00057, Std. Error = 0.0026, df = 10.55, t = 0.219, p = 0.8305). The correlation between the intercept and burn percentage was moderate (-0.806). Therefore, the impact of burn percentage on effect size was not statistically significant in this model.
+
+# # post hoc test 
+# emmeans::lsmeans(doc_bp_mixed_nonnormal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were no pairs that were significantly different from each other 
+# 
+# # conduct Levene's Test for equality of variances
+# # Null: the variance amoung the groups is equal. 
+# leveneTest(Effect_size_no_watershed ~ as.factor(Climate), data = DOC_model) #F-value: 2.616, p-value: 0.03757, Df: 5,43 
+# # Variability is significantly different 
+# 
+# # plot 
+# boxplot(Effect_size_no_watershed ~ Climate,
+#   data = DOC_model,
+#   main = "Effect size - non-normal Distribution by Climate - DOC",
+#   xlab = "Climate",
+#   ylab = "Effect Size",
+#   col = "#00AFBB",
+#   border = "black")
+
+
+#### DOC NORMAL (orig) ####
+doc_bp_mixed_normal <-  lmer(Effect_size ~ burn_percentage + (1 | Site), data = DOC_BP_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_bp_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.981).
+
+# Check for normality
+residuals <- resid(doc_bp_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.97068, p-value = 0.3781: p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+summary(doc_bp_mixed_normal) 
+
+# For fixed effects, neither the intercept nor burn percentage demonstrated statistical significance. The intercept estimate was -0.588 (Std. Error = 0.635, df = 10.96, t = -0.927, p = 0.374), while the estimate for burn percentage was -0.00038 (Std. Error = 0.01289, df = 11.02, t = -0.030, p = 0.977). The correlation between the intercept and burn percentage was moderate (-0.809). In summary, the model did not find evidence of a significant relationship between burn percentage and effect size after accounting for site-level variability.
+
+# Comparison 
+# The variance attributed to Site was substantially higher for the Effect_size model (1.795 vs. 0.059), indicating greater variability across sites for the Effect_size response variable than for Effect_size_no_watershed.
+
+# Observation: Both models found no significant relationship between burn percentage and the response variable, but the direction of the estimated effect was different: positive for Effect_size_no_watershed and negative for Effect_size.
+
+# post hoc test 
+# emmeans::lsmeans(doc_climate_mixed_normal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were no pairs that were significantly different from each other 
+# 
+# # conduct Levene's Test for equality of variances
+# # Null: the variance amoung the groups is equal. 
+# leveneTest(Effect_size ~ as.factor(Climate), data = DOC_model) #F-value: 40.417, p-value: 3.479e-15, Df: 5,43
+# # Variability is significantly different 
+# 
+# # plot 
+# boxplot(Effect_size ~ Climate,
+#   data = DOC_model,
+#   main = "Effect size - Distribution by Climate - DOC",
+#   xlab = "Climate",
+#   ylab = "Effect Size",
+#   col = "#00AFBB",
+#   border = "black")
+
+#### NO3 NON-NORMAL ####
+# Only N03 
+NO3_BP_model <- BP_ES %>% 
+  filter(response_var == "NO3_Interp")
+
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+no3_bp_mixed_nonnormal <-  lmer(Effect_size_no_watershed ~ burn_percentage + (1 | Site), data = NO3_BP_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_bp_mixed_nonnormal) # OK: Error variance appears to be homoscedastic (p = 0.329).
+
+# Check for normality
+residuals <- resid(no3_bp_mixed_nonnormal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.94141, p-value = 0.001468: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+summary(no3_bp_mixed_nonnormal) 
+
+# Intercept was significant (p = 0.00119), suggesting a strong baseline positive effect size for sites with no burn percentage. Burn percentage was not a significant predictor (p = 0.228), and its estimated effect was small and negative, consistent with no strong influence on NO₃⁻ effect size. Site-level variability (random effects) contributed moderately to the response (variance = 0.622), highlighting spatial effects in NO₃⁻ data.
+
+
+# # post hoc test 
+# emmeans::lsmeans(no3_climate_mixed_nonnormal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were no pairs that were significantly different from each other 
+# 
+# # conduct Levene's Test for equality of variances
+# # Null: the variance amoung the groups is equal. 
+# leveneTest(Effect_size_no_watershed ~ as.factor(Climate), data = NO3_model) #F-value: 0.8502, p-value: 0.5618, Df: 8,80
+# 
+# # plot 
+# boxplot(Effect_size_no_watershed ~ Climate,
+#   data = NO3_model,
+#   main = "Effect size - non-normal Distribution by Climate - NO3",
+#   xlab = "Climate",
+#   ylab = "Effect Size",
+#   col = "#E7B800",
+#   border = "black")
+
+#### NO3 NORMAL (orig) ####
+no3_bp_mixed_normal <-  lmer(Effect_size ~ burn_percentage + (1 | Site), data = NO3_BP_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_bp_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.952).
+
+# Check for normality
+residuals <- resid(no3_bp_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.9397, p-value = 0.001195: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+summary(no3_bp_mixed_normal) 
+
+# Intercept was not significant (p = 0.192), suggesting no strong baseline effect size for sites with zero burn percentage. Burn percentage was not a significant predictor (p = 0.403); the estimated effect was small and negative, with no evidence of statistical importance. Site-level variability was substantial (variance = 2.529), much larger than the residual variance, indicating strong spatial effects on NO₃⁻ effect size. 
+
+# Comparison 
+# Both models failed to detect a statistically significant relationship between burn percentage and NO₃⁻ effect size. Effect_size model exhibited far greater site-level variance (2.529 vs. 0.622), suggesting that site effects dominate in explaining variability in Effect_size, whereas their influence on Effect_size_no_watershed is more limited.
+
+# # post hoc test 
+# emmeans::lsmeans(no3_climate_mixed_normal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were two pairs that were significantly different: Csb - Dfc, Csa - Dfc
+# 
+# # conduct Levene's Test for equality of variances
+# # Null: the variance amoung the groups is equal. 
+# leveneTest(Effect_size ~ as.factor(Climate), data = NO3_model) #F-value: 2.2233, p-value: 0.03401, Df: 8,80
+# 
+# # plot 
+# boxplot(Effect_size ~ Climate,
+#   data = NO3_model,
+#   main = "Effect size - normal Distribution by Climate - NO3",
+#   xlab = "Climate",
+#   ylab = "Effect Size",
+#   col = "#E7B800",
+#   border = "black")
+
+```
 
 
 
