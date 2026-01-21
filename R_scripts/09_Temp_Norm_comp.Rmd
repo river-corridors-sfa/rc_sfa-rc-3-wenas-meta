@@ -30,6 +30,8 @@ library(zoo)
 library(viridis)
 library(car)
 library(lme4)
+library(merTools)
+
 
 ```
 
@@ -760,7 +762,140 @@ summary(no3_tsf_mixed_normal)
 
 ```
 
+```{r Non-normalized effect size - Climate}
+#### DOC NON-NORMAL ####
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+doc_climate_mixed_nonnormal <-  lmer(Effect_size_no_watershed ~ as.factor(Climate) + (1 | Site), data = DOC_model)
 
+# Check for equal variance
+performance::check_heteroscedasticity(doc_climate_mixed_nonnormal) # Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+
+# Check for normality
+residuals <- resid(doc_climate_mixed_nonnormal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.97404, p-value = 0.3477: p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+summary(doc_climate_mixed_nonnormal) 
+summary_output <- summary(doc_climate_mixed_nonnormal) 
+summary_df <- as.data.frame(summary_output$doc_climate_mixed_nonnormal)
+
+# post hoc test 
+emmeans::lsmeans(doc_climate_mixed_nonnormal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were no pairs that were significantly different from each other 
+
+# conduct Levene's Test for equality of variances
+# Null: the variance amoung the groups is equal. 
+leveneTest(Effect_size_no_watershed ~ as.factor(Climate), data = DOC_model) #F-value: 2.616, p-value: 0.03757, Df: 5,43 
+# Variability is significantly different 
+
+# plot 
+boxplot(Effect_size_no_watershed ~ Climate,
+  data = DOC_model,
+  main = "Effect size - non-normal Distribution by Climate - DOC",
+  xlab = "Climate",
+  ylab = "Effect Size",
+  col = "#00AFBB",
+  border = "black")
+
+
+#### DOC NORMAL (orig) ####
+doc_climate_mixed_normal <-  lmer(Effect_size ~ as.factor(Climate) + (1 | Site), data = DOC_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_climate_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.988).
+
+# Check for normality
+residuals <- resid(doc_climate_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.97153, p-value = 0.2784: p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+summary(doc_climate_mixed_normal) 
+
+# post hoc test 
+emmeans::lsmeans(doc_climate_mixed_normal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were no pairs that were significantly different from each other 
+
+# conduct Levene's Test for equality of variances
+# Null: the variance amoung the groups is equal. 
+leveneTest(Effect_size ~ as.factor(Climate), data = DOC_model) #F-value: 40.417, p-value: 3.479e-15, Df: 5,43
+# Variability is significantly different 
+
+# plot 
+boxplot(Effect_size ~ Climate,
+  data = DOC_model,
+  main = "Effect size - Distribution by Climate - DOC",
+  xlab = "Climate",
+  ylab = "Effect Size",
+  col = "#00AFBB",
+  border = "black")
+
+#### NO3 NON-NORMAL ####
+no3_climate_mixed_nonnormal <-  lmer(Effect_size_no_watershed ~ as.factor(Climate) + (1 | Site), data = NO3_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_climate_mixed_nonnormal) # OK: Error variance appears to be homoscedastic (p = 0.583).
+
+# Check for normality
+residuals <- resid(no3_climate_mixed_nonnormal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.94414, p-value = 0.0007995: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+summary(no3_climate_mixed_nonnormal) 
+
+# post hoc test 
+emmeans::lsmeans(no3_climate_mixed_nonnormal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were no pairs that were significantly different from each other 
+
+# conduct Levene's Test for equality of variances
+# Null: the variance amoung the groups is equal. 
+leveneTest(Effect_size_no_watershed ~ as.factor(Climate), data = NO3_model) #F-value: 0.8502, p-value: 0.5618, Df: 8,80
+
+# plot 
+boxplot(Effect_size_no_watershed ~ Climate,
+  data = NO3_model,
+  main = "Effect size - non-normal Distribution by Climate - NO3",
+  xlab = "Climate",
+  ylab = "Effect Size",
+  col = "#E7B800",
+  border = "black")
+
+#### NO3 NORMAL ####
+no3_climate_mixed_normal <-  lmer(Effect_size ~ as.factor(Climate) + (1 | Site), data = NO3_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_climate_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.969).
+
+# Check for normality
+residuals <- resid(no3_climate_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.94782, p-value = 0.001324: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+summary(no3_climate_mixed_normal) 
+
+# post hoc test 
+emmeans::lsmeans(no3_climate_mixed_normal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were two pairs that were significantly different: Csb - Dfc, Csa - Dfc
+
+# conduct Levene's Test for equality of variances
+# Null: the variance amoung the groups is equal. 
+leveneTest(Effect_size ~ as.factor(Climate), data = NO3_model) #F-value: 2.2233, p-value: 0.03401, Df: 8,80
+
+# plot 
+boxplot(Effect_size ~ Climate,
+  data = NO3_model,
+  main = "Effect size - normal Distribution by Climate - NO3",
+  xlab = "Climate",
+  ylab = "Effect Size",
+  col = "#E7B800",
+  border = "black")
+
+```
 
 
 
