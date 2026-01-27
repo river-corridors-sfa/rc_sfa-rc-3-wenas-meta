@@ -783,8 +783,6 @@ shapiro.test(residuals) # W = 0.97404, p-value = 0.3477: p-value is > 0.05
 # when p > 0.05 can assume normality 
 
 summary(doc_climate_mixed_nonnormal) 
-summary_output <- summary(doc_climate_mixed_nonnormal) 
-summary_df <- as.data.frame(summary_output$doc_climate_mixed_nonnormal)
 
 # post hoc test 
 emmeans::lsmeans(doc_climate_mixed_nonnormal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were no pairs that were significantly different from each other 
