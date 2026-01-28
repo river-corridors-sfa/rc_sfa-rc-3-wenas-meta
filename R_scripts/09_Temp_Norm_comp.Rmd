@@ -594,6 +594,16 @@ for (response in names(anova_results)) {
 
 ```
 
+```{r means normalized/non}
+
+means <- Effect_size_orig_nonnormal %>%
+  group_by(response_var) %>%
+   dplyr::summarise(across(everything(), list(mean = ~mean(.), sd = ~sd(.))), .groups = "keep")
+
+print(means)
+```
+
+
 ```{r Non-normalized effect size - TSF}
 unique(sort(Effect_size_orig_nonnormal$Study_ID)) # all 17 studies included in TSF analysis
 
