@@ -72,7 +72,7 @@ control_impact <- meta_df %>%
 
 # separate out the time columns 
 time_format <- control_impact %>% 
-  select(Study_ID, Sampling_Date) 
+  dplyr::select(Study_ID, Sampling_Date) 
 
 # merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
 control_impact <- control_impact %>% 
@@ -114,7 +114,7 @@ control_impact_units <- control_impact %>%
 
 # Creating a site characteristics data frame that I will use to merge later to add in the proper data 
 site_data <- control_impact_units %>% 
-  select(Study_ID, Pair, Site, latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
+  dplyr::select(Study_ID, Pair, Site, latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
 
 site_data_unique <- site_data %>% 
   group_by(Study_ID, Pair, Area_watershed_km) %>% 
@@ -126,7 +126,7 @@ site_data_unique <- site_data %>%
 ```{r - gap fill}
 # filling in daily time series and interpolating by study and site
 control_impact_fill <-  control_impact_units %>% 
-  select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
   group_by(Study_ID, Site) %>%
   complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
   fill(Study_ID:Burn_Unburn) %>%
@@ -285,6 +285,7 @@ write_csv(no3_cv_out, here("Output_for_analysis", "09_Temp_Norm_comp", "NO3_CV_t
 
 ### PLOT Burn vs. Unburn ###
 
+
 ```{r}
 # DOC 
 # simple box plot 
@@ -395,7 +396,42 @@ ggsave("NO3_CV_yield.pdf",
 ```
 
 
-```{r - report summary stats}
+```{r - report summary stats - mean conc. - watershed area}
+# Burn vs. unburned watershed area # Run to line 123 to generate the site_data_unique data frame
+watershed_ratio_wide <- site_data_unique %>% 
+  filter(Study_ID != "Murphy et al. 2015") %>% 
+  filter(Study_ID != "Rhea et al. 2021") %>% 
+  pivot_wider(
+    id_cols = Study_ID,
+    names_from = Pair,
+    values_from = Area_watershed_km
+  )
+
+# Pivot longer to handle multiple Site columns and calculate ratios individually
+watershed_ratio <- watershed_ratio_wide %>%
+  pivot_longer(
+    cols = starts_with("Site"), # Pivoting all Site columns (Site_1, Site_2, Site_3, etc.)
+    names_to = "Site",          # Creates a 'Site' column to track sites
+    values_to = "Site_value"    # Store numeric values of Site in the 'Site_value' column
+  ) %>%
+  mutate(
+    watershed_ratio = case_when(
+      # Configurations based on specific Site and Control pairings
+      !is.na(Control_1) & Site == "Site_1" ~ Site_value / Control_1, # Site_1/Control_1
+      !is.na(Control_2) & Site == "Site_2" ~ Site_value / Control_2, # Site_2/Control_2
+      !is.na(Control_3_4_5) & Site %in% c("Site_3", "Site_4", "Site_5") ~ Site_value / Control_3_4_5, # Site_3, Site_4, Site_5 divided by Control_3_4_5
+      !is.na(Control) & Site == "Site_1" ~ Site_value / Control, # Generic Site_1/Control
+      !is.na(Control) & Site == "Site_2" ~ Site_value / Control, # Generic Site_2/Control
+      !is.na(Control) & Site == "Site_3" ~ Site_value / Control, # Generic Site_3/Control
+      TRUE ~ NA_real_ # Default case for rows without valid pairing
+    )
+  ) %>% 
+    filter(!is.na(watershed_ratio)) 
+
+median(watershed_ratio$watershed_ratio)
+sd(watershed_ratio$watershed_ratio)
+range(watershed_ratio$watershed_ratio)
+
 # DOC
 doc_summary <- doc_yearly %>%
   group_by(Burn_Unburn) %>% 
