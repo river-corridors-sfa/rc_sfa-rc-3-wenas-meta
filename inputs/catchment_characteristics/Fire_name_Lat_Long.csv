@@ -1,5 +1,5 @@
 Study_ID,Site,Effect_size_pair,Fire_N/Ame,Fire_year,Data_collection_years,Vegetation_year_pull,latitude,longitude,Area_watershed,burn_percentage,Reports_Size,Reports_Burn_Percentage,Reports_Coords,Have_HUC
-Abbott et al. 2021,AN/Aktuvuk Fire,N/A,AN/Aktuvuk Fire,MTBS_2007Ws,2017,2017,69.047,-150.837,-9999,-9999,N/A,N/A,N/A,N/A
+Abbott et al. 2021,Anaktuvuk,lnR1,Anaktuvuk Fire,MTBS_2007Ws,2017,2017,69.047,-150.837,-9999,-9999,N/A,N/A,N/A,N/A
 Burd et al 2018,Notawohka Creek,lnR1,Northwest Territories Fire ,MTBS_2013Ws,2016,2016,61.133333,-120.283333,321,90,Y,Y,Y,N_CaN/Ada
 Burd et al 2018,Scotty Creek,N/A,Northwest Territories Fire ,MTBS_2013Ws,2016,2016,61.4,-121.433,134,0,Y,Y,Y,N_CaN/Ada
 Burd et al 2018,N/A,N/A,Northwest Territories Fire ,MTBS_2013Ws,2016,2016,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
@@ -47,12 +47,6 @@ Mast & Clow; 2008,Lower MacDoN/Ald Creek,lnR3_post,Rampage Fire_Robert Fire_Trap
 Mast & Clow; 2008,Pinchot,N/A,Rampage Fire_Robert Fire_Trapper Fire,MTBS_2003Ws,2003_2004_2005_2006_2007,2004_2008,48.42222,-113.7005555,47.3,0.2982,Y,Y,N_Hampton,Y
 Mast & Clow; 2008,Upper MacDoN/Ald Creek,lnR4_post,Rampage Fire_Robert Fire_Trapper Fire,MTBS_2003Ws,2003_2004_2005_2006_2007,2004_2008,48.63527778,-113.8669444,282,26,Y,Y,N_Hampton,Y
 Mast & Clow; 2008,N/A,N/A,Rampage Fire_Robert Fire_Trapper Fire,MTBS_2003Ws,2003_2004_2005_2006_2007,2004_2008,-9999,-9999,-9999,-9999,N/A,N/A,N/A,N/A
-Murphy et al. 2015,DS1,lnR1,Fourmile Canyon Fire,MTBS_2010Ws,2010_2011_2012_2013,2011,40.039046,-105.393878,37,16.3095,N_Hampton,N,N_Google,Y
-Murphy et al. 2015,DS2,lnR2,Fourmile Canyon Fire,MTBS_2010Ws,2010_2011_2012_2013,2011,40.041668,-105.364823,50,27.1144,N_Hampton_has USGS Q Gauge,N,N_Google,Y
-Murphy et al. 2015,DS3,lnR3,Fourmile Canyon Fire,MTBS_2010Ws,2010_2011_2012_2013,2011,40.0155,-105.324566,63.1,27.1121,N_Hampton_has USGS Q Gauge,N,N_Google,Y
-Murphy et al. 2015,US1,N/A,Fourmile Canyon Fire,MTBS_2010Ws,2010_2011_2012_2013,2011,40.036103,-105.439101,25.9,0,N_Hampton,N,N_Google,Y_Same_COMID_as_US2
-Murphy et al. 2015,US2,N/A,Fourmile Canyon Fire,MTBS_2010Ws,2010_2011_2012_2013,2011,40.037791,-105.421247,29,0,N_Hampton,N,N_Google,Y
-Murphy et al. 2015,N/A,N/A,Fourmile Canyon Fire,MTBS_2010Ws,2010_2011_2012_2013,2011,40.033333,-105.416667,-9999,-9999,N/A,N/A,N/A,N/A
 Murphy et al. 2018,DS1,lnR1,Fourmile Canyon Fire,MTBS_2010Ws,2011_2012_2013_2014_2015,2011,40.039046,-105.393878,370,16.3095,N_Hampton,N,N_Google,Y
 Murphy et al. 2018,DS2,lnR2,Fourmile Canyon Fire,MTBS_2010Ws,2011_2012_2013_2014_2015,2011,40.041668,-105.364823,500,27.1144,N_Hampton_has USGS Q Gauge,N,N_Google,Y
 Murphy et al. 2018,DS3,lnR3,Fourmile Canyon Fire,MTBS_2010Ws,2011_2012_2013_2014_2015,2011,40.0155,-105.324566,631,27.1121,N_Hampton_has USGS Q Gauge,N,N_Google,Y

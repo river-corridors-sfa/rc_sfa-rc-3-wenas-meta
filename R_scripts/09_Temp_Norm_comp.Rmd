@@ -449,8 +449,8 @@ doc_summary <- doc_yearly %>%
 # NO3
 no3_summary <- no3_yearly %>%
   group_by(Burn_Unburn) %>% 
-  summarise(meanDOC = mean(TempNorm),
-            sdDOC = sd(TempNorm),
+  summarise(meanNo3 = mean(TempNorm),
+            sdNo3 = sd(TempNorm),
             range = range(TempNorm, scientific = F))
 
 # Burn mean: 2.527080
@@ -588,7 +588,7 @@ no3_summary <- no3_yearly %>%
 
 ```
 
-```{r normalized/non-normalized DOC and nitrate effect sizes across whole dataset -- ANOVA }
+```{r normalized/non-normalized DOC and nitrate effect sizes across whole dataset -- ANOVA}
 Effect_size_orig_nonnormal <- read_csv("Output_for_analysis/04_Meta_merge_all_studies_effect_size/Effect_size_orig_nonnormal.csv")
 
 sort(unique(Effect_size_orig_nonnormal$Study_ID)) # 17 studies - this is all of them
@@ -694,7 +694,71 @@ confint(doc_tsf_mixed_nonnormal)
 # Overall, these results demonstrate that Time_Since_Fire has a significant and consistent negative effect on Effect_size_no_watershed, with site-specific variability included as a random effect in the model framework
 
 #### DOC NORMAL (orig) ####
+
+### TEST ###
+TSF_ES <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "TSF_ES_Fig_data.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size_pair, Effect_size, year, Time_Since_Fire) %>% 
+  rename(fire_year = year)
+unique(TSF_ES$Study_ID) # Should be all 17 studies
+
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair) %>% 
+  rename(year = Fire_year) %>% 
+  na.omit()
+
+unique(study_site_data$Study_ID) # should be all 17 studies. 
+
+TSF_model <- full_join(TSF_ES, study_site_data) # joining the TSF dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
+
+# manually putting in Abbott names because we merged these watersheds into burn/unburn
+TSF_model <- TSF_model %>% 
+  mutate(Site = case_when(Study_ID == 'Abbott et al. 2021' ~ 'Burn',
+                                     TRUE ~ Site),
+         year = case_when(Study_ID == 'Abbott et al. 2021' ~ 'MTBS_2007Ws',
+                                     TRUE ~ year))
+# Want to make the TSF continuous so I am gonna put actual years to them 
+TSF_model <- TSF_model %>% 
+  mutate(Time_Since_Fire = case_when(Study_ID == 'Abbott et al. 2021' &
+                                     fire_year == 2017 ~ '10',
+                                     TRUE ~ Time_Since_Fire),
+         Time_Since_Fire = case_when(Study_ID == 'Abbott et al. 2021' &
+                                     fire_year == 2018 ~ '11',
+                                     TRUE ~ Time_Since_Fire),
+         Time_Since_Fire = case_when(Study_ID == 'Rhea et al. 2021' ~ '15',
+                                     TRUE ~ Time_Since_Fire)) %>% 
+  na.omit() %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire))
+
+doc_es_tsf <- TSF_model %>% 
+  filter(response_var == "DOC_Interp")
+
+# Continuous 
+doc_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = doc_es_tsf)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_tsf_mixed) #OK: Error variance appears to be homoscedastic (p = 0.968).
+
+# Check for normality
+residuals <- resid(doc_tsf_mixed)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # p-value is > 0.05
+# when p > 0.05 can assume normality 
+ 
+doc_tsf_mixed
+
+summary(doc_tsf_mixed) # df: 40.9851, t-value: -4.792, p-value: 2.47e-05 # TSF is significant for DOC 
+
+
+
+
+###
+
 # perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+
+
+
+
 doc_tsf_mixed_normal <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = DOC_model)
 
 # Check for equal variance

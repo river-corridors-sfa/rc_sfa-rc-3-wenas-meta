@@ -137,7 +137,7 @@ landcover_summary <- landcover_summary %>%
 ### Load in geospatial data 
 ```{r}
 # The effect sizes of each study's watershed
-effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_Size.csv"), na = c('-9999', 'N/A')) %>% 
+effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "archive", "Effect_Size_40days.csv"), na = c('-9999', 'N/A')) %>% 
   dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size, Effect_size_pair, Time_Since_Fire)
 
 # This has site and effect size pair which will merge with the effect size dataframe to get a site name with each effect size.
@@ -199,7 +199,7 @@ write_csv(no3_RF, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta
 ### Load in geospatial data 
 ```{r}
 # The effect sizes of each study's watershed
-effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "Effect_size_orig_nonnormal.csv"), na = c('-9999', 'N/A')) 
+effect_size <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "archive", "Effect_size_orig_nonnormal.csv"), na = c('-9999', 'N/A')) 
 
 # This has site and effect size pair which will merge with the effect size dataframe to get a site name with each effect size.
 study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>%

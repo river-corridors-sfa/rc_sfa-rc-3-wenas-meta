@@ -35,12 +35,16 @@ library(readr)
 
 1. load random forest dataset 
 ```{r load data}
-all_data <- read_csv("~/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/08_Meta_summary_stats/random_forest_nonnormal_orig_both_analytes.csv") %>%
+all_data <- read_csv("Output_for_analysis/08_Meta_summary_stats/random_forest_nonnormal_orig_both_analytes.csv") %>%
   pivot_longer(
     cols= c(Effect_size, Effect_size_no_watershed),
     names_to = "normalization",
     values_to = "Effect_size"
   )
+
+filtered <- all_data %>% 
+  dplyr::select(Study_ID, response_var, Time_Since_Fire, Effect_size_pair, Effect_size, normalization)
+
 
 ```
 
@@ -87,7 +91,7 @@ all_data <- read_csv("Output_for_analysis/08_Meta_summary_stats/random_forest_no
     values_to = "Effect_size"
   )
 
-Effect_size_orig_nonnormal <- read_csv("Output_for_analysis/04_Meta_merge_all_studies_effect_size/Effect_size_orig_nonnormal.csv") %>% 
+Effect_size_orig_nonnormal <- read_csv("Output_for_analysis/04_Meta_merge_all_studies_effect_size/archive/Effect_size_orig_nonnormal.csv") %>% 
   pivot_longer(
     cols= c(Effect_size, Effect_size_no_watershed),
     names_to = "normalization",
