@@ -20,7 +20,10 @@ p_load(tidyverse,
        # hrbrthemes,
        viridis, 
        ggpmisc,
-       RobustLinearReg)
+       RobustLinearReg,
+       lme4,
+       car)
+
 ```
 
 ### Build Model data frame for all variables of interest - BP, BS, TSF, CLIMATE 
@@ -113,7 +116,7 @@ no3_es_climate <- ES_nn_normal %>%
 
 ```
 
-# NON-NORMAL vs. NORMAL EFFECT SIZE TSF
+# TSF NON-NORMAL vs. NORMAL EFFECT SIZE 
 ```{r}
 # Pivot into long format
 long_doc_nn_normal <- doc_es_tsf %>%
@@ -155,8 +158,9 @@ for (response in names(anova_results)) {
 ```
 
 # TSF MODEL 
-```{r Normalized effect size - TSF - original}
-### TSF DOC normalized - original workflow ####
+```{r TSF - Normalized & non-normal models}
+### TSF DOC normalized  ####
+# Original workflow 
 # data frame: doc_es_tsf 
 doc_es_tsf <- doc_es_tsf %>%
   group_by(Study_ID, Effect_size_pair) %>%
@@ -225,10 +229,85 @@ Anova(doc_tsf_mixed_nn, type = "III")
 
 # Note: The strong significance in this model contrasts with the marginal effects found when watershed controls were included, suggesting that watershed-level factors may mask or confound the temporal recovery patterns in DOC concentrations following fire.
 
+### TSF NITRATE normalized ####
+# Original workflow 
+# data frame: doc_es_tsf 
+no3_es_tsf <- no3_es_tsf %>%
+  group_by(Study_ID, Effect_size_pair) %>%
+  mutate(Site = cur_group_id()) %>%
+  ungroup()
+
+# perform linear mixed effect model for normalized effect size # Effect_size_pair (Site) as a random effect 
+no3_tsf_mixed_normal <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = no3_es_tsf)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_tsf_mixed_normal) # OOK: Error variance appears to be homoscedastic (p = 0.876).
+
+# Check for normality
+residuals <- resid(no3_tsf_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.96477, p-value = 0.1067
+# when p > 0.05 can assume normality 
+
+no3_tsf_mixed_normal
+
+summary(no3_tsf_mixed_normal) 
+
+# P-value 
+Anova(no3_tsf_mixed_normal, type = "III")
+
+# We examined the relationship between time since fire and nitrate (NO₃) effect sizes using a linear mixed effects model with site as a random effect. The model included 55 observations across 21 sites.
+
+# The analysis revealed no significant relationship between time since fire and NO₃ effect size (β = 0.029, SE = 0.092, t = 0.312, p = 0.757). The intercept was also not significantly different from zero (β = 0.346, SE = 0.377, t = 0.917, p = 0.368).
+
+# Random effects showed substantial variation among sites (SD = 1.47), indicating considerable site-specific differences in baseline conditions, while residual variation was moderate (SD = 0.83). The Type III Wald test confirmed the non-significant effect of time since fire (χ² = 0.097, df = 1, p = 0.755).
+
+# These results suggest that nitrate levels in the studied systems do not show a clear temporal pattern of recovery following fire disturbance. The large among-site variation indicates that site-specific factors may be more important than time since fire in determining nitrate response patterns post-fire.
+
+### TSF NITRATE non-normalized ####
+# data frame: no3_es_tsf 
+
+# perform linear mixed effect model for normalized effect size # Effect_size_pair (Site) as a random effect 
+no3_tsf_mixed_non_normal <-  lmer(Effect_size_no_watershed ~ Time_Since_Fire + (1 | Site), data = no3_es_tsf)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_tsf_mixed_non_normal) # OK: Error variance appears to be homoscedastic (p = 0.067).
+
+# Check for normality
+residuals <- resid(no3_tsf_mixed_non_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.89441, p-value = 0.00016
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+no3_tsf_mixed_non_normal
+
+summary(no3_tsf_mixed_non_normal) 
+
+# P-value 
+Anova(no3_tsf_mixed_non_normal, type = "III")
+
+# We examined the relationship between time since fire and nitrate (NO₃) effect sizes (excluding watershed-scale studies) using a linear mixed effects model with site as a random effect. The model included 55 observations across 21 sites.
+
+# The analysis revealed no significant relationship between time since fire and NO₃ effect size (β = 0.125, SE = 0.088, t = 1.43, p = 0.160). However, the intercept was significantly greater than zero (β = 0.692, SE = 0.239, t = 2.90, p = 0.008), indicating that nitrate effect sizes were significantly positive immediately following fire disturbance.
+
+# Random effects showed relatively low variation among sites (SD = 0.39), while residual variation was higher (SD = 0.99), suggesting that within-site variability was greater than among-site differences. The Type III Wald test confirmed the non-significant effect of time since fire (χ² = 2.04, df = 1, p = 0.154) and the significant intercept effect (χ² = 8.42, df = 1, p = 0.004).
+
+# These results suggest that fire initially produces a significant positive effect on nitrate levels, but this effect does not change systematically over time since fire. The significant baseline effect indicates that fire disturbance consistently elevates nitrate concentrations in the immediate post-fire period across the studied systems.
+
+# COMPARE
+# Effect_size model (normalized): No significant baseline effect (intercept p = 0.368) and no relationship with time since fire (p = 0.757). This model showed higher among-site variation (SD = 1.47) relative to residual variation (SD = 0.83).
+
+# Effect_size_no_watershed model (non-normal): Significant positive baseline effect immediately post-fire (intercept = 0.692, p = 0.008) but still no relationship with time since fire (p = 0.160). This model showed lower among-site variation (SD = 0.39) but higher residual variation (SD = 0.99).
+
+# The key difference is that excluding watershed-scale studies reveals a consistent, significant positive effect of fire on nitrate concentrations in the immediate post-fire period. This suggests that watershed-scale studies may dilute or mask the direct effects of fire on nitrate, possibly due to differences in spatial scale, methodology, or the influence of broader landscape processes. The reduced among-site variation in the no-watershed model indicates that watershed studies contributed substantially to site-level heterogeneity in the full dataset.
+
 ```
 
-### PLOT NON-NORMAL vs. NORMAL EFFECT SIZE TSF
-```{r}
+### TSF PLOT NON-NORMAL vs. NORMAL EFFECT SIZE 
+```{r TSF plot}
 tsf_nn_normal_long <-  doc_es_tsf %>%
   pivot_longer(
     cols= c(Effect_size, Effect_size_no_watershed),
@@ -268,6 +347,688 @@ tsf_plot = tsf_nn_normal_plot %>%
 tsf_plot
 
 ```
+
+
+# CLIMATE MODEL 
+```{r CLIMATE - Normalized & non-normal models}
+### CLIMATE DOC normalized  ####
+# Original workflow 
+# data frame: doc_es_climate
+doc_es_climate <- doc_es_climate %>%
+  group_by(Study_ID, Effect_size_pair) %>%
+  mutate(Site = cur_group_id()) %>%
+  ungroup()
+
+# perform linear mixed effect model for normalized effect size # Effect_size_pair (Site) as a random effect 
+doc_climate_mixed_normal <-  lmer(Effect_size ~ Climate + (1 | Site), data = doc_es_climate)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_climate_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.994)
+
+# Check for normality
+residuals <- resid(doc_climate_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.96704, p-value = 0.237
+# when p > 0.05 can assume normality 
+
+doc_climate_mixed_normal
+
+summary(doc_climate_mixed_normal) 
+
+# P-value 
+Anova(doc_climate_mixed_normal, type = "III")
+
+# We examined the relationship between climate type and dissolved organic carbon (DOC) effect sizes using a linear mixed effects model with site as a random effect. The model included 44 observations across 21 sites, comparing six climate types (reference climate plus Csa, Csb, Dfb, Dfc, and Dwc).
+
+# The analysis revealed no significant differences in DOC effect sizes among climate types (overall climate effect: χ² = 1.12, df = 5, p = 0.952). None of the individual climate contrasts were significant: Csa (β = -0.227, SE = 0.835, t = -0.272, p = 0.789), Csb (β = 0.685, SE = 1.078, t = 0.636, p = 0.535), Dfb (β = 0.086, SE = 0.902, t = 0.096, p = 0.925), Dfc (β = 0.114, SE = 0.862, t = 0.132, p = 0.897), and Dwc (β = 0.578, SE = 1.363, t = 0.424, p = 0.678). The reference climate intercept was also not significantly different from zero (β = -0.518, SE = 0.680, t = -0.762, p = 0.458).
+
+# Random effects showed substantial variation among sites (SD = 1.18) compared to very low residual variation (SD = 0.13), indicating that site-specific factors account for most of the variability in DOC response to fire, while within-site measurements were highly consistent.
+
+# These results suggest that climate type does not significantly influence how DOC concentrations respond to fire disturbance, with site-specific characteristics being the primary driver of variability in post-fire DOC dynamics.
+
+### CLIMATE DOC non-normalized ####
+# data frame: doc_es_climate
+# perform linear mixed effect model for normalized effect size # Effect_size_pair (Site) as a random effect 
+doc_climate_mixed_nn <-  lmer(Effect_size_no_watershed ~ Climate + (1 | Site), data = doc_es_climate)
+
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_climate_mixed_nn) # Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+
+# Check for normality
+residuals <- resid(doc_climate_mixed_nn)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.9674, p-value = 0.2441
+# when p > 0.05 can assume normality 
+
+doc_climate_mixed_nn
+
+summary(doc_climate_mixed_nn) 
+
+# P-value 
+Anova(doc_climate_mixed_nn, type = "III")
+
+# We examined the relationship between climate type and dissolved organic carbon (DOC) effect sizes on non-normalized data using a linear mixed effects model with site as a random effect. The model included 44 observations across 21 sites, comparing six climate types (reference climate plus Csa, Csb, Dfb, Dfc, and Dwc).
+# Comparing Cfb to the rest of them?
+
+
+# The analysis revealed a significant overall effect of climate type on DOC effect sizes (χ² = 13.87, df = 5, p = 0.016). Among individual climate contrasts, the Csb climate showed a marginally significant positive effect (β = 0.641, SE = 0.324, t = 1.98, p = 0.067), while other climate types showed non-significant effects: Csa (β = 0.286, SE = 0.249, t = 1.15, p = 0.270), Dfb (β = 0.030, SE = 0.269, t = 0.11, p = 0.914), Dfc (β = -0.341, SE = 0.257, t = -1.33, p = 0.206), and Dwc (β = 0.013, SE = 0.407, t = 0.032, p = 0.975). The reference climate intercept was not significantly different from zero (β = 0.117, SE = 0.200, t = 0.582, p = 0.570).
+
+# Random effects showed moderate variation among sites (SD = 0.34) with very low residual variation (SD = 0.13), indicating that site-specific factors still account for most variability, but this variation was substantially reduced compared to the full dataset.
+
+# These results suggest that when watershed-scale studies are excluded, climate type does significantly influence DOC response to fire, with Mediterranean climates (particularly Csb) showing the strongest positive responses to fire disturbance.
+
+# post hoc test 
+a <- emmeans::lsmeans(doc_climate_mixed_nn, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. 
+
+# Or if you want the full contrast results as a data frame
+contrast_results <- as.data.frame(a$contrasts)
+# Csb to Dfc is significantly different 
+
+
+### CLIMATE NITRATE normalized ####
+# Original workflow 
+# data frame: no3_es_climate
+no3_es_climate <- no3_es_climate %>%
+  group_by(Study_ID, Effect_size_pair) %>%
+  mutate(Site = cur_group_id()) %>%
+  ungroup()
+
+# perform linear mixed effect model for normalized effect size # Effect_size_pair (Site) as a random effect 
+no3_climate_mixed_normal <-  lmer(Effect_size ~ Climate + (1 | Site), data = no3_es_climate)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_climate_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.956).
+
+# Check for normality
+residuals <- resid(no3_climate_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.95116, p-value = 0.00281
+# when p > 0.05 can assume normality 
+
+no3_climate_mixed_normal
+
+summary(no3_climate_mixed_normal) 
+
+# P-value 
+Anova(no3_climate_mixed_normal, type = "III")
+
+# We examined the relationship between climate type and nitrate (NO₃) effect sizes using a linear mixed effects model with site as a random effect. The model included 85 observations across 34 sites, comparing nine climate types (reference climate plus Cfa, Cfb, Csa, Csb, Dfb, Dfc, Dsb, and Dwc).
+
+# The analysis revealed a highly significant overall effect of climate type on NO₃ effect sizes (χ² = 40.02, df = 8, p < 0.001). Individual climate contrasts showed varying effects relative to the reference climate, though none reached statistical significance in the individual t-tests: Cfa (β = 1.320, SE = 1.357, t = 0.973, p = 0.341), Cfb (β = 0.775, SE = 0.933, t = 0.831, p = 0.416), Csa (β = -1.220, SE = 0.847, t = -1.439, p = 0.163), Csb (β = -0.604, SE = 0.864, t = -0.699, p = 0.492), and Dfb (β = 0.114, SE = 1.073, t = 0.106, p = 0.916). The reference climate intercept was not significantly different from zero (β = -0.080, SE = 0.679, t = -0.117, p = 0.908).
+
+# Random effects showed substantial variation among sites (SD = 1.06) and moderate residual variation (SD = 0.72), indicating that both site-specific factors and within-site variability contribute meaningfully to overall variance in nitrate responses.
+
+# These results demonstrate that climate type is a significant predictor of how nitrate concentrations respond to fire disturbance, with the overall pattern suggesting systematic differences among climate zones despite individual contrasts not reaching significance, likely due to multiple comparison effects.
+
+# post hoc test 
+a <- emmeans::lsmeans(no3_climate_mixed_normal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. 
+
+# Or if you want the full contrast results as a data frame
+contrast_results <- as.data.frame(a$contrasts)
+# Csa - Dfc
+# Csb - Dfc
+
+
+### CLIMATE NITRATE non-normalized ####
+# data frame: no3_es_climate 
+
+# perform linear mixed effect model for normalized effect size # Effect_size_pair (Site) as a random effect 
+no3_climate_mixed_nn <-  lmer(Effect_size_no_watershed ~ Climate + (1 | Site), data = no3_es_climate)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_climate_mixed_nn) # OK: Error variance appears to be homoscedastic (p = 0.555).
+
+# Check for normality
+residuals <- resid(no3_climate_mixed_nn)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.94189, p-value = 0.0008131
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+no3_climate_mixed_nn
+
+summary(no3_climate_mixed_nn) 
+
+# P-value 
+Anova(no3_climate_mixed_nn, type = "III")
+
+# A linear mixed-effects model was fitted using REML to assess the effect of climate classification on Effect_size_no_watershed, with Site included as a random intercept. The model included 85 observations across 34 sites (REML criterion = 214.6).
+# Random Effects:
+  # Site variance = 0.514 (SD = 0.717)
+  # Residual variance = 0.547 (SD = 0.740)
+
+# Fixed Effects:
+# The intercept was estimated at 0.839 (SE = 0.512, p = 0.120). None of the individual climate categories showed statistically significant effects (all p > 0.05), though ClimateDfc had the largest positive estimate (0.754, SE = 0.568, p = 0.203), and ClimateCsa had the largest negative estimate (-0.801, SE = 0.649, p = 0.232).
+
+
+```
+
+### CLIMATE PLOT NON-NORMAL vs. NORMAL EFFECT SIZE 
+```{r CLIMATE plot}
+climate_long <- ES_nn_normal %>% 
+  pivot_longer(
+    cols= c(Effect_size, Effect_size_no_watershed),
+    names_to = "normalization",
+    values_to = "Effect_size")
+  
+vn = expression(paste(""*N*O[3]^"-"))
+dose.labs <- as_labeller(c("DOC" = "DOC", "NO3" = "Nitrate"))
+
+climate_fig_data <- climate_long %>%
+  mutate(response_var = stringr::str_remove(response_var, "_Interp")) %>%
+   group_by(Climate, response_var, normalization) %>%
+  dplyr::summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>%
+  mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
+
+
+
+# Data frame for the red X marks (only for the DOC facet)
+x_marks <- data.frame(
+  response_var = "DOC", # must match the facet variable exactly
+  Climate = c("Dsb", "Cfa", "BSk"),
+  Effect_size = 0 # position the X at x = 0 (you can change this)
+)
+
+
+climate_plot <- climate_fig_data %>% 
+  ggplot(aes(Effect_size, Climate, color = normalization))+
+  geom_pointrange(aes(xmin = mean_effect - se_effect, xmax = mean_effect + se_effect,
+                      color = normalization),
+                  position = position_jitter(width = 0, height = 0.2)) +
+  facet_grid(~response_var, labeller = dose.labs) +
+     scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Normalization"),
+                     labels = c('Normalized Effect Size', 'Non-Normalized Effect Size')) +
+  scale_y_discrete(labels=c("Dwc" = "Monsoon-influenced subarctic",
+                            "Dsb" = "Mediterranean", 
+                            "Dfc" = "Subarctic",
+                            "Dfb" = "Warm-humid",
+                            "Csb" = "Warm-Mediterranean",
+                            "Csa" = "Hot-Mediterranean",
+                            "Cfb" = "Subtropical highland",
+                            "Cfa" = "Humid subtropical",
+                            "BSk" = "Cold semi-arid")) +
+  ylab("Koppen (Climate Classification)") +
+  xlab("Effect Size") +
+  # xlim(c(-100,100)) +
+    geom_vline(xintercept = 0, linewidth = 0.5, color = "red") +
+      theme_bw() +
+  theme(legend.position = "top") +
+  geom_text(
+    data = x_marks,
+    aes(x = Effect_size, y = Climate),
+    label = "X",
+    color = "red",
+    size = 6,
+    fontface = "bold",
+    inherit.aes = FALSE,
+    show.legend = FALSE)
+
+
+
+
+climate_plot
+
+ggsave("ES_CLIMATE_nonnormal_vs_normal.pdf",
+       path = here("initial_plots", "Temporal_normalization_vs_nonnormal"),
+       width = 7, height = 7,  units = "in")
+
+```
+
+
+# BP MODEL 
+```{r BP - Normalized & non-normal models}
+### BP DOC normalized  ####
+# Original workflow 
+# data frame: doc_es_bp
+doc_es_bp <- doc_es_bp %>%
+  group_by(Study_ID, Effect_size_pair) %>%
+  mutate(Site = cur_group_id()) %>%
+  ungroup()
+
+# perform linear mixed effect model for normalized effect size # Effect_size_pair (Site) as a random effect 
+doc_bp_mixed_normal <-  lmer(Effect_size ~ burn_percentage + (1 | Site), data = doc_es_bp)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_bp_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.994)
+
+# Check for normality
+residuals <- resid(doc_bp_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.96704, p-value = 0.237
+# when p > 0.05 can assume normality 
+
+doc_bp_mixed_normal
+
+summary(doc_bp_mixed_normal) 
+
+# P-value 
+Anova(doc_bp_mixed_normal, type = "III")
+
+
+### BP DOC non-normalized ####
+# data frame: doc_es_bp
+# perform linear mixed effect model for non-normalized effect size and site as a random effect
+doc_bp_mixed_nn <-  lmer(Effect_size_no_watershed ~ burn_percentage + (1 | Site), data = doc_es_bp)
+
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_bp_mixed_nn) # Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+
+# Check for normality
+residuals <- resid(doc_bp_mixed_nn)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.9674, p-value = 0.2441
+# when p > 0.05 can assume normality 
+
+doc_bp_mixed_nn
+
+summary(doc_bp_mixed_nn) 
+
+# P-value 
+Anova(doc_bp_mixed_nn, type = "III")
+
+
+### BP NITRATE normalized ####
+# Original workflow 
+# data frame: no3_es_bp
+no3_es_bp <- no3_es_bp %>%
+  group_by(Study_ID, Effect_size_pair) %>%
+  mutate(Site = cur_group_id()) %>%
+  ungroup()
+
+# perform linear mixed effect model for normalized effect size and site as a random effect 
+no3_bp_mixed_normal <-  lmer(Effect_size ~ burn_percentage + (1 | Site), data = no3_es_bp)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_bp_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.956).
+
+# Check for normality
+residuals <- resid(no3_bp_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.95116, p-value = 0.00281
+# when p > 0.05 can assume normality 
+
+no3_bp_mixed_normal
+
+summary(no3_bp_mixed_normal) 
+
+# P-value 
+Anova(no3_bp_mixed_normal, type = "III")
+
+
+### BP NITRATE non-normalized ####
+# data frame: no3_es_bp
+
+# perform linear mixed effect model for non-normalized effect size and site as a random effect 
+no3_bp_mixed_nn <-  lmer(Effect_size_no_watershed ~ Climate + (1 | Site), data = no3_es_bp)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_bp_mixed_nn) # OK: Error variance appears to be homoscedastic (p = 0.555).
+
+# Check for normality
+residuals <- resid(no3_bp_mixed_nn)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.94189, p-value = 0.0008131
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+no3_bp_mixed_nn
+
+summary(no3_bp_mixed_nn) 
+
+# P-value 
+Anova(no3_bp_mixed_nn, type = "III")
+
+
+```
+
+### BP PLOT NON-NORMAL vs. NORMAL EFFECT SIZE 
+```{r BP plot}
+# Continuous 
+bp_long <- BP_model %>% 
+  pivot_longer(
+    cols= c(Effect_size, Effect_size_no_watershed),
+    names_to = "normalization",
+    values_to = "Effect_size")
+  
+vn = expression(paste(""*N*O[3]^"-"))
+dose.labs <- as_labeller(c("DOC" = "DOC", "NO3" = "Nitrate"))
+
+bp_fig_data <- bp_long %>%
+  mutate(response_var = stringr::str_remove(response_var, "_Interp")) %>%
+   group_by(burn_percentage, response_var, normalization) %>%
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>%
+  mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) %>% 
+  na.omit()
+
+bp_plot <- bp_fig_data %>%
+  ggplot(aes(x = burn_percentage, y = Effect_size, color = normalization)) +
+  geom_pointrange(aes(ymin = mean_effect - se_effect, ymax = mean_effect + se_effect),
+                  position = position_jitter(width = 0.2, height = 0)) + # Adds jitter
+  facet_grid(~response_var, labeller = dose.labs) +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Normalization"),
+                     labels = c('Normalized Effect Size', 'Non-Normalized Effect Size')) +
+  labs(
+    x = "Burn Percentage",
+    y = "Effect Size"
+  ) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  theme_bw() +
+  theme(legend.position = "top")
+
+bp_plot
+
+ggsave("ES_BP_nonnormal_vs_normal.pdf",
+       path = here("initial_plots", "Temporal_normalization_vs_nonnormal"),
+       width = 7, height = 7,  units = "in")
+
+
+
+# # #### 10 % grouping ####
+# bp_fig_data_group <- bp_long %>%
+#   mutate(grouped_percentage = cut(burn_percentage, breaks = seq(0, 100, by = 10), include.lowest = TRUE, labels = FALSE))
+# 
+# # make a grouped_percentage
+# bp_fig_data_group <- bp_fig_data_group %>% 
+#   mutate(grouped_percentage = as.character(grouped_percentage))
+# 
+# # Make a grouped percentage
+# bp_fig_data_group <- bp_fig_data_group %>% 
+#   mutate(burn_percentage_group = case_when(grouped_percentage == "1" ~ "0-10",
+#                                            grouped_percentage == "2" ~ "11-20",
+#                                            grouped_percentage == "3" ~ "21-30",
+#                                            grouped_percentage == "4" ~ "31-40",
+#                                            grouped_percentage == "5" ~ "41-50",
+#                                            grouped_percentage == "6" ~ "51-60",
+#                                            grouped_percentage == "7" ~ "61-70",
+#                                            grouped_percentage == "8" ~ "71-80",
+#                                            grouped_percentage == "9" ~ "81-90",
+#                                            grouped_percentage == "10" ~ "91-100"))
+#                                            
+# # level it so it goes in order 
+# bp_fig_data_group$burn_percentage_group <- factor(bp_fig_data_group$burn_percentage_group, levels = c("0-10", "11-20", "21-30", "31-40", "41-50", "51-60", "61-70", "71-80", "81-90", "91-100"))
+# 
+# bp_fig_data_group <- bp_fig_data_group %>% 
+#   na.omit(response_var)
+# 
+# # calculating the mean percent_difference by grouped burn percentage
+# mean_group_bp <- bp_fig_data_group %>% 
+#   mutate(response_var = stringr::str_remove(response_var, "_Interp")) %>%
+#    group_by(burn_percentage_group, response_var, normalization) %>% 
+#    summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+#             sd_effect = sd(Effect_size, na.rm = TRUE),
+#             n_effect = n(),
+#             Effect_size = mean(Effect_size, na.rm = TRUE)) 
+# 
+# 
+# # %>%
+# #   mutate(se_effect = sd_effect / sqrt(n_effect),
+# #          lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+# #          upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect)
+# 
+# burn_percentage_effect_out <- mean_group_bp %>%
+#   mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+#   mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .))) %>% 
+#   mutate(across(where(is.factor), ~ifelse(is.na(.), -9999, .)))
+# 
+# # Plot 
+# bp_plot_grouped <- burn_percentage_effect_out %>%
+#   ggplot(aes(x = burn_percentage_group, y = Effect_size, color = normalization)) +
+#   geom_pointrange(aes(ymin = mean_effect - se_effect, ymax = mean_effect + se_effect),
+#                   position = position_jitter(width = 0.2, height = 0)) + # Adds jitter
+#   facet_grid(~response_var, labeller = dose.labs) +
+#   scale_color_manual(values = c("#00AFBB", "#E7B800"),
+#                      guide = guide_legend(title = "Normalization"),
+#                      labels = c('Normalized Effect Size', 'Non-Normalized Effect Size')) +
+#   labs(
+#     x = "Burn Percentage",
+#     y = "Effect Size"
+#   ) +
+#   geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+#   theme_bw() +
+#   theme(legend.position = "top")
+# 
+# bp_plot_grouped
+
+```
+
+
+# BS MODEL 
+```{r BS - Normalized & non-normal models}
+### BS DOC normalized  ####
+# Original workflow 
+# data frame: doc_es_dnbr
+doc_es_dnbr <- doc_es_dnbr %>%
+  group_by(Study_ID, Effect_size_pair) %>%
+  mutate(Site = cur_group_id()) %>%
+  ungroup()
+
+# perform linear mixed effect model for normalized effect size # Effect_size_pair (Site) as a random effect 
+doc_bs_mixed_normal <-  lmer(Effect_size ~ mean_dnbr + (1 | Site), data = doc_es_dnbr)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_bs_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.999).
+
+# Check for normality
+residuals <- resid(doc_bs_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.95668, p-value = 0.3097
+# when p > 0.05 can assume normality 
+
+doc_bs_mixed_normal
+
+summary(doc_bs_mixed_normal) 
+
+# P-value 
+Anova(doc_bs_mixed_normal, type = "III")
+
+# We used a linear mixed-effects model to examine the relationship between burn severity (mean dNBR) and effect size, with site as a random effect to account for spatial clustering of observations. The model included 27 observations across 12 sites.
+
+# Burn severity had a significant negative effect on effect size (β = -0.005, SE = 0.002, t = -2.538, χ² = 6.44, p = 0.011). For each unit increase in mean dNBR (burn severity), the effect size decreased by 0.005 units. The model intercept was also significant (β = 1.606, SE = 0.805, t = 1.995, χ² = 3.98, p = 0.046).
+
+# Random effects showed substantial variation among sites (σ² = 0.622, SD = 0.789), which was considerably larger than the residual variance (σ² = 0.015, SD = 0.122), indicating meaningful site-level differences in effect size that were appropriately accounted for in the mixed-effects framework.
+
+
+### BS DOC non-normalized ####
+# data frame: doc_es_dnbr
+# perform linear mixed effect model for non-normalized effect size and site as a random effect
+doc_bs_mixed_nn <-  lmer(Effect_size_no_watershed ~ mean_dnbr + (1 | Site), data = doc_es_dnbr)
+
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_bs_mixed_nn) # Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+
+# Check for normality
+residuals <- resid(doc_bs_mixed_nn)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = W = 0.92746, p-value = 0.05988
+# when p > 0.05 can assume normality 
+
+doc_bs_mixed_nn
+
+summary(doc_bs_mixed_nn) 
+
+# P-value 
+Anova(doc_bs_mixed_nn, type = "III")
+
+# We used a linear mixed-effects model to examine the relationship between burn severity (mean dNBR) and effect size (excluding watershed effects), with site as a random effect to account for spatial clustering of observations. The model included 27 observations across 12 sites.
+
+# Burn severity showed no significant effect on effect size (β = -9.33 × 10⁻⁵, SE = 7.57 × 10⁻⁴, t = -0.123, χ² = 0.015, p = 0.902). The model intercept was also non-significant (β = 0.298, SE = 0.286, t = 1.041, χ² = 1.083, p = 0.298), indicating no detectable relationship between burn severity and effect size when watershed-level effects were excluded from the response variable.
+
+# Random effects showed moderate variation among sites (σ² = 0.071, SD = 0.267), which was larger than the residual variance (σ² = 0.015, SD = 0.124). This suggests that while there were site-level differences in effect size, the overall effect sizes were smaller and less variable compared to the previous model that included watershed effects.
+
+# Key differences from the previous model:
+  #No significant relationships detected
+  #Much smaller effect sizes overall (note the scientific notation)
+  #Lower between-site variation compared to the watershed-inclusive model
+  #Suggests that watershed-level processes may be important drivers of the patterns observed in the first model
+
+
+### BS NITRATE normalized ####
+# Original workflow 
+# data frame: no3_es_dnbr
+no3_es_dnbr <- no3_es_dnbr %>%
+  group_by(Study_ID, Effect_size_pair) %>%
+  mutate(Site = cur_group_id()) %>%
+  ungroup()
+
+# perform linear mixed effect model for normalized effect size and site as a random effect 
+no3_bs_mixed_normal <-  lmer(Effect_size ~ mean_dnbr + (1 | Site), data = no3_es_dnbr)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_bs_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.898).
+
+# Check for normality
+residuals <- resid(no3_bs_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.96035, p-value = 0.0671
+# when p > 0.05 can assume normality 
+
+no3_bs_mixed_normal
+
+summary(no3_bs_mixed_normal) 
+
+# P-value 
+Anova(no3_bs_mixed_normal, type = "III")
+
+# We used a linear mixed-effects model to examine the relationship between burn severity (mean dNBR) and nitrate effect size, with site as a random effect to account for spatial clustering of observations. The model included 55 observations across 21 sites.
+
+# Burn severity showed no significant effect on nitrate effect size (β = -1.77 × 10⁻⁵, SE = 2.56 × 10⁻³, t = -0.007, χ² < 0.001, p = 0.995). The model intercept was also non-significant (β = 0.394, SE = 0.990, t = 0.398, χ² = 0.159, p = 0.691), indicating no detectable relationship between burn severity and nitrate effect size.
+
+# Random effects showed substantial variation among sites (σ² = 2.364, SD = 1.538), which was considerably larger than the residual variance (σ² = 0.663, SD = 0.814). This indicates meaningful site-level differences in nitrate effect size that were appropriately accounted for in the mixed-effects framework, despite the lack of a burn severity effect.
+
+
+### BS NITRATE non-normalized ####
+# data frame: no3_es_dnbr
+# perform linear mixed effect model for non-normalized effect size and site as a random effect 
+no3_bs_mixed_nn <-  lmer(Effect_size_no_watershed ~ mean_dnbr + (1 | Site), data = no3_es_dnbr)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_bs_mixed_nn) # OK: Error variance appears to be homoscedastic (p = 0.238).
+
+# Check for normality
+residuals <- resid(no3_bs_mixed_nn)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.93143, p-value = 0.003761
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+no3_bs_mixed_nn
+
+summary(no3_bs_mixed_nn) 
+
+# P-value 
+Anova(no3_bs_mixed_nn, type = "III")
+
+# We used a linear mixed-effects model to examine the relationship between burn severity (mean dNBR) and nitrate effect size (excluding watershed effects), with site as a random effect to account for spatial clustering of observations. The model included 55 observations across 21 sites.
+
+# Burn severity showed no significant effect on nitrate effect size (β = 7.96 × 10⁻⁵, SE = 1.56 × 10⁻³, t = 0.051, χ² = 0.003, p = 0.959). The model intercept was also non-significant (β = 0.809, SE = 0.606, t = 1.337, χ² = 1.787, p = 0.181), indicating no detectable relationship between burn severity and nitrate effect size when watershed-level effects were excluded from the response variable.
+
+# Random effects showed moderate variation among sites (σ² = 0.650, SD = 0.806), which was smaller than the residual variance (σ² = 0.749, SD = 0.865). This pattern contrasts with the watershed-inclusive model, suggesting that watershed-level processes may contribute to site-level variation in nitrate responses.
+
+#Comparison between models:
+  # Excluding watershed effects from the nitrate response variable resulted in reduced between-site variation (SD decreased from 1.538 to 0.806) while residual variation increased slightly (SD from 0.814 to 0.865). Unlike the DOC models where watershed inclusion revealed a significant burn severity effect, both nitrate models showed no relationship with burn severity regardless of whether watershed effects were included. This suggests that nitrate responses to fire may be driven by different mechanisms than DOC responses, with burn severity playing a less important role in nitrate dynamics.
+
+```
+
+
+### BS PLOT NON-NORMAL vs. NORMAL EFFECT SIZE 
+```{r BP plot}
+# Continuous 
+bs_long <- DNBR_model %>% 
+  pivot_longer(
+    cols= c(Effect_size, Effect_size_no_watershed),
+    names_to = "normalization",
+    values_to = "Effect_size")
+  
+vn = expression(paste(""*N*O[3]^"-"))
+dose.labs <- as_labeller(c("DOC" = "DOC", "NO3" = "Nitrate"))
+
+bs_fig_data <- bs_long %>%
+  mutate(response_var = stringr::str_remove(response_var, "_Interp")) %>%
+   group_by(mean_dnbr, response_var, normalization) %>%
+  summarise(mean_effect = mean(Effect_size, na.rm = TRUE),
+            sd_effect = sd(Effect_size, na.rm = TRUE),
+            n_effect = n(),
+            Effect_size = mean(Effect_size, na.rm = TRUE)) %>%
+  mutate(se_effect = sd_effect / sqrt(n_effect),
+         lower_ci_effect = mean_effect - qt(1 - (0.05 / 2), n_effect - 1) * se_effect,
+         upper_ci_effect = mean_effect + qt(1 - (0.05 / 2), n_effect - 1) * se_effect) %>% 
+  na.omit()
+
+bs_plot <- bs_fig_data %>%
+  ggplot(aes(x = mean_dnbr, y = Effect_size, color = normalization)) +
+  geom_pointrange(aes(ymin = mean_effect - se_effect, ymax = mean_effect + se_effect),
+                  position = position_jitter(width = 0.2, height = 0)) + # Adds jitter
+  facet_grid(~response_var, labeller = dose.labs) +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"),
+                     guide = guide_legend(title = "Normalization"),
+                     labels = c('Normalized Effect Size', 'Non-Normalized Effect Size')) +
+  labs(
+    x = "Burn Severity",
+    y = "Effect Size"
+  ) +
+  geom_hline(yintercept = 0, linewidth = 0.5, color = "red") +
+  theme_bw() +
+  theme(legend.position = "top")
+
+bs_plot
+
+ggsave("ES_BS_nonnormal_vs_normal.pdf",
+       path = here("initial_plots", "Temporal_normalization_vs_nonnormal"),
+       width = 7, height = 7,  units = "in")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### OLD DATA and COMPARE 
 ```{r}
