@@ -67,7 +67,7 @@ BP_ES <- full_join(bp_clip, ES_nn_normal) %>%
   na.omit() %>% 
   dplyr::select(Study_ID, response_var, Effect_size_pair, Effect_size, Effect_size_no_watershed, burn_percentage) # joining the BP dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
 
-unique(BP_ES$Study_ID) # 13 studies
+sort(unique(BP_ES$Study_ID)) # 13 studies
 
 # Merge to include site
 BP_model <- full_join(BP_ES, study_site_data) %>% 
@@ -100,19 +100,24 @@ doc_es_tsf <- ES_nn_normal %>%
   dplyr::select(Study_ID, response_var, Effect_size_pair, Effect_size, Effect_size_no_watershed, 
                 Time_Since_Fire)
 
-no3_es_tsf <- DNBR_model %>% 
+no3_es_tsf <- ES_nn_normal %>% 
   filter(response_var == "NO3_Interp") %>% 
   dplyr::select(Study_ID, response_var, Effect_size_pair, Effect_size, Effect_size_no_watershed, 
                 Time_Since_Fire)
 
 #### CLIMATE MODEL DATAFRAME ##### 
+# Filter out studies that are greater than 10 years 
 doc_es_climate <- ES_nn_normal %>% 
   filter(response_var == "DOC_Interp") %>% 
-  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size_pair, Effect_size, Effect_size_no_watershed)
+  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size_pair, Effect_size, Effect_size_no_watershed) %>% 
+  filter(Study_ID != "Abbott et al. 2021") %>% 
+  filter(Study_ID != "Rhea et al. 2021")
 
 no3_es_climate <- ES_nn_normal %>% 
   filter(response_var == "NO3_Interp") %>% 
-  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size_pair, Effect_size, Effect_size_no_watershed)
+  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size_pair, Effect_size, Effect_size_no_watershed) %>% 
+  filter(Study_ID != "Abbott et al. 2021") %>% 
+  filter(Study_ID != "Rhea et al. 2021")
 
 ```
 
@@ -674,16 +679,16 @@ Anova(no3_bp_mixed_normal, type = "III")
 # data frame: no3_es_bp
 
 # perform linear mixed effect model for non-normalized effect size and site as a random effect 
-no3_bp_mixed_nn <-  lmer(Effect_size_no_watershed ~ Climate + (1 | Site), data = no3_es_bp)
+no3_bp_mixed_nn <-  lmer(Effect_size_no_watershed ~ burn_percentage + (1 | Site), data = no3_es_bp)
 
 # Check for equal variance
-performance::check_heteroscedasticity(no3_bp_mixed_nn) # OK: Error variance appears to be homoscedastic (p = 0.555).
+performance::check_heteroscedasticity(no3_bp_mixed_nn) # OOK: Error variance appears to be homoscedastic (p = 0.414).
 
 # Check for normality
 residuals <- resid(no3_bp_mixed_nn)
 qqnorm(residuals)
 qqline(residuals)
-shapiro.test(residuals) # W = 0.94189, p-value = 0.0008131
+shapiro.test(residuals) # W = 0.94004, p-value = 0.0006407
 # when p > 0.05 can assume normality 
 # NON-NORMAL?
 
@@ -1005,6 +1010,476 @@ ggsave("ES_BS_nonnormal_vs_normal.pdf",
 ```
 
 
+# Manuscript Summary Table
+```{r watershed ratios for each variable of interest}
+studies_file_list <- list.files(path = "inputs/Studies/meta_final/", 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv,
+                                     na = c('-9999', 'N/A'),
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) %>% 
+  select(Study_ID, Pair, Site, Area_watershed,Area_unit, Burn_Unburn) %>% 
+  group_by(Study_ID, Pair) %>% 
+  distinct(Pair, .keep_all = TRUE)
+
+
+# crandall_metadata <- meta_df %>% 
+#   filter(Study_ID != "Crandall et al. 2021")
+# 
+# control_impact <- meta_df %>% 
+#   filter(Design_Control_Burn_Pre_Post == "Control_Reference_vs_Impact",
+#          Study_ID != "Crandall et al. 2021",
+#          Mean_Median_or_IndividualSample == "Individual")
+
+# Changing the units to make sure everything is consistent in mg_N_L or mg_C_L
+control_impact_units <- meta_df %>% 
+  mutate(Area_watershed_km = case_when(Area_unit == 'ha' ~ Area_watershed * .01,
+                                       Area_unit == 'km' ~ print(Area_watershed)))
+
+# Creating a site characteristics data frame that I will use to merge later to add in the proper data 
+site_data <- control_impact_units %>% 
+  dplyr::select(Study_ID, Pair, Site, Area_watershed_km, Burn_Unburn)
+
+site_data_unique <- site_data %>% 
+  group_by(Study_ID, Pair, Area_watershed_km) %>% 
+  distinct(Area_watershed_km, .keep_all = TRUE) %>% 
+  select(Study_ID, Pair, Site, Area_watershed_km, Burn_Unburn)
+
+# Generic calculation:
+# Pivot longer to handle multiple Site columns and calculate ratios individually
+# watershed_ratio <- watershed_ratio_wide %>%
+#   pivot_longer(
+#     cols = starts_with("Site"), # Pivoting all Site columns (Site_1, Site_2, Site_3, etc.)
+#     names_to = "Site",          # Creates a 'Site' column to track sites
+#     values_to = "Site_value"    # Store numeric values of Site in the 'Site_value' column
+#   ) %>%
+#   mutate(
+#     watershed_ratio = case_when(
+#       # Configurations based on specific Site and Control pairings
+#       !is.na(Control_1) & Site == "Site_1" ~ Site_value / Control_1, # Site_1/Control_1
+#       !is.na(Control_2) & Site == "Site_2" ~ Site_value / Control_2, # Site_2/Control_2
+#       !is.na(Control_3_4_5) & Site %in% c("Site_3", "Site_4", "Site_5") ~ Site_value / Control_3_4_5, # Site_3, Site_4, Site_5 divided by Control_3_4_5
+#       !is.na(Control) & Site == "Site_1" ~ Site_value / Control, # Generic Site_1/Control
+#       !is.na(Control) & Site == "Site_2" ~ Site_value / Control, # Generic Site_2/Control
+#       !is.na(Control) & Site == "Site_3" ~ Site_value / Control, # Generic Site_3/Control
+#       TRUE ~ NA_real_ # Default case for rows without valid pairing
+#     )
+#   ) %>% 
+#     filter(!is.na(watershed_ratio)) 
+
+#### BP studies ####
+# Number of watershed pairs
+# data frames: doc_es_bp; no3_es_bp
+# DOC
+print(max(doc_es_bp$Site)) # 15 burned watershed pairs 
+# NO3
+print(max(no3_es_bp$Site)) # 27 burned watershed pairs 
+
+# BP DOC watershed ratio ####
+bp_doc <- sort(unique(doc_es_bp$Study_ID))
+# Filter out by DOC BP studies
+bp_doc_watershed_ratio <- site_data_unique %>%
+  filter(Study_ID %in% bp_doc) %>% 
+  pivot_wider(
+    id_cols = Study_ID,
+    names_from = Pair,
+    values_from = Area_watershed_km
+  )
+
+# Pivot longer to handle multiple Site columns and calculate ratios individually
+bp_doc_wr <- bp_doc_watershed_ratio %>%
+  pivot_longer(
+    cols = starts_with("Site"), # Pivoting all Site columns (Site_1, Site_2, Site_3, etc.)
+    names_to = "Site",          # Creates a 'Site' column to track sites
+    values_to = "Site_value"    # Store numeric values of Site in the 'Site_value' column
+  ) %>%
+  mutate(
+    watershed_ratio = case_when(
+      # Configurations based on specific Site and Control pairings
+      !is.na(Control_1) & Site == "Site_1" ~ Site_value / Control_1, # Site_1/Control_1
+      !is.na(Control_2) & Site == "Site_2" ~ Site_value / Control_2, # Site_2/Control_2
+      !is.na(Control_3_4) & Site %in% c("Site_3", "Site_4") ~ Site_value / Control_3_4, # Site_3, Site_4, divided by Control_3_4
+      !is.na(Control) & Site == "Site_1" ~ Site_value / Control, # Generic Site_1/Control
+      !is.na(Control) & Site == "Site_2" ~ Site_value / Control, # Generic Site_2/Control
+      !is.na(Control) & Site == "Site_3" ~ Site_value / Control, # Generic Site_3/Control
+      TRUE ~ NA_real_ # Default case for rows without valid pairing
+    )
+  ) %>% 
+    filter(!is.na(watershed_ratio))
+
+sort(unique(doc_es_bp$Study_ID))
+sort(unique(bp_doc_wr$Study_ID))
+
+median(bp_doc_wr$watershed_ratio) # 1.930502
+sd(bp_doc_wr$watershed_ratio) # 10.27117
+range(bp_doc_wr$watershed_ratio) # [0.9327304, 38.6794872]
+
+# BP NO3 watershed ratio ####
+bp_no3 <- sort(unique(no3_es_bp$Study_ID))
+# Filter out by DOC BP studies
+bp_no3_watershed_ratio <- site_data_unique %>%
+  filter(Study_ID %in% bp_no3) %>% 
+  pivot_wider(
+    id_cols = Study_ID,
+    names_from = Pair,
+    values_from = Area_watershed_km
+  )
+
+# Pivot longer to handle multiple Site columns and calculate ratios individually
+bp_no3_wr <- bp_no3_watershed_ratio %>%
+  pivot_longer(
+    cols = starts_with("Site"), # Pivoting all Site columns (Site_1, Site_2, Site_3, etc.)
+    names_to = "Site",          # Creates a 'Site' column to track sites
+    values_to = "Site_value"    # Store numeric values of Site in the 'Site_value' column
+  ) %>%
+  mutate(
+    watershed_ratio = case_when(
+      # Configurations based on specific Site and Control pairings
+      !is.na(Control_1) & Site == "Site_1" ~ Site_value / Control_1, # Site_1/Control_1
+      !is.na(Control_2) & Site == "Site_2" ~ Site_value / Control_2, # Site_2/Control_2
+      !is.na(Control_3_4) & Site %in% c("Site_3", "Site_4") ~ Site_value / Control_3_4, # Site_3, Site_4, divided by Control_3_4
+      !is.na(Control_3_4_5) & Site %in% c("Site_3", "Site_4", "Site_5") ~ Site_value / Control_3_4_5, # Site_3, Site_4, divided by Control_3_4
+      !is.na(Control) & Site == "Site_1" ~ Site_value / Control, # Generic Site_1/Control
+      !is.na(Control) & Site == "Site_2" ~ Site_value / Control, # Generic Site_2/Control
+      !is.na(Control) & Site == "Site_3" ~ Site_value / Control, # Generic Site_3/Control
+      !is.na(Control) & Site == "Site_4" ~ Site_value / Control, # Generic Site_4/Control
+      !is.na(Control) & Site == "Site_5" ~ Site_value / Control, # Generic Site_5/Control
+      TRUE ~ NA_real_ # Default case for rows without valid pairing
+    )
+  ) %>% 
+    filter(!is.na(watershed_ratio))
+
+# Make sure they match 
+sort(unique(no3_es_bp$Study_ID)) # 11
+sort(unique(bp_no3_wr$Study_ID)) # 11 - good
+
+median(bp_no3_wr$watershed_ratio) # 1.428571
+sd(bp_no3_wr$watershed_ratio) # 7.932648
+range(bp_no3_wr$watershed_ratio) # [0.3024718 38.6794872]
+
+#### BS studies ####
+# Number of watershed pairs
+# data frames: doc_es_dnbr, no3_es_dnbr
+# DOC
+print(max(doc_es_dnbr$Site)) # 12 burned watershed pairs 
+# NO3
+print(max(no3_es_dnbr$Site)) # 21 burned watershed pairs 
+
+sort(unique(DNBR_model$Study_ID))
+
+# BS DOC watershed ratio ####
+bs_doc <- sort(unique(doc_es_dnbr$Study_ID))
+# Filter out by DOC BP studies
+bs_doc_watershed_ratio <- site_data_unique %>%
+  filter(Study_ID %in% bs_doc) %>% 
+  pivot_wider(
+    id_cols = Study_ID,
+    names_from = Pair,
+    values_from = Area_watershed_km
+  )
+
+# Pivot longer to handle multiple Site columns and calculate ratios individually
+bs_doc_wr <- bs_doc_watershed_ratio %>%
+  pivot_longer(
+    cols = starts_with("Site"), # Pivoting all Site columns (Site_1, Site_2, Site_3, etc.)
+    names_to = "Site",          # Creates a 'Site' column to track sites
+    values_to = "Site_value"    # Store numeric values of Site in the 'Site_value' column
+  ) %>%
+  mutate(
+    watershed_ratio = case_when(
+      # Configurations based on specific Site and Control pairings
+      !is.na(Control_1) & Site == "Site_1" ~ Site_value / Control_1, # Site_1/Control_1
+      !is.na(Control_2) & Site == "Site_2" ~ Site_value / Control_2, # Site_2/Control_2
+      !is.na(Control_3_4) & Site %in% c("Site_3", "Site_4") ~ Site_value / Control_3_4, # Site_3, Site_4, divided by Control_3_4
+      !is.na(Control) & Site == "Site_1" ~ Site_value / Control, # Generic Site_1/Control
+      !is.na(Control) & Site == "Site_2" ~ Site_value / Control, # Generic Site_2/Control
+      !is.na(Control) & Site == "Site_3" ~ Site_value / Control, # Generic Site_3/Control
+      !is.na(Control) & Site == "Site_4" ~ Site_value / Control, # Generic Site_4/Control
+      TRUE ~ NA_real_ # Default case for rows without valid pairing
+    )
+  ) %>% 
+    filter(!is.na(watershed_ratio))
+
+# Compare - should be the same 
+sort(unique(doc_es_dnbr$Study_ID)) # 5
+sort(unique(bs_doc_wr$Study_ID)) # 5 - good
+
+median(bs_doc_wr$watershed_ratio) # 1.8
+sd(bs_doc_wr$watershed_ratio) # 11.00979
+range(bs_doc_wr$watershed_ratio) # [0.9327304 38.6794872]
+
+# BS NO3 watershed ratio ####
+bs_no3 <- sort(unique(no3_es_dnbr$Study_ID))
+# Filter out by DOC BP studies
+bs_no3_watershed_ratio <- site_data_unique %>%
+  filter(Study_ID %in% bs_no3) %>% 
+  pivot_wider(
+    id_cols = Study_ID,
+    names_from = Pair,
+    values_from = Area_watershed_km
+  )
+
+# Pivot longer to handle multiple Site columns and calculate ratios individually
+bs_no3_wr <- bs_no3_watershed_ratio %>%
+  pivot_longer(
+    cols = starts_with("Site"), # Pivoting all Site columns (Site_1, Site_2, Site_3, etc.)
+    names_to = "Site",          # Creates a 'Site' column to track sites
+    values_to = "Site_value"    # Store numeric values of Site in the 'Site_value' column
+  ) %>%
+  mutate(
+    watershed_ratio = case_when(
+      # Configurations based on specific Site and Control pairings
+      !is.na(Control_1) & Site == "Site_1" ~ Site_value / Control_1, # Site_1/Control_1
+      !is.na(Control_2) & Site == "Site_2" ~ Site_value / Control_2, # Site_2/Control_2
+      !is.na(Control_3_4) & Site %in% c("Site_3", "Site_4") ~ Site_value / Control_3_4, # Site_3, Site_4, divided by Control_3_4
+      !is.na(Control_3_4_5) & Site %in% c("Site_3", "Site_4", "Site_5") ~ Site_value / Control_3_4_5, # Site_3, Site_4, Site 5 divided by Control_3_4_5
+      !is.na(Control) & Site == "Site_1" ~ Site_value / Control, # Generic Site_1/Control
+      !is.na(Control) & Site == "Site_2" ~ Site_value / Control, # Generic Site_2/Control
+      !is.na(Control) & Site == "Site_3" ~ Site_value / Control, # Generic Site_3/Control
+      !is.na(Control) & Site == "Site_4" ~ Site_value / Control, # Generic Site_4/Control
+      !is.na(Control) & Site == "Site_5" ~ Site_value / Control, # Generic Site_5/Control
+      TRUE ~ NA_real_ # Default case for rows without valid pairing
+    )
+  ) %>% 
+    filter(!is.na(watershed_ratio))
+
+# Compare - should be the same 
+sort(unique(no3_es_dnbr$Study_ID)) # 8
+sort(unique(bs_no3_wr$Study_ID)) # 8 - good
+
+median(bs_no3_wr$watershed_ratio) # 1.56
+sd(bs_no3_wr$watershed_ratio) # 8.523296
+range(bs_no3_wr$watershed_ratio) # [0.3024718, 38.6794872]
+
+
+#### CLIMATE studies ####
+# Number of watershed pairs
+# data frames: doc_es_climate, no3_es_climate
+# DOC
+print(max(doc_es_climate$Site)) # 17 burned watershed pairs 
+# NO3
+print(max(no3_es_climate$Site)) # 30 burned watershed pairs 
+
+sort(unique(ES_nn_normal$Study_ID))
+
+# CLIMATE DOC watershed ratio ####
+climate_doc <- sort(unique(doc_es_climate$Study_ID))
+# Filter out by DOC BP studies
+climate_doc_watershed_ratio <- site_data_unique %>%
+  filter(Study_ID %in% climate_doc) %>% 
+  pivot_wider(
+    id_cols = Study_ID,
+    names_from = Pair,
+    values_from = Area_watershed_km
+  )
+
+# Pivot longer to handle multiple Site columns and calculate ratios individually
+climate_doc_wr <- climate_doc_watershed_ratio %>%
+  pivot_longer(
+    cols = starts_with("Site"), # Pivoting all Site columns (Site_1, Site_2, Site_3, etc.)
+    names_to = "Site",          # Creates a 'Site' column to track sites
+    values_to = "Site_value"    # Store numeric values of Site in the 'Site_value' column
+  ) %>%
+  mutate(
+    watershed_ratio = case_when(
+      # Configurations based on specific Site and Control pairings
+      !is.na(Control_1) & Site == "Site_1" ~ Site_value / Control_1, # Site_1/Control_1
+      !is.na(Control_2) & Site == "Site_2" ~ Site_value / Control_2, # Site_2/Control_2
+      !is.na(Control_3_4) & Site %in% c("Site_3", "Site_4") ~ Site_value / Control_3_4, # Site_3, Site_4, divided by Control_3_4
+      !is.na(Control) & Site == "Site_1" ~ Site_value / Control, # Generic Site_1/Control
+      !is.na(Control) & Site == "Site_2" ~ Site_value / Control, # Generic Site_2/Control
+      !is.na(Control) & Site == "Site_3" ~ Site_value / Control, # Generic Site_3/Control
+      !is.na(Control) & Site == "Site_4" ~ Site_value / Control, # Generic Site_4/Control
+      TRUE ~ NA_real_ # Default case for rows without valid pairing
+    )
+  ) %>% 
+    filter(!is.na(watershed_ratio))
+
+# Compare - should be the same 
+sort(unique(doc_es_climate$Study_ID)) # 8
+sort(unique(climate_doc_wr$Study_ID)) # 8 - good
+
+median(climate_doc_wr$watershed_ratio) # 1.85
+sd(climate_doc_wr$watershed_ratio) # 9.678452
+range(climate_doc_wr$watershed_ratio) # [0.9327304 38.6794872]
+
+# CLIMATE NO3 watershed ratio ####
+climate_no3 <- sort(unique(no3_es_climate$Study_ID))
+# Filter out by DOC BP studies
+climate_no3_watershed_ratio <- site_data_unique %>%
+  filter(Study_ID %in% climate_no3) %>% 
+  pivot_wider(
+    id_cols = Study_ID,
+    names_from = Pair,
+    values_from = Area_watershed_km
+  )
+
+# Pivot longer to handle multiple Site columns and calculate ratios individually
+climate_no3_wr <- climate_no3_watershed_ratio %>%
+  pivot_longer(
+    cols = starts_with("Site"), # Pivoting all Site columns (Site_1, Site_2, Site_3, etc.)
+    names_to = "Site",          # Creates a 'Site' column to track sites
+    values_to = "Site_value"    # Store numeric values of Site in the 'Site_value' column
+  ) %>%
+  mutate(
+    watershed_ratio = case_when(
+      # Configurations based on specific Site and Control pairings
+      !is.na(Control_1) & Site == "Site_1" ~ Site_value / Control_1, # Site_1/Control_1
+      !is.na(Control_2) & Site == "Site_2" ~ Site_value / Control_2, # Site_2/Control_2
+      !is.na(Control_3_4) & Site %in% c("Site_3", "Site_4") ~ Site_value / Control_3_4, # Site_3, Site_4, divided by Control_3_4
+      !is.na(Control_3_4_5) & Site %in% c("Site_3", "Site_4", "Site_5") ~ Site_value / Control_3_4_5, # Site_3, Site_4, Site_5 divided by Control_3_4_5
+      !is.na(Control) & Site == "Site_1" ~ Site_value / Control, # Generic Site_1/Control
+      !is.na(Control) & Site == "Site_2" ~ Site_value / Control, # Generic Site_2/Control
+      !is.na(Control) & Site == "Site_3" ~ Site_value / Control, # Generic Site_3/Control
+      !is.na(Control) & Site == "Site_4" ~ Site_value / Control, # Generic Site_4/Control
+      !is.na(Control) & Site == "Site_5" ~ Site_value / Control, # Generic Site_5/Control
+      TRUE ~ NA_real_ # Default case for rows without valid pairing
+    )
+  ) %>% 
+    filter(!is.na(watershed_ratio))
+
+# Compare - should be the same 
+sort(unique(no3_es_climate$Study_ID)) # 13
+sort(unique(climate_no3_wr$Study_ID)) # 13 - good
+
+median(climate_no3_wr$watershed_ratio) # 1.493043
+sd(climate_no3_wr$watershed_ratio) # 7.554198
+range(climate_no3_wr$watershed_ratio) # [0.2428571 38.6794872]
+
+
+#### TSF studies ####
+# Number of watershed pairs
+# data frames: doc_es_tsf, no3_es_tsf
+# DOC
+print(max(doc_es_tsf$Site)) # 21 burned watershed pairs 
+# NO3
+print(max(no3_es_tsf$Site)) # 34 burned watershed pairs 
+
+sort(unique(ES_nn_normal$Study_ID))
+
+
+# TSF DOC watershed ratio ####
+tsf_doc <- sort(unique(doc_es_tsf$Study_ID))
+# Filter out by DOC TSF studies
+tsf_doc_watershed_ratio <- site_data_unique %>%
+  filter(Study_ID %in% tsf_doc) %>% 
+  pivot_wider(
+    id_cols = Study_ID,
+    names_from = Pair,
+    values_from = Area_watershed_km
+  ) %>% 
+  filter(Study_ID != "Abbott et al. 2021")
+
+# Pivot longer to handle multiple Site columns and calculate ratios individually
+tsf_doc_wr <- tsf_doc_watershed_ratio %>%
+  pivot_longer(
+    cols = starts_with("Site"), # Pivoting all Site columns (Site_1, Site_2, Site_3, etc.)
+    names_to = "Site",          # Creates a 'Site' column to track sites
+    values_to = "Site_value"    # Store numeric values of Site in the 'Site_value' column
+  ) %>%
+  mutate(
+    watershed_ratio = case_when(
+      # Configurations based on specific Site and Control pairings
+      !is.na(Control_1) & Site == "Site_1" ~ Site_value / Control_1, # Site_1/Control_1
+      !is.na(Control_2) & Site == "Site_2" ~ Site_value / Control_2, # Site_2/Control_2
+      !is.na(Control_3_4) & Site %in% c("Site_3", "Site_4") ~ Site_value / Control_3_4, # Site_3, Site_4, divided by Control_3_4
+      !is.na(Control) & Site == "Site_1" ~ Site_value / Control, # Generic Site_1/Control
+      !is.na(Control) & Site == "Site_2" ~ Site_value / Control, # Generic Site_2/Control
+      !is.na(Control) & Site == "Site_3" ~ Site_value / Control, # Generic Site_3/Control
+      !is.na(Control) & Site == "Site_4" ~ Site_value / Control, # Generic Site_4/Control
+      TRUE ~ NA_real_ # Default case for rows without valid pairing
+    )
+  ) %>% 
+    filter(!is.na(watershed_ratio))
+
+# Compare - should be the same 
+sort(unique(doc_es_tsf$Study_ID)) # 10
+sort(unique(tsf_doc_wr$Study_ID)) # 9 - no Abbott
+
+median(tsf_doc_wr$watershed_ratio) # 1.787272
+sd(tsf_doc_wr$watershed_ratio) #  9.007161
+range(tsf_doc_wr$watershed_ratio) # [0.4616477 38.6794872]
+
+# TSF NO3 watershed ratio ####
+tsf_no3 <- sort(unique(no3_es_tsf$Study_ID))
+# Filter out by DOC TSF studies
+tsf_no3_watershed_ratio <- site_data_unique %>%
+  filter(Study_ID %in% tsf_no3) %>% 
+  pivot_wider(
+    id_cols = Study_ID,
+    names_from = Pair,
+    values_from = Area_watershed_km
+  ) %>% 
+  filter(Study_ID != "Abbott et al. 2021")
+
+# Pivot longer to handle multiple Site columns and calculate ratios individually
+tsf_no3_wr <- tsf_no3_watershed_ratio %>%
+  pivot_longer(
+    cols = starts_with("Site"), # Pivoting all Site columns (Site_1, Site_2, Site_3, etc.)
+    names_to = "Site",          # Creates a 'Site' column to track sites
+    values_to = "Site_value"    # Store numeric values of Site in the 'Site_value' column
+  ) %>%
+  mutate(
+    watershed_ratio = case_when(
+      # Configurations based on specific Site and Control pairings
+      !is.na(Control_1) & Site == "Site_1" ~ Site_value / Control_1, # Site_1/Control_1
+      !is.na(Control_2) & Site == "Site_2" ~ Site_value / Control_2, # Site_2/Control_2
+      !is.na(Control_3_4) & Site %in% c("Site_3", "Site_4") ~ Site_value / Control_3_4, # Site_3, Site_4, divided by Control_3_4
+      !is.na(Control_3_4_5) & Site %in% c("Site_3", "Site_4", "Site_5") ~ Site_value / Control_3_4_5, # Site_3, Site_4, Site_5 divided by Control_3_4_5
+      !is.na(Control) & Site == "Site_1" ~ Site_value / Control, # Generic Site_1/Control
+      !is.na(Control) & Site == "Site_2" ~ Site_value / Control, # Generic Site_2/Control
+      !is.na(Control) & Site == "Site_3" ~ Site_value / Control, # Generic Site_3/Control
+      !is.na(Control) & Site == "Site_4" ~ Site_value / Control, # Generic Site_4/Control
+      !is.na(Control) & Site == "Site_5" ~ Site_value / Control, # Generic Site_5/Control
+      TRUE ~ NA_real_ # Default case for rows without valid pairing
+    )
+  ) %>% 
+    filter(!is.na(watershed_ratio))
+
+# Compare - should be the same 
+sort(unique(no3_es_tsf$Study_ID)) # 15
+sort(unique(tsf_no3_wr$Study_ID)) # 14 - no Abbott
+
+median(tsf_no3_wr$watershed_ratio) # 1.298625
+sd(tsf_no3_wr$watershed_ratio) #  7.235802
+range(tsf_no3_wr$watershed_ratio) # [0.3024718 38.6794872]
+
+### WHY DOES CLIMATE N03 HAVE MORE WATERSHEDS THAN TSF NO3 ####
+print(max(no3_es_climate$Site)) # 30 burned watershed pairs 
+print(max(no3_es_tsf$Site)) # 21 burned watershed pairs 
+
+sort(unique(no3_es_climate$Study_ID)) # 13 studies
+# Coombs, Crandall, Gerla, Gluns, Hauer, Hickenbottom, Mast, Murphy, Neary, Oliver, Tiedemann, Uzun, Writer
+
+sort(unique(no3_es_tsf$Study_ID)) # 8 studies
+# Coombs, Crandall, Gerla, Hauer, Murphy, Oliver, Uzun, Writer
+# Why no Gluns, Hickenbottom, Mast, Neary, Tiedemann?
+
+# This is how the data frames are being filtered out. 
+# They are both from the 
+no3_es_tsf <- DNBR_model %>% 
+  filter(response_var == "NO3_Interp") %>% 
+  dplyr::select(Study_ID, response_var, Effect_size_pair, Effect_size, Effect_size_no_watershed, 
+                Time_Since_Fire)
+
+#### CLIMATE MODEL DATAFRAME ##### 
+# Filter out studies that are greater than 10 years 
+no3_es_climate <- ES_nn_normal %>% 
+  filter(response_var == "NO3_Interp") %>% 
+  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size_pair, Effect_size, Effect_size_no_watershed) %>% 
+  filter(Study_ID != "Abbott et al. 2021") %>% 
+  filter(Study_ID != "Rhea et al. 2021")
+
+
+
+
+
+```
 
 
 
@@ -1030,6 +1505,36 @@ ggsave("ES_BS_nonnormal_vs_normal.pdf",
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ================================ GRAVEYARD ==================================================#
 ### OLD DATA and COMPARE 
 ```{r}
 ### ORIGINAL DATA MODEL ####
@@ -1172,33 +1677,6 @@ ES_NEW <- doc_es_tsf %>%
 
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ================================ GRAVEYARD ==================================================#
 # Normalized Effect size - orig
 ```{r Normalized Effect size - orig}
 ES_orig <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "archive", "Effect_Size_UPDATED.csv")) %>% 
