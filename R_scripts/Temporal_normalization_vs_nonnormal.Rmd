@@ -246,7 +246,7 @@ no3_es_tsf <- no3_es_tsf %>%
 no3_tsf_mixed_normal <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = no3_es_tsf)
 
 # Check for equal variance
-performance::check_heteroscedasticity(no3_tsf_mixed_normal) # OOK: Error variance appears to be homoscedastic (p = 0.876).
+performance::check_heteroscedasticity(no3_tsf_mixed_normal) # OOK: Error variance appears to be homoscedastic (p = 0.910).
 
 # Check for normality
 residuals <- resid(no3_tsf_mixed_normal)
@@ -262,13 +262,13 @@ summary(no3_tsf_mixed_normal)
 # P-value 
 Anova(no3_tsf_mixed_normal, type = "III")
 
-# We examined the relationship between time since fire and nitrate (NO₃) effect sizes using a linear mixed effects model with site as a random effect. The model included 55 observations across 21 sites.
+# We analyzed the relationship between nitrate effect size and time since fire using a linear mixed-effects model with site as a random effect. The model included 85 observations across 34 sites.
 
-# The analysis revealed no significant relationship between time since fire and NO₃ effect size (β = 0.029, SE = 0.092, t = 0.312, p = 0.757). The intercept was also not significantly different from zero (β = 0.346, SE = 0.377, t = 0.917, p = 0.368).
+# Time since fire had a significant positive effect on nitrate effect size (β = 0.099, SE = 0.049, χ² = 4.05, p = 0.044). For each additional year since fire, the nitrate effect size increased by approximately 0.10 units. The intercept was not significantly different from zero (β = 0.283, SE = 0.300, χ² = 0.89, p = 0.347).
 
-# Random effects showed substantial variation among sites (SD = 1.47), indicating considerable site-specific differences in baseline conditions, while residual variation was moderate (SD = 0.83). The Type III Wald test confirmed the non-significant effect of time since fire (χ² = 0.097, df = 1, p = 0.755).
+# The random effect of site accounted for substantial variation in the data, with a standard deviation of 1.44 for the site-level intercepts compared to a residual standard deviation of 0.73. This indicates considerable between-site heterogeneity in baseline nitrate effect sizes. The correlation between the intercept and time since fire slope was moderate and negative (r = -0.48).
 
-# These results suggest that nitrate levels in the studied systems do not show a clear temporal pattern of recovery following fire disturbance. The large among-site variation indicates that site-specific factors may be more important than time since fire in determining nitrate response patterns post-fire.
+# These results suggest that the impact of fire on nitrate dynamics becomes more pronounced with increasing time since the fire event, though there is substantial variation among sites in their baseline responses.
 
 ### TSF NITRATE non-normalized ####
 # data frame: no3_es_tsf 
@@ -277,13 +277,13 @@ Anova(no3_tsf_mixed_normal, type = "III")
 no3_tsf_mixed_non_normal <-  lmer(Effect_size_no_watershed ~ Time_Since_Fire + (1 | Site), data = no3_es_tsf)
 
 # Check for equal variance
-performance::check_heteroscedasticity(no3_tsf_mixed_non_normal) # OK: Error variance appears to be homoscedastic (p = 0.067).
+performance::check_heteroscedasticity(no3_tsf_mixed_non_normal) # OK: Error variance appears to be homoscedastic (p = 0.259).
 
 # Check for normality
 residuals <- resid(no3_tsf_mixed_non_normal)
 qqnorm(residuals)
 qqline(residuals)
-shapiro.test(residuals) # W = 0.89441, p-value = 0.00016
+shapiro.test(residuals) # W = 0.93518, p-value = 0.0003474
 # when p > 0.05 can assume normality 
 # NON-NORMAL?
 
@@ -294,20 +294,18 @@ summary(no3_tsf_mixed_non_normal)
 # P-value 
 Anova(no3_tsf_mixed_non_normal, type = "III")
 
-# We examined the relationship between time since fire and nitrate (NO₃) effect sizes (excluding watershed-scale studies) using a linear mixed effects model with site as a random effect. The model included 55 observations across 21 sites.
+# We analyzed the relationship between nitrate effect size (excluding watershed studies) and time since fire using a linear mixed-effects model with site as a random effect. The model included 85 observations across 34 sites.
 
-# The analysis revealed no significant relationship between time since fire and NO₃ effect size (β = 0.125, SE = 0.088, t = 1.43, p = 0.160). However, the intercept was significantly greater than zero (β = 0.692, SE = 0.239, t = 2.90, p = 0.008), indicating that nitrate effect sizes were significantly positive immediately following fire disturbance.
+# Time since fire had a significant positive effect on nitrate effect size (β = 0.096, SE = 0.034, χ² = 7.79, p = 0.005). For each additional year since fire, the nitrate effect size increased by approximately 0.10 units. The intercept was significantly greater than zero (β = 0.698, SE = 0.172, χ² = 16.38, p < 0.001), indicating a positive baseline effect of fire on nitrate dynamics.
 
-# Random effects showed relatively low variation among sites (SD = 0.39), while residual variation was higher (SD = 0.99), suggesting that within-site variability was greater than among-site differences. The Type III Wald test confirmed the non-significant effect of time since fire (χ² = 2.04, df = 1, p = 0.154) and the significant intercept effect (χ² = 8.42, df = 1, p = 0.004).
+# The random effect of site showed moderate variation, with a standard deviation of 0.64 for the site-level intercepts compared to a residual standard deviation of 0.78. This suggests modest between-site heterogeneity in baseline nitrate effect sizes. The correlation between the intercept and time since fire slope was moderate and negative (r = -0.56).
 
-# These results suggest that fire initially produces a significant positive effect on nitrate levels, but this effect does not change systematically over time since fire. The significant baseline effect indicates that fire disturbance consistently elevates nitrate concentrations in the immediate post-fire period across the studied systems.
+# These results demonstrate that fire has a consistently positive effect on nitrate dynamics that becomes increasingly pronounced over time since the fire event. The exclusion of watershed-scale studies appears to have strengthened the relationship compared to the full dataset, with both the baseline effect and the temporal trend being statistically significant.
 
 # COMPARE
-# Effect_size model (normalized): No significant baseline effect (intercept p = 0.368) and no relationship with time since fire (p = 0.757). This model showed higher among-site variation (SD = 1.47) relative to residual variation (SD = 0.83).
+# We fitted two linear mixed-effects models to examine the relationship between nitrate effect size and time since fire: one using the complete dataset and another excluding watershed-scale studies. Both models included site as a random effect and analyzed 85 observations across 34 sites.
 
-# Effect_size_no_watershed model (non-normal): Significant positive baseline effect immediately post-fire (intercept = 0.692, p = 0.008) but still no relationship with time since fire (p = 0.160). This model showed lower among-site variation (SD = 0.39) but higher residual variation (SD = 0.99).
-
-# The key difference is that excluding watershed-scale studies reveals a consistent, significant positive effect of fire on nitrate concentrations in the immediate post-fire period. This suggests that watershed-scale studies may dilute or mask the direct effects of fire on nitrate, possibly due to differences in spatial scale, methodology, or the influence of broader landscape processes. The reduced among-site variation in the no-watershed model indicates that watershed studies contributed substantially to site-level heterogeneity in the full dataset.
+# Effect of Time Since Fire: Both models showed a significant positive relationship between time since fire and nitrate effect size, with nearly identical slopes (β = 0.099 vs. 0.096). However, the statistical significance was stronger for non-normalized effect size (p = 0.005 vs. p = 0.044), suggesting that watershed-scale studies may introduce additional variability that weakens the temporal signal.
 
 ```
 
@@ -384,13 +382,13 @@ summary(doc_climate_mixed_normal)
 # P-value 
 Anova(doc_climate_mixed_normal, type = "III")
 
-# We examined the relationship between climate type and dissolved organic carbon (DOC) effect sizes using a linear mixed effects model with site as a random effect. The model included 44 observations across 21 sites, comparing six climate types (reference climate plus Csa, Csb, Dfb, Dfc, and Dwc).
+# We analyzed the relationship between dissolved organic carbon (DOC) effect size and climate type using a linear mixed-effects model with site as a random effect. The model included 38 observations across 17 sites and five climate categories.
 
-# The analysis revealed no significant differences in DOC effect sizes among climate types (overall climate effect: χ² = 1.12, df = 5, p = 0.952). None of the individual climate contrasts were significant: Csa (β = -0.227, SE = 0.835, t = -0.272, p = 0.789), Csb (β = 0.685, SE = 1.078, t = 0.636, p = 0.535), Dfb (β = 0.086, SE = 0.902, t = 0.096, p = 0.925), Dfc (β = 0.114, SE = 0.862, t = 0.132, p = 0.897), and Dwc (β = 0.578, SE = 1.363, t = 0.424, p = 0.678). The reference climate intercept was also not significantly different from zero (β = -0.518, SE = 0.680, t = -0.762, p = 0.458).
+# Climate type did not have a significant effect on DOC effect size (χ² = 0.77, df = 4, p = 0.943). Compared to the reference climate category, none of the individual climate types showed significant differences: Csa (β = -0.226, SE = 0.906), Csb (β = 0.685, SE = 1.170), Dfb (β = 0.086, SE = 0.979), or Dfc (β = 0.012, SE = 1.170). The intercept was also not significantly different from zero (β = -0.518, SE = 0.739, χ² = 0.49, p = 0.483).
 
-# Random effects showed substantial variation among sites (SD = 1.18) compared to very low residual variation (SD = 0.13), indicating that site-specific factors account for most of the variability in DOC response to fire, while within-site measurements were highly consistent.
+# The random effect of site accounted for the vast majority of variation in the data, with a standard deviation of 1.28 for site-level intercepts compared to a very small residual standard deviation of 0.13. This indicates that between-site variation dominates over within-site variation, and that site-specific factors are much more important than climate type in determining DOC response to fire.
 
-# These results suggest that climate type does not significantly influence how DOC concentrations respond to fire disturbance, with site-specific characteristics being the primary driver of variability in post-fire DOC dynamics.
+# These results suggest that climate type, as categorized in this analysis, is not a significant predictor of how fire affects DOC dynamics. Instead, site-specific characteristics appear to be the primary driver of variation in fire effects on dissolved organic carbon.
 
 ### CLIMATE DOC non-normalized ####
 # data frame: doc_es_climate
@@ -405,7 +403,7 @@ performance::check_heteroscedasticity(doc_climate_mixed_nn) # Warning: Heterosce
 residuals <- resid(doc_climate_mixed_nn)
 qqnorm(residuals)
 qqline(residuals)
-shapiro.test(residuals) # W = 0.9674, p-value = 0.2441
+shapiro.test(residuals) # W = 0.95387, p-value = 0.1195
 # when p > 0.05 can assume normality 
 
 doc_climate_mixed_nn
@@ -415,22 +413,31 @@ summary(doc_climate_mixed_nn)
 # P-value 
 Anova(doc_climate_mixed_nn, type = "III")
 
-# We examined the relationship between climate type and dissolved organic carbon (DOC) effect sizes on non-normalized data using a linear mixed effects model with site as a random effect. The model included 44 observations across 21 sites, comparing six climate types (reference climate plus Csa, Csb, Dfb, Dfc, and Dwc).
-# Comparing Cfb to the rest of them?
+# We analyzed the relationship between dissolved organic carbon (DOC) effect size and climate type using a linear mixed-effects model with site as a random effect, excluding watershed-scale studies. The model included 38 observations across 17 sites and five climate categories.
 
+# Climate type had a significant effect on DOC effect size (χ² = 11.08, df = 4, p = 0.026). Compared to the reference climate category, the Csb climate showed the strongest positive effect (β = 0.638, SE = 0.218), followed by Csa (β = 0.278, SE = 0.166), Dfc (β = 0.196, SE = 0.214), and Dfb (β = 0.033, SE = 0.179). The intercept was not significantly different from zero (β = 0.117, SE = 0.130, χ² = 0.80, p = 0.371).
 
-# The analysis revealed a significant overall effect of climate type on DOC effect sizes (χ² = 13.87, df = 5, p = 0.016). Among individual climate contrasts, the Csb climate showed a marginally significant positive effect (β = 0.641, SE = 0.324, t = 1.98, p = 0.067), while other climate types showed non-significant effects: Csa (β = 0.286, SE = 0.249, t = 1.15, p = 0.270), Dfb (β = 0.030, SE = 0.269, t = 0.11, p = 0.914), Dfc (β = -0.341, SE = 0.257, t = -1.33, p = 0.206), and Dwc (β = 0.013, SE = 0.407, t = 0.032, p = 0.975). The reference climate intercept was not significantly different from zero (β = 0.117, SE = 0.200, t = 0.582, p = 0.570).
+# The random effect structure differed markedly from the full dataset model. Site-level variation was substantially reduced (SD = 0.22) while residual variation remained similar (SD = 0.14), resulting in improved model fit (REML criterion: 30.97 to -8.49). This indicates that excluding watershed studies reduced between-site heterogeneity and allowed climate effects to emerge more clearly.
 
-# Random effects showed moderate variation among sites (SD = 0.34) with very low residual variation (SD = 0.13), indicating that site-specific factors still account for most variability, but this variation was substantially reduced compared to the full dataset.
-
-# These results suggest that when watershed-scale studies are excluded, climate type does significantly influence DOC response to fire, with Mediterranean climates (particularly Csb) showing the strongest positive responses to fire disturbance.
+# These results suggest that climate type is a significant predictor of how fire affects DOC dynamics when watershed-scale studies are excluded. Mediterranean climates (Csa, Csb) appear to show particularly strong positive responses, indicating that climate-driven processes may be more detectable at smaller spatial scales where watershed-level heterogeneity is minimized.
 
 # post hoc test 
 a <- emmeans::lsmeans(doc_climate_mixed_nn, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. 
 
 # Or if you want the full contrast results as a data frame
 contrast_results <- as.data.frame(a$contrasts)
-# Csb to Dfc is significantly different 
+# no climate types significantly differ from each other:
+
+# We analyzed the relationship between dissolved organic carbon (DOC) effect size and climate type using a linear mixed-effects model with site as a random effect, excluding watershed-scale studies. The model included 38 observations across 17 sites and five climate categories.
+
+# Climate type had a significant overall effect on DOC effect size (χ² = 11.08, df = 4, p = 0.026). However, post-hoc pairwise comparisons using Tukey's adjustment revealed no significant differences between any specific climate pairs (p > 0.05 for all comparisons). The intercept was not significantly different from zero (β = 0.117, SE = 0.130, χ² = 0.80, p = 0.371).
+
+# The random effect structure showed that site-level variation was relatively low (SD = 0.22) compared to residual variation (SD = 0.14), with substantially improved model fit compared to the full dataset (REML criterion: -8.49).
+
+# Interpretation
+# The significant overall climate effect with non-significant pairwise comparisons suggests that while climate categories collectively explain significant variation in DOC response to fire, the differences between individual climate types are not sufficiently large to reach statistical significance after multiple comparison correction. This pattern often occurs when there is meaningful biological variation across groups but limited statistical power due to sample size or high within-group variability.
+
+# This indicates that climate influences DOC fire responses, but the specific climate categories used may not capture the most relevant climatic distinctions for DOC dynamics.
 
 
 ### CLIMATE NITRATE normalized ####
@@ -445,13 +452,13 @@ no3_es_climate <- no3_es_climate %>%
 no3_climate_mixed_normal <-  lmer(Effect_size ~ Climate + (1 | Site), data = no3_es_climate)
 
 # Check for equal variance
-performance::check_heteroscedasticity(no3_climate_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.956).
+performance::check_heteroscedasticity(no3_climate_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.963).
 
 # Check for normality
 residuals <- resid(no3_climate_mixed_normal)
 qqnorm(residuals)
 qqline(residuals)
-shapiro.test(residuals) # W = 0.95116, p-value = 0.00281
+shapiro.test(residuals) # W = 0.95187, p-value = 0.004746
 # when p > 0.05 can assume normality 
 
 no3_climate_mixed_normal
@@ -461,15 +468,15 @@ summary(no3_climate_mixed_normal)
 # P-value 
 Anova(no3_climate_mixed_normal, type = "III")
 
-# We examined the relationship between climate type and nitrate (NO₃) effect sizes using a linear mixed effects model with site as a random effect. The model included 85 observations across 34 sites, comparing nine climate types (reference climate plus Cfa, Cfb, Csa, Csb, Dfb, Dfc, Dsb, and Dwc).
+# We analyzed the relationship between nitrate effect size and climate type using a linear mixed-effects model with site as a random effect. The model included 79 observations across 30 sites and eight climate categories.
 
-# The analysis revealed a highly significant overall effect of climate type on NO₃ effect sizes (χ² = 40.02, df = 8, p < 0.001). Individual climate contrasts showed varying effects relative to the reference climate, though none reached statistical significance in the individual t-tests: Cfa (β = 1.320, SE = 1.357, t = 0.973, p = 0.341), Cfb (β = 0.775, SE = 0.933, t = 0.831, p = 0.416), Csa (β = -1.220, SE = 0.847, t = -1.439, p = 0.163), Csb (β = -0.604, SE = 0.864, t = -0.699, p = 0.492), and Dfb (β = 0.114, SE = 1.073, t = 0.106, p = 0.916). The reference climate intercept was not significantly different from zero (β = -0.080, SE = 0.679, t = -0.117, p = 0.908).
+# Climate type had a highly significant effect on nitrate effect size (χ² = 30.09, df = 7, p < 0.001). Compared to the reference climate category, the climate effects varied substantially: Dsb showed the largest positive effect (β = 2.202, SE = 1.348), followed by Dfc (β = 1.787, SE = 0.789), Cfa (β = 1.320, SE = 1.379), and Cfb (β = 0.775, SE = 0.948). In contrast, Csa showed a negative effect (β = -1.219, SE = 0.861), Csb showed a moderate negative effect (β = -0.604, SE = 0.878), and Dfb showed minimal effect (β = 0.114, SE = 1.090). The intercept was not significantly different from zero (β = -0.080, SE = 0.690, χ² = 0.013, p = 0.908).
 
-# Random effects showed substantial variation among sites (SD = 1.06) and moderate residual variation (SD = 0.72), indicating that both site-specific factors and within-site variability contribute meaningfully to overall variance in nitrate responses.
+# The random effect of site showed moderate variation, with a standard deviation of 1.08 for site-level intercepts compared to a residual standard deviation of 0.72. This indicates that between-site heterogeneity is somewhat larger than within-site variation, suggesting both climate and site-specific factors contribute to variation in nitrate responses.
 
-# These results demonstrate that climate type is a significant predictor of how nitrate concentrations respond to fire disturbance, with the overall pattern suggesting systematic differences among climate zones despite individual contrasts not reaching significance, likely due to multiple comparison effects.
-
+# These results demonstrate that climate is a strong predictor of how fire affects nitrate dynamics, with continental climates (Dfc, Dsb) showing the most positive responses and Mediterranean climates (Csa, Csb) showing negative or reduced responses to fire.
 # post hoc test 
+
 a <- emmeans::lsmeans(no3_climate_mixed_normal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. 
 
 # Or if you want the full contrast results as a data frame
@@ -485,13 +492,13 @@ contrast_results <- as.data.frame(a$contrasts)
 no3_climate_mixed_nn <-  lmer(Effect_size_no_watershed ~ Climate + (1 | Site), data = no3_es_climate)
 
 # Check for equal variance
-performance::check_heteroscedasticity(no3_climate_mixed_nn) # OK: Error variance appears to be homoscedastic (p = 0.555).
+performance::check_heteroscedasticity(no3_climate_mixed_nn) # OK: Error variance appears to be homoscedastic (p = 0.433).
 
 # Check for normality
 residuals <- resid(no3_climate_mixed_nn)
 qqnorm(residuals)
 qqline(residuals)
-shapiro.test(residuals) # W = 0.94189, p-value = 0.0008131
+shapiro.test(residuals) # W = 0.93762, p-value = 0.000784
 # when p > 0.05 can assume normality 
 # NON-NORMAL?
 
@@ -502,13 +509,13 @@ summary(no3_climate_mixed_nn)
 # P-value 
 Anova(no3_climate_mixed_nn, type = "III")
 
-# A linear mixed-effects model was fitted using REML to assess the effect of climate classification on Effect_size_no_watershed, with Site included as a random intercept. The model included 85 observations across 34 sites (REML criterion = 214.6).
-# Random Effects:
-  # Site variance = 0.514 (SD = 0.717)
-  # Residual variance = 0.547 (SD = 0.740)
+# We analyzed the relationship between nitrate effect size and climate type using a linear mixed-effects model with site as a random effect, excluding watershed-scale studies. The model included 79 observations across 30 sites and eight climate categories.
 
-# Fixed Effects:
-# The intercept was estimated at 0.839 (SE = 0.512, p = 0.120). None of the individual climate categories showed statistically significant effects (all p > 0.05), though ClimateDfc had the largest positive estimate (0.754, SE = 0.568, p = 0.203), and ClimateCsa had the largest negative estimate (-0.801, SE = 0.649, p = 0.232).
+# Climate type did not have a significant effect on nitrate effect size (χ² = 11.36, df = 7, p = 0.124). Compared to the reference climate category, the climate effects were relatively modest and varied in direction: Cfb showed the largest positive effect (β = 0.491, SE = 0.656), followed by Dfc (β = 0.525, SE = 0.558), while Csa showed the largest negative effect (β = -0.788, SE = 0.626), followed by Csb (β = -0.508, SE = 0.630). Other climate types showed smaller effects: Dfb (β = -0.229, SE = 0.779), Dsb (β = -0.132, SE = 0.937), and Cfa (β = -0.117, SE = 0.985). The intercept showed a marginally non-significant positive effect (β = 0.839, SE = 0.493, χ² = 2.90, p = 0.089).
+
+# The random effect structure changed substantially compared to the full dataset model. Site-level variation decreased markedly (SD = 0.67 vs. 1.08) while residual variation increased slightly (SD = 0.75 vs. 0.72), and model fit improved (REML criterion: 210.9 to 199.3). This indicates that excluding watershed studies reduced between-site heterogeneity but also diminished the climate signal.
+
+# These results suggest that when watershed-scale studies are excluded, climate becomes a less important predictor of nitrate fire responses, contrasting with the highly significant climate effects observed in the full dataset. This indicates that climate effects on nitrate dynamics may be more pronounced or detectable at larger spatial scales.
 
 
 ```
@@ -605,13 +612,13 @@ doc_es_bp <- doc_es_bp %>%
 doc_bp_mixed_normal <-  lmer(Effect_size ~ burn_percentage + (1 | Site), data = doc_es_bp)
 
 # Check for equal variance
-performance::check_heteroscedasticity(doc_bp_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.994)
+performance::check_heteroscedasticity(doc_bp_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.968)
 
 # Check for normality
 residuals <- resid(doc_bp_mixed_normal)
 qqnorm(residuals)
 qqline(residuals)
-shapiro.test(residuals) # W = 0.96704, p-value = 0.237
+shapiro.test(residuals) # W = 0.93252, p-value = 0.006892
 # when p > 0.05 can assume normality 
 
 doc_bp_mixed_normal
@@ -620,6 +627,14 @@ summary(doc_bp_mixed_normal)
 
 # P-value 
 Anova(doc_bp_mixed_normal, type = "III")
+
+# We analyzed the relationship between dissolved organic carbon (DOC) effect size and burn percentage using a linear mixed-effects model with site as a random effect. The model included 50 observations across 15 sites.
+
+# Burn percentage did not have a significant effect on DOC effect size (β = -0.001, SE = 0.011, χ² = 0.008, p = 0.928). The negligible slope indicates that burn percentage has virtually no relationship with DOC response to fire. The intercept was also not significantly different from zero (β = -0.549, SE = 0.508, χ² = 1.17, p = 0.280).
+
+# The random effect of site dominated the variance structure, with a standard deviation of 1.23 for site-level intercepts compared to a very small residual standard deviation of 0.15. This indicates that between-site variation is approximately eight times larger than within-site variation, suggesting that site-specific characteristics are far more important than burn severity in determining DOC response to fire.
+
+# These results suggest that burn percentage is not a meaningful predictor of how fire affects DOC dynamics. Instead, site-specific factors such as soil type, vegetation, topography, or other local characteristics appear to be the primary drivers of variation in DOC fire responses, regardless of burn percentage
 
 
 ### BP DOC non-normalized ####
@@ -635,7 +650,7 @@ performance::check_heteroscedasticity(doc_bp_mixed_nn) # Warning: Heteroscedasti
 residuals <- resid(doc_bp_mixed_nn)
 qqnorm(residuals)
 qqline(residuals)
-shapiro.test(residuals) # W = 0.9674, p-value = 0.2441
+shapiro.test(residuals) # W = 0.89323, p-value = 0.0002892
 # when p > 0.05 can assume normality 
 
 doc_bp_mixed_nn
@@ -644,6 +659,14 @@ summary(doc_bp_mixed_nn)
 
 # P-value 
 Anova(doc_bp_mixed_nn, type = "III")
+
+# We analyzed the relationship between dissolved organic carbon (DOC) effect size and burn percentage using a linear mixed-effects model with site as a random effect, excluding watershed-scale studies. The model included 50 observations across 15 sites.
+
+# Burn percentage did not have a significant effect on DOC effect size (β = 0.001, SE = 0.002, χ² = 0.26, p = 0.609). The minimal slope indicates that fire severity, as measured by burn percentage, has essentially no relationship with DOC response to fire. However, the intercept was significantly greater than zero (β = 0.214, SE = 0.105, χ² = 4.13, p = 0.042), indicating a consistent positive baseline effect of fire on DOC dynamics.
+
+# The random effect structure changed substantially compared to the full dataset model. Site-level variation decreased dramatically (SD = 0.23 vs. 1.23) while residual variation remained similar (SD = 0.16 vs. 0.15), resulting in much improved model fit (REML criterion: 33.8 to -6.3). The variance components became more balanced, with site-level variation only slightly larger than residual variation.
+
+# These results suggest that while excluding watershed studies reveals a significant positive baseline effect of fire on DOC, burn percentage remains an unimportant predictor of DOC fire responses regardless of spatial scale. The dramatic reduction in site-level variance indicates that watershed-scale studies contributed substantial heterogeneity that masked the consistent positive fire effect observed at smaller scales.
 
 
 ### BP NITRATE normalized ####
@@ -658,13 +681,13 @@ no3_es_bp <- no3_es_bp %>%
 no3_bp_mixed_normal <-  lmer(Effect_size ~ burn_percentage + (1 | Site), data = no3_es_bp)
 
 # Check for equal variance
-performance::check_heteroscedasticity(no3_bp_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.956).
+performance::check_heteroscedasticity(no3_bp_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.967).
 
 # Check for normality
 residuals <- resid(no3_bp_mixed_normal)
 qqnorm(residuals)
 qqline(residuals)
-shapiro.test(residuals) # W = 0.95116, p-value = 0.00281
+shapiro.test(residuals) # W = 0.93151, p-value = 0.0002218
 # when p > 0.05 can assume normality 
 
 no3_bp_mixed_normal
@@ -673,6 +696,14 @@ summary(no3_bp_mixed_normal)
 
 # P-value 
 Anova(no3_bp_mixed_normal, type = "III")
+
+# We analyzed the relationship between nitrate effect size and burn percentage using a linear mixed-effects model with site as a random effect. The model included 85 observations across 27 sites.
+
+# Burn percentage did not have a significant effect on nitrate effect size (β = -0.009, SE = 0.011, χ² = 0.73, p = 0.394). The weak negative slope suggests that fire severity, as measured by burn percentage, has minimal relationship with nitrate response to fire. The intercept was also not significantly different from zero (β = 0.723, SE = 0.541, χ² = 1.78, p = 0.182).
+
+# The random effect of site accounted for substantial variation in the data, with a standard deviation of 1.60 for site-level intercepts compared to a residual standard deviation of 0.65. This indicates that between-site variation is approximately 2.5 times larger than within-site variation, suggesting that site-specific characteristics are considerably more important than burn severity in determining nitrate response to fire.
+
+# These results suggest that burn percentage is not a significant predictor of how fire affects nitrate dynamics. Instead, site-specific factors appear to be the primary drivers of variation in nitrate fire responses, with fire severity playing a minimal role in determining the magnitude of nitrogen cycling changes following fire.
 
 
 ### BP NITRATE non-normalized ####
@@ -699,6 +730,13 @@ summary(no3_bp_mixed_nn)
 # P-value 
 Anova(no3_bp_mixed_nn, type = "III")
 
+# We analyzed the relationship between nitrate effect size and burn percentage using a linear mixed-effects model with site as a random effect, excluding watershed-scale studies. The model included 85 observations across 27 sites.
+
+# Burn percentage did not have a significant effect on nitrate effect size (β = -0.008, SE = 0.006, χ² = 1.55, p = 0.213). The weak negative slope suggests that fire severity, as measured by burn percentage, has minimal relationship with nitrate response to fire. However, the intercept was highly significant and positive (β = 1.182, SE = 0.309, χ² = 14.63, p < 0.001), indicating a strong baseline positive effect of fire on nitrate dynamics.
+
+# The random effect structure changed substantially compared to the full dataset model. Site-level variation decreased notably (SD = 0.84 vs. 1.60) while residual variation remained similar (SD = 0.67 vs. 0.65), resulting in improved model fit (REML criterion: 248.8 to 224.6). Between-site variation remained larger than within-site variation but the difference was reduced.
+
+# These results demonstrate that while excluding watershed studies reveals a highly significant positive baseline effect of fire on nitrate dynamics, burn percentage remains an unimportant predictor of nitrate fire responses regardless of spatial scale. This suggests that fire consistently enhances nitrate availability, but the magnitude of this effect is not dependent on fire severity. Site-specific factors continue to be more important than burn intensity in determining the variability of nitrate responses to fire.
 
 ```
 
