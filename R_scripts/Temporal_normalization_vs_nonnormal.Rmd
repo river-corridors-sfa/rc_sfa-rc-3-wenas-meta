@@ -1154,6 +1154,7 @@ sort(unique(doc_es_bp$Study_ID))
 sort(unique(bp_doc_wr$Study_ID))
 
 median(bp_doc_wr$watershed_ratio) # 1.930502
+mean(bp_doc_wr$watershed_ratio) # 5.325945
 sd(bp_doc_wr$watershed_ratio) # 10.27117
 range(bp_doc_wr$watershed_ratio) # [0.9327304, 38.6794872]
 
@@ -1197,6 +1198,7 @@ sort(unique(no3_es_bp$Study_ID)) # 11
 sort(unique(bp_no3_wr$Study_ID)) # 11 - good
 
 median(bp_no3_wr$watershed_ratio) # 1.428571
+mean(bp_no3_wr$watershed_ratio) # 3.810139
 sd(bp_no3_wr$watershed_ratio) # 7.932648
 range(bp_no3_wr$watershed_ratio) # [0.3024718 38.6794872]
 
@@ -1248,6 +1250,7 @@ sort(unique(doc_es_dnbr$Study_ID)) # 5
 sort(unique(bs_doc_wr$Study_ID)) # 5 - good
 
 median(bs_doc_wr$watershed_ratio) # 1.8
+mean(bs_doc_wr$watershed_ratio) #  5.804277
 sd(bs_doc_wr$watershed_ratio) # 11.00979
 range(bs_doc_wr$watershed_ratio) # [0.9327304 38.6794872]
 
@@ -1291,6 +1294,7 @@ sort(unique(no3_es_dnbr$Study_ID)) # 8
 sort(unique(bs_no3_wr$Study_ID)) # 8 - good
 
 median(bs_no3_wr$watershed_ratio) # 1.56
+mean(bs_no3_wr$watershed_ratio) # 4.294542
 sd(bs_no3_wr$watershed_ratio) # 8.523296
 range(bs_no3_wr$watershed_ratio) # [0.3024718, 38.6794872]
 
@@ -1343,6 +1347,7 @@ sort(unique(doc_es_climate$Study_ID)) # 8
 sort(unique(climate_doc_wr$Study_ID)) # 8 - good
 
 median(climate_doc_wr$watershed_ratio) # 1.85
+mean(climate_doc_wr$watershed_ratio) # 4.912453
 sd(climate_doc_wr$watershed_ratio) # 9.678452
 range(climate_doc_wr$watershed_ratio) # [0.9327304 38.6794872]
 
@@ -1386,6 +1391,7 @@ sort(unique(no3_es_climate$Study_ID)) # 13
 sort(unique(climate_no3_wr$Study_ID)) # 13 - good
 
 median(climate_no3_wr$watershed_ratio) # 1.493043
+mean(climate_no3_wr$watershed_ratio) # 3.557971
 sd(climate_no3_wr$watershed_ratio) # 7.554198
 range(climate_no3_wr$watershed_ratio) # [0.2428571 38.6794872]
 
@@ -1440,6 +1446,7 @@ sort(unique(doc_es_tsf$Study_ID)) # 10
 sort(unique(tsf_doc_wr$Study_ID)) # 9 - no Abbott
 
 median(tsf_doc_wr$watershed_ratio) # 1.787272
+mean(tsf_doc_wr$watershed_ratio) # 4.300585
 sd(tsf_doc_wr$watershed_ratio) #  9.007161
 range(tsf_doc_wr$watershed_ratio) # [0.4616477 38.6794872]
 
@@ -1484,6 +1491,7 @@ sort(unique(no3_es_tsf$Study_ID)) # 15
 sort(unique(tsf_no3_wr$Study_ID)) # 14 - no Abbott
 
 median(tsf_no3_wr$watershed_ratio) # 1.298625
+mean(tsf_no3_wr$watershed_ratio) #  3.310277
 sd(tsf_no3_wr$watershed_ratio) #  7.235802
 range(tsf_no3_wr$watershed_ratio) # [0.3024718 38.6794872]
 
