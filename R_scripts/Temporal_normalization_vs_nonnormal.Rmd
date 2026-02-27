@@ -122,7 +122,8 @@ no3_es_climate <- ES_nn_normal %>%
 ```
 
 # TSF NON-NORMAL vs. NORMAL EFFECT SIZE 
-```{r}
+```{r TSF - nn vs. normal anova}
+### DOC ####
 # Pivot into long format
 long_doc_nn_normal <- doc_es_tsf %>%
   pivot_longer(
@@ -158,7 +159,43 @@ for (response in names(anova_results)) {
 
 # The effect type (with vs. without watershed controls) explained a substantial portion of the variance in effect sizes, with an effect size sum of squares of 11.15 compared to residual sum of squares of 45.17. This significant difference indicates that the inclusion or exclusion of watershed-level controls meaningfully impacts the calculated effect sizes for fire impacts on DOC concentrations.
 
-# The significant difference between effect size calculations suggests that watershed-level factors play an important role in determining the magnitude of fire effects on dissolved organic carbon. This highlights the importance of controlling for watershed characteristics when assessing fire impacts, as failure to account for these factors may lead to biased effect size estimates.
+### Nitrate ####
+# Pivot into long format
+long_no3_nn_normal <- no3_es_tsf %>%
+  pivot_longer(
+    cols = c(Effect_size, Effect_size_no_watershed), # Columns to pivot
+    names_to = "Effect_type",                      # New column to identify which column the value comes from
+    values_to = "Effect_value"                     # New column to store the values
+  )
+
+# Create a list to store ANOVA results for each response_var group
+anova_results <- list()
+
+# Perform ANOVA for each unique response_var
+unique_response_vars <- unique(long_no3_nn_normal$response_var)
+
+for (response in unique_response_vars) {
+  # Filter data for the current response_var group
+  group_data <- long_no3_nn_normal %>% filter(response_var == response)
+  
+  # Perform ANOVA
+  anova_result <- aov(Effect_value ~ Effect_type, data = group_data)
+  
+  # Store the result in the list
+  anova_results[[response]] <- summary(anova_result)
+}
+
+# Print each ANOVA result by response_var group
+for (response in names(anova_results)) {
+  cat("\nANOVA Results for Response Variable:", response, "\n")
+  print(anova_results[[response]])
+}
+
+# We examined whether the inclusion of watershed-level covariates significantly altered nitrate (NO3_Interp) effect size estimates using a one-way ANOVA comparing effect sizes calculated with and without watershed variables. The analysis included 170 observations (df = 168 for residuals, plus 1 df for the effect type factor).
+
+# The ANOVA revealed no statistically significant difference between effect sizes calculated with watershed covariates versus those calculated without watershed covariates (F₁,₁₆₈ = 2.053, p = 0.154). This suggests that the inclusion of watershed-level variables does not substantially alter the magnitude of nitrate effect size estimates in our models.
+
+# The residual mean square error was 1.701, indicating the typical within-group variability in effect sizes after accounting for the effect type classification.
 
 ```
 
@@ -353,6 +390,82 @@ tsf_plot
 
 
 # CLIMATE MODEL 
+```{r Climate - nn vs. normal anova}
+### DOC ####
+# Pivot into long format
+long_doc_nn_normal <- doc_es_climate %>%
+  pivot_longer(
+    cols = c(Effect_size, Effect_size_no_watershed), # Columns to pivot
+    names_to = "Effect_type",                      # New column to identify which column the value comes from
+    values_to = "Effect_value"                     # New column to store the values
+  )
+
+# Create a list to store ANOVA results for each response_var group
+anova_results <- list()
+
+# Perform ANOVA for each unique response_var
+unique_response_vars <- unique(long_doc_nn_normal$response_var)
+
+for (response in unique_response_vars) {
+  # Filter data for the current response_var group
+  group_data <- long_doc_nn_normal %>% filter(response_var == response)
+  
+  # Perform ANOVA
+  anova_result <- aov(Effect_value ~ Effect_type, data = group_data)
+  
+  # Store the result in the list
+  anova_results[[response]] <- summary(anova_result)
+}
+
+# Print each ANOVA result by response_var group
+for (response in names(anova_results)) {
+  cat("\nANOVA Results for Response Variable:", response, "\n")
+  print(anova_results[[response]])
+}
+
+# We conducted a one-way ANOVA to compare dissolved organic carbon (DOC) effect sizes calculated with and without watershed-level controls. The analysis included 76 observations and revealed a statistically significant difference between the two effect size calculations (F₁,74 = 26.5, p < 0.001).
+
+# The residual mean square error was 0.531, indicating relatively low within-group variability compared to the between-group differences in effect sizes.
+
+### Nitrate ####
+# Pivot into long format
+long_no3_nn_normal <- no3_es_climate %>%
+  pivot_longer(
+    cols = c(Effect_size, Effect_size_no_watershed), # Columns to pivot
+    names_to = "Effect_type",                      # New column to identify which column the value comes from
+    values_to = "Effect_value"                     # New column to store the values
+  )
+
+# Create a list to store ANOVA results for each response_var group
+anova_results <- list()
+
+# Perform ANOVA for each unique response_var
+unique_response_vars <- unique(long_no3_nn_normal$response_var)
+
+for (response in unique_response_vars) {
+  # Filter data for the current response_var group
+  group_data <- long_no3_nn_normal %>% filter(response_var == response)
+  
+  # Perform ANOVA
+  anova_result <- aov(Effect_value ~ Effect_type, data = group_data)
+  
+  # Store the result in the list
+  anova_results[[response]] <- summary(anova_result)
+}
+
+# Print each ANOVA result by response_var group
+for (response in names(anova_results)) {
+  cat("\nANOVA Results for Response Variable:", response, "\n")
+  print(anova_results[[response]])
+}
+
+# We examined whether the inclusion of watershed-level covariates significantly altered nitrate (NO3_Interp) effect size estimates using a one-way ANOVA comparing effect sizes calculated with and without watershed variables. The analysis included 158 observations (df = 156 for residuals, plus 1 df for the effect type factor).
+
+# The ANOVA revealed no statistically significant difference between effect sizes calculated with watershed covariates versus those calculated without watershed covariates (F₁,₁₅₆ = 2.561, p = 0.112). This suggests that the inclusion of watershed-level variables does not substantially alter the magnitude of nitrate effect size estimates in our models.
+
+# The residual mean square error was 1.640, indicating the typical within-group variability in effect sizes after accounting for the effect type classification.
+```
+
 ```{r CLIMATE - Normalized & non-normal models}
 ### CLIMATE DOC normalized  ####
 # Original workflow 
@@ -599,6 +712,86 @@ ggsave("ES_CLIMATE_nonnormal_vs_normal.pdf",
 
 
 # BP MODEL 
+```{r BP - nn vs. normal anova}
+### DOC ####
+# Pivot into long format
+long_doc_nn_normal <- doc_es_bp %>%
+  pivot_longer(
+    cols = c(Effect_size, Effect_size_no_watershed), # Columns to pivot
+    names_to = "Effect_type",                      # New column to identify which column the value comes from
+    values_to = "Effect_value"                     # New column to store the values
+  )
+
+# Create a list to store ANOVA results for each response_var group
+anova_results <- list()
+
+# Perform ANOVA for each unique response_var
+unique_response_vars <- unique(long_doc_nn_normal$response_var)
+
+for (response in unique_response_vars) {
+  # Filter data for the current response_var group
+  group_data <- long_doc_nn_normal %>% filter(response_var == response)
+  
+  # Perform ANOVA
+  anova_result <- aov(Effect_value ~ Effect_type, data = group_data)
+  
+  # Store the result in the list
+  anova_results[[response]] <- summary(anova_result)
+}
+
+# Print each ANOVA result by response_var group
+for (response in names(anova_results)) {
+  cat("\nANOVA Results for Response Variable:", response, "\n")
+  print(anova_results[[response]])
+}
+
+# We examined whether the inclusion of watershed-level covariates significantly altered dissolved organic carbon (DOC_Interp) effect size estimates using a one-way ANOVA comparing effect sizes calculated with and without watershed variables. The analysis included 100 observations (df = 98 for residuals, plus 1 df for the effect type factor).
+
+# The ANOVA revealed a highly significant difference between effect sizes calculated with watershed covariates versus those calculated without watershed covariates (F₁,₉₈ = 41.71, p < 0.001). This indicates that the inclusion of watershed-level variables substantially alters the magnitude of DOC effect size estimates in our models.
+
+# The residual mean square error was 0.415, indicating relatively low within-group variability compared to the between-group differences in effect sizes.
+
+### Nitrate ####
+# Pivot into long format
+long_no3_nn_normal <- no3_es_bp %>%
+  pivot_longer(
+    cols = c(Effect_size, Effect_size_no_watershed), # Columns to pivot
+    names_to = "Effect_type",                      # New column to identify which column the value comes from
+    values_to = "Effect_value"                     # New column to store the values
+  )
+
+# Create a list to store ANOVA results for each response_var group
+anova_results <- list()
+
+# Perform ANOVA for each unique response_var
+unique_response_vars <- unique(long_no3_nn_normal$response_var)
+
+for (response in unique_response_vars) {
+  # Filter data for the current response_var group
+  group_data <- long_no3_nn_normal %>% filter(response_var == response)
+  
+  # Perform ANOVA
+  anova_result <- aov(Effect_value ~ Effect_type, data = group_data)
+  
+  # Store the result in the list
+  anova_results[[response]] <- summary(anova_result)
+}
+
+# Print each ANOVA result by response_var group
+for (response in names(anova_results)) {
+  cat("\nANOVA Results for Response Variable:", response, "\n")
+  print(anova_results[[response]])
+}
+
+# We examined whether the inclusion of watershed-level covariates significantly altered nitrate (NO3_Interp) effect size estimates using a one-way ANOVA comparing effect sizes calculated with and without watershed variables. The analysis included 170 observations (df = 168 for residuals, plus 1 df for the effect type factor).
+
+# The ANOVA revealed a statistically significant difference between effect sizes calculated with watershed covariates versus those calculated without watershed covariates (F₁,₁₆₈ = 5.508, p = 0.020). This indicates that the inclusion of watershed-level variables significantly alters the magnitude of nitrate effect size estimates in our models.
+
+# The residual mean square error was 1.442, indicating the typical within-group variability in effect sizes after accounting for the effect type classification.
+
+
+```
+
 ```{r BP - Normalized & non-normal models}
 ### BP DOC normalized  ####
 # Original workflow 
@@ -858,6 +1051,85 @@ ggsave("ES_BP_nonnormal_vs_normal.pdf",
 
 
 # BS MODEL 
+```{r BP - nn vs. normal anova}
+### DOC ####
+# Pivot into long format
+long_doc_nn_normal <- doc_es_dnbr %>%
+  pivot_longer(
+    cols = c(Effect_size, Effect_size_no_watershed), # Columns to pivot
+    names_to = "Effect_type",                      # New column to identify which column the value comes from
+    values_to = "Effect_value"                     # New column to store the values
+  )
+
+# Create a list to store ANOVA results for each response_var group
+anova_results <- list()
+
+# Perform ANOVA for each unique response_var
+unique_response_vars <- unique(long_doc_nn_normal$response_var)
+
+for (response in unique_response_vars) {
+  # Filter data for the current response_var group
+  group_data <- long_doc_nn_normal %>% filter(response_var == response)
+  
+  # Perform ANOVA
+  anova_result <- aov(Effect_value ~ Effect_type, data = group_data)
+  
+  # Store the result in the list
+  anova_results[[response]] <- summary(anova_result)
+}
+
+# Print each ANOVA result by response_var group
+for (response in names(anova_results)) {
+  cat("\nANOVA Results for Response Variable:", response, "\n")
+  print(anova_results[[response]])
+}
+
+# We examined whether the inclusion of watershed-level covariates significantly altered dissolved organic carbon (DOC_Interp) effect size estimates using a one-way ANOVA comparing effect sizes calculated with and without watershed variables. The analysis included 54 observations (df = 52 for residuals, plus 1 df for the effect type factor).
+
+# The ANOVA revealed a highly significant difference between effect sizes calculated with watershed covariates versus those calculated without watershed covariates (F₁,₅₂ = 19.73, p < 0.001). This indicates that the inclusion of watershed-level variables substantially alters the magnitude of DOC effect size estimates in our models.
+
+# The residual mean square error was 0.345, indicating relatively low within-group variability compared to the between-group differences in effect sizes.
+
+### Nitrate ####
+# Pivot into long format
+long_no3_nn_normal <- no3_es_dnbr %>%
+  pivot_longer(
+    cols = c(Effect_size, Effect_size_no_watershed), # Columns to pivot
+    names_to = "Effect_type",                      # New column to identify which column the value comes from
+    values_to = "Effect_value"                     # New column to store the values
+  )
+
+# Create a list to store ANOVA results for each response_var group
+anova_results <- list()
+
+# Perform ANOVA for each unique response_var
+unique_response_vars <- unique(long_no3_nn_normal$response_var)
+
+for (response in unique_response_vars) {
+  # Filter data for the current response_var group
+  group_data <- long_no3_nn_normal %>% filter(response_var == response)
+  
+  # Perform ANOVA
+  anova_result <- aov(Effect_value ~ Effect_type, data = group_data)
+  
+  # Store the result in the list
+  anova_results[[response]] <- summary(anova_result)
+}
+
+# Print each ANOVA result by response_var group
+for (response in names(anova_results)) {
+  cat("\nANOVA Results for Response Variable:", response, "\n")
+  print(anova_results[[response]])
+}
+
+# We examined whether the inclusion of watershed-level covariates significantly altered nitrate (NO3_Interp) effect size estimates using a one-way ANOVA comparing effect sizes calculated with and without watershed variables. The analysis included 110 observations (df = 108 for residuals, plus 1 df for the effect type factor).
+
+# The ANOVA revealed no statistically significant difference between effect sizes calculated with watershed covariates versus those calculated without watershed covariates (F₁,₁₀₈ = 1.799, p = 0.183). This suggests that the inclusion of watershed-level variables does not substantially alter the magnitude of nitrate effect size estimates in our models.
+
+# The residual mean square error was 1.709, indicating the typical within-group variability in effect sizes after accounting for the effect type classification.
+
+```
+
 ```{r BS - Normalized & non-normal models}
 ### BS DOC normalized  ####
 # Original workflow 
@@ -1495,38 +1767,110 @@ mean(tsf_no3_wr$watershed_ratio) #  3.310277
 sd(tsf_no3_wr$watershed_ratio) #  7.235802
 range(tsf_no3_wr$watershed_ratio) # [0.3024718 38.6794872]
 
-### WHY DOES CLIMATE N03 HAVE MORE WATERSHEDS THAN TSF NO3 ####
-print(max(no3_es_climate$Site)) # 30 burned watershed pairs 
-print(max(no3_es_tsf$Site)) # 21 burned watershed pairs 
+```
 
-sort(unique(no3_es_climate$Study_ID)) # 13 studies
-# Coombs, Crandall, Gerla, Gluns, Hauer, Hickenbottom, Mast, Murphy, Neary, Oliver, Tiedemann, Uzun, Writer
+# Manuscript density figure
+```{r density plot}
+# Run all chunks before this chunk to get the following data frames:
+# bp_doc_wr
+# bp_no3_wr
 
-sort(unique(no3_es_tsf$Study_ID)) # 8 studies
-# Coombs, Crandall, Gerla, Hauer, Murphy, Oliver, Uzun, Writer
-# Why no Gluns, Hickenbottom, Mast, Neary, Tiedemann?
+# bs_doc_wr
+# bs_no3_wr
 
-# This is how the data frames are being filtered out. 
-# They are both from the 
-no3_es_tsf <- DNBR_model %>% 
-  filter(response_var == "NO3_Interp") %>% 
-  dplyr::select(Study_ID, response_var, Effect_size_pair, Effect_size, Effect_size_no_watershed, 
-                Time_Since_Fire)
+# climate_doc_wr
+# climate_no3_wr
 
-#### CLIMATE MODEL DATAFRAME ##### 
-# Filter out studies that are greater than 10 years 
-no3_es_climate <- ES_nn_normal %>% 
-  filter(response_var == "NO3_Interp") %>% 
-  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size_pair, Effect_size, Effect_size_no_watershed) %>% 
-  filter(Study_ID != "Abbott et al. 2021") %>% 
-  filter(Study_ID != "Rhea et al. 2021")
+# tsf_doc_wr
+# tsf_no3_wr
 
+# Merge for DOC ####
+merged_doc <- bind_rows(
+  bp_doc_wr %>% mutate(response_var = "DOC", source = "Burn percent"),
+  bs_doc_wr %>% mutate(response_var = "DOC", source = "Burn severity"),
+  climate_doc_wr %>% mutate(response_var = "DOC", source = "Climate"),
+  tsf_doc_wr %>% mutate(response_var = "DOC", source = "Time-since-fire")
+)
+
+# Create the density plot
+ggplot(merged_doc, aes(x = watershed_ratio, fill = source)) +
+  geom_density(alpha = 0.7) +
+  labs(
+    x = "Watershed Ratio",
+    y = "Density",
+    title = "Distribution of Watershed Ratio by Source",
+    fill = "Source"
+  ) +
+  theme_minimal()
+
+
+# Merge for nitrate ####
+merged_no3 <- bind_rows(
+  bp_no3_wr %>% mutate(response_var = "Nitrate", source = "Burn percent"),
+  bs_no3_wr %>% mutate(response_var = "Nitrate", source = "Burn severity"),
+  climate_no3_wr %>% mutate(response_var = "Nitrate", source = "Climate"),
+  tsf_no3_wr %>% mutate(response_var = "Nitrate", source = "Time-since-fire")
+)
+
+# Combine both datasets
+combined_data <- bind_rows(merged_doc, merged_no3)
+
+
+# 2 panel plot ####
+ggplot(combined_data, aes(x = watershed_ratio, color = source)) +
+  geom_density(alpha = 0.6) +
+  facet_wrap(~ response_var, ncol = 2) +
+  labs(
+    x = "Watershed Ratio",
+    y = "Density",
+    fill = "Source"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 12, face = "bold"),
+    panel.spacing = unit(1, "lines"),
+    legend.position = c(0.825, 0.85),  
+    legend.text = element_text(size = 18),
+    legend.title = element_blank(),
+    legend.margin = margin(5, 5, 5, 5)
+  )
+
+ggsave("watershed_ratio_DOC_nitrate.png",
+       path = here("initial_plots", "Temporal_normalization_vs_nonnormal"),
+       width = 7, height = 7,  units = "in")
+
+# Filter out big ones
+small_data <- combined_data %>% 
+  filter(watershed_ratio < 10)
+
+
+# 2 panel plot ####
+ggplot(small_data, aes(x = watershed_ratio, color = source)) +
+  geom_density(alpha = 0.6) +
+  facet_wrap(~ response_var, ncol = 2) +
+  labs(
+    x = "Watershed Ratio",
+    y = "Density",
+    fill = "Source"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 12, face = "bold"),
+    panel.spacing = unit(1, "lines"),
+    legend.position = c(0.825, 0.85),  
+    legend.text = element_text(size = 18),
+    legend.title = element_blank(),
+    legend.margin = margin(5, 5, 5, 5)
+  )
+
+ggsave("watershed_ratio_DOC_nitrate.png",
+       path = here("initial_plots", "Temporal_normalization_vs_nonnormal"),
+       width = 7, height = 7,  units = "in")
 
 
 
 
 ```
-
 
 
 
@@ -1768,14 +2112,6 @@ comp_summary_3 <- left_join(comp_summary_2, nn_summary, by = c("Study_ID", "resp
 
 ```
 
-
-
-
-
-
-
-
-
 # TSF LMER - Normalized (original)
 ```{r DOC}
 ### DOC ####
@@ -1804,6 +2140,37 @@ DOC_model <- DOC_data %>%
   mutate(Time_Since_Fire = as.numeric(Time_Since_Fire))
 
 unique(DOC_model$Study_ID)
+
+```
+
+# TSF vs climate site number 
+```{r}
+### WHY DOES CLIMATE N03 HAVE MORE WATERSHEDS THAN TSF NO3 ###
+# print(max(no3_es_climate$Site)) # 30 burned watershed pairs 
+# print(max(no3_es_tsf$Site)) # 34 burned watershed pairs 
+# 
+# sort(unique(no3_es_climate$Study_ID)) # 13 studies
+# # Coombs, Crandall, Gerla, Gluns, Hauer, Hickenbottom, Mast, Murphy, Neary, Oliver, Tiedemann, Uzun, Writer
+# 
+# sort(unique(no3_es_tsf$Study_ID)) # 8 studies
+# # Coombs, Crandall, Gerla, Hauer, Murphy, Oliver, Uzun, Writer
+# # Why no Gluns, Hickenbottom, Mast, Neary, Tiedemann?
+# 
+# # This is how the data frames are being filtered out. 
+# # They are both from the 
+# no3_es_tsf <- DNBR_model %>% 
+#   filter(response_var == "NO3_Interp") %>% 
+#   dplyr::select(Study_ID, response_var, Effect_size_pair, Effect_size, Effect_size_no_watershed, 
+#                 Time_Since_Fire)
+# 
+# #### CLIMATE MODEL DATAFRAME ###
+# # Filter out studies that are greater than 10 years 
+# no3_es_climate <- ES_nn_normal %>% 
+#   filter(response_var == "NO3_Interp") %>% 
+#   dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size_pair, Effect_size, Effect_size_no_watershed) %>% 
+#   filter(Study_ID != "Abbott et al. 2021") %>% 
+#   filter(Study_ID != "Rhea et al. 2021")
+
 
 ```
 
