@@ -2174,5 +2174,526 @@ unique(DOC_model$Study_ID)
 
 ```
 
+# AMP START HERE FOR BOOTSTRAPPING VARIANCE ANALYSIS 
+Compare effect size variances across all watersheds between normalized/non-normalized data
+
+Chunk 2180 - 2439 is an attempt to do it myself. It looks like # HYPOTHESIS i SUPPORTED (overall): Area normalization significantly reduces effect-size variance. Watershed area explains a meaningful share of cross-watershed variability. Area normalization explains 62% [49%, 72%] of the raw effect-size variance. Anything over 50% tells us that area is the dominant source of cross-watershed variability. When I break it up by nitrate and DOC for looking at variance difference by response variable: both Variables are positive = area normalization captures watershed variance. When looking at variance RATIO by response variable (log scale: both variables >1 = normalization shrinks variance.
+
+```{r Read in final data frame with non-normal and normalized}
+rm(list=ls(all=T)) #this clears your Environment
+
+library(pacman)
+p_load(tidyverse,
+       here,
+       forecastML, 
+       zoo,
+       # hrbrthemes,
+       viridis, 
+       ggpmisc,
+       RobustLinearReg,
+       lme4,
+       car)
+
+# Read in effect size data frame for normalized and non-normalized data
+ES_nn_normal <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "archive", "Effect_size_orig_nonnormal.csv"))
+
+ES_nn_normal <- ES_nn_normal %>% 
+  group_by(Study_ID) %>% # Group by Study_ID to handle occurrences within the group
+  mutate(
+    occurrence = row_number(), # Create an occurrence tracker within Study_ID
+    Time_Since_Fire = case_when(
+      Study_ID == "Abbott et al. 2021" & occurrence == 1 ~ "10", # First value
+      Study_ID == "Abbott et al. 2021" & occurrence == 2 ~ "11", # Second value
+      Study_ID == "Abbott et al. 2021" & occurrence == 3 ~ "10", # Third value
+      Study_ID == "Abbott et al. 2021" & occurrence == 4 ~ "11", # Fourth value
+      TRUE ~ Time_Since_Fire),
+    Time_Since_Fire = case_when(Study_ID == 'Rhea et al. 2021' ~ '15',
+                                     TRUE ~ Time_Since_Fire)) %>%
+  ungroup() %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire)) %>% 
+  dplyr::select(Study_ID:Effect_size_no_watershed)
+
+# Make dataframe long format
+ES_long <- ES_nn_normal %>%
+  mutate(row_id = row_number()) %>%
+  pivot_longer(
+    cols = c(Effect_size, Effect_size_no_watershed),
+    names_to  = "type",
+    values_to = "value"
+  ) %>%
+  mutate(type = factor(type))
+
+
+# Levene's Test of all data ####
+cat("=== Standard Levene's Test ===\n")
+levene_obs <- leveneTest(value ~ type, data = ES_long, center = median)
+print(levene_obs)
+obs_F <- levene_obs$`F value`[1]
+
+# Quick look at the observed variances
+cat("\nVar(Effect_size):", var(ES_nn_normal$Effect_size), "\n")
+cat("Var(Effect_size_no_watershed):", var(ES_nn_normal$Effect_size_no_watershed), "\n")
+cat("Variance ratio:", 
+    var(ES_nn_normal$Effect_size) / var(ES_nn_normal$Effect_size_no_watershed), "\n\n")
+
+
+# BOOTSTRAPPING ####
+set.seed(2024)
+n_boot <- 10000
+
+# Pivot to wide so each row_id is one observation with both the raw and area-normalized effect size
+ES_wide <- ES_long %>%
+  pivot_wider(
+    id_cols  = c(Study_ID, response_var, Climate, Biome,
+                 Effect_size_pair, Time_Since_Fire, row_id),
+    names_from  = type,
+    values_from = value
+  ) %>%
+  drop_na(Effect_size, Effect_size_no_watershed)
+
+# paired bootstrap of variance difference & ratio Resamples row_ids (whole pairs) to keep the pairing intact
+boot_var_compare <- function(df, n_boot = 10000) {
+  n <- nrow(df)
+  replicate(n_boot, {
+    bs  <- slice_sample(df, n = n, replace = TRUE)
+    v_r <- var(bs$Effect_size,              na.rm = TRUE)
+    v_n <- var(bs$Effect_size_no_watershed, na.rm = TRUE)
+    c(var_raw = v_r, var_norm = v_n,
+      diff = v_r - v_n,              # + → normalization shrinks variance
+      ratio = v_r / v_n)            # >1 → normalization shrinks variance
+  }) %>% t() %>% as_tibble()
+}
+
+# OVERALL comparison (all response variables pooled)
+boot_overall <- boot_var_compare(ES_wide, n_boot)
+
+overall_summary <- boot_overall %>%
+  pivot_longer(everything(), names_to = "metric") %>%
+  group_by(metric) %>%
+  summarise(
+    mean    = mean(value),
+    median  = median(value),
+    ci_lo   = quantile(value, 0.025),
+    ci_hi   = quantile(value, 0.975),
+    .groups = "drop"
+  )
+
+overall_summary %>% filter(metric %in% c("diff", "ratio"))
+
+# Quick programmatic check
+if (overall_summary %>%
+      filter(metric == "diff") %>%
+      pull(ci_lo) > 0) {
+  cat("✔ HYPOTHESIS i SUPPORTED (overall):
+      Area normalization significantly reduces effect-size variance.
+      Watershed area explains a meaningful share of cross-watershed variability.\n")
+} else if (overall_summary %>%
+             filter(metric == "diff") %>%
+             pull(ci_hi) < 0) {
+  cat("✔ HYPOTHESIS ii SUPPORTED (overall):
+      Area normalization increases effect-size variance.
+      Additional watershed characteristics likely modulate fire response.\n")
+} else {
+  cat("⚠ INCONCLUSIVE (overall):
+      95% CI of the variance difference spans zero.\n")
+}
+
+# HYPOTHESIS i SUPPORTED (overall): Area normalization significantly reduces effect-size variance. Watershed area explains a meaningful share of cross-watershed variability.
+
+# Proportion of raw variance "removed" by normalization
+boot_overall <- boot_overall %>%
+  mutate(prop_explained = (var_raw - var_norm) / var_raw)
+
+prop_summary <- boot_overall %>%
+  summarise(
+    mean_prop   = mean(prop_explained),
+    ci_lo       = quantile(prop_explained, 0.025),
+    ci_hi       = quantile(prop_explained, 0.975)
+  )
+
+cat(sprintf(
+  "\nArea normalization explains %.0f%% [%.0f%%, %.0f%%] of the raw effect-size variance.\n",
+  prop_summary$mean_prop * 100,
+  prop_summary$ci_lo     * 100,
+  prop_summary$ci_hi     * 100
+))
+
+# Area normalization explains 62% [49%, 72%] of the raw effect-size variance.
+
+# 0.50 -> Area is a dominant source of cross-watershed variability 
+# 0.20 –> 0.50 -> Area is meaningful but other factors matter too
+# 0.20 -> Area alone is a weak first-order correction 
+# 0 -> Normalization actually inflates variance → hypothesis ii 
+
+boot_by_response <- boot_by_response %>%
+  mutate(
+    direction = case_when(
+      boot_diff_ci_lo > 0  ~ "i  – norm reduces variance",
+      boot_diff_ci_hi < 0  ~ "ii – norm increases variance",
+      TRUE                 ~ "inconclusive"
+    ),
+    prop_explained = obs_diff / obs_var_raw
+  )
+
+boot_by_response %>%
+  select(response_var, n, obs_var_raw, obs_var_norm,
+         obs_diff, prop_explained,
+         boot_diff_ci_lo, boot_diff_ci_hi, direction) %>%
+  arrange(desc(prop_explained)) %>%
+  print(width = Inf)
+
+# One-sided "p-value": proportion of resamples where raw > normalised
+p_overall <- mean(boot_overall$diff > 0)
+
+cat("\n===== OVERALL VARIANCE COMPARISON =====\n")
+print(overall_summary)
+cat(sprintf("\nP(var_raw > var_norm) = %.3f\n", p_overall))
+
+# BY RESPONSE VARIABLE ####
+boot_by_response <- ES_wide %>%
+  group_by(response_var) %>%
+  group_split() %>%
+  map_dfr(function(df) {
+    rv    <- unique(df$response_var)
+    n_obs <- nrow(df)
+    b     <- boot_var_compare(df, n_boot)
+
+    tibble(
+      response_var       = rv,
+      n                  = n_obs,
+      obs_var_raw        = var(df$Effect_size,              na.rm = TRUE),
+      obs_var_norm       = var(df$Effect_size_no_watershed, na.rm = TRUE),
+      obs_diff           = obs_var_raw - obs_var_norm,
+      obs_ratio          = obs_var_raw / obs_var_norm,
+      boot_diff_mean     = mean(b$diff),
+      boot_diff_ci_lo    = quantile(b$diff, 0.025),
+      boot_diff_ci_hi    = quantile(b$diff, 0.975),
+      boot_ratio_mean    = mean(b$ratio),
+      boot_ratio_ci_lo   = quantile(b$ratio, 0.025),
+      boot_ratio_ci_hi   = quantile(b$ratio, 0.975),
+      p_raw_gt_norm      = mean(b$diff > 0)
+    )
+  })
+
+cat("\n===== BY RESPONSE VARIABLE =====\n")
+print(boot_by_response, width = Inf)
+
+# PLOTS
+# 5a – Overlapping densities of bootstrapped variances (overall)
+boot_overall %>%
+  select(var_raw, var_norm) %>%
+  pivot_longer(everything(),
+               names_to  = "type",
+               values_to = "variance") %>%
+  mutate(type = recode(type,
+    var_raw  = "Raw effect size",
+    var_norm = "Area-normalised effect size")) %>%
+  ggplot(aes(variance, fill = type)) +
+  geom_density(alpha = 0.45, colour = "grey30") +
+  labs(title = "Bootstrapped variance distributions (all responses pooled)",
+       x = "Variance of effect sizes", y = "Density", fill = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "top")
+
+# 5b – Density of variance DIFFERENCE with zero reference line
+boot_overall %>%
+  ggplot(aes(diff)) +
+  geom_density(fill = "steelblue", alpha = 0.6) +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "red", linewidth = 0.8) +
+  annotate("text", x = 0, y = Inf, vjust = 2, hjust = -0.1,
+           label = paste0("P(diff > 0) = ", round(p_overall, 3)),
+           colour = "red", size = 4.5) +
+  labs(title = "Bootstrapped variance difference (Raw − Normalised)",
+       subtitle = "Positive -> normalization reduces variability  |  Negative -> normalization increases variability",
+       x = "Var(raw) − Var(normalized)", y = "Density") +
+  theme_minimal(base_size = 13)
+
+# 5c – Forest-style plot: variance difference by response variable
+boot_by_response %>%
+  ggplot(aes(x = reorder(response_var, obs_diff), y = obs_diff)) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "red") +
+  geom_pointrange(aes(ymin = boot_diff_ci_lo, ymax = boot_diff_ci_hi),
+                  size = 0.6) +
+  coord_flip() +
+  labs(title = "Variance difference by response variable",
+       subtitle = "Positive = area normalization captures watershed variance\nNegative = additional modulators likely",
+       x = NULL,
+       y = "Var(raw) − Var(normalized)  [95 % bootstrap CI]") +
+  theme_minimal(base_size = 13)
+
+# Both Variables are Positive = area normalization captures watershed variance
+
+# 5d – Variance RATIO by response variable (log scale)
+boot_by_response %>%
+  ggplot(aes(x = reorder(response_var, obs_ratio), y = obs_ratio)) +
+  geom_hline(yintercept = 1, linetype = "dashed", colour = "red") +
+  geom_pointrange(aes(ymin = boot_ratio_ci_lo, ymax = boot_ratio_ci_hi),
+                  size = 0.6) +
+  scale_y_log10() +
+  coord_flip() +
+  labs(title = "Variance ratio by response variable",
+       subtitle = ">1 = normalisation shrinks variance  |  <1 = normalisation inflates variance",
+       x = NULL,
+       y = "Var(raw) / Var(normalised)  [95 % CI, log scale]") +
+  theme_minimal(base_size = 13)
+
+# Both variables >1 = normalization shrinks variance
+```
+
+# BY ANALYTE
+```{r}
+# library(tidyverse)
+# 
+# set.seed(2024)
+# n_boot <- 10000
+# 
+# # 1.  Separate DOC and NO3, pivot to wide (raw + normalised)
+# make_wide <- function(df, pattern) {
+#   df %>%
+#     filter(str_detect(response_var, pattern)) %>%
+#     pivot_wider(
+#       id_cols  = c(Study_ID, response_var, Climate, Biome,
+#                    Effect_size_pair, Time_Since_Fire, row_id),
+#       names_from  = type,
+#       values_from = value
+#     ) %>%
+#     drop_na(Effect_size, Effect_size_no_watershed)
+# }
+# 
+# doc_data <- make_wide(ES_long, "DOC")
+# no3_data <- make_wide(ES_long, "NO3")
+# 
+# cat(sprintf("DOC observations: %d\nNO3 observations: %d\n",
+#             nrow(doc_data), nrow(no3_data)))
+# 
+# # 2.  Bootstrap Var(DOC)/Var(NO3) for raw AND normalised
+# #     DOC and NO3 resampled independently (different studies)
+# boot_results <- replicate(n_boot, {
+# 
+#   doc_bs <- slice_sample(doc_data, n = nrow(doc_data), replace = TRUE)
+#   no3_bs <- slice_sample(no3_data, n = nrow(no3_data), replace = TRUE)
+# 
+#   # --- raw effect sizes ---
+#   v_doc_raw <- var(doc_bs$Effect_size, na.rm = TRUE)
+#   v_no3_raw <- var(no3_bs$Effect_size, na.rm = TRUE)
+# 
+# 
+#   # --- area-normalised effect sizes ---
+#   v_doc_norm <- var(doc_bs$Effect_size_no_watershed, na.rm = TRUE)
+#   v_no3_norm <- var(no3_bs$Effect_size_no_watershed, na.rm = TRUE)
+# 
+#   c(var_doc_raw  = v_doc_raw,
+#     var_no3_raw  = v_no3_raw,
+#     ratio_raw    = v_doc_raw / v_no3_raw,
+#     var_doc_norm = v_doc_norm,
+#     var_no3_norm = v_no3_norm,
+#     ratio_norm   = v_doc_norm / v_no3_norm)
+# 
+# }) %>% t() %>% as_tibble()
+# 
+# # 3.  Summarise the two variance ratios
+# summarise_ratio <- function(x, label) {
+#   tibble(
+#     data_type  = label,
+#     mean_ratio = mean(x),
+#     median_ratio = median(x),
+#     ci_lo      = quantile(x, 0.025),
+#     ci_hi      = quantile(x, 0.975),
+#     p_DOC_gt   = mean(x > 1)
+#   )
+# }
+# 
+# ratio_summary <- bind_rows(
+#   summarise_ratio(boot_results$ratio_raw,  "Raw effect sizes"),
+#   summarise_ratio(boot_results$ratio_norm, "Area-normalised effect sizes")
+# )
+# 
+# cat("\n===== Var(DOC) / Var(NO3) — Bootstrapped =====\n")
+# print(ratio_summary, width = Inf)
+# 
+# # 4.  Is the DOC-vs-NO3 variance gap ITSELF different between raw and normalized data?
+# boot_results <- boot_results %>%
+#   mutate(ratio_diff = ratio_raw - ratio_norm)
+# 
+# ratio_diff_summary <- boot_results %>%
+#   summarise(
+#     mean_diff = mean(ratio_diff),
+#     ci_lo     = quantile(ratio_diff, 0.025),
+#     ci_hi     = quantile(ratio_diff, 0.975),
+#     p_raw_gap_larger = mean(ratio_diff > 0)
+#   )
+# 
+# cat("\n===== Ratio_raw − Ratio_norm =====\n")
+# print(ratio_diff_summary, width = Inf)
+# 
+# # 5.  Plots
+# 
+# # 5a — Overlapping densities of the two variance ratios
+# boot_results %>%
+#   select(ratio_raw, ratio_norm) %>%
+#   pivot_longer(everything(),
+#                names_to = "type", values_to = "ratio") %>%
+#   mutate(type = recode(type,
+#     ratio_raw  = "Raw effect sizes",
+#     ratio_norm = "Area-normalised")) %>%
+#   ggplot(aes(ratio, fill = type)) +
+#   geom_density(alpha = 0.45, colour = "grey30") +
+#   geom_vline(xintercept = 1, linetype = "dashed", colour = "red",
+#              linewidth = 0.8) +
+#   labs(title    = "Bootstrapped Var(DOC) / Var(NO₃)",
+#        subtitle = "> 1 → DOC more variable than NO₃",
+#        x = "Variance ratio", y = "Density", fill = NULL) +
+#   theme_minimal(base_size = 13) +
+#   theme(legend.position = "top")
+# 
+# # 5b — Density of the DIFFERENCE between the two ratios
+# boot_results %>%
+#   ggplot(aes(ratio_diff)) +
+#   geom_density(fill = "darkorange", alpha = 0.55) +
+#   geom_vline(xintercept = 0, linetype = "dashed", colour = "red",
+#              linewidth = 0.8) +
+#   annotate("text", x = 0, y = Inf, vjust = 2, hjust = -0.1,
+#            label = sprintf("P(gap larger in raw) = %.3f",
+#                            ratio_diff_summary$p_raw_gap_larger),
+#            colour = "red", size = 4.5) +
+#   labs(title = "Does normalisation change the DOC-vs-NO₃ variance gap?",
+#        subtitle = "Positive → raw data exaggerates DOC's extra variability",
+#        x = "Ratio(raw) − Ratio(normalised)", y = "Density") +
+#   theme_minimal(base_size = 13)
+# 
+# # 5c — Paired dot plot of observed variances
+# tibble(
+#   solute = rep(c("DOC", "NO₃"), 2),
+#   type   = rep(c("Raw", "Area-normalised"), each = 2),
+#   variance = c(var(doc_data$Effect_size),
+#                var(no3_data$Effect_size),
+#                var(doc_data$Effect_size_no_watershed),
+#                var(no3_data$Effect_size_no_watershed))
+# ) %>%
+#   ggplot(aes(type, variance, colour = solute, group = solute)) +
+#   geom_point(size = 4) +
+#   geom_line(linewidth = 1) +
+#   labs(title = "Observed effect-size variance",
+#        x = NULL, y = "Variance", colour = NULL) +
+#   theme_minimal(base_size = 13) +
+#   theme(legend.position = "top")
+```
+
+### ATTEMPT 1
+```{r}
+# 
+# # 1. Reshape data to long format for Levene's test
+# df_long <- ES_nn_normal %>%
+#   mutate(row_id = row_number()) %>%
+#   pivot_longer(
+#     cols = c(Effect_size, Effect_size_no_watershed),
+#     names_to  = "type",
+#     values_to = "value"
+#   ) %>%
+#   mutate(type = factor(type))
+# 
+# # 2. Standard Levene's Test (for reference)
+# cat("=== Standard Levene's Test ===\n")
+# levene_obs <- leveneTest(value ~ type, data = df_long, center = median)
+# print(levene_obs)
+# obs_F <- levene_obs$`F value`[1]
+# 
+# # Quick look at the observed variances
+# cat("\nVar(Effect_size):             ", var(ES_nn_normal$Effect_size), "\n")
+# cat("Var(Effect_size_no_watershed):", var(ES_nn_normal$Effect_size_no_watershed), "\n")
+# cat("Variance ratio:               ", 
+#     var(ES_nn_normal$Effect_size) / var(ES_nn_normal$Effect_size_no_watershed), "\n\n")
+# 
+# # 3. Bootstrapped Variance Ratio & Difference (paired resampling)
+# #    - Resamples ROWS to preserve pairing
+# #    - Gives you a CI for how the variances compare
+# set.seed(42)
+# n_boot <- 10000
+# n      <- nrow(ES_nn_normal)
+# 
+# boot_var_norm    <- numeric(n_boot)
+# boot_var_nonorm  <- numeric(n_boot)
+# boot_ratio       <- numeric(n_boot)
+# boot_diff        <- numeric(n_boot)
+# 
+# for (i in seq_len(n_boot)) {
+#   idx <- sample(1:n, n, replace = TRUE)
+#   boot_var_norm[i]   <- var(ES_nn_normal$Effect_size[idx])
+#   boot_var_nonorm[i] <- var(ES_nn_normal$Effect_size_no_watershed[idx])
+#   boot_ratio[i]      <- boot_var_norm[i] / boot_var_nonorm[i]
+#   boot_diff[i]       <- boot_var_norm[i] - boot_var_nonorm[i]
+# }
+# 
+# cat("=== Bootstrapped Variance Ratio (Normalized / Non-normalized) ===\n")
+# cat("Mean ratio :", mean(boot_ratio), "\n")
+# cat("95% CI     :", quantile(boot_ratio, c(0.025, 0.975)), "\n\n")
+# 
+# cat("=== Bootstrapped Variance Difference (Normalized - Non-normalized) ===\n")
+# cat("Mean diff  :", mean(boot_diff), "\n")
+# cat("95% CI     :", quantile(boot_diff, c(0.025, 0.975)), "\n")
+# # If the CI for the ratio excludes 1 (or the diff CI excludes 0), variances differ
+# cat("CI excludes 1 (ratio)?:", 
+#     !(quantile(boot_ratio, 0.025) <= 1 & quantile(boot_ratio, 0.975) >= 1), "\n")
+# cat("CI excludes 0 (diff)? :", 
+#     !(quantile(boot_diff, 0.025) <= 0 & quantile(boot_diff, 0.975) >= 0), "\n\n")
+# 
+# # 4. Permutation-based Levene's Test (better p-value for small n)
+# #    - Under H0 the two columns are exchangeable within each row
+# #    - Randomly swap normalized <-> non-normalized within rows
+# set.seed(42)
+# n_perm  <- 10000
+# perm_F  <- numeric(n_perm)
+# 
+# for (i in seq_len(n_perm)) {
+#   # For each row, randomly decide whether to swap the two values
+#   swap <- rbinom(n, 1, 0.5) == 1
+#   
+#   perm_norm   <- ifelse(swap,
+#                         ES_nn_normal$Effect_size_no_watershed,
+#                         ES_nn_normal$Effect_size)
+#   perm_nonorm <- ifelse(swap,
+#                         ES_nn_normal$Effect_size,
+#                         ES_nn_normal$Effect_size_no_watershed)
+#   
+#   perm_long <- tibble(
+#     value = c(perm_norm, perm_nonorm),
+#     type  = factor(rep(c("norm", "nonorm"), each = n))
+#   )
+#   
+#   perm_F[i] <- leveneTest(value ~ type, data = perm_long, center = median)$`F value`[1]
+# }
+# 
+# perm_p <- mean(perm_F >= obs_F)
+# cat("=== Permutation Levene's Test ===\n")
+# cat("Observed F :", obs_F, "\n")
+# cat("Permutation p-value:", perm_p, "\n\n")
+# 
+# # 5. Plots
+# par(mfrow = c(1, 3))
+# 
+# # A) Bootstrap distribution of variance ratio
+# hist(boot_ratio, breaks = 50, col = "steelblue", border = "white",
+#      main = "Bootstrap: Variance Ratio",
+#      xlab = "Var(normalized) / Var(non-normalized)")
+# abline(v = 1, col = "red", lwd = 2, lty = 2)
+# abline(v = quantile(boot_ratio, c(0.025, 0.975)), col = "orange", lwd = 2, lty = 3)
+# 
+# # B) Bootstrap distribution of variance difference
+# hist(boot_diff, breaks = 50, col = "steelblue", border = "white",
+#      main = "Bootstrap: Variance Difference",
+#      xlab = "Var(normalized) - Var(non-normalized)")
+# abline(v = 0, col = "red", lwd = 2, lty = 2)
+# abline(v = quantile(boot_diff, c(0.025, 0.975)), col = "orange", lwd = 2, lty = 3)
+# 
+# # C) Permutation null distribution of Levene's F
+# hist(perm_F, breaks = 50, col = "grey70", border = "white",
+#      main = "Permutation Null: Levene's F",
+#      xlab = "F statistic")
+# abline(v = obs_F, col = "red", lwd = 2)
+# legend("topright", legend = paste("p =", round(perm_p, 4)), bty = "n", cex = 1.2)
+# 
+# par(mfrow = c(1, 1))
+
+```
 
 
