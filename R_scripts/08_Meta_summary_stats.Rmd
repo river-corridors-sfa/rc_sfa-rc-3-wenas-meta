@@ -300,87 +300,7 @@ write_csv(no3_RF, here("Output_for_analysis", "08_Meta_summary_stats", "no3_meta
 # ============================= Correlation Matrix filtered ===================
 I want to look at the variables that were in the previous RF and see how they are correlated with the additional lithology variables
 
-```{r}
-doc_correlation <- doc_RF %>% 
-  dplyr::select(Effect_size, totdasqkm, maxelevsmo, slope, Tmean9120Ws, OmWs,
-BFIWs, PermWs, burn_percentage, mean_dnbr, Time_Since_Fire, 
-RckDepWs, PctCarbResidWs, PctNonCarbResidWs, PctSilicicWs, PctGlacTilCrsWs, PctSalLakeWs)
-
-new_names <- c("Effect Size", "Watershed area", "Maximum Watershed Elevation smooth", "Watershed Slope", "30-year Mean Air Temp", "Organic Matter Mean", "Baseflow Index", "Soil Permeability", "Watershed Burn Percentage", "Burn Severity", "Time Since Fire", "Mean Bedrock Depth", "Carbonate Residual Material", "Non-Carbonate Residual Material", "Silicic Residual Material", "Glacial Till, Coarse-Textured", "Saline Lake Sediment")
-
-colnames(doc_correlation) <- new_names
-
-# If mean DNBR values are calculated then our measurement is no bueno. Remove. 
-doc_correlation <- doc_correlation %>% 
-  mutate(`Burn Severity` = case_when(`Burn Severity` < 0 ~ NA,
-                               TRUE ~ `Burn Severity`))
-
-# Make all columns numeric
-doc_correlation <- doc_correlation %>% 
-  mutate_all(as.numeric)
-
-# Calculate the correlation matrix
-cor_matrix_doc <- cor(doc_correlation, use = "complete.obs")
-
-# Assuming cor_matrix_doc is your correlation matrix
-cor_matrix_doc <- as.data.frame(cor_matrix_doc)
-
-# Get the order of columns with 'Effect_size' first
-column_order <- c("Effect Size", setdiff(names(cor_matrix_doc), "Effect Size"))
-
-# Reorder columns using select
-cor_matrix_doc <- cor_matrix_doc %>%
-  dplyr::select(all_of(column_order))
-
-# Reorder rows by converting row names to a column, ordering, then converting back
-cor_matrix_doc <- cor_matrix_doc %>%
-  rownames_to_column(var = "rowname") %>%
-  arrange(factor(rowname, levels = column_order)) %>%
-  column_to_rownames(var = "rowname")
-
-# Convert back to matrix if needed
-cor_matrix_doc <- as.matrix(cor_matrix_doc)
-
-# Assign new names to both row and column names
-rownames(cor_matrix_doc) <- new_names
-colnames(cor_matrix_doc) <- new_names
-
-# Print the reordered correlation matrix
-print(cor_matrix_doc)
-
-### PLOT ####
-          
-# Specify the file path and format for the output PDF file
-output_file <- here("initial_plots", "08_Meta_summary_stats", "DOC_geospatial_correlation_test_2.0.pdf")
-
-# Open a PDF device
-pdf(file = output_file, width = 12, height = 12)
-
-# Plot the reordered correlation matrix using corrplot
-corrplot(cor_matrix_doc, method = "circle", type = "upper", order = "original", 
-         tl.cex = 0.8, tl.col = "black", addgrid.col = "grey")
-
-# Add a title to the bottom left corner
-mtext("DOC Correlation Matrix", side = 3, line = 1, adj = 0, cex = 1.2)
-
-
-# Close the device to save the file
-dev.off()
-
-# DOC 
-# # Filter the correlation matrix to include only values greater than 0.3
-cor_matrix_filtered_doc <- ifelse(abs(cor_matrix_doc) > 0.3, cor_matrix_doc, NA)
-
-# Export the filtered correlation matrix to a CSV file
-# write.csv(cor_matrix_filtered_doc, here("Output_for_analysis", "08_Meta_summary_stats", "doc_RF_lith.csv"), row.names = TRUE)
-
-```
-
-
-
-# ============================= Correlation Matrix ===================
-# DOC
-```{r correlation plot}
+```{r Filter variables}
 # Simple correlation matrix between effect size and all the other catchment characteristics
 # totdasqkm -  Watershed area
 # maxelevsmo - Max elevation
@@ -420,46 +340,32 @@ cor_matrix_filtered_doc <- ifelse(abs(cor_matrix_doc) > 0.3, cor_matrix_doc, NA)
 # RunoffWs - Runoff  
 # burn_percentage - Burn percentage  
 # mean_dnbr - Burn severity  
-# Time_Since_Fire - Time since fire  
+# Time_Since_Fire - Time since fire 
 
+# DOC NORMALIZED ####
 doc_correlation <- doc_RF %>% 
-  dplyr::select(Effect_size, totdasqkm, maxelevsmo, slope, Tmax9120Ws,Tmean9120Ws, Tmin9120Ws, Forest, Urban, Grassland, Wetland, AG, OmWs,
-                
-RckDepWs, PctCarbResidWs, PctNonCarbResidWs, PctAlkIntruVolWs, PctSilicicWs, PctExtruVolWs, PctColluvSedWs, PctGlacTilClayWs, PctGlacTilLoamWs, PctGlacTilCrsWs, PctGlacLakeCrsWs, PctGlacLakeFineWs, PctHydricWs,  PctEolCrsWs, PctEolFineWs, PctSalLakeWs, PctAlluvCoastWs, PctCoastCrsWs, PctWaterWs,
+  dplyr::select(Effect_size, totdasqkm, maxelevsmo, slope, Tmean9120Ws, OmWs,
+BFIWs, PermWs, burn_percentage, mean_dnbr, Time_Since_Fire, 
+RckDepWs, PctCarbResidWs, PctNonCarbResidWs, PctSilicicWs, PctGlacTilCrsWs, PctSalLakeWs)
 
-BFIWs, PermWs, RunoffWs, burn_percentage, mean_dnbr, Time_Since_Fire) %>% 
-  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire)) 
-
-# Change the news of the variables
-new_names <- c("Effect Size", "Watershed area", "Maximum Watershed Elevation smooth", "Watershed Slope", "30-year Max Air Temp" , "30-year Mean Air Temp", "30-year Min Air Temp", "Forest cover", "Urban cover", "Grassland cover", "Wetland cover", "Agriculture cover", "Organic Matter Mean",
-
-"Mean bedrock depth", "Carbonate Residual Material", "Non-Carbonate Residual Material", "Alkaline Intrusive Volcanic Rock", "Silicic Residual Material", "Extrusive Volcanic Rock", "Colluvial Sediment", "Glacial Till, Clayey", "Glacial Till, Loamy", "Glacial Till, Coarse-Textured", "Glacial Outwash and Glacial Lake Sediment", "Glacial Outwash and Glacial Lake", "Peat & Muck -%", "Eolian Sediment, Coarse-Textured", "Eolian Sediment, Fine-Textured", "Saline Lake Sediment", "Alluvium & Fine-Textured Coastal Zone Sediment", "Coastal Zone Sediment, Coarse-Textured", "Water",
-
-"Baseflow Index", "Soil Permeability", "Mean Runoff", "Watershed Burn Percentage", "Burn Severity", "Time-Since-Fire")  
+new_names <- c("Effect Size", "Watershed area", "Maximum Watershed Elevation smooth", "Watershed Slope", "30-year Mean Air Temp", "Organic Matter Mean", "Baseflow Index", "Soil Permeability", "Watershed Burn Percentage", "Burn Severity", "Time Since Fire", "Mean Bedrock Depth", "Carbonate Residual Material", "Non-Carbonate Residual Material", "Silicic Residual Material", "Glacial Till, Coarse-Textured", "Saline Lake Sediment")
 
 colnames(doc_correlation) <- new_names
-
-# Check to see which variables have data vs. not. Remove the ones that don't have complete datasets
-doc_correlation <- doc_correlation %>%
-  select_if(~ !all(. == 0))
-
-doc_correlation <- doc_correlation %>% 
-  select(!`Alluvium & Fine-Textured Coastal Zone Sediment`)
 
 # If mean DNBR values are calculated then our measurement is no bueno. Remove. 
 doc_correlation <- doc_correlation %>% 
   mutate(`Burn Severity` = case_when(`Burn Severity` < 0 ~ NA,
                                TRUE ~ `Burn Severity`))
 
+# Make all columns numeric
+doc_correlation <- doc_correlation %>% 
+  mutate_all(as.numeric)
+
 # Calculate the correlation matrix
 cor_matrix_doc <- cor(doc_correlation, use = "complete.obs")
 
 # Assuming cor_matrix_doc is your correlation matrix
 cor_matrix_doc <- as.data.frame(cor_matrix_doc)
-
-# The watersheds that dont have 0s for the weird lithologies it creates NAs and we want to remove those
-cor_matrix_doc <- cor_matrix_doc %>%
-  mutate_all(~replace_na(., 0))
 
 # Get the order of columns with 'Effect_size' first
 column_order <- c("Effect Size", setdiff(names(cor_matrix_doc), "Effect Size"))
@@ -474,6 +380,28 @@ cor_matrix_doc <- cor_matrix_doc %>%
   arrange(factor(rowname, levels = column_order)) %>%
   column_to_rownames(var = "rowname")
 
+# Watershed area correlations for DOC:
+# Watershed - Effect Size: 0.24835946
+# Watershed - Max watershed elevation: -0.413877171
+# Watershed - Slope: -0.41356756
+# Watershed - temp: -0.82647118
+# Watershed - OM: -0.36939475
+# Watershed - BFI: -0.773482221
+# Watershed - BFI: -0.773482221
+# Watershed - soil perm: 0.452871636
+# Watershed - BP: -0.36755821
+# Watershed - BS: -0.05621155
+# Watershed - TSF: -0.547954228
+# Watershed - mean bedrock depth: 0.47317977
+# Watershed - Glacier Till: 0.86083398
+
+
+
+
+
+
+
+
 # Convert back to matrix if needed
 cor_matrix_doc <- as.matrix(cor_matrix_doc)
 
@@ -487,7 +415,7 @@ print(cor_matrix_doc)
 ### PLOT ####
           
 # Specify the file path and format for the output PDF file
-output_file <- here("initial_plots", "08_Meta_summary_stats", "DOC_geospatial_correlation_test.pdf")
+output_file <- here("initial_plots", "08_Meta_summary_stats", "DOC_geospatial_correlation_test_2.0.pdf")
 
 # Open a PDF device
 pdf(file = output_file, width = 12, height = 12)
@@ -503,8 +431,15 @@ mtext("DOC Correlation Matrix", side = 3, line = 1, adj = 0, cex = 1.2)
 # Close the device to save the file
 dev.off()
 
+# DOC 
+# # Filter the correlation matrix to include only values greater than 0.3
+cor_matrix_filtered_doc <- ifelse(abs(cor_matrix_doc) > 0.3, cor_matrix_doc, NA)
+
+# Export the filtered correlation matrix to a CSV file
+# write.csv(cor_matrix_filtered_doc, here("Output_for_analysis", "08_Meta_summary_stats", "doc_RF_lith.csv"), row.names = TRUE)
 
 ```
+
 
 # Variable selection for DOC
 ```{r > 0.3}
@@ -902,7 +837,133 @@ ggsave("Watershed_Area_Burn_Ratio.pdf",
 ```
 
 
+# ============================= Correlation Matrix ===================
+# DOC
+```{r correlation plot}
+# Simple correlation matrix between effect size and all the other catchment characteristics
+# totdasqkm -  Watershed area
+# maxelevsmo - Max elevation
+# slope - Average watershed slope
+# Tmax9120Ws - 30-year Average Annual Normal Maximum Air Temperature
+# Tmin9120Ws - 30-year Average Annual Normal Minimum Air Temperature
+# Forest - Forest coverage
+# Grassland - Grassland coverage 
+# Wetland - Wetland coverage
+# AG - Agriculture coverage
+# OmWs - Organic matter
 
+# ====== # Adding 3/7/2025
+  # RckDepWs -mean bedrock depth 
+  # PctCarbResidWs -Carbonate Residual Material
+  # PctNonCarbResidWs - Non-Carbonate Residual Material
+  # PctAlkIntruVolWs - Alkaline Intrusive Volcanic Rock
+  # PctSilicicWs - Silicic Residual Material
+  # PctExtruVolWs - Extrusive Volcanic Rock
+  # PctColluvSedWs - Colluvial Sediment
+  # PctGlacTilClayWs - Glacial Till, Clayey
+  # PctGlacTilLoamWs - Glacial Till, Loamy
+  # PctGlacTilCrsWs - Glacial Till, Coarse-Textured
+  # PctGlacLakeCrsWs - Glacial Outwash and Glacial Lake Sediment
+  # PctGlacLakeFineWs - Glacial Outwash and Glacial Lake
+  # PctHydricWs - Hydric, Peat & Muck -% of AOI area classified as lithology type: hydric, peat and muck
+  # PctEolCrsWs - Eolian Sediment, Coarse-Textured 
+  # PctEolFineWs - Eolian Sediment, Fine-Textured
+  # PctSalLakeWs - Saline Lake Sediment
+  # PctAlluvCoastWs - Alluvium & Fine-Textured Coastal Zone Sediment
+  # PctCoastCrsWs - Coastal Zone Sediment, Coarse-Textured
+  # PctWaterWs - Water
+# ====== #
+
+# BFIWs - Baseflow index
+# PermWs - Soil Permeability 
+# RunoffWs - Runoff  
+# burn_percentage - Burn percentage  
+# mean_dnbr - Burn severity  
+# Time_Since_Fire - Time since fire  
+
+doc_correlation <- doc_RF %>% 
+  dplyr::select(Effect_size, totdasqkm, maxelevsmo, slope, Tmax9120Ws,Tmean9120Ws, Tmin9120Ws, Forest, Urban, Grassland, Wetland, AG, OmWs,
+                
+RckDepWs, PctCarbResidWs, PctNonCarbResidWs, PctAlkIntruVolWs, PctSilicicWs, PctExtruVolWs, PctColluvSedWs, PctGlacTilClayWs, PctGlacTilLoamWs, PctGlacTilCrsWs, PctGlacLakeCrsWs, PctGlacLakeFineWs, PctHydricWs,  PctEolCrsWs, PctEolFineWs, PctSalLakeWs, PctAlluvCoastWs, PctCoastCrsWs, PctWaterWs,
+
+BFIWs, PermWs, RunoffWs, burn_percentage, mean_dnbr, Time_Since_Fire) %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire)) 
+
+# Change the news of the variables
+new_names <- c("Effect Size", "Watershed area", "Maximum Watershed Elevation smooth", "Watershed Slope", "30-year Max Air Temp" , "30-year Mean Air Temp", "30-year Min Air Temp", "Forest cover", "Urban cover", "Grassland cover", "Wetland cover", "Agriculture cover", "Organic Matter Mean",
+
+"Mean bedrock depth", "Carbonate Residual Material", "Non-Carbonate Residual Material", "Alkaline Intrusive Volcanic Rock", "Silicic Residual Material", "Extrusive Volcanic Rock", "Colluvial Sediment", "Glacial Till, Clayey", "Glacial Till, Loamy", "Glacial Till, Coarse-Textured", "Glacial Outwash and Glacial Lake Sediment", "Glacial Outwash and Glacial Lake", "Peat & Muck -%", "Eolian Sediment, Coarse-Textured", "Eolian Sediment, Fine-Textured", "Saline Lake Sediment", "Alluvium & Fine-Textured Coastal Zone Sediment", "Coastal Zone Sediment, Coarse-Textured", "Water",
+
+"Baseflow Index", "Soil Permeability", "Mean Runoff", "Watershed Burn Percentage", "Burn Severity", "Time-Since-Fire")  
+
+colnames(doc_correlation) <- new_names
+
+# Check to see which variables have data vs. not. Remove the ones that don't have complete datasets
+doc_correlation <- doc_correlation %>%
+  select_if(~ !all(. == 0))
+
+doc_correlation <- doc_correlation %>% 
+  select(!`Alluvium & Fine-Textured Coastal Zone Sediment`)
+
+# If mean DNBR values are calculated then our measurement is no bueno. Remove. 
+doc_correlation <- doc_correlation %>% 
+  mutate(`Burn Severity` = case_when(`Burn Severity` < 0 ~ NA,
+                               TRUE ~ `Burn Severity`))
+
+# Calculate the correlation matrix
+cor_matrix_doc <- cor(doc_correlation, use = "complete.obs")
+
+# Assuming cor_matrix_doc is your correlation matrix
+cor_matrix_doc <- as.data.frame(cor_matrix_doc)
+
+# The watersheds that dont have 0s for the weird lithologies it creates NAs and we want to remove those
+cor_matrix_doc <- cor_matrix_doc %>%
+  mutate_all(~replace_na(., 0))
+
+# Get the order of columns with 'Effect_size' first
+column_order <- c("Effect Size", setdiff(names(cor_matrix_doc), "Effect Size"))
+
+# Reorder columns using select
+cor_matrix_doc <- cor_matrix_doc %>%
+  dplyr::select(all_of(column_order))
+
+# Reorder rows by converting row names to a column, ordering, then converting back
+cor_matrix_doc <- cor_matrix_doc %>%
+  rownames_to_column(var = "rowname") %>%
+  arrange(factor(rowname, levels = column_order)) %>%
+  column_to_rownames(var = "rowname")
+
+# Convert back to matrix if needed
+cor_matrix_doc <- as.matrix(cor_matrix_doc)
+
+# Assign new names to both row and column names
+rownames(cor_matrix_doc) <- new_names
+colnames(cor_matrix_doc) <- new_names
+
+# Print the reordered correlation matrix
+print(cor_matrix_doc)
+
+### PLOT ####
+          
+# Specify the file path and format for the output PDF file
+output_file <- here("initial_plots", "08_Meta_summary_stats", "DOC_geospatial_correlation_test.pdf")
+
+# Open a PDF device
+pdf(file = output_file, width = 12, height = 12)
+
+# Plot the reordered correlation matrix using corrplot
+corrplot(cor_matrix_doc, method = "circle", type = "upper", order = "original", 
+         tl.cex = 0.8, tl.col = "black", addgrid.col = "grey")
+
+# Add a title to the bottom left corner
+mtext("DOC Correlation Matrix", side = 3, line = 1, adj = 0, cex = 1.2)
+
+
+# Close the device to save the file
+dev.off()
+
+
+```
 
 
 
