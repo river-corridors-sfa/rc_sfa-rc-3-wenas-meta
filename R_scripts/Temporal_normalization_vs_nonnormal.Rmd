@@ -2231,11 +2231,13 @@ print(levene_obs)
 obs_F <- levene_obs$`F value`[1]
 
 # Quick look at the observed variances
-cat("\nVar(Effect_size):", var(ES_nn_normal$Effect_size), "\n")
-cat("Var(Effect_size_no_watershed):", var(ES_nn_normal$Effect_size_no_watershed), "\n")
+cat("\nVar(Effect_size NORMALIZED):", var(ES_nn_normal$Effect_size), "\n")
+cat("Var(Effect_size NON-NORMALIZED):", var(ES_nn_normal$Effect_size_no_watershed), "\n")
 cat("Variance ratio:", 
     var(ES_nn_normal$Effect_size) / var(ES_nn_normal$Effect_size_no_watershed), "\n\n")
+```
 
+```{r bootstrap}
 
 # BOOTSTRAPPING ####
 set.seed(2024)

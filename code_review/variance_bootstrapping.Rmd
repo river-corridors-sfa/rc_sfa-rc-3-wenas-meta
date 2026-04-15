@@ -1,0 +1,587 @@
+---
+title: "Variance"
+author: "JC & AMP"
+date: "`r Sys.Date()`"
+output: html_document
+---
+Compare effect size variances across all watersheds between normalized/non-normalized data
+
+Chunk 2180 - 2439 is an attempt to do it myself. It looks like # HYPOTHESIS i SUPPORTED (overall): Area normalization significantly reduces effect-size variance. Watershed area explains a meaningful share of cross-watershed variability. Area normalization explains 62% [49%, 72%] of the raw effect-size variance. Anything over 50% tells us that area is the dominant source of cross-watershed variability. When I break it up by nitrate and DOC for looking at variance difference by response variable: both Variables are positive = area normalization captures watershed variance. When looking at variance RATIO by response variable (log scale: both variables >1 = normalization shrinks variance.
+
+```{r Read in final data frame with non-normal and normalized}
+rm(list=ls(all=T)) #this clears your Environment
+
+library(pacman)
+p_load(tidyverse,
+       here,
+       zoo,
+       # hrbrthemes,
+       viridis, 
+       ggpmisc,
+       RobustLinearReg,
+       lme4,
+       car)
+
+# Read in effect size data frame for normalized and non-normalized data
+ES_nn_normal <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "archive", "Effect_size_orig_nonnormal.csv"))
+
+ES_nn_normal <- ES_nn_normal %>% 
+  group_by(Study_ID) %>% # Group by Study_ID to handle occurrences within the group
+  mutate(
+    occurrence = row_number(), # Create an occurrence tracker within Study_ID
+    Time_Since_Fire = case_when(
+      Study_ID == "Abbott et al. 2021" & occurrence == 1 ~ "10", # First value
+      Study_ID == "Abbott et al. 2021" & occurrence == 2 ~ "11", # Second value
+      Study_ID == "Abbott et al. 2021" & occurrence == 3 ~ "10", # Third value
+      Study_ID == "Abbott et al. 2021" & occurrence == 4 ~ "11", # Fourth value
+      TRUE ~ Time_Since_Fire),
+    Time_Since_Fire = case_when(Study_ID == 'Rhea et al. 2021' ~ '15',
+                                     TRUE ~ Time_Since_Fire)) %>%
+  ungroup() %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire)) %>% 
+  dplyr::select(Study_ID:Effect_size_no_watershed)
+
+  head(ES_nn_normal)
+```
+```{r levene prep}
+# Make dataframe long format
+ES_long <- ES_nn_normal %>%
+  mutate(row_id = row_number()) %>%
+  pivot_longer(
+    cols = c(Effect_size, Effect_size_no_watershed),
+    names_to  = "type",
+    values_to = "effect_size"
+  ) %>%
+  mutate(type = factor(type))
+
+head(ES_long)
+
+```
+```{r prep var}
+# Levene's Test of all data ####
+cat("=== Standard Levene's Test ===\n")
+levene_obs <- leveneTest(effect_size ~ type, data = ES_long, center = median)
+print(levene_obs)
+obs_F <- levene_obs$`F value`[1]
+
+# Quick look at the observed variances
+cat("\nVar(Effect_size NORMALIZED):", var(ES_nn_normal$Effect_size), "\n")
+cat("Var(Effect_size NON-NORMALIZED):", var(ES_nn_normal$Effect_size_no_watershed), "\n")
+cat("Variance ratio:", 
+    var(ES_nn_normal$Effect_size) / var(ES_nn_normal$Effect_size_no_watershed), "\n\n")
+```
+
+```{r paired outlier check}
+# Check for unusually large within-row shifts between non-normalized and normalized effect sizes.
+paired_outlier_df <- ES_nn_normal %>%
+  mutate(
+    row_id = row_number(),
+    paired_diff = Effect_size - Effect_size_no_watershed,
+    abs_paired_diff = abs(paired_diff)
+  )
+
+paired_q1 <- quantile(paired_outlier_df$abs_paired_diff, 0.25, na.rm = TRUE)
+paired_q3 <- quantile(paired_outlier_df$abs_paired_diff, 0.75, na.rm = TRUE)
+paired_iqr <- IQR(paired_outlier_df$abs_paired_diff, na.rm = TRUE)
+paired_upper_fence <- paired_q3 + 1.5 * paired_iqr
+paired_median <- median(paired_outlier_df$paired_diff, na.rm = TRUE)
+paired_mad <- mad(paired_outlier_df$paired_diff, constant = 1, na.rm = TRUE)
+
+paired_outlier_df <- paired_outlier_df %>%
+  mutate(
+    iqr_outlier = abs_paired_diff > paired_upper_fence,
+    robust_z = if (paired_mad == 0) {
+      rep(NA_real_, n())
+    } else {
+      0.6745 * (paired_diff - paired_median) / paired_mad
+    },
+    robust_outlier = abs(robust_z) > 3.5
+  )
+
+cat("\n===== PAIRED DIFFERENCE OUTLIER CHECK =====\n")
+cat(sprintf("IQR upper fence on absolute paired difference: %.3f\n", paired_upper_fence))
+cat(sprintf("Median paired difference: %.3f | MAD: %.3f\n\n", paired_median, paired_mad))
+
+cat("IQR outliers with metadata:\n")
+print(
+  paired_outlier_df %>%
+    filter(iqr_outlier) %>%
+    arrange(desc(abs_paired_diff)) %>%
+    select(
+      row_id, Study_ID, response_var, Climate, Biome,
+      Effect_size_pair, Time_Since_Fire,
+      Effect_size_no_watershed, Effect_size,
+      paired_diff, abs_paired_diff, robust_z
+    ),
+  width = Inf
+)
+
+cat("\nRobust-z outliers with metadata:\n")
+print(
+  paired_outlier_df %>%
+    filter(robust_outlier) %>%
+    arrange(desc(abs_paired_diff)) %>%
+    select(
+      row_id, Study_ID, response_var, Climate, Biome,
+      Effect_size_pair, Time_Since_Fire,
+      Effect_size_no_watershed, Effect_size,
+      paired_diff, abs_paired_diff, robust_z
+    ),
+  width = Inf
+)
+
+cat("\nStudy counts among IQR outliers:\n")
+print(
+  paired_outlier_df %>%
+    filter(iqr_outlier) %>%
+    count(Study_ID, sort = TRUE),
+  width = Inf
+)
+```
+
+```{r sensitivity analysis}
+# Sensitivity analysis: compare the variance result after excluding studies
+# that contribute the largest within-pair shifts.
+sensitivity_summary <- function(df, label) {
+  tibble(
+    dataset = label,
+    n = nrow(df),
+    studies = n_distinct(df$Study_ID),
+    var_non_normalized = var(df$Effect_size_no_watershed, na.rm = TRUE),
+    var_normalized = var(df$Effect_size, na.rm = TRUE),
+    diff = var_non_normalized - var_normalized,
+    log_ratio = log(var_non_normalized / var_normalized)
+  )
+}
+
+robust_outlier_studies <- paired_outlier_df %>%
+  filter(robust_outlier) %>%
+  distinct(Study_ID) %>%
+  pull(Study_ID)
+
+iqr_outlier_studies <- paired_outlier_df %>%
+  filter(iqr_outlier) %>%
+  distinct(Study_ID) %>%
+  pull(Study_ID)
+
+sensitivity_results <- bind_rows(
+  sensitivity_summary(ES_nn_normal, "Full dataset"),
+  sensitivity_summary(
+    ES_nn_normal %>% filter(!Study_ID %in% robust_outlier_studies),
+    "Exclude robust-outlier studies"
+  ),
+  sensitivity_summary(
+    ES_nn_normal %>% filter(!Study_ID %in% iqr_outlier_studies),
+    "Exclude IQR-outlier studies"
+  )
+) %>%
+  mutate(
+    interpretation = case_when(
+      diff > 0 ~ "normalization reduces variance",
+      diff < 0 ~ "normalization increases variance",
+      TRUE ~ "no change"
+    )
+  )
+
+cat("\n===== SENSITIVITY ANALYSIS =====\n")
+cat("Robust-outlier studies removed:\n")
+print(robust_outlier_studies)
+cat("\nIQR-outlier studies removed:\n")
+print(iqr_outlier_studies)
+
+cat("\nVariance comparison across sensitivity datasets:\n")
+print(sensitivity_results, width = Inf)
+```
+
+```{r dispersion comparison}
+# Companion analysis: compare multiple spread metrics before and after normalization.
+# This provides a robustness check because variance can be strongly influenced by outliers.
+spread_compare <- function(x_non_normalized, x_normalized) {
+  tibble(
+    metric = c("Variance", "SD", "MAD", "IQR"),
+    non_normalized = c(
+      var(x_non_normalized, na.rm = TRUE),
+      sd(x_non_normalized, na.rm = TRUE),
+      mad(x_non_normalized, constant = 1, na.rm = TRUE),
+      IQR(x_non_normalized, na.rm = TRUE)
+    ),
+    normalized = c(
+      var(x_normalized, na.rm = TRUE),
+      sd(x_normalized, na.rm = TRUE),
+      mad(x_normalized, constant = 1, na.rm = TRUE),
+      IQR(x_normalized, na.rm = TRUE)
+    )
+  ) %>%
+    mutate(
+      abs_change = normalized - non_normalized,
+      fold_change = normalized / non_normalized,
+      log_ratio = log(normalized / non_normalized),
+      interpretation = case_when(
+        abs_change < 0 ~ "normalization reduces spread",
+        abs_change > 0 ~ "normalization increases spread",
+        TRUE ~ "no change"
+      )
+    )
+}
+
+spread_overall <- spread_compare(
+  ES_nn_normal$Effect_size_no_watershed,
+  ES_nn_normal$Effect_size
+)
+
+spread_by_response <- ES_nn_normal %>%
+  group_by(response_var) %>%
+  group_modify(~ spread_compare(.x$Effect_size_no_watershed, .x$Effect_size)) %>%
+  ungroup()
+
+cat("\n===== DISPERSION COMPARISON (OVERALL) =====\n")
+print(spread_overall, width = Inf)
+
+cat("\n===== DISPERSION COMPARISON (BY RESPONSE VARIABLE) =====\n")
+print(spread_by_response, width = Inf)
+```
+
+```{r bootstrap}
+
+# BOOTSTRAPPING ####
+set.seed(2024)
+n_boot <- 10000
+
+# Audit missingness before bootstrapping so any dropped rows are visible.
+boot_na_audit <- ES_nn_normal %>%
+  summarise(
+    n_rows = n(),
+    n_missing_effect_size = sum(is.na(Effect_size)),
+    n_missing_effect_size_no_watershed = sum(is.na(Effect_size_no_watershed)),
+    n_missing_either = sum(is.na(Effect_size) | is.na(Effect_size_no_watershed))
+  )
+
+cat("\n===== BOOTSTRAP NA AUDIT =====\n")
+print(boot_na_audit)
+
+# Bootstrap from the original wide data to avoid an unnecessary long -> wide round trip.
+ES_boot <- ES_nn_normal %>%
+  mutate(row_id = row_number()) %>%
+  drop_na(Effect_size, Effect_size_no_watershed)
+
+if (nrow(ES_boot) != nrow(ES_nn_normal) - boot_na_audit$n_missing_either) {
+  stop("Unexpected row count after dropping incomplete effect-size pairs.")
+}
+
+if (anyNA(ES_boot$Effect_size) || anyNA(ES_boot$Effect_size_no_watershed)) {
+  stop("NA values remain in bootstrap effect-size columns after filtering.")
+}
+
+head(ES_boot)
+
+# paired bootstrap of variance difference and log variance ratio
+# Resamples row_ids (whole pairs) to keep the pairing intact
+boot_var_compare <- function(df, n_boot = 10000) {
+  n <- nrow(df)
+  replicate(n_boot, {
+    bs  <- slice_sample(df, n = n, replace = TRUE)
+    v_normalized <- var(bs$Effect_size,              na.rm = TRUE)
+    v_non_normalized <- var(bs$Effect_size_no_watershed, na.rm = TRUE)
+    c(var_normalized = v_normalized,
+      var_non_normalized = v_non_normalized,
+      diff = v_non_normalized - v_normalized,              # + -> area normalization reduces variance
+      log_ratio = log(v_non_normalized / v_normalized),    # >0 -> area normalization reduces variance
+      prop_explained = (v_non_normalized - v_normalized) / v_non_normalized)
+  }) %>% t() %>% as_tibble()
+}
+
+# OVERALL comparison (all response variables pooled)
+boot_overall <- boot_var_compare(ES_boot, n_boot)
+
+head(boot_overall)
+
+overall_summary <- boot_overall %>%
+  pivot_longer(everything(), names_to = "metric") %>%
+  group_by(metric) %>%
+  summarise(
+    mean    = mean(value),
+    median  = median(value),
+    ci_lo   = quantile(value, 0.025),
+    ci_hi   = quantile(value, 0.975),
+    .groups = "drop"
+  )
+
+overall_summary %>% filter(metric %in% c("diff", "log_ratio"))
+```
+```{r check}
+# Interpretation:
+# diff > 0 and log_ratio > 0 indicate that area normalization reduces
+# cross-watershed variance, so watershed area is an important first-order
+# source of variability. diff < 0 and log_ratio < 0 indicate that normalization
+# increases variance, suggesting area alone is not sufficient and that
+# additional watershed characteristics may be modulating response.
+if (overall_summary %>%
+      filter(metric == "diff") %>%
+      pull(ci_lo) > 0) {
+  cat("✔ HYPOTHESIS i SUPPORTED (overall):
+      Area normalization reduces effect-size variance.
+      Watershed area appears to be an important first-order source of cross-watershed variability.\n")
+} else if (overall_summary %>%
+             filter(metric == "diff") %>%
+             pull(ci_hi) < 0) {
+  cat("✔ HYPOTHESIS ii SUPPORTED (overall):
+      Area normalization increases effect-size variance.
+      Area alone does not appear to capture the dominant source of cross-watershed variability, and additional watershed characteristics may modulate fire response.\n")
+} else {
+  cat("⚠ INCONCLUSIVE (overall):
+      The 95% CI of the variance difference spans zero, so area normalization does not clearly reduce or increase cross-watershed variance.\n")
+}
+```
+
+```{r next}
+# Summarize the fraction of non-normalized variance removed by area normalization.
+prop_summary <- boot_overall %>%
+  summarise(
+    mean_prop   = mean(prop_explained),
+    ci_lo       = quantile(prop_explained, 0.025),
+    ci_hi       = quantile(prop_explained, 0.975)
+  )
+
+cat("\n===== PROPORTION OF VARIANCE REDUCED =====\n")
+print(prop_summary)
+
+cat(sprintf(
+  "\nArea normalization reduces variance by %.0f%% [%.0f%%, %.0f%%] relative to the non-normalized effect sizes.\n",
+  prop_summary$mean_prop * 100,
+  prop_summary$ci_lo     * 100,
+  prop_summary$ci_hi     * 100
+))
+
+# Heuristic interpretation of prop_explained:
+# > 0.50 -> area is a dominant first-order source of cross-watershed variability
+# 0.20 to 0.50 -> area is meaningful, but other factors likely matter too
+# 0 to 0.20 -> area alone is a weak first-order correction
+# < 0 -> normalization increases variance, consistent with hypothesis ii
+```
+```{r by response}
+# One-sided summary: proportion of resamples where non-normalized variance
+# exceeds normalized variance.
+p_overall <- mean(boot_overall$diff > 0)
+
+cat("\n===== OVERALL VARIANCE COMPARISON =====\n")
+print(overall_summary)
+cat(sprintf("\nP(var_non_normalized > var_normalized) = %.3f\n", p_overall))
+
+# BY RESPONSE VARIABLE ####
+boot_by_response <- ES_boot %>%
+  group_by(response_var) %>%
+  group_split() %>%
+  map_dfr(function(df) {
+    rv    <- unique(df$response_var)
+    n_obs <- nrow(df)
+    b     <- boot_var_compare(df, n_boot)
+
+    tibble(
+      response_var       = rv,
+      n                  = n_obs,
+      obs_var_normalized = var(df$Effect_size,              na.rm = TRUE),
+      obs_var_non_normalized = var(df$Effect_size_no_watershed, na.rm = TRUE),
+      obs_diff           = obs_var_non_normalized - obs_var_normalized,
+      obs_log_ratio      = log(obs_var_non_normalized / obs_var_normalized),
+      obs_prop_explained = (obs_var_non_normalized - obs_var_normalized) / obs_var_non_normalized,
+      boot_diff_mean     = mean(b$diff),
+      boot_diff_ci_lo    = quantile(b$diff, 0.025),
+      boot_diff_ci_hi    = quantile(b$diff, 0.975),
+      boot_log_ratio_mean  = mean(b$log_ratio),
+      boot_log_ratio_ci_lo = quantile(b$log_ratio, 0.025),
+      boot_log_ratio_ci_hi = quantile(b$log_ratio, 0.975),
+      boot_prop_mean     = mean(b$prop_explained),
+      boot_prop_ci_lo    = quantile(b$prop_explained, 0.025),
+      boot_prop_ci_hi    = quantile(b$prop_explained, 0.975),
+      p_non_normalized_gt_normalized = mean(b$diff > 0)
+    )
+  }) %>%
+  mutate(
+    direction = case_when(
+      boot_diff_ci_lo > 0  ~ "normalization reduces variance",
+      boot_diff_ci_hi < 0  ~ "normalization increases variance",
+      TRUE                 ~ "inconclusive"
+    )
+  )
+
+cat("\n===== BY RESPONSE VARIABLE =====\n")
+print(boot_by_response, width = Inf)
+
+boot_by_response %>%
+  select(response_var, n, obs_var_non_normalized, obs_var_normalized,
+         obs_diff, obs_prop_explained,
+         boot_diff_ci_lo, boot_diff_ci_hi,
+         boot_prop_ci_lo, boot_prop_ci_hi, direction) %>%
+  arrange(desc(obs_prop_explained)) %>%
+  print(width = Inf)
+
+cat("\n===== BOOTSTRAP DIAGNOSTICS =====\n")
+
+diagnostics_overall <- tibble(
+  metric = c("diff", "log_ratio", "prop_explained"),
+  observed = c(
+    var(ES_boot$Effect_size_no_watershed, na.rm = TRUE) - var(ES_boot$Effect_size, na.rm = TRUE),
+    log(var(ES_boot$Effect_size_no_watershed, na.rm = TRUE) / var(ES_boot$Effect_size, na.rm = TRUE)),
+    (var(ES_boot$Effect_size_no_watershed, na.rm = TRUE) - var(ES_boot$Effect_size, na.rm = TRUE)) /
+      var(ES_boot$Effect_size_no_watershed, na.rm = TRUE)
+  ),
+  boot_median = c(
+    median(boot_overall$diff),
+    median(boot_overall$log_ratio),
+    median(boot_overall$prop_explained)
+  ),
+  boot_min = c(
+    min(boot_overall$diff),
+    min(boot_overall$log_ratio),
+    min(boot_overall$prop_explained)
+  ),
+  boot_max = c(
+    max(boot_overall$diff),
+    max(boot_overall$log_ratio),
+    max(boot_overall$prop_explained)
+  ),
+  ci_lo = c(
+    quantile(boot_overall$diff, 0.025),
+    quantile(boot_overall$log_ratio, 0.025),
+    quantile(boot_overall$prop_explained, 0.025)
+  ),
+  ci_hi = c(
+    quantile(boot_overall$diff, 0.975),
+    quantile(boot_overall$log_ratio, 0.975),
+    quantile(boot_overall$prop_explained, 0.975)
+  )
+)
+
+print(diagnostics_overall, width = Inf)
+
+cat("\nGroup sizes used in the response-specific bootstrap:\n")
+print(boot_by_response %>% select(response_var, n), width = Inf)
+
+cat("\nObserved variance inputs by response variable:\n")
+print(
+  boot_by_response %>%
+    select(response_var, obs_var_non_normalized, obs_var_normalized,
+           obs_diff, obs_log_ratio, obs_prop_explained),
+  width = Inf
+)
+
+cat("\nPotential instability checks:\n")
+cat(sprintf("Minimum bootstrapped normalized variance: %.4f\n", min(boot_overall$var_normalized)))
+cat(sprintf("Minimum bootstrapped non-normalized variance: %.4f\n", min(boot_overall$var_non_normalized)))
+cat(sprintf("Any non-finite log ratios? %s\n", any(!is.finite(boot_overall$log_ratio))))
+cat(sprintf("Any non-finite prop_explained values? %s\n", any(!is.finite(boot_overall$prop_explained))))
+
+# PLOTS
+# Presentation-focused figures: one overall takeaway and two simple follow-ups.
+
+plot_theme <- theme_minimal(base_size = 13) +
+  theme(
+    panel.grid.minor = element_blank(),
+    plot.title.position = "plot",
+    legend.position = "top"
+  )
+
+# 5a – By response variable: log variance ratio
+plot_by_response_log_ratio <- boot_by_response %>%
+  ggplot(aes(x = obs_log_ratio, y = reorder(response_var, obs_log_ratio))) +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey55") +
+  geom_errorbarh(aes(xmin = boot_log_ratio_ci_lo, xmax = boot_log_ratio_ci_hi),
+                 height = 0.18, linewidth = 0.9, colour = "grey35") +
+  geom_point(size = 3.2, colour = "#b5403b") +
+  labs(
+    title = "Log variance ratio by response variable",
+    subtitle = "Positive values mean normalization reduces variance; negative values mean variance increases",
+    x = "log(Var(non-normalized) / Var(normalized))",
+    y = NULL
+  ) +
+  plot_theme
+
+plot_by_response_log_ratio
+
+ggsave(
+  filename = "plot_by_response_log_ratio.png",
+  plot = plot_by_response_log_ratio,
+  width = 8.5,
+  height = 4.5,
+  dpi = 300
+)
+
+# 5b – Observed variances before and after normalization
+plot_observed_variance_comparison <- boot_by_response %>%
+  select(response_var, obs_var_non_normalized, obs_var_normalized) %>%
+  pivot_longer(
+    cols = c(obs_var_non_normalized, obs_var_normalized),
+    names_to = "type",
+    values_to = "variance"
+  ) %>%
+  mutate(type = case_when(
+    type == "obs_var_non_normalized" ~ "Non-normalized",
+    type == "obs_var_normalized" ~ "Area-normalized",
+    TRUE ~ type
+  )) %>%
+  ggplot(aes(x = variance, y = reorder(response_var, variance), colour = type)) +
+  geom_line(aes(group = response_var), linewidth = 1, colour = "grey75") +
+  geom_point(size = 3) +
+  labs(
+    title = "Observed variances before and after normalization",
+    subtitle = "Grey connectors show the direction of change within each response variable",
+    x = "Observed variance",
+    y = NULL,
+    colour = NULL
+  ) +
+  scale_colour_manual(values = c("Non-normalized" = "#b5403b", "Area-normalized" = "#1f4e79")) +
+  plot_theme
+
+plot_observed_variance_comparison
+
+ggsave(
+  filename = "plot_observed_variance_comparison.png",
+  plot = plot_observed_variance_comparison,
+  width = 8.5,
+  height = 4.5,
+  dpi = 300
+)
+
+# 5c – Paired effect sizes for each observation
+plot_paired_effect_sizes <- ES_boot %>%
+  mutate(obs_label = paste0(row_id, " | ", Study_ID)) %>%
+  select(row_id, obs_label, response_var, Effect_size_no_watershed, Effect_size) %>%
+  pivot_longer(
+    cols = c(Effect_size_no_watershed, Effect_size),
+    names_to = "type",
+    values_to = "effect_size"
+  ) %>%
+  mutate(
+    type = case_when(
+      type == "Effect_size_no_watershed" ~ "Non-normalized",
+      type == "Effect_size" ~ "Area-normalized",
+      TRUE ~ type
+    )
+  ) %>%
+  ggplot(aes(x = effect_size, y = factor(obs_label, levels = rev(unique(obs_label))), colour = type)) +
+  geom_line(aes(group = row_id), linewidth = 0.35, colour = "grey80", alpha = 0.8) +
+  geom_point(size = 1.6, alpha = 0.9) +
+  facet_wrap(~ response_var, scales = "free_y") +
+  labs(
+    x = "Effect size",
+    y = "Observation | Study_ID",
+    colour = NULL
+  ) +
+  scale_colour_manual(values = c("Non-normalized" = "#b5403b", "Area-normalized" = "#1f4e79")) +
+  plot_theme +
+  theme(
+    panel.grid.major.y = element_blank(),
+    strip.text = element_text(face = "bold"),
+    axis.text.y = element_text(size = 6)
+  )
+
+plot_paired_effect_sizes
+
+ggsave(
+  filename = "plot_paired_effect_sizes.png",
+  plot = plot_paired_effect_sizes,
+  width = 9,
+  height = 8,
+  dpi = 300
+)
+```
