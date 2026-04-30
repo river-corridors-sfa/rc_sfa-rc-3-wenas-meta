@@ -2699,3 +2699,276 @@ boot_by_response %>%
 ```
 
 
+### Build MAIN data frame for all variables of interest: columns from Katie Willi code, watershed areas, study_ID, concentration, effect size pairs, effect sizes
+
+# ATTEMPT 2
+```{r Build model data frames}
+# Read in effect size data frame for normalized and non-normalized data
+ES_nn_normal <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "archive", "Effect_size_orig_nonnormal.csv"))
+
+ES_nn_normal <- ES_nn_normal %>% 
+  group_by(Study_ID) %>% # Group by Study_ID to handle occurrences within the group
+  mutate(
+    occurrence = row_number(), # Create an occurrence tracker within Study_ID
+    Time_Since_Fire = case_when(
+      Study_ID == "Abbott et al. 2021" & occurrence == 1 ~ "10", # First value
+      Study_ID == "Abbott et al. 2021" & occurrence == 2 ~ "11", # Second value
+      Study_ID == "Abbott et al. 2021" & occurrence == 3 ~ "10", # Third value
+      Study_ID == "Abbott et al. 2021" & occurrence == 4 ~ "11", # Fourth value
+      TRUE ~ Time_Since_Fire),
+    Time_Since_Fire = case_when(Study_ID == 'Rhea et al. 2021' ~ '15',
+                                     TRUE ~ Time_Since_Fire)) %>%
+  ungroup() %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire)) %>% 
+  dplyr::select(Study_ID:Effect_size_no_watershed)
+
+# Read in the study and site csv 
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
+  rename(year = Fire_year) %>% 
+  filter(!Study_ID == "Murphy et al. 2015") %>% 
+  na.omit()
+
+unique(study_site_data$Study_ID) # Should be 13 studies because we are missing Abbott.
+# Abbott because of merging burned and unburned sites. 
+# Murphy et al. 2015 was already accounted for in the Murphy et al. 2018 
+
+
+### BURN PERCENTAGE MODEL DATAFRAME ####
+bp_clip <- study_site_data %>% 
+  dplyr::select(Study_ID, Site, year, Effect_size_pair, burn_percentage)
+
+BP_ES <- full_join(bp_clip, ES_nn_normal) %>% 
+  na.omit() %>% 
+  dplyr::select(Study_ID, response_var, Effect_size_pair, Effect_size, Effect_size_no_watershed, burn_percentage) # joining the BP dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
+
+sort(unique(BP_ES$Study_ID)) # 13 studies
+
+# Merge to include site
+BP_model <- full_join(BP_ES, study_site_data) %>% 
+  dplyr::select(Study_ID, response_var, Effect_size_pair, Site, Effect_size, Effect_size_no_watershed, burn_percentage)
+
+# Merge to include geospatial variables:
+geospatial <- read_csv("Output_for_analysis/06_Meta_geospatial_extraction_with_comids/random_forest_data_new.csv") %>% 
+   select(-starts_with("MTBS_"))
+
+# 2. # Helper: normalize a site name
+normalize_site <- function(x) {
+  x %>%
+    str_to_lower() %>%
+    str_replace_all("[_\\-]", " ") %>%   # underscores/dashes -> space
+    str_replace_all("[^a-z0-9 ]", "") %>% # drop other punctuation
+    str_squish()                          # collapse multiple spaces, trim
+}
+
+# Add the normalized key to both frames
+gap_key <- geospatial %>%
+  mutate(Site_key = normalize_site(Site))
+
+BP_key <- BP_model %>%
+  mutate(Site_key = normalize_site(Site))
+  # renamed Study_ID to avoid collision; drop if you don't need it
+
+# Join: keep all rows in gap_no_mtbs
+bp_geo_merged <- gap_key %>%
+  left_join(BP_key, by = "Site_key")
+```
+
+```{r DNBR BURN SEVERITY MODEL DATAFRAME}
+# Read in DNBR
+DNBR_df <- read_csv(here("Output_for_analysis", "14_Meta_calculate_burn_severity", "Burn_severity_ES_fig_data.csv")) %>% 
+  dplyr::select(Study_ID, Site, response_var, fire_name, Effect_size_pair, mean_dnbr, burn_severity_category, burn_percentage, Time_Since_Fire)
+
+DNBR_model <- left_join(DNBR_df, ES_nn_normal, by = c("Study_ID", "Effect_size_pair", "response_var", "Time_Since_Fire")) %>% 
+  na.omit()
+
+DNBR_key <- DNBR_model %>%
+  mutate(Site_key = normalize_site(Site))
+  # renamed Study_ID to avoid collision; drop if you don't need it
+
+# Join: keep all rows in gap_no_mtbs
+dnbr_geo_merged <- gap_key %>%
+  left_join(DNBR_key, by = "Site_key")
+
+```
+
+```{r TSF MODEL DATAFRAME} 
+# Merge to include site
+TSF_model <- full_join(ES_nn_normal, study_site_data) %>% 
+  select(Study_ID, Site, response_var:Effect_size_no_watershed)
+
+TSF_key <- TSF_model %>%
+  mutate(Site_key = normalize_site(Site))
+  # renamed Study_ID to avoid collision; drop if you don't need it
+
+# Join: keep all rows in gap_no_mtbs
+tsf_geo_merged <- gap_key %>%
+  left_join(TSF_key, by = "Site_key")
+
+```
+
+```{r CLIMATE MODEL DATAFRAME}
+# Filter out studies that are greater than 10 years 
+CLIMATE_model <- TSF_model %>% 
+  filter(Study_ID != "Abbott et al. 2021") %>% 
+  filter(Study_ID != "Rhea et al. 2021")
+
+CLIMATE_key <- CLIMATE_model %>%
+  mutate(Site_key = normalize_site(Site))
+  # renamed Study_ID to avoid collision; drop if you don't need it
+
+# Join: keep all rows in gap_no_mtbs
+climate_geo_merged <- gap_key %>%
+  left_join(TSF_key, by = "Site_key")
+
+```
+
+
+
+
+
+
+# ================================= GRAVEYARD =========================================
+```{r Read in gap filled data - daily concentrations}
+conc <- read_csv("Output_for_analysis/04_Meta_merge_all_studies_effect_size/gap_fill_40.csv")
+
+sort(unique(conc$Study_ID)) # 15 studies. 
+# Burd, Coombs, Gerla, Gluns, Hauer, Hickenbottom, Mast & Clow, Murphy, Neary, Oliver, Rhea, Tiedemann, Uzun, Wagner, Writer 
+
+# Missing Abbott, and Crandall?
+
+# Abbott:
+Abbott_conc_fill <- read_csv("Output_for_analysis/02_Abbott_effect_size/Abbott_conc_fill.csv")
+
+# Crandall:
+crandall_conc_fill <- read_csv("Output_for_analysis/01_Crandall_effect_size/crandall_conc_fill.csv")
+
+# merge these in:
+others_gap_fill <- full_join(crandall_conc_fill, Abbott_conc_fill)
+
+others_gap_fill <- others_gap_fill %>%
+  mutate(
+    DOC_mg_C_L = na_if(DOC_mg_C_L, -9999),
+    NO3_mg_N_L = na_if(NO3_mg_N_L, -9999)
+  )
+
+# merge all studies together
+final_gap_fill <- bind_rows(others_gap_fill, conc) %>%
+  mutate(
+    year  = lubridate::year(Sampling_Date),
+    month = lubridate::month(Sampling_Date),
+    day   = lubridate::day(Sampling_Date)
+  )
+
+final_gap_fill <- final_gap_fill %>% 
+  select(-year, -month, -day)
+```
+
+```{r Read in Katie Willi code}
+geospatial <- read_csv("Output_for_analysis/06_Meta_geospatial_extraction_with_comids/random_forest_data_new.csv")
+# Based on the below commented out line, these data frames contain the same site info. 
+
+# Geospatial_data_2024_02_15 <- read_csv("Output_for_analysis/06_Meta_geospatial_extraction_with_comids/Geospatial_data_2024-02-15.csv")
+# 
+# # Standardize site names for fair comparison (optional but recommended)
+# sites_geo  <- unique(str_replace_all(geospatial$Site, " ", "_"))
+# sites_2024 <- unique(str_replace_all(Geospatial_data_2024_02_15$Site, " ", "_"))
+# 
+# # Sites in geospatial but NOT in Geospatial_data_2024_02_15
+# missing_sites <- setdiff(sites_geo, sites_2024)
+# 
+# # Print as a sentence
+# cat("Sites", paste(missing_sites, collapse = ", "),
+#     "are included in the geospatial data that are not included in the Geospatial_data_2024_02_15 data.\n")
+
+# Remove duplicate sites that have a space in them
+geospatial <- geospatial %>%
+  filter(!str_detect(Site, " "))
+
+# Merge geospatial with final_gap_fill
+gap_geospatial <- final_gap_fill %>%
+  mutate(Site = str_replace_all(Site, " ", "_")) %>%
+  left_join(
+    geospatial %>% mutate(Site = str_replace_all(Site, " ", "_")),
+    by = "Site"
+  )
+
+# Sites with missing slope
+missing_slope <- gap_geospatial %>%
+  filter(is.na(slope)) %>%
+  distinct(Site)
+
+missing_slope
+
+```
+
+```{r Read in effect sizes}
+# Read in effect size data frame for normalized and non-normalized data
+ES_nn_normal <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "archive", "Effect_size_orig_nonnormal.csv"))
+
+ES_nn_normal <- ES_nn_normal %>% 
+  group_by(Study_ID) %>% # Group by Study_ID to handle occurrences within the group
+  mutate(
+    occurrence = row_number(), # Create an occurrence tracker within Study_ID
+    Time_Since_Fire = case_when(
+      Study_ID == "Abbott et al. 2021" & occurrence == 1 ~ "10", # First value
+      Study_ID == "Abbott et al. 2021" & occurrence == 2 ~ "11", # Second value
+      Study_ID == "Abbott et al. 2021" & occurrence == 3 ~ "10", # Third value
+      Study_ID == "Abbott et al. 2021" & occurrence == 4 ~ "11", # Fourth value
+      TRUE ~ Time_Since_Fire),
+    Time_Since_Fire = case_when(Study_ID == 'Rhea et al. 2021' ~ '15',
+                                     TRUE ~ Time_Since_Fire)) %>%
+  ungroup() %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire)) %>% 
+  dplyr::select(Study_ID:Effect_size_no_watershed)
+
+# Read in the study and site csv 
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
+  rename(year = Fire_year) %>% 
+  filter(!Study_ID == "Murphy et al. 2015") %>% 
+  na.omit()
+
+unique(study_site_data$Study_ID) # Should be 13 studies because we are missing Abbott.
+# Abbott because of merging burned and unburned sites. 
+# Murphy et al. 2015 was already accounted for in the Murphy et al. 2018 
+
+### BURN PERCENTAGE MODEL DATAFRAME ####
+bp_clip <- study_site_data %>% 
+  dplyr::select(Study_ID, Site, year, Effect_size_pair, burn_percentage)
+
+BP_ES <- full_join(bp_clip, ES_nn_normal) %>% 
+  na.omit() %>% 
+  dplyr::select(Study_ID, response_var, Effect_size_pair, Effect_size, Effect_size_no_watershed, burn_percentage) # joining the BP dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
+
+sort(unique(BP_ES$Study_ID)) # 13 studies
+
+
+### MERGE GAP_GEOSPATIAL with BURN PERCENT
+# 1. Remove the MTBS wide format in the geospatial data 
+gap_no_mtbs <- gap_geospatial %>%
+  select(-starts_with("MTBS_"))
+
+# 2. # Helper: normalize a site name
+normalize_site <- function(x) {
+  x %>%
+    str_to_lower() %>%
+    str_replace_all("[_\\-]", " ") %>%   # underscores/dashes -> space
+    str_replace_all("[^a-z0-9 ]", "") %>% # drop other punctuation
+    str_squish()                          # collapse multiple spaces, trim
+}
+
+# Add the normalized key to both frames
+gap_key <- gap_no_mtbs %>%
+  mutate(Site_key = normalize_site(Site))
+
+bp_key <- bp_clip %>%
+  mutate(Site_key = normalize_site(Site)) %>%
+  select(Site_key, Study_ID_bp = Study_ID, year, Effect_size_pair, burn_percentage)
+  # renamed Study_ID to avoid collision; drop if you don't need it
+
+# Join: keep all rows in gap_no_mtbs
+gap_merged <- gap_key %>%
+  left_join(bp_key, by = "Site_key")
+
+```
