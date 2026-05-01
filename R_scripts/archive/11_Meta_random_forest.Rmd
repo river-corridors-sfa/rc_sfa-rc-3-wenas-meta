@@ -1,0 +1,440 @@
+---
+title: "11_Random_forest"
+output: html_document
+date: "2024-02-07"
+editor_options: 
+  chunk_output_type: console
+---
+
+The purpose of this script is to run random forests for DOC and NO3 effect sizes using catchment characteristics
+
+Script Workflow:
+
+Step 1) Load in the geospatial csv that is generated from pulling in stream cat data
+
+Step 2) Load in the fire name and year summary csv
+
+Step 3) Load in the effect size sheet that comes from the All_Studies_Temporal_Normalization script that includes effect size for each watershed. 
+
+
+
+
+# Status: in progress
+
+# ==============================================================================
+# Author: Peter Regier
+
+# Adapted by Jake Cavaiani; jake.cavaiani@pnnl.gov
+
+# 7 February 2024
+# ==============================================================================
+
+# Library download # 
+```{r Load packages}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+require(pacman)
+library(tidyverse)
+library(janitor)
+library(tidymodels)
+library(PNWColors)
+library(ranger)
+library(here)
+
+```
+
+# random forest dataframes # 
+```{r read in csvs}
+read_data <- function(filename){
+  read_csv(here("Output_for_analysis", "08_Meta_summary_stats", filename), na = c('-9999', 'N/A')) %>% 
+  clean_names() %>%
+  rename("dependent" = effect_size) %>%
+  dplyr::select(dependent, climate, totdasqkm, maxelevsmo, slope, tmean9120ws, om_ws, bfi_ws, perm_ws, rck_dep_ws,
+                burn_percentage, mean_dnbr, time_since_fire) %>%
+  mutate(mean_dnbr = as.numeric(mean_dnbr),
+         white_noise = rnorm(1:n(), mean = 0, sd = 1)) %>%
+  na.omit()
+}
+
+## Read in normalized effect datasets
+no3 <- read_data("no3_meta_random_forest.csv")
+doc <- read_data("doc_meta_random_forest.csv")
+  
+## Add non-normalized data
+no3_nn <- read_data("no3_meta_random_forest_nonnormal.csv")
+doc_nn<- read_data("doc_meta_random_forest_nonnormal.csv")
+
+# How many studies are included in this analysis
+doc_rf_nn <- read_csv("Output_for_analysis/08_Meta_summary_stats/doc_meta_random_forest_nonnormal.csv")
+
+sort(unique(doc_rf_nn$Study_ID)) # 5 studies
+# X
+# Crandall et al. 2021
+# Mast & Clow; 2008
+# Murphy et al. 2018
+# Wagner et al. 2015
+# Writer et al. 2014
+
+rm(doc_rf_nn)
+
+no3_rf_nn <- read_csv("Output_for_analysis/08_Meta_summary_stats/no3_meta_random_forest_nonnormal.csv")
+
+sort(unique(no3_rf_nn$Study_ID)) # 5 studies
+# Coombs & Melack; 2013
+# Crandall et al. 2021
+# Mast & Clow; 2008
+# Murphy et al. 2018
+# X 
+# Writer et al. 2014
+rm(no3_rf_nn)
+
+## Set ggplot theme
+theme_set(theme_bw())
+
+```
+
+# 2. Random Forest models 
+```{r function to calculate variable importance}
+## Function to calculate variable importance for a default ranger() model
+plot_fi <- function(data){
+  
+  model_recipe <- data %>% 
+    recipe(dependent ~ .) %>% 
+    step_integer(climate) %>% 
+    # step_corr(all_predictors()) %>% # looking at correlations between the variables and if two things are strongly correlated. Runoff is strongly correlated with another variable within DOC. Random forest do a good job handling multi-colinearity
+    step_normalize(all_predictors(), -all_outcomes()) %>% 
+    recipes::prep()
+  
+  df <- model_recipe %>% 
+    bake(data)
+  
+  ## Make model
+  rf_model <- ranger(dependent ~ ., data = df, importance = "impurity")
+  
+  ## Visualize model output
+  print(rf_model)
+  
+  ## Set vectors for renaming stuff
+  var_names <- rf_model$variable.importance
+  col_names <- c("predictor", "raw_fi")
+  
+  ## Convert feature importance to a tibble with variables as a column
+  fi0 <- as.data.frame(var_names) %>% 
+    tibble::rownames_to_column() %>% 
+    as_tibble()
+  
+  ## Rename columns
+  colnames(fi0) = col_names
+  
+  ## Output variable importance (or feature importance)
+  fi0
+}
+
+
+```
+
+
+# Plot FI for effect sizes
+```{r plot Feature importance}
+## Create a dataset of variable importance
+# Old code with no white noise included. 
+# df <- bind_rows(plot_fi(no3) %>% mutate(analyte = "no3"), 
+#           plot_fi(doc) %>% mutate(analyte = "doc")) %>% 
+#   group_by(analyte) %>% 
+#   mutate(fi = raw_fi / sum(raw_fi),
+#          fi100 = fi * 100)
+# 
+# write_csv(df, here("Output_for_analysis", "11_Random_forest", "Random_Forest_Effect_Size_Fig_data.csv"))
+
+replicate_plot_fi <- function(parameter, analyte, nn){
+  
+  #set.seed(100)
+  
+  replicate(200, plot_fi(parameter), simplify = FALSE) %>% 
+    bind_rows() %>% 
+    group_by(predictor) %>% 
+    summarize(mean_fi = mean(raw_fi, na.rm = T), 
+              min_fi = min(raw_fi, na.rm = T), 
+              max_fi = max(raw_fi, na.rm = T)) %>% 
+    ungroup() %>%
+    mutate(analyte = analyte) %>% 
+    mutate(normalization = nn)
+}
+
+
+# JSC Testing here 
+# @PETER this is what i've been messing with
+doc_eb <- replicate_plot_fi(doc, "doc", "Normalized")
+no3_eb <- replicate_plot_fi(no3, "no3", "Normalized")
+doc_eb_nn <- replicate_plot_fi(doc_nn, "doc", "Not normalized")
+no3_eb_nn <- replicate_plot_fi(no3_nn, "no3", "Not normalized")
+
+# Mutate each column at a time
+df <- bind_rows(doc_eb, no3_eb, doc_eb_nn, no3_eb_nn)
+
+df_test <- df %>% 
+  group_by(analyte) %>% 
+  mutate(across(contains("_fi"), ~ . / sum(mean_fi, na.rm = TRUE)))
+
+#### 12/22/2025 ####
+# I want to output the R^2 for the non-normalized vs. normalized 
+# Modified function
+plot_fi <- function(parameter){
+  # Fit the model
+  model <- ranger(dependent ~ ., data = parameter, importance = "impurity")
+  
+  # Extract variable importance and model R²
+  variable_importance <- as_tibble(model$variable.importance, rownames = "predictor") %>% 
+    rename(raw_fi = value)
+  
+  # Add R² to the output
+  variable_importance <- variable_importance %>%
+    mutate(R2 = model$r.squared)
+  
+  return(list(data = variable_importance, R2 = model$r.squared))
+}
+
+replicate_plot_fi <- function(parameter, analyte, nn){
+  
+  # Replicate process and collect results
+  results <- replicate(
+    200,
+    {
+      model_output <- plot_fi(parameter) # Run the plot_fi function
+      if (!is.null(model_output$data)) { # Check if model returns valid data
+        model_output$data %>% 
+          mutate(r_squared = model_output$R2) # Include R² in the results
+      } else {
+        NULL # Return NULL if the model fails
+      }
+    },
+    simplify = FALSE
+  )
+  
+  # Ensure non-null results are bound into a single data frame
+  summary_results <- bind_rows(results) %>% 
+    group_by(predictor) %>% 
+    summarize(mean_fi = mean(raw_fi, na.rm = TRUE),
+              min_fi = min(raw_fi, na.rm = TRUE),
+              max_fi = max(raw_fi, na.rm = TRUE),
+              mean_r_squared = mean(r_squared, na.rm = TRUE)) %>% 
+    ungroup() %>%
+    mutate(analyte = analyte) %>% 
+    mutate(normalization = nn)
+  
+  return(summary_results)
+}
+
+if ("predictor" %in% colnames(results[[1]])) {
+  print("Predictor column exists.")
+} else {
+  stop("predictor column not found in output.")
+}
+
+results <- replicate(
+  200,
+  {
+    model_output <- tryCatch(
+      plot_fi(parameter),
+      error = function(e) NULL # Return NULL if an error occurs
+    )
+    
+    if (!is.null(model_output$data)) {
+      model_output$data %>% 
+        mutate(r_squared = model_output$R2)
+    } else {
+      NULL
+    }
+  },
+  simplify = FALSE
+)
+
+
+# Run replicates for normalized data
+doc_eb <- replicate_plot_fi(doc, "doc", "Normalized")
+no3_eb <- replicate_plot_fi(no3, "no3", "Normalized")
+
+# Run replicates for non-normalized data
+doc_eb_nn <- replicate_plot_fi(doc, "doc", "Non-Normalized")
+no3_eb_nn <- replicate_plot_fi(no3, "no3", "Non-Normalized")
+
+# Combine into one dataframe
+df <- bind_rows(doc_eb, no3_eb, doc_eb_nn, no3_eb_nn)
+
+# Debugging the resulting `df`
+if (!"predictor" %in% colnames(df)) {
+  stop("predictor column missing in the combined dataframe.")
+}
+
+# Calculate mean R² values by normalization
+mean_r2_summary <- df %>%
+  group_by(analyte, normalization) %>%
+  summarize(mean_r_squared = mean(mean_r_squared, na.rm = TRUE))
+
+print(mean_r2_summary)
+
+
+
+
+```
+
+
+```{r white noise}
+# BACK TO NORMAL WORKFLOW
+# pr <- bind_rows(replicate_plot_fi(no3, "no3"),
+#                     replicate_plot_fi(doc, "doc")) %>%  
+#   group_by(analyte) %>%
+#   mutate(across(contains("_fi"), ~ . / sum(.)))
+
+## Set up a color palette
+var_colors <- PNWColors::pnw_palette("Bay", n = length(unique(df$predictor)))
+
+## Make plots
+# burn_percentage - Burn percentage 
+# Climate - Climate classification 
+# maxelevsmo - Maximum elevation (smoothed) in centimeters
+# minelevsmo - Minimum elevation (smoothed) in centimeters
+# slope - Slope of flowline (meters/meters) based on smoothed elevations
+# time_since_fire - time since fire 
+# Mean Bedrock depth - RckDep
+# totdasqkm -Total upstream catchment area from downstream end of flowline.
+
+
+dose.labs <- c("DOC", "Nitrate")
+names(dose.labs) <- c("doc", "no3")
+
+ggplot(df_test, aes(mean_fi * 100, 
+               reorder(predictor, mean_fi), fill = predictor)) + 
+  geom_col(alpha = 0.8, show.legend = F, width = 0.7) +
+  geom_errorbar(aes(xmin = min_fi * 100, xmax = max_fi * 100, width = 0.2)) +
+  #facet_wrap(~analyte, nrow = 1, labeller = labeller(analyte = dose.labs)) + 
+  facet_grid(normalization~analyte, labeller = labeller(analyte = dose.labs)) + 
+  scale_fill_manual(values = var_colors) + 
+  labs(x = "Feature Importance (%)", 
+       y = "", fill = "") +
+  scale_y_discrete(labels=c("bfi_ws" = "Baseflow Index",
+                            "runoff_ws" = "Runoff",
+                            "perm_ws" = "Soil Permeability",
+                            "tmean9120ws" = "Mean Annual Air Temperature",
+                            "mean_dnbr" = "Burn Severity",
+                            "om_ws" = "Organic Matter",
+                            "maxelevsmo" = "Max Watershed Elevation",
+                            "burn_percentage" = "Burn Percentage", 
+                            "climate" = "Koppen Climate Classification",
+                            "rck_dep_ws" = "Mean Bedrock Depth",
+                            "white_noise" = "White Noise",
+                            "slope" = "Catchment Slope",
+                            "time_since_fire" = "Time Since Fire",
+                            "totdasqkm" = "Catchment Area")) +
+  theme_bw()
+                            
+
+ggsave("Effect_Size_Random_Forest_white_noise.pdf",
+       path = here("initial_plots", "11_Meta_random_forest"),
+       width = 5.5, height = 6,  units = "in")
+
+# including white noise. You put in a random variable. You feed that in as a predictor. If white noise has higher feature importance than any of these variables. The concern there is, we dont want to add anything that doesn't address the comment. 
+
+# white noise is greater than climate, tmean, rck_dep, burn percentage, perm, om, watershed area, bfi for doc
+  # white noise is greater than rck_dep, om, bp, perm, watershed area, bfi
+
+# white noise is greater than slope and watershed area for no3
+
+
+# Plot only with variables that are greater than white noise.  
+# Calculate the white noise mean_fi for each analyte
+white_noise_values <- df_test %>% 
+  filter(predictor == "white_noise") %>% 
+  select(analyte, normalization, mean_fi)
+
+# Filter the data to include only variables with mean_fi greater than white noise value for each analyte
+filtered_df <- df_test %>%
+  inner_join(white_noise_values, by = c("analyte", "normalization"), suffix = c("", "_white_noise")) %>%
+  filter(mean_fi > mean_fi_white_noise)
+```
+
+
+
+```{r make plots}
+# Plotting
+# CHAT 1.0 
+# Define the blank spaces
+# blank_spaces <- data.frame(
+#   analyte = c(rep("doc", 5), "no3"),
+#   predictor = c("perm_ws", "tmean9120ws", "om_ws", 
+#                 "bfi_ws", "burn_percentage", "slope")
+# )
+
+# Filtered dataset assumed to be 'filtered_df'
+# Original plot with X annotations
+p <- ggplot(filtered_df, aes(mean_fi * 100, reorder(predictor, mean_fi), fill = predictor)) +
+  geom_col(alpha = 0.8, show.legend = F, width = 0.7) +
+  geom_errorbar(aes(xmin = min_fi * 100, xmax = max_fi * 100, width = 0.2)) +
+  facet_grid(normalization~analyte, labeller = labeller(analyte = dose.labs)) + 
+  scale_fill_manual(values = var_colors) +
+  labs(x = "Feature Importance (%)", y = "", fill = "") +
+  scale_y_discrete(labels = c(
+    "bfi_ws" = "Baseflow Index",
+    "runoff_ws" = "Runoff",
+    "perm_ws" = "Soil Permeability",
+    "tmean9120ws" = "Mean Annual Air Temperature",
+    "mean_dnbr" = "Burn Severity",
+    "om_ws" = "Organic Matter",
+    "maxelevsmo" = "Max Watershed Elevation",
+    "burn_percentage" = "Burn Percentage", 
+    "climate" = "Koppen Climate Classification",
+    "rck_dep_ws" = "Mean Bedrock Depth",
+    "white_noise" = "White Noise",
+    "slope" = "Catchment Slope",
+    "time_since_fire" = "Time Since Fire",
+    "totdasqkm" = "Catchment Area"
+  )) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1))
+
+blank_spaces <- df_test %>%
+  inner_join(white_noise_values, by = c("analyte", "normalization"), suffix = c("", "_white_noise")) %>%
+  filter(mean_fi <= mean_fi_white_noise) %>% 
+  filter(predictor != "white_noise")
+
+
+# Manually create a data frame for the red X's for missing predictors in the "doc" panel
+# blank_spaces <- data.frame(
+#   analyte = c(rep("doc", 5), "no3"),
+#   predictor = c("perm_ws", "tmean9120ws", "om_ws", 
+#                 "bfi_ws", "burn_percentage", "slope")
+# )
+# missing_doc <- data.frame(
+#   analyte = c(rep("doc", 5), "no3"),
+#   predictor = c("perm_ws", "tmean9120ws", "bfi_ws", "om_ws", "burn_percentage", "slope"),
+#   mean_fi = c(0, 0, 0, 0, 0, 0)  # Set mean_fi to 0 to position the X's
+# )
+
+# A single frame for the y-values
+# predictor_y_mapping <- data.frame(
+#   predictor = c("perm_ws", "tmean9120ws", "bfi_ws", "om_ws", "burn_percentage", "slope"),
+#   y_position = c(11, 10, 9, 6, 2, 8) # Adjust this multiplyer to move X upwards or downwards
+# )
+
+# Add y_position from predictor_y_mapping to missing_doc
+# missing_doc <- merge(missing_doc, predictor_y_mapping, by="predictor")
+
+# Add red X for cases where predictors are specified as blank for "doc"
+p + 
+  geom_text(data = blank_spaces, aes(x = mean_fi + 5, label = "X"),
+                   color = "red", size = 5, vjust = 0.5)
+
+
+ggsave("Effect_Size_Random_Forest_variables_less_than_white_noise.pdf",
+       path = here("initial_plots", "11_Meta_random_forest"),
+       width = 5.5, height = 6,  units = "in")
+
+```
+
+
+
+
+
+

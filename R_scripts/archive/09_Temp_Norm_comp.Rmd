@@ -1,0 +1,1191 @@
+---
+title: "AGU_2023_Burn_Unburn_comp"
+output: html_document
+date: "2023-12-01"
+editor_options: 
+  chunk_output_type: console
+---
+
+The purpose of this script is to read in the studies from the final meta data list and to normalize daily stream concentrations by time and plot burn vs. unburned concentrations for a figure for my presentation
+
+# Status: in progress
+
+# ==============================================================================
+# Author: Jake Cavaiani; jake.cavaiani@pnnl.gov 
+# 01 December 2023
+# ==============================================================================
+
+## Temporal Normalization 
+```{r Jake/Mac Load Packages and}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+
+library(tidyverse)
+library(here)
+library(forecastML)
+library(zoo)
+# library(hrbrthemes)
+library(viridis)
+library(car)
+library(lme4)
+library(merTools)
+
+
+```
+
+```{r load in publications}
+studies_file_list <- list.files(path = "inputs/Studies/meta_final/", 
+                                  recursive=F, 
+                                  pattern=".csv", 
+                                  full.names=TRUE)
+
+storm_list_beta<-do.call("list", lapply(studies_file_list, 
+                                        read.csv, 
+                                        stringsAsFactors=FALSE, 
+                                        header=T))
+
+meta_df <-do.call("rbind", lapply(studies_file_list, 
+                                     read.csv,
+                                     na = c('-9999', 'N/A'),
+                                     check.names = FALSE,
+                                     stringsAsFactors=FALSE, 
+                                     header=T, blank.lines.skip = TRUE, fill=TRUE)) 
+
+```
+
+
+```{r format date and units}
+options(max.print = 40)
+# Filtering by only the control vs.impact studies to make sure we have no paper that is included that is any other study design. 
+
+# Crandall is filtered out because the burned and reference sites are not paired so I do that is a separate script and will read that csv in later to merge to this dataframe to get the more accurate effect size calculations 
+
+# The studies that monitor streams more than 5 years following a wildfire are also excluded for this initial code and will be added in later.  
+
+control_impact <- meta_df %>% 
+  filter(Design_Control_Burn_Pre_Post == "Control_Reference_vs_Impact",
+         Study_ID != "Crandall et al. 2021",
+         Mean_Median_or_IndividualSample == "Individual",
+         as.numeric(Time_Since_Fire) < 6)
+
+# separate out the time columns 
+time_format <- control_impact %>% 
+  dplyr::select(Study_ID, Sampling_Date) 
+
+# merge this dataframe with the metadata df to make sure all the dates are the same format and there aren't any NAs
+control_impact <- control_impact %>% 
+  mutate(Sampling_Date = time_format$Sampling_Date)
+
+
+# changing the structure of the concentrations
+control_impact <- control_impact %>% 
+  mutate(DOC = as.numeric(DOC),
+         NO3 = as.numeric(NO3), 
+         Sampling_Date = ymd(Sampling_Date))
+
+# Changing the units to make sure everything is consistent in mg_N_L or mg_C_L
+control_impact_units <- control_impact %>% 
+  mutate(Area_watershed_km = case_when(Area_unit == 'ha' ~ Area_watershed * .01,
+                                       Area_unit == 'km' ~ print(Area_watershed)),
+         
+         DOC_mg_C_L = case_when(DOC_unit == 'mg_C_L' ~ print(DOC),
+                                DOC_unit == 'mg_L' ~ print(DOC),
+                                DOC_unit == 'um' ~ DOC * 0.01201),
+         
+         NO3_mg_N_L = case_when(NO3_unit == 'um' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'umol_NO2_NO3_L' ~ NO3 * 0.014007000,
+                                NO3_unit == 'mg_N_L' ~ print(NO3),
+                                NO3_unit == 'ug_N_L' ~ NO3 * .001, 
+                                NO3_unit == 'mg_L' ~ NO3 * 0.225904780),
+         
+         DOC_uM_C = case_when(DOC_unit == 'um' ~ print(DOC),
+                              DOC_unit == 'mg_C_L' ~ DOC * 83.2639467,
+                              DOC_unit == 'mg_L' ~ DOC * 83.2639467),
+
+         NO3_uM_N = case_when(NO3_unit == 'um' ~ print(NO3),
+                              NO3_unit == 'umol_L' ~ print(NO3),
+                              NO3_unit == 'umol_NO2_NO3_L' ~ print(NO3),
+                              NO3_unit == 'mg_L' ~ NO3 * 16.127729,
+                              NO3_unit == 'mg_N_L' ~ NO3 * 3.64145101,
+                              NO3_unit == 'ug_N_L' ~ NO3 * 0.22594948))
+
+# Creating a site characteristics data frame that I will use to merge later to add in the proper data 
+site_data <- control_impact_units %>% 
+  dplyr::select(Study_ID, Pair, Site, latitude, longitude, Area_watershed_km, Climate, Burn_Unburn)
+
+site_data_unique <- site_data %>% 
+  group_by(Study_ID, Pair, Area_watershed_km) %>% 
+  distinct(Area_watershed_km, .keep_all = TRUE)
+
+```
+
+
+```{r - gap fill}
+# filling in daily time series and interpolating by study and site
+control_impact_fill <-  control_impact_units %>% 
+  dplyr::select("Study_ID", "latitude", "longitude", "Area_watershed_km", "Pair", "Climate", "Site", "Burn_Unburn", "Sampling_Date", "DOC_mg_C_L", "NO3_mg_N_L") %>%
+  group_by(Study_ID, Site) %>%
+  complete(Sampling_Date = seq(min(Sampling_Date), max(Sampling_Date), by = "1 day")) %>% 
+  fill(Study_ID:Burn_Unburn) %>%
+  fill(Study_ID, Site) %>%
+  ungroup() %>%
+  group_by(Site) %>%
+  mutate(NO3_Interp = na.approx(NO3_mg_N_L, na.rm = FALSE),
+         DOC_Interp = na.approx(DOC_mg_C_L, na.rm = FALSE)) %>%
+  fill(Study_ID:Burn_Unburn)
+
+
+control_impact_fill <- control_impact_fill %>% 
+  mutate(year = year(Sampling_Date),
+         month = month(Sampling_Date),
+         day = day(Sampling_Date))
+  
+
+```
+
+
+```{r calculating the temporal normalized data}
+# pivoting to make the responses in one column
+metadata_long <- control_impact_fill %>%
+  pivot_longer(
+    cols = NO3_Interp:DOC_Interp,
+    names_to = "response_var",
+    values_to = "concentration",
+    values_drop_na = TRUE
+  )
+
+
+# aggregate by year 
+yearly_mean_site <-  metadata_long %>%
+  group_by(Study_ID, response_var, Pair, year) %>% 
+  summarize(meanConc = mean(concentration)) %>% 
+  left_join(site_data) %>% 
+  group_by(year) %>% 
+  distinct(meanConc, .keep_all = TRUE) %>% 
+  mutate(TempNorm = meanConc / Area_watershed_km) 
+
+yearly_mean_site$TempNorm <- format(yearly_mean_site$TempNorm, scientific = F)
+
+yearly_mean_site <-  yearly_mean_site %>%
+  mutate(TempNorm = as.numeric(TempNorm))
+
+
+```
+
+
+# Add in corrected Crandall and papers that are greater than 5 years to this list 
+```{r}
+# combine the conc. fill of Crandall, Abbott, and Rhea with the rest of it 
+
+crandall_conc_fill <- read_csv(here("Output_for_analysis", "01_Crandall_effect_size", "crandall_temp_norm.csv"), na = c('-9999', 'N/A')) 
+
+abbott_conc_fill <- read_csv(here("Output_for_analysis", "02_Abbott_effect_size", "Abbott_temp_norm.csv"), na = c('-9999', 'N/A')) 
+
+rhea_conc_fill <- read_csv(here("Output_for_analysis", "03_Rhea_effect_size", "Rhea_temp_norm.csv"), na = c('-9999', 'N/A')) 
+
+
+yearly_mean_site <- rbind(yearly_mean_site, crandall_conc_fill, abbott_conc_fill, rhea_conc_fill)
+
+write_csv(yearly_mean_site, here("Output_for_analysis", "09_Temp_Norm_comp", "non-normalization_effect_size.csv"))
+
+
+```
+
+
+
+```{r Calculate CV}
+metadata_cv <- yearly_mean_site %>% 
+  group_by(Study_ID, response_var, Burn_Unburn) %>% 
+  summarise(meanConc = mean(TempNorm, na.rm = TRUE),
+            sdconc = sd(TempNorm, na.rm = TRUE),
+            CVconc = sdconc/meanConc) # generating CVs
+
+doc_cv <- metadata_cv %>% 
+  filter(response_var == "DOC_Interp")
+
+# DOC 
+doc_yearly <- yearly_mean_site %>% 
+  filter(response_var == "DOC_Interp")
+
+# conduct anova test to see if the mean concentrations were different between burn and unbunr
+one.way.doc <- aov(TempNorm ~ Burn_Unburn, data = doc_yearly)
+
+plot(one.way.doc)
+# QQ plot is not great. Looks like I should log transform. Lets try that. 
+
+doc_yearly <- doc_yearly %>% 
+  mutate(logTempNorm = log(TempNorm))
+
+log.one.way.doc <- aov(logTempNorm ~ Burn_Unburn, data = doc_yearly)
+plot(log.one.way.doc)
+
+summary(log.one.way.doc) # F-value: 1.113, p-value: 0.294
+
+# conduct Levene's Test for equality of variances
+leveneTest(TempNorm ~ Burn_Unburn, data = doc_yearly) #F-value: 0.6377, p-value: 0.4266,
+
+
+# NO3 
+no3_yearly <- yearly_mean_site %>% 
+  filter(response_var == "NO3_Interp")
+
+no3_cv <- metadata_cv %>% 
+  filter(response_var == "NO3_Interp")
+
+
+# conduct anova test to see if the mean concentrations were different between burn and unbunr
+one.way.no3 <- aov(TempNorm ~ Burn_Unburn, data = no3_yearly)
+
+plot(one.way.no3)
+
+# QQ plot is not great. Looks like I should log transform. Lets try that. 
+
+no3_yearly <- no3_yearly %>% 
+  mutate(logTempNorm = log(TempNorm))
+
+log.one.way.no3 <- aov(logTempNorm ~ Burn_Unburn, data = no3_yearly)
+plot(log.one.way.no3)
+
+summary(log.one.way.no3) # df: 1,181, F-value: 0.152, p-value: 0.697
+
+
+
+# conduct Levene's Test for equality of variances
+leveneTest(TempNorm ~ Burn_Unburn, data = no3_yearly) # df: 1,181, F-value: 0.7465,  p-value: 0.38 
+
+# Write csv's
+doc_yearly_out <- doc_yearly %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
+
+write_csv(doc_yearly_out, here("Output_for_analysis", "09_Temp_Norm_comp", "DOC_temp_norm_fig_data.csv"))
+
+doc_cv_out <- doc_cv %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
+
+write_csv(doc_cv_out, here("Output_for_analysis", "09_Temp_Norm_comp", "DOC_CV_temp_norm_fig_data.csv"))
+
+no3_yearly_out <- no3_yearly %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
+
+write_csv(no3_yearly_out, here("Output_for_analysis", "09_Temp_Norm_comp", "NO3_temp_norm_fig_data.csv"))
+
+no3_cv_out <- no3_cv %>%
+  mutate(across(where(is.character), ~ifelse(is.na(.), "N/A", .))) %>%
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), -9999, .)))
+
+write_csv(no3_cv_out, here("Output_for_analysis", "09_Temp_Norm_comp", "NO3_CV_temp_norm_fig_data.csv"))
+
+```
+
+### PLOT Burn vs. Unburn ###
+
+
+```{r}
+# DOC 
+# simple box plot 
+ggplot(doc_yearly, aes(Burn_Unburn, TempNorm, fill = Burn_Unburn)) +
+  geom_boxplot() +
+  theme_bw()
+  
+# Boxplot with density plot   
+ggplot(doc_yearly, aes(x = Burn_Unburn, y = TempNorm, fill = Burn_Unburn)) +
+  scale_fill_manual(values = c("darkred", "#69b3a2")) +
+  labs(x =  " ", y = expression(paste("mg  ", DOC ," ", L^-1, km^-2, ""))) +
+  ggdist::stat_halfeye(adjust = 0.5, 
+                       justification = -.3,
+                       .width = 0,
+                       point_colour = NA,
+                       scale = 0.5) +
+  geom_boxplot(width = .25,
+                 outlier.colour = NA,
+                 alpha = 0.5) +
+  scale_y_continuous(trans='log10') +
+  ggtitle("") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 20),
+        axis.title.y = element_text(size = 25))
+
+ggsave("DOC_yield.pdf",
+       path = here("initial_plots", "09_Temp_Norm_comp"),
+       width = 6, height = 6,  units = "in")
+
+# Box plot with CV
+ggplot(doc_cv, aes(x = Burn_Unburn, y = CVconc, fill = Burn_Unburn)) +
+  scale_fill_manual(values = c("darkred", "#69b3a2")) +
+  labs(y = "CV", x = "") +
+  ggdist::stat_halfeye(adjust = 0.5, 
+                       justification = -.2,
+                       .width = 0,
+                       point_colour = NA) +
+  geom_boxplot(width = .25,
+                 outlier.colour = NA,
+                 alpha = 0.5) +
+  ggtitle("Coefficient of Variation for DOC") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25),
+        axis.title.y = element_text(size = 25))
+
+ggsave("DOC_CV_yield.pdf",
+       path = here("initial_plots", "09_Temp_Norm_comp"),
+       width = 6, height = 6,  units = "in")        
+
+# NO3
+vn = expression(paste("mg " *N*O[3]^"-",  L^-1, km^-2, ""))
+
+# Boxplot with density plot   
+ggplot(no3_yearly, aes(x = Burn_Unburn, y = TempNorm, fill = Burn_Unburn)) +
+  scale_fill_manual(values = c("darkred", "#69b3a2")) +
+  ggdist::stat_halfeye(adjust = 0.5, 
+                       justification = -.3,
+                       .width = 0,
+                       point_colour = NA,
+                       scale = 0.5) +
+  geom_boxplot(width = .25,
+                 outlier.colour = NA,
+                 alpha = 0.5) +
+  scale_y_continuous(trans='log10') +
+  ylab(vn) +
+  xlab("") +
+  ggtitle("") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 20),
+        axis.title.y = element_text(size = 25))
+
+ggsave("NO3_yield.pdf",
+       path = here("initial_plots", "09_Temp_Norm_comp"),
+       width = 6, height = 6,  units = "in")
+
+# Box plot with CV
+ggplot(no3_cv, aes(x = Burn_Unburn, y = CVconc, fill = Burn_Unburn)) +
+  scale_fill_manual(values = c("darkred", "#69b3a2")) +
+  labs(y = "CV", x = "") +
+  ggdist::stat_halfeye(adjust = 0.5, 
+                       justification = -.2,
+                       .width = 0,
+                       point_colour = NA) +
+  geom_boxplot(width = .25,
+                 outlier.colour = NA,
+                 alpha = 0.5) +
+  ggtitle("Coefficient of Variation for Nitrate") +
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25),
+        axis.title.y = element_text(size = 25))
+
+ggsave("NO3_CV_yield.pdf",
+       path = here("initial_plots", "09_Temp_Norm_comp"),
+       width = 6, height = 6,  units = "in")
+
+
+
+
+
+```
+
+
+```{r - report summary stats - mean conc. - watershed area}
+# Burn vs. unburned watershed area # Run to line 123 to generate the site_data_unique data frame
+watershed_ratio_wide <- site_data_unique %>% 
+  filter(Study_ID != "Murphy et al. 2015") %>% 
+  filter(Study_ID != "Rhea et al. 2021") %>% 
+  pivot_wider(
+    id_cols = Study_ID,
+    names_from = Pair,
+    values_from = Area_watershed_km
+  )
+
+# Pivot longer to handle multiple Site columns and calculate ratios individually
+watershed_ratio <- watershed_ratio_wide %>%
+  pivot_longer(
+    cols = starts_with("Site"), # Pivoting all Site columns (Site_1, Site_2, Site_3, etc.)
+    names_to = "Site",          # Creates a 'Site' column to track sites
+    values_to = "Site_value"    # Store numeric values of Site in the 'Site_value' column
+  ) %>%
+  mutate(
+    watershed_ratio = case_when(
+      # Configurations based on specific Site and Control pairings
+      !is.na(Control_1) & Site == "Site_1" ~ Site_value / Control_1, # Site_1/Control_1
+      !is.na(Control_2) & Site == "Site_2" ~ Site_value / Control_2, # Site_2/Control_2
+      !is.na(Control_3_4_5) & Site %in% c("Site_3", "Site_4", "Site_5") ~ Site_value / Control_3_4_5, # Site_3, Site_4, Site_5 divided by Control_3_4_5
+      !is.na(Control) & Site == "Site_1" ~ Site_value / Control, # Generic Site_1/Control
+      !is.na(Control) & Site == "Site_2" ~ Site_value / Control, # Generic Site_2/Control
+      !is.na(Control) & Site == "Site_3" ~ Site_value / Control, # Generic Site_3/Control
+      TRUE ~ NA_real_ # Default case for rows without valid pairing
+    )
+  ) %>% 
+    filter(!is.na(watershed_ratio)) 
+
+median(watershed_ratio$watershed_ratio)
+sd(watershed_ratio$watershed_ratio)
+range(watershed_ratio$watershed_ratio)
+
+# DOC
+doc_summary <- doc_yearly %>%
+  group_by(Burn_Unburn) %>% 
+  summarise(meanDOC = mean(TempNorm),
+            sdDOC = sd(TempNorm),
+            range = range(TempNorm))
+# Burn mean: 4.661536
+# Burn sd: 11.02459
+# Burn range: [0.010632809:79.805081141]
+
+# Unburn mean: 6.511373
+# Unburn sd: 12.59621
+# Unburn range: [0.005674765:52.736711286]
+
+# NO3
+no3_summary <- no3_yearly %>%
+  group_by(Burn_Unburn) %>% 
+  summarise(meanNo3 = mean(TempNorm),
+            sdNo3 = sd(TempNorm),
+            range = range(TempNorm, scientific = F))
+
+# Burn mean: 2.527080
+# Burn sd: 10.383352
+# Burn range: [0:87.40485]
+
+# Unburn mean: 1.339846
+# Unburn sd: 3.505517
+# Unburn range: [0:15.14391]
+
+
+```
+
+# ==============================================================================
+```{r TSF df TEST}
+TSF_ES_Fig_data <- read_csv("Output_for_analysis/04_Meta_merge_all_studies_effect_size/TSF_ES_Fig_data.csv")
+
+sort(unique(TSF_ES_Fig_data$Study_ID)) # 17 studies This matches the df down below but there are only 139 observations here and 237 down there -WHY?
+
+ounted_data <- TSF_ES_Fig_data %>%
+  group_by(Study_ID, response_var) %>%
+  summarise(row_count = n(), .groups = 'drop')
+
+counted_data <- yearly_mean_site %>%
+  group_by(Study_ID, response_var) %>%
+  summarise(row_count = n(), .groups = 'drop')
+
+merged_data <- cbind(ounted_data, counted_data)
+
+```
+
+# 12/19/2025 - resubmission stats - TSF/Climate/BP - 1/20/2026
+```{r - report summary stats - non-normalized}
+# This chunk is comparing the meanConc (non-normalized) of DOC and nitrate between burned and unburned watersheds (These values are NOT the effect size, its just the raw conc. averaged per site/year/study_ID)
+
+# Step 1: Run above code until 192 and then remove all the data frames you don't need anymore
+rm(abbott_conc_fill)
+rm(control_impact)
+rm(control_impact_fill)
+rm(control_impact_units)
+rm(crandall_conc_fill)
+rm(meta_df)
+rm(metadata_long)
+rm(rhea_conc_fill)
+rm(site_data)
+rm(site_data_unique)
+rm(storm_list_beta)
+rm(time_format)
+
+View(yearly_mean_site)
+yearly_mean_site <- yearly_mean_site %>% 
+  filter(Study_ID !="Murphy et al. 2015")
+sort(unique(yearly_mean_site$Study_ID)) # 17 studies
+
+# meanConc is the non-normalized mean concentrations of DOC and nitrate for each site and year so I should be able to do the same triage but the response variable is meanConc rather than TempNorm
+
+# group by study_ID, response_var, Burn_Unburn
+metadata_cv <- yearly_mean_site %>% 
+  group_by(Study_ID, response_var, Burn_Unburn) %>% 
+  summarise(meanConc = mean(TempNorm, na.rm = TRUE),
+            sdconc = sd(TempNorm, na.rm = TRUE),
+            CVconc = sdconc/meanConc) # generating CVs
+
+# Separate out DOC 
+doc_cv <- metadata_cv %>% 
+  filter(response_var == "DOC_Interp")
+
+# DOC 
+doc_yearly <- yearly_mean_site %>% 
+  filter(response_var == "DOC_Interp")
+
+# conduct anova test to see if the mean concentrations were different between burn and unburned for the non-normalized data (meanConc)
+one.way.doc <- aov(meanConc ~ Burn_Unburn, data = doc_yearly)
+
+plot(one.way.doc)
+
+# QQ plot is not great. Looks like I should log transform. Lets try that. 
+doc_yearly <- doc_yearly %>% 
+  mutate(logmeanConc = log(meanConc))
+
+log.one.way.doc <- aov(logmeanConc ~ Burn_Unburn, data = doc_yearly)
+plot(log.one.way.doc)
+
+summary(log.one.way.doc) # F-value: 0.757, p-value: 0.387
+
+
+# DOC
+doc_summary <- doc_yearly %>%
+  group_by(Burn_Unburn) %>% 
+  reframe(meanDOC = mean(meanConc),
+            sdDOC = sd(meanConc),
+            range = range(meanConc))
+# Burn mean: 5.464236
+# Burn sd: 7.028624
+# Burn range: [0.8471739:28.6974038]
+
+# Unburn mean: 5.192652
+# Unburn sd: 6.565883
+# Unburn range: [0.4378601:24.5090775]
+
+# The mean NON-NORMALIZED (meanConc) concentrations for DOC (5.46 (mg DOC-C)) for burned and 5.19 (mg DOC-C) for unburned were not significantly different from each other (one-way ANOVA: F-value = 0.757; df = 1,72; p-value = 0.387; Fig. S7).
+
+# NO3
+no3_yearly <- yearly_mean_site %>% 
+  filter(response_var == "NO3_Interp")
+
+# conduct anova test to see if the mean concentrations were different between burn and unburned for the non-normalized data (meanConc)
+one.way.n03 <- aov(meanConc ~ Burn_Unburn, data = no3_yearly)
+
+plot(one.way.n03)
+
+# QQ plot is not great. Looks like I should log transform. Lets try that. 
+no3_yearly <- no3_yearly %>% 
+  mutate(logmeanConc = log(meanConc))
+
+log.one.way.no3 <- aov(logmeanConc ~ Burn_Unburn, data = no3_yearly)
+plot(log.one.way.no3)
+
+summary(log.one.way.no3) # F-value: 7.823, p-value: 0.00579 - Significant?
+
+
+no3_summary <- no3_yearly %>%
+  group_by(Burn_Unburn) %>% 
+  reframe(meanNO3 = mean(TempNorm),
+            sdNO3 = sd(TempNorm),
+            range = range(TempNorm, scientific = F))
+
+# Burn mean: 0.11068395
+# Burn sd: 0.5803534
+# Burn range: [0.000000:4.870437]
+
+# Unburn mean: 0.06131053
+# Unburn sd: 0.2377624
+# Unburn range: [0:1.499988]
+
+```
+
+```{r normalized/non-normalized DOC and nitrate effect sizes across whole dataset -- ANOVA}
+Effect_size_orig_nonnormal <- read_csv("Output_for_analysis/04_Meta_merge_all_studies_effect_size/Effect_size_orig_nonnormal.csv")
+
+sort(unique(Effect_size_orig_nonnormal$Study_ID)) # 17 studies - this is all of them
+
+# Pivot into long format
+long_data <- Effect_size_orig_nonnormal %>%
+  pivot_longer(
+    cols = c(Effect_size, Effect_size_no_watershed), # Columns to pivot
+    names_to = "Effect_type",                      # New column to identify which column the value comes from
+    values_to = "Effect_value"                     # New column to store the values
+  )
+
+# Create a list to store ANOVA results for each response_var group
+anova_results <- list()
+
+# Perform ANOVA for each unique response_var
+unique_response_vars <- unique(long_data$response_var)
+
+for (response in unique_response_vars) {
+  # Filter data for the current response_var group
+  group_data <- long_data %>% filter(response_var == response)
+  
+  # Perform ANOVA
+  anova_result <- aov(Effect_value ~ Effect_type, data = group_data)
+  
+  # Store the result in the list
+  anova_results[[response]] <- summary(anova_result)
+}
+
+# Print each ANOVA result by response_var group
+for (response in names(anova_results)) {
+  cat("\nANOVA Results for Response Variable:", response, "\n")
+  print(anova_results[[response]])
+}
+
+# The results revealed significant differences between the effect types for `DOC_Interp`, while no significant differences were observed for `NO3_Interp`. For the response variable `DOC_Interp`, the effect type (`Effect_size` vs. `Effect_size_no_watershed`) showed a significant effect on the response (F(1, 86) = 21.23, *p* < 0.001). The mean sum of squares for the effect type was considerably larger (11.15) compared to the residual variance (0.525). These results indicate that the adjustment for watershed markedly influences effect sizes for this response variable.
+
+# In contrast, for `NO3_Interp`, the ANOVA results showed no significant difference between effect types (F(1, 168) = 2.053, *p* = 0.154). The mean sum of squares for the effect type was considerably smaller (3.49) relative to the residual variance (1.701). This suggests that watershed adjustments do not have a statistically meaningful impact on effect sizes for this response variable.
+
+```
+
+```{r Non-normalized effect size - TSF}
+unique(sort(Effect_size_orig_nonnormal$Study_ID)) # all 17 studies included in TSF analysis
+
+#### DOC NON-NORMAL ####
+# Filter data for DOC and nitrate separately
+DOC_data <- Effect_size_orig_nonnormal %>% 
+  filter(response_var == "DOC_Interp")
+
+# Read in site data to merge the sites to the DOC_data data frame 
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair) %>% 
+  rename(year = Fire_year) %>% 
+  na.omit()
+
+unique(sort(study_site_data$Study_ID)) # should be all 17 studies. 
+
+DOC_model <- full_join(DOC_data, study_site_data) %>% 
+  filter(!is.na(Effect_size_no_watershed))# joining the TSF dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
+
+# Want to make the TSF continuous so I am gonna put actual years to them 
+DOC_model <- DOC_model %>% 
+  group_by(Study_ID) %>% # Group by Study_ID to handle occurrences within the group
+  mutate(
+    occurrence = row_number(), # Create an occurrence tracker within Study_ID
+    Time_Since_Fire = case_when(
+      Study_ID == "Abbott et al. 2021" & occurrence == 1 ~ "10", # First value
+      Study_ID == "Abbott et al. 2021" & occurrence == 2 ~ "11", # Second value
+      TRUE ~ Time_Since_Fire),
+    Time_Since_Fire = case_when(Study_ID == 'Rhea et al. 2021' ~ '15',
+                                     TRUE ~ Time_Since_Fire),
+    Site = case_when(Study_ID == "Abbott et al. 2021" ~ "Burn",
+                                     TRUE ~ Site)) %>%
+  ungroup() %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire))
+  
+
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+doc_tsf_mixed_nonnormal <-  lmer(Effect_size_no_watershed ~ Time_Since_Fire + (1 | Site), data = DOC_model)
+
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_tsf_mixed_nonnormal) #Variance error
+
+# Check for normality
+residuals <- resid(doc_tsf_mixed_nonnormal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.97841, p-value = 0.5004: p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+
+doc_tsf_mixed_nonnormal
+
+summary(doc_tsf_mixed_nonnormal) 
+fixef(doc_tsf_mixed_nonnormal)
+confint(doc_tsf_mixed_nonnormal)
+
+# The fixed effects revealed a significant negative relationship between Time_Since_Fire and Effect_size_no_watershed (t = -5.238, p < 0.05). Specifically, the fixed-effect estimate indicates that for each unit increase in Time_Since_Fire, Effect_size_no_watershed decreases by 0.05603 (± 0.01070 standard error). Additionally, the intercept suggests an initial estimated effect size of 0.40913 (± 0.07692 standard error).
+
+# The random effects analysis showed that variability among sites contributed a variance of 0.06683, with a standard deviation of 0.2585. The residual variance was 0.02049, with a standard deviation of 0.1432. This suggests that site-level differences were modest but contributed meaningfully to the overall model structure.
+
+# Overall, these results demonstrate that Time_Since_Fire has a significant and consistent negative effect on Effect_size_no_watershed, with site-specific variability included as a random effect in the model framework
+
+#### DOC NORMAL (orig) ####
+
+### TEST ###
+TSF_ES <- read_csv(here("Output_for_analysis", "04_Meta_merge_all_studies_effect_size", "TSF_ES_Fig_data.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, response_var, Climate, Biome, Effect_size_pair, Effect_size, year, Time_Since_Fire) %>% 
+  rename(fire_year = year)
+unique(TSF_ES$Study_ID) # Should be all 17 studies
+
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair) %>% 
+  rename(year = Fire_year) %>% 
+  na.omit()
+
+unique(study_site_data$Study_ID) # should be all 17 studies. 
+
+TSF_model <- full_join(TSF_ES, study_site_data) # joining the TSF dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
+
+# manually putting in Abbott names because we merged these watersheds into burn/unburn
+TSF_model <- TSF_model %>% 
+  mutate(Site = case_when(Study_ID == 'Abbott et al. 2021' ~ 'Burn',
+                                     TRUE ~ Site),
+         year = case_when(Study_ID == 'Abbott et al. 2021' ~ 'MTBS_2007Ws',
+                                     TRUE ~ year))
+# Want to make the TSF continuous so I am gonna put actual years to them 
+TSF_model <- TSF_model %>% 
+  mutate(Time_Since_Fire = case_when(Study_ID == 'Abbott et al. 2021' &
+                                     fire_year == 2017 ~ '10',
+                                     TRUE ~ Time_Since_Fire),
+         Time_Since_Fire = case_when(Study_ID == 'Abbott et al. 2021' &
+                                     fire_year == 2018 ~ '11',
+                                     TRUE ~ Time_Since_Fire),
+         Time_Since_Fire = case_when(Study_ID == 'Rhea et al. 2021' ~ '15',
+                                     TRUE ~ Time_Since_Fire)) %>% 
+  na.omit() %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire))
+
+doc_es_tsf <- TSF_model %>% 
+  filter(response_var == "DOC_Interp")
+
+# Continuous 
+doc_tsf_mixed <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = doc_es_tsf)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_tsf_mixed) #OK: Error variance appears to be homoscedastic (p = 0.968).
+
+# Check for normality
+residuals <- resid(doc_tsf_mixed)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # p-value is > 0.05
+# when p > 0.05 can assume normality 
+ 
+doc_tsf_mixed
+
+summary(doc_tsf_mixed) # df: 40.9851, t-value: -4.792, p-value: 2.47e-05 # TSF is significant for DOC 
+
+
+
+
+###
+
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+
+
+
+
+doc_tsf_mixed_normal <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = DOC_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_tsf_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.987).
+
+# Check for normality
+residuals <- resid(doc_tsf_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.97094, p-value = 0.2639: p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+doc_tsf_mixed_normal
+
+summary(doc_tsf_mixed_normal) 
+
+# The fixed effects showed a negative relationship between Time_Since_Fire and Effect_size, but the effect was not statistically significant (t = -1.420, p > 0.05). The fixed-effect estimate suggests that for each unit increase in Time_Since_Fire, Effect_size decreases by 0.02677 (± 0.01886 standard error). The intercept value of -0.33942 (± 0.27074 standard error) suggests a slightly negative starting point, but it is also non-significant (t = -1.254).
+
+# The random effects analysis revealed notable variability between sites, with a variance of 1.27387 and a standard deviation of 1.1287. This indicates that site-level differences contribute substantially to the overall variation in Effect_size. In comparison, the residual variance was much smaller at 0.01956, with a standard deviation of 0.1399, suggesting that most of the variability is captured by the random site effect.
+
+# In summary, the analysis did not detect a significant relationship between Time_Since_Fire and Effect_size. However, the random effects highlight substantial variability across study sites, indicating that site-specific factors play a critical role in modulating the observed effect sizes. This underscores the importance of accounting for site-level differences in the analysis.
+
+# DOC model comparison #
+# The nonnormal model (Effect_size_no_watershed) identifies a significant negative effect of Time_Since_Fire on the response variable, while the normal model (Effect_size) does not detect a significant relationship.
+
+# The normal model attributes much greater variability to site-level differences, suggesting that Effect_size varies substantially across sites. The nonnormal model captures less site-level variability, suggesting that Effect_size_no_watershed may better account for systematic site differences. Using Effect_size_no_watershed (nonnormal) emphasizes a significant negative relationship with Time_Since_Fire, whereas using Effect_size (normal) dilutes this relationship due to substantial variability across sites.
+
+#### NO3 NON-NORMAL ####
+Nitrate_data <- Effect_size_orig_nonnormal %>% 
+  filter(response_var == "NO3_Interp")
+
+NO3_model <- full_join(Nitrate_data, study_site_data) %>% 
+  filter(!is.na(Effect_size_no_watershed))# joining the TSF dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
+
+# Want to make the TSF continuous so I am gonna put actual years to them 
+NO3_model <- NO3_model %>% 
+  group_by(Study_ID) %>% # Group by Study_ID to handle occurrences within the group
+  mutate(
+    occurrence = row_number(), # Create an occurrence tracker within Study_ID
+    Time_Since_Fire = case_when(
+      Study_ID == "Abbott et al. 2021" & occurrence == 1 ~ "10", # First value
+      Study_ID == "Abbott et al. 2021" & occurrence == 2 ~ "11", # Second value
+      TRUE ~ Time_Since_Fire),
+    Time_Since_Fire = case_when(Study_ID == 'Rhea et al. 2021' ~ '15',
+                                     TRUE ~ Time_Since_Fire),
+    Site = case_when(Study_ID == "Abbott et al. 2021" ~ "Burn",
+                                     TRUE ~ Site)) %>%
+  ungroup() %>% 
+  mutate(Time_Since_Fire = as.numeric(Time_Since_Fire))
+  
+
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+no3_tsf_mixed_nonnormal <-  lmer(Effect_size_no_watershed ~ Time_Since_Fire + (1 | Site), data = NO3_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_tsf_mixed_nonnormal) # OK: Error variance appears to be homoscedastic (p = 0.287).
+
+# Check for normality
+residuals <- resid(no3_tsf_mixed_nonnormal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.93737, p-value = 0.0003269: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NOT NORMAL?
+
+no3_tsf_mixed_nonnormal
+
+summary(no3_tsf_mixed_nonnormal) 
+fixef(no3_tsf_mixed_nonnormal)
+confint(no3_tsf_mixed_nonnormal)
+
+# The fixed effects revealed a significant positive relationship between Time_Since_Fire and Effect_size_no_watershed (t = 2.694, p < 0.05). Specifically, the fixed-effect estimate indicates that for each unit increase in Time_Since_Fire, Effect_size_no_watershed increases by 0.09152 (± 0.03397 standard error). The intercept indicates an initial estimated effect size of 0.70308 (± 0.17360 standard error).
+
+# The random effects analysis showed that site-level variability contributed a variance of 0.4472, with a standard deviation of 0.6687. The residual variance was higher at 0.5603, with a standard deviation of 0.7485, suggesting that variability within sites was substantial relative to between-site differences.
+
+# In summary, these results demonstrate that Time_Since_Fire has a significant positive effect on Effect_size_no_watershed, with site-specific variability included as a random effect. This positive relationship implies that as time since fire increases, the influence on Effect_size_no_watershed becomes increasingly pronounced.
+
+#### NO3 NORMAL (orig) ####
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+no3_tsf_mixed_normal <-  lmer(Effect_size ~ Time_Since_Fire + (1 | Site), data = NO3_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_tsf_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.923).
+
+# Check for normality
+residuals <- resid(no3_tsf_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.95725, p-value = 0.005135: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NOT NORMAL?
+
+no3_tsf_mixed_normal
+
+summary(no3_tsf_mixed_normal) 
+# The fixed effects showed a positive relationship between Time_Since_Fire and Effect_size, although the effect was marginally non-significant (t = 1.827, p > 0.05). The fixed-effect estimate suggests that for each unit increase in Time_Since_Fire, Effect_size increases by 0.08813 (± 0.04824 standard error). The intercept indicates an initial estimated effect size of 0.31320 (± 0.30045 standard error).
+
+# The random effects analysis demonstrated notable variability across sites, with a random-effect variance of 2.1417 and a standard deviation of 1.4634. Residual variance accounted for less variability, with a value of 0.5006 and a standard deviation of 0.7076. This indicates that site-level differences contribute substantially to the variance in Effect_size overall.
+
+# In summary, while the positive relationship between Time_Since_Fire and Effect_size was detectable, the results were marginally non-significant. Site-specific variability was substantial, underscoring the importance of accounting for between-site differences in the analysis.
+
+# * Comparison between normal and non-normal* 
+#The non-normal model (Effect_size_no_watershed) detected a significant positive relationship between Time_Since_Fire and the response variable, while the normal model (Effect_size) did not. This difference suggests that using the non-normalized data may obscure the significance of the relationship, whereas the transformation or adjustments applied to Effect_size_no_watershed make this relationship clearer.
+
+```
+
+```{r Non-normalized effect size - Climate}
+unique(sort(Effect_size_orig_nonnormal$Study_ID)) # all 17 studies included in Climate analysis
+
+#### DOC NON-NORMAL ####
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+doc_climate_mixed_nonnormal <-  lmer(Effect_size_no_watershed ~ as.factor(Climate) + (1 | Site), data = DOC_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_climate_mixed_nonnormal) # Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+
+# Check for normality
+residuals <- resid(doc_climate_mixed_nonnormal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.97404, p-value = 0.3477: p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+summary(doc_climate_mixed_nonnormal) 
+
+# post hoc test 
+emmeans::lsmeans(doc_climate_mixed_nonnormal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were no pairs that were significantly different from each other 
+
+# conduct Levene's Test for equality of variances
+# Null: the variance amoung the groups is equal. 
+leveneTest(Effect_size_no_watershed ~ as.factor(Climate), data = DOC_model) #F-value: 2.616, p-value: 0.03757, Df: 5,43 
+# Variability is significantly different 
+
+# plot 
+boxplot(Effect_size_no_watershed ~ Climate,
+  data = DOC_model,
+  main = "Effect size - non-normal Distribution by Climate - DOC",
+  xlab = "Climate",
+  ylab = "Effect Size",
+  col = "#00AFBB",
+  border = "black")
+
+
+#### DOC NORMAL (orig) ####
+doc_climate_mixed_normal <-  lmer(Effect_size ~ as.factor(Climate) + (1 | Site), data = DOC_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_climate_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.988).
+
+# Check for normality
+residuals <- resid(doc_climate_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.97153, p-value = 0.2784: p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+summary(doc_climate_mixed_normal) 
+
+# post hoc test 
+emmeans::lsmeans(doc_climate_mixed_normal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were no pairs that were significantly different from each other 
+
+# conduct Levene's Test for equality of variances
+# Null: the variance amoung the groups is equal. 
+leveneTest(Effect_size ~ as.factor(Climate), data = DOC_model) #F-value: 40.417, p-value: 3.479e-15, Df: 5,43
+# Variability is significantly different 
+
+# plot 
+boxplot(Effect_size ~ Climate,
+  data = DOC_model,
+  main = "Effect size - Distribution by Climate - DOC",
+  xlab = "Climate",
+  ylab = "Effect Size",
+  col = "#00AFBB",
+  border = "black")
+
+#### NO3 NON-NORMAL ####
+no3_climate_mixed_nonnormal <-  lmer(Effect_size_no_watershed ~ as.factor(Climate) + (1 | Site), data = NO3_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_climate_mixed_nonnormal) # OK: Error variance appears to be homoscedastic (p = 0.583).
+
+# Check for normality
+residuals <- resid(no3_climate_mixed_nonnormal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.94414, p-value = 0.0007995: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+summary(no3_climate_mixed_nonnormal) 
+
+# post hoc test 
+emmeans::lsmeans(no3_climate_mixed_nonnormal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were no pairs that were significantly different from each other 
+
+# conduct Levene's Test for equality of variances
+# Null: the variance amoung the groups is equal. 
+leveneTest(Effect_size_no_watershed ~ as.factor(Climate), data = NO3_model) #F-value: 0.8502, p-value: 0.5618, Df: 8,80
+
+# plot 
+boxplot(Effect_size_no_watershed ~ Climate,
+  data = NO3_model,
+  main = "Effect size - non-normal Distribution by Climate - NO3",
+  xlab = "Climate",
+  ylab = "Effect Size",
+  col = "#E7B800",
+  border = "black")
+
+#### NO3 NORMAL (orig) ####
+no3_climate_mixed_normal <-  lmer(Effect_size ~ as.factor(Climate) + (1 | Site), data = NO3_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_climate_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.969).
+
+# Check for normality
+residuals <- resid(no3_climate_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.94782, p-value = 0.001324: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+summary(no3_climate_mixed_normal) 
+
+# post hoc test 
+emmeans::lsmeans(no3_climate_mixed_normal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were two pairs that were significantly different: Csb - Dfc, Csa - Dfc
+
+# conduct Levene's Test for equality of variances
+# Null: the variance amoung the groups is equal. 
+leveneTest(Effect_size ~ as.factor(Climate), data = NO3_model) #F-value: 2.2233, p-value: 0.03401, Df: 8,80
+
+# plot 
+boxplot(Effect_size ~ Climate,
+  data = NO3_model,
+  main = "Effect size - normal Distribution by Climate - NO3",
+  xlab = "Climate",
+  ylab = "Effect Size",
+  col = "#E7B800",
+  border = "black")
+
+```
+
+```{r Non-normalized effect size - BP}
+# Clip burn percent from the study_site_data data frame
+study_site_data <- read_csv(here("inputs", "catchment_characteristics", "Fire_name_Lat_Long.csv"), na = c('-9999', 'N/A')) %>% 
+  dplyr::select(Study_ID, Site, Fire_year, Effect_size_pair, burn_percentage) %>% 
+  rename(year = Fire_year) %>% 
+  filter(!Study_ID == "Murphy et al. 2015") %>% 
+  na.omit()
+
+bp_clip <- study_site_data %>% 
+  dplyr::select(Study_ID, Site, year, Effect_size_pair, burn_percentage)
+
+unique(sort(bp_clip$Study_ID)) # 13 studies included in burn percentage analysis:
+# Burd et al 2018, Coombs & Melack; 2013, Crandall et al. 2021, Gerla & Galloway; 1998, 
+# Gluns & Toews; 1989, Hauer & Spencer 1998, Mast & Clow; 2008, Murphy et al. 2018, 
+# Neary & Currier; 1982, Oliver et al. 2012, Uzun et al. 2020, Wagner et al. 2015, Writer et al. 2014
+
+# Merge with effect size data frame 
+BP_ES <- full_join(bp_clip, Effect_size_orig_nonnormal) %>% 
+  na.omit() %>% 
+  dplyr::select(Study_ID, Site, response_var, Climate, year, Biome, Effect_size_pair, Effect_size, Effect_size_no_watershed, Time_Since_Fire, burn_percentage) # joining the BP dataframe used to make the figure and study site data to match sites because we will be including site as a random effect
+
+# Only DOC 
+DOC_BP_model <- BP_ES %>% 
+  filter(response_var == "DOC_Interp")
+
+#### DOC NON-NORMAL ####
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+doc_bp_mixed_nonnormal <-  lmer(Effect_size_no_watershed ~ burn_percentage + (1 | Site), data = DOC_BP_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_bp_mixed_nonnormal) # Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+
+# Check for normality
+residuals <- resid(doc_bp_mixed_nonnormal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.94196, p-value = 0.04026: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+summary(doc_bp_mixed_nonnormal) 
+
+# Among fixed effects, the intercept was marginally significant (Estimate = 0.252, Std. Error = 0.125, df = 9.09, t = 2.025, p = 0.0733), while the effect of burn percentage was not significant (Estimate = 0.00057, Std. Error = 0.0026, df = 10.55, t = 0.219, p = 0.8305). The correlation between the intercept and burn percentage was moderate (-0.806). Therefore, the impact of burn percentage on effect size was not statistically significant in this model.
+
+# # post hoc test 
+# emmeans::lsmeans(doc_bp_mixed_nonnormal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were no pairs that were significantly different from each other 
+# 
+# # conduct Levene's Test for equality of variances
+# # Null: the variance amoung the groups is equal. 
+# leveneTest(Effect_size_no_watershed ~ as.factor(Climate), data = DOC_model) #F-value: 2.616, p-value: 0.03757, Df: 5,43 
+# # Variability is significantly different 
+# 
+# # plot 
+# boxplot(Effect_size_no_watershed ~ Climate,
+#   data = DOC_model,
+#   main = "Effect size - non-normal Distribution by Climate - DOC",
+#   xlab = "Climate",
+#   ylab = "Effect Size",
+#   col = "#00AFBB",
+#   border = "black")
+
+
+#### DOC NORMAL (orig) ####
+doc_bp_mixed_normal <-  lmer(Effect_size ~ burn_percentage + (1 | Site), data = DOC_BP_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(doc_bp_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.981).
+
+# Check for normality
+residuals <- resid(doc_bp_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.97068, p-value = 0.3781: p-value is > 0.05
+# when p > 0.05 can assume normality 
+
+summary(doc_bp_mixed_normal) 
+
+# For fixed effects, neither the intercept nor burn percentage demonstrated statistical significance. The intercept estimate was -0.588 (Std. Error = 0.635, df = 10.96, t = -0.927, p = 0.374), while the estimate for burn percentage was -0.00038 (Std. Error = 0.01289, df = 11.02, t = -0.030, p = 0.977). The correlation between the intercept and burn percentage was moderate (-0.809). In summary, the model did not find evidence of a significant relationship between burn percentage and effect size after accounting for site-level variability.
+
+# Comparison 
+# The variance attributed to Site was substantially higher for the Effect_size model (1.795 vs. 0.059), indicating greater variability across sites for the Effect_size response variable than for Effect_size_no_watershed.
+
+# Observation: Both models found no significant relationship between burn percentage and the response variable, but the direction of the estimated effect was different: positive for Effect_size_no_watershed and negative for Effect_size.
+
+# post hoc test 
+# emmeans::lsmeans(doc_climate_mixed_normal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were no pairs that were significantly different from each other 
+# 
+# # conduct Levene's Test for equality of variances
+# # Null: the variance amoung the groups is equal. 
+# leveneTest(Effect_size ~ as.factor(Climate), data = DOC_model) #F-value: 40.417, p-value: 3.479e-15, Df: 5,43
+# # Variability is significantly different 
+# 
+# # plot 
+# boxplot(Effect_size ~ Climate,
+#   data = DOC_model,
+#   main = "Effect size - Distribution by Climate - DOC",
+#   xlab = "Climate",
+#   ylab = "Effect Size",
+#   col = "#00AFBB",
+#   border = "black")
+
+#### NO3 NON-NORMAL ####
+# Only N03 
+NO3_BP_model <- BP_ES %>% 
+  filter(response_var == "NO3_Interp")
+
+# perform linear mixed effect model for non-normalized effect size # Site as a random effect 
+no3_bp_mixed_nonnormal <-  lmer(Effect_size_no_watershed ~ burn_percentage + (1 | Site), data = NO3_BP_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_bp_mixed_nonnormal) # OK: Error variance appears to be homoscedastic (p = 0.329).
+
+# Check for normality
+residuals <- resid(no3_bp_mixed_nonnormal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.94141, p-value = 0.001468: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+summary(no3_bp_mixed_nonnormal) 
+
+# Intercept was significant (p = 0.00119), suggesting a strong baseline positive effect size for sites with no burn percentage. Burn percentage was not a significant predictor (p = 0.228), and its estimated effect was small and negative, consistent with no strong influence on NO₃⁻ effect size. Site-level variability (random effects) contributed moderately to the response (variance = 0.622), highlighting spatial effects in NO₃⁻ data.
+
+
+# # post hoc test 
+# emmeans::lsmeans(no3_climate_mixed_nonnormal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were no pairs that were significantly different from each other 
+# 
+# # conduct Levene's Test for equality of variances
+# # Null: the variance amoung the groups is equal. 
+# leveneTest(Effect_size_no_watershed ~ as.factor(Climate), data = NO3_model) #F-value: 0.8502, p-value: 0.5618, Df: 8,80
+# 
+# # plot 
+# boxplot(Effect_size_no_watershed ~ Climate,
+#   data = NO3_model,
+#   main = "Effect size - non-normal Distribution by Climate - NO3",
+#   xlab = "Climate",
+#   ylab = "Effect Size",
+#   col = "#E7B800",
+#   border = "black")
+
+#### NO3 NORMAL (orig) ####
+no3_bp_mixed_normal <-  lmer(Effect_size ~ burn_percentage + (1 | Site), data = NO3_BP_model)
+
+# Check for equal variance
+performance::check_heteroscedasticity(no3_bp_mixed_normal) # OK: Error variance appears to be homoscedastic (p = 0.952).
+
+# Check for normality
+residuals <- resid(no3_bp_mixed_normal)
+qqnorm(residuals)
+qqline(residuals)
+shapiro.test(residuals) # W = 0.9397, p-value = 0.001195: p-value is < 0.05
+# when p > 0.05 can assume normality 
+# NON-NORMAL?
+
+summary(no3_bp_mixed_normal) 
+
+# Intercept was not significant (p = 0.192), suggesting no strong baseline effect size for sites with zero burn percentage. Burn percentage was not a significant predictor (p = 0.403); the estimated effect was small and negative, with no evidence of statistical importance. Site-level variability was substantial (variance = 2.529), much larger than the residual variance, indicating strong spatial effects on NO₃⁻ effect size. 
+
+# Comparison 
+# Both models failed to detect a statistically significant relationship between burn percentage and NO₃⁻ effect size. Effect_size model exhibited far greater site-level variance (2.529 vs. 0.622), suggesting that site effects dominate in explaining variability in Effect_size, whereas their influence on Effect_size_no_watershed is more limited.
+
+# # post hoc test 
+# emmeans::lsmeans(no3_climate_mixed_normal, pairwise ~ Climate, adjust = "tukey") # This is assessing the pair wise comparisons for the rest of the climate classifications. In this case there were two pairs that were significantly different: Csb - Dfc, Csa - Dfc
+# 
+# # conduct Levene's Test for equality of variances
+# # Null: the variance amoung the groups is equal. 
+# leveneTest(Effect_size ~ as.factor(Climate), data = NO3_model) #F-value: 2.2233, p-value: 0.03401, Df: 8,80
+# 
+# # plot 
+# boxplot(Effect_size ~ Climate,
+#   data = NO3_model,
+#   main = "Effect size - normal Distribution by Climate - NO3",
+#   xlab = "Climate",
+#   ylab = "Effect Size",
+#   col = "#E7B800",
+#   border = "black")
+
+```
+
+
+
+
+
+
+
+
+
+

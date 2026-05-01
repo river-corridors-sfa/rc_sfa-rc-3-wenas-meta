@@ -49,7 +49,7 @@ hackastreamcat <- function(name){
   
   urls = paste0(base_url, name, '_Region', regions, '.zip')
 
-  folder = paste0('data/temp_streamcat/', name)
+  folder = paste0('R_scripts/data/temp_streamcat/', name)
   
   files = paste0(folder, '/', regions, '.zip')
 

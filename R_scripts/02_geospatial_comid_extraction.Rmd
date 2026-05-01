@@ -1,0 +1,403 @@
+---
+title: "02a_geospatial_comid_extraction"
+output: html_document
+date: "2026-04-30"
+---
+
+
+# ==============================================================================
+# Author: Kathryn Willi & Matthew R. V. Ross: https://doi.org/10.5281/zenodo.8140272
+
+# Adapted by Jake Cavaiani for the manuscript: Catchment characteristics modulate the influence of wildfires on nitrate and dissolved organic carbon across space and time: A meta-analysis; jake.cavaiani@pnnl.gov
+
+# 30 October 2023
+# ==============================================================================
+
+
+```{r setup, include=TRUE, echo = T, warning = F, comment = F, message = FALSE}
+rm(list = ls())
+library(sf)
+library(tidyverse)
+library(terra)
+library(nhdplusTools)
+library(mapview)
+library(dataRetrieval)
+library(lubridate)
+library(prism)
+library(ggspatial)
+library(nngeo)# Added from original code
+library(stars)# Added from original code
+library(here)
+library(webshot)
+library(readxl)
+library(StreamCatTools)
+
+# this gives you an error, but it can be ignored:
+try(plyr::ldply(list.files(path = here("R_scripts", "data", "src"),
+                           pattern="*.R",
+                           full.names=TRUE),
+                source))
+# Rmarkdown options
+knitr::opts_chunk$set(echo = T, warning = F, comment = F, message = F)
+
+# mapview options
+mapviewOptions(basemaps.color.shuffle=FALSE,basemaps='OpenTopoMap')
+```
+
+### Setting up your site data set.
+
+For this code to run properly, your site data must be configured as follows:
+
+1)  Each site is identified with a unique site name. In the data set, this column must be called `site`.
+2)  Each site has coordinates, with column names `longitude` and `latitude`. Knowledge of coordinate projection required. **OR:**
+    Each site has their known COMID, with column name `comid`. 
+4)  Site data table is a CSV, and stored in the `data/` folder. 
+
+I have included an example data set called `placeholder.csv`, along with all of the additional data sets necessary for the code to run, stored in the `data` folder. 
+
+#### Downloading necessary data sets
+
+Currently, this workflow requires downloading several data sets locally for much speedier run times. This includes: PRISM climate & aridity rasters, NHD flow direction data, and CONUS-wide NHD catchments. All data sets are found in the shared `data` folder.
+
+### Site data assumptions.
+
+This analysis is only appropriate for locations along adequately-sized streams. Some streams are too small to be captured by NHDPlusV2; it is also common for coordinates to fall in the wrong catchment (especially for big rivers). For that reason, review each site and make sure that the NHD feature attributes were appropriately captured.
+
+# National Hydrodraphy Dataset (NHD) data extraction
+
+Identify each sample's NHD COMID. This COMID will allow site linkages with all datasets in this workflow. If COMID is already listed in the CSV, make `site_type = "comid"`.
+
+```{r}
+sf_use_s2(FALSE)
+
+site_type = "xy" # OR site_type = "comid"
+
+sites <- read_csv(here("Output_for_analysis", "01_read_and_gapfill", "01_daily_time_series_paired.csv"), na = c('-9999', 'N/A')) %>%
+  distinct(Site, .keep_all = TRUE) %>%
+  dplyr::select('Site','latitude','longitude') %>% 
+  rename(site = Site) %>% 
+  drop_na()
+
+
+```
+
+Additional steps for sites with coordinates, and no COMID:
+
+```{r}
+if(site_type == "xy"){
+  sites <- sites %>%
+    dplyr::select(site, latitude, longitude) %>% 
+    sf::st_as_sf(coords = c("longitude","latitude"), crs = 4269) # 4269 = NAD83 CRS
+  
+  if(sf::st_crs(sites) != sf::st_crs(4269)){
+    sites <- sites %>% st_transform(., crs = 4269)
+  }
+  
+  mapview(sites)
+}
+```
+
+Pull all meta data associated with each site's COMID. 
+
+```{r}
+
+sites$comid <- NA
+for(i in 1:nrow(sites)){
+  result <- try(discover_nhdplus_id(sites[i,]), silent = TRUE)
+  if(!inherits(result, "try-error") && length(result) > 0){
+    sites$comid[i] <- result
+  } else {
+    message("No COMID for site: ", sites$site[i])
+  }
+}
+
+# NEW: extract coordinates into plain columns and drop geometry
+sites_1 <- sites %>%
+  mutate(
+    longitude = sf::st_coordinates(.)[,1],
+    latitude  = sf::st_coordinates(.)[,2]
+  ) %>%
+  sf::st_drop_geometry()
+
+
+```
+
+### Setting up your site data set.
+
+For this code to run properly, your site data must be configured as follows:
+
+1)  Each site is identified with a unique site name. In the data set, this column must be called `site`.
+2)  Each site has their known COMID, with column name `comid`. 
+4)  Site data table is a CSV, and stored in the `data/` folder. 
+
+
+#### Downloading necessary data sets
+
+Currently, this workflow requires downloading several data sets locally for much speedier run times. This includes: PRISM climate & aridity rasters, NHD flow direction data, and CONUS-wide NHD catchments. All data sets are found in the shared `data` folder.
+
+
+# National Hydrodraphy Dataset (NHD) data extraction
+
+Use COMID to allow site linkages with all datasets in this workflow. 
+Pull all meta data associated with each site's COMID. 
+```{r}
+# site_type = "comid" # This steps assumes you have checked your COMIDs
+# 
+# if(site_type == "comid"){
+#   sites <- getNHDcomid(df = dplyr::select(sites, site, comid))
+# }
+
+site_type = "comid"
+
+if(site_type == "comid"){
+  
+  # 1. Save the full site list (with lat/long preserved)
+  sites_all <- sites_1
+  
+  # 2. Identify sites without COMIDs
+  sites_no_comid <- sites_all %>% dplyr::filter(is.na(comid))
+  
+  if(nrow(sites_no_comid) > 0){
+    message("Skipping NHD extraction for ", nrow(sites_no_comid),
+            " site(s) without COMIDs: ",
+            paste(sites_no_comid$site, collapse = ", "))
+  }
+  
+  # 3. Run getNHDcomid() only on sites WITH valid COMIDs
+  sites_with_comid <- sites_all %>%
+    dplyr::filter(!is.na(comid)) %>%
+    dplyr::select(site, comid)
+  
+  sites_nhd <- getNHDcomid(df = sites_with_comid)
+  
+  # 4. Drop sf geometry so we can join as a regular data frame
+  sites_nhd_df <- sites_nhd %>% 
+    sf::st_drop_geometry() %>%
+    dplyr::select(-any_of(c("latitude", "longitude")))   # drop NHD-snapped coords
+  
+  # 5. Use sites_all as the spine (keeps original lat/long for ALL sites),
+  #    then left_join the NHD metadata onto it
+  sites <- sites_all %>%
+    dplyr::left_join(sites_nhd_df, by = c("site", "comid"))
+  
+  # 6. Sanity checks
+  message("Total rows: ", nrow(sites),
+          " | With NHD data: ", sum(!is.na(sites$comid)),
+          " | Without (NA): ", sum(is.na(sites$comid)))
+}
+
+# Remove data frames that are not needed
+rm(sites_all)
+rm(sites_nhd)
+rm(sites_nhd_df)
+rm(sites_no_comid)
+rm(sites_with_comid)
+
+```
+
+
+# STREAMCAT BURN PERCENT for each COMID 
+```{r}
+# ---- 1. Read fire-year metadata from Sites_meta_data.csv ---------
+sites_meta <- read_csv(here("inputs", "Studies_Summary", "Sites_meta_data.csv"),
+                       show_col_types = FALSE) %>%
+  dplyr::select(Study_ID, Fire_year) %>%
+  distinct()
+
+# Expand multi-year fire strings (e.g., "2021_2022") into separate rows
+fire_years_long <- sites_meta %>%
+  mutate(Fire_year = str_split(as.character(Fire_year), "_")) %>%
+  unnest(Fire_year) %>%
+  mutate(Fire_year = as.integer(Fire_year)) %>%
+  filter(!is.na(Fire_year))
+
+# ---- 2. Link each Site to its Study_ID and fire year(s) ----------
+daily_ts <- read_csv(here("Output_for_analysis", "01_read_and_gapfill",
+                          "01_daily_time_series_paired.csv"),
+                     show_col_types = FALSE)
+
+site_fire_key <- daily_ts %>%
+  distinct(Study_ID, Site) %>%
+  left_join(fire_years_long, by = "Study_ID") %>%
+  left_join(sites_1 %>% dplyr::select(site, comid) %>%
+              rename(Site = site),
+            by = "Site") %>%
+  filter(!is.na(comid), !is.na(Fire_year))
+
+# ---- 3. Build the metric list from the unique fire years ---------
+# StreamCat MTBS coverage: 1984–2018
+needed_years  <- unique(site_fire_key$Fire_year)
+covered_years <- needed_years[needed_years >= 1984 & needed_years <= 2018]
+uncovered <- setdiff(needed_years, covered_years)
+
+if(length(uncovered) > 0){
+  message("Fire years outside StreamCat MTBS coverage (1984–2018): ",
+          paste(uncovered, collapse = ", "),
+          " — these sites will have NA burn percent.")
+}
+
+# Metric naming: MTBS_{year} (the API will return the Ws version because
+# we pass aoi = "watershed"). The returned column will be named like
+# "mtbs_{year}ws" after lowercasing.
+mtbs_metrics <- paste0("pctburnarea", covered_years)
+message("Requesting StreamCat metrics: ", paste(mtbs_metrics, collapse = ", "))
+
+# ---- 4. Pull burn percentages from StreamCat API -----------------
+unique_comids <- unique(site_fire_key$comid)
+
+burn_data <- sc_get_data(
+  metric = paste(mtbs_metrics, collapse = ","),
+  aoi    = "watershed",
+  comid  = paste(unique_comids, collapse = ",")
+)
+
+# Standardize column names to lowercase (API returns mixed case)
+names(burn_data) <- tolower(names(burn_data))
+
+# Quick sanity check
+message("burn_data columns: ", paste(names(burn_data), collapse = ", "))
+
+# ---- 5. Pivot to long: one row per (comid, year) -----------------
+burn_long <- burn_data %>%
+  pivot_longer(cols = starts_with("pctburnarea"),
+               names_to  = "metric",
+               values_to = "burn_percent") %>%
+  mutate(Fire_year = as.integer(str_extract(metric, "\\d{4}"))) %>%
+  dplyr::select(comid, Fire_year, burn_percent)
+
+# ---- 6. Match each site to its fire-year burn percentage ---------
+site_burn <- site_fire_key %>%
+  left_join(burn_long, by = c("comid", "Fire_year"))
+
+# For multi-year fires (e.g., 2021_2022), collapse per site
+site_burn_summary <- site_burn %>%
+  group_by(Study_ID, Site, comid) %>%
+  summarise(
+    burn_percent_fire_year = sum(burn_percent, na.rm = TRUE),   # or max()
+    fire_years_used        = paste(sort(unique(Fire_year)), collapse = "_"),
+    .groups = "drop"
+  )
+
+# ---- 7. Join onto sites (rename Site -> site to match sites' lowercase key) -----------
+sites_bp_geo <- sites %>%
+  left_join(
+    site_burn_summary %>% 
+      dplyr::select(-Study_ID) %>%
+      rename(site = Site),
+    by = c("site", "comid")
+  )
+
+
+```
+
+# MTBS BURN SEVERITY percent low, moderate, high for each COMID 
+```{r}
+# ---- 1. Build severity metric list from the covered fire years ---
+# We already have `site_fire_key` and `covered_years` from the burn_percent pull
+sev_metrics <- c(
+  paste0("pcthighsev", covered_years),
+  paste0("pctmodsev",  covered_years),
+  paste0("pctlowsev",  covered_years)
+)
+message("Requesting severity metrics: ", paste(sev_metrics, collapse = ", "))
+
+# ---- 2. Pull from StreamCat API ---------------------------------
+sev_data <- sc_get_data(
+  metric = paste(sev_metrics, collapse = ","),
+  aoi    = "watershed",
+  comid  = paste(unique_comids, collapse = ",")
+)
+
+# Standardize column names
+names(sev_data) <- tolower(names(sev_data))
+message("sev_data columns: ", paste(names(sev_data), collapse = ", "))
+
+# ---- 3. Pivot to long: one row per (comid, year, severity class) -
+sev_long <- sev_data %>%
+  pivot_longer(
+    cols = matches("^pct(high|mod|low)sev\\d{4}ws$"),
+    names_to = "metric",
+    values_to = "severity_percent"
+  ) %>%
+  mutate(
+    Fire_year = as.integer(str_extract(metric, "\\d{4}")),
+    severity_class = str_extract(metric, "(high|mod|low)")
+  ) %>%
+  dplyr::select(comid, Fire_year, severity_class, severity_percent)
+
+# ---- 4. Match each site to its fire-year severity values ---------
+site_sev <- site_fire_key %>%
+  left_join(sev_long, by = c("comid", "Fire_year"))
+
+# For multi-year fires, collapse by summing (or max)
+site_sev_summary <- site_sev %>%
+  group_by(Study_ID, Site, comid, severity_class) %>%
+  summarise(
+    severity_percent = sum(severity_percent, na.rm = TRUE),   # or max()
+    fire_years_used  = paste(sort(unique(Fire_year)), collapse = "_"),
+    .groups = "drop"
+  )
+
+# ---- 5. Pivot back to wide: one column per severity class --------
+site_sev_wide <- site_sev_summary %>%
+  dplyr::select(-fire_years_used) %>%    # already captured in burn_percent join
+  pivot_wider(
+    names_from = severity_class,
+    values_from = severity_percent,
+    names_prefix = "burn_sev_"           # -> burn_sev_high, burn_sev_mod, burn_sev_low
+  )
+
+# ---- 6. Join onto the sites data frame ---------------------------
+sites_sev_bp_geo <- sites_bp_geo %>%
+  left_join(
+    site_sev_wide %>%
+      dplyr::select(-Study_ID) %>%
+      rename(site = Site),
+    by = c("site", "comid")
+  )
+
+
+```
+
+
+# EXPORT FILE 
+```{r}
+# ---- Deduplicate: one row per site ---------------------------------
+# Some sites get expanded when multiple input sites share a COMID.
+# Collapse to a single row per site.
+
+n_before <- nrow(sites_sev_bp_geo)
+
+sites_sev_bp_geo <- sites_sev_bp_geo %>%
+  distinct(site, .keep_all = TRUE)
+
+n_after <- nrow(sites_sev_bp_geo)
+
+message("Deduplicated: ", n_before, " rows -> ", n_after, " rows (",
+        n_before - n_after, " duplicates removed)")
+
+# Verify no remaining duplicates
+dup_check <- sites_sev_bp_geo %>% count(site) %>% filter(n > 1)
+stopifnot(nrow(dup_check) == 0)
+message("Confirmed: one row per site in final geospatial data frame.")
+
+
+# ---- Export ---------------------------------------------
+out_dir <- here("Output_for_analysis/02_geospatial_comid_extraction")
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+
+write_csv(sites_sev_bp_geo,
+          file.path(out_dir, "geospatial_variables_bp_severity_pull.csv"))
+
+
+```
+
+
+
+
+
+
+
+
+
+

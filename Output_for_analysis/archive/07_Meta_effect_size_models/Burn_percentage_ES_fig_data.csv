@@ -1,0 +1,146 @@
+Study_ID,Site,response_var,Climate,year,Biome,Effect_size_pair,Effect_size,Time_Since_Fire,burn_percentage,grouped_percentage,burn_percentage_group
+Burd et al 2018,Notawohka Creek,DOC_Interp,Dfc,MTBS_2013Ws,Cold,lnR1,-0.8074667025846229,3,90,9,9
+Coombs & Melack; 2013,Arroyo Hondo,NO3_Interp,BSk,MTBS_2004Ws,Arid,lnR3,-0.2030079720285851,0,18,2,2
+Coombs & Melack; 2013,Arroyo Hondo,NO3_Interp,BSk,MTBS_2004Ws,Arid,lnR3,0.17335251790747283,1,18,2,2
+Coombs & Melack; 2013,Gaviota,NO3_Interp,BSk,MTBS_2004Ws,Arid,lnR2,-2.0473966314124756,0,12,2,2
+Coombs & Melack; 2013,Gaviota,NO3_Interp,BSk,MTBS_2004Ws,Arid,lnR2,-1.8565999926447945,1,12,2,2
+Coombs & Melack; 2013,San Onofre,NO3_Interp,BSk,MTBS_2004Ws,Arid,lnR1,1.75295228052377,0,98.9419,10,10
+Coombs & Melack; 2013,San Onofre,NO3_Interp,BSk,MTBS_2004Ws,Arid,lnR1,1.702459542946486,1,98.9419,10,10
+Crandall et al. 2021,Benjamin Slough,DOC_Interp,Csa,MTBS_2008Ws,Temperate,lnR1,0.988069231426104,0,67,7,7
+Crandall et al. 2021,Benjamin Slough,NO3_Interp,Csa,MTBS_2008Ws,Temperate,lnR1,1.4661797341705565,0,67,7,7
+Crandall et al. 2021,Payson,DOC_Interp,Csa,MTBS_2008Ws,Temperate,lnR2,-0.5012324665111016,0,90,9,9
+Crandall et al. 2021,Payson,NO3_Interp,Csa,MTBS_2008Ws,Temperate,lnR2,-4.246086967895374,0,90,9,9
+Crandall et al. 2021,Spanish Fork Lower,DOC_Interp,Csa,MTBS_2008Ws,Temperate,lnR3,0.6279152172921498,0,24,3,3
+Crandall et al. 2021,Spanish Fork Lower,NO3_Interp,Csa,MTBS_2008Ws,Temperate,lnR3,0.3617241962673968,0,24,3,3
+Crandall et al. 2021,Spanish Fork Upper,DOC_Interp,Csa,MTBS_2008Ws,Temperate,lnR4,0.8028695220357438,0,25,3,3
+Crandall et al. 2021,Spanish Fork Upper,NO3_Interp,Csa,MTBS_2008Ws,Temperate,lnR4,-1.0139978491713204,0,25,3,3
+Gerla & Galloway; 1998,Jones Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR1,-0.9404498708553406,1,96.1969,10,10
+Gerla & Galloway; 1998,Jones Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR1,0.8469826044301482,2,96.1969,10,10
+Gerla & Galloway; 1998,Jones Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR1,0.9767219657876396,3,96.1969,10,10
+Gerla & Galloway; 1998,Jones Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR1,1.3512432699490873,4,96.1969,10,10
+Gerla & Galloway; 1998,Jones Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR1,0.8936477010811649,5,96.1969,10,10
+Gluns & Toews; 1989,East Fork,NO3_Interp,Dfc,MTBS_1985Ws,Cold,lnR1,2.1175380180518832,0,26.1,3,3
+Gluns & Toews; 1989,East Fork,NO3_Interp,Dfc,MTBS_1985Ws,Cold,lnR1,2.043287391906721,1,26.1,3,3
+Gluns & Toews; 1989,East Fork,NO3_Interp,Dfc,MTBS_1985Ws,Cold,lnR1,2.4793176404333854,2,26.1,3,3
+Gluns & Toews; 1989,East Fork,NO3_Interp,Dfc,MTBS_1985Ws,Cold,lnR1,1.8413502470540644,3,26.1,3,3
+Gluns & Toews; 1989,Middle Fork,NO3_Interp,Dfc,MTBS_1985Ws,Cold,lnR2,1.5124370882941682,0,32.8,4,4
+Gluns & Toews; 1989,Middle Fork,NO3_Interp,Dfc,MTBS_1985Ws,Cold,lnR2,1.7902711083086134,1,32.8,4,4
+Gluns & Toews; 1989,Middle Fork,NO3_Interp,Dfc,MTBS_1985Ws,Cold,lnR2,2.175364252047078,2,32.8,4,4
+Gluns & Toews; 1989,Middle Fork,NO3_Interp,Dfc,MTBS_1985Ws,Cold,lnR2,1.8853069011924857,3,32.8,4,4
+Hauer & Spencer 1998,Akokala_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR3,2.332128722301076,1,9.9,1,1
+Hauer & Spencer 1998,Akokala_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR3,2.2632756340805606,2,9.9,1,1
+Hauer & Spencer 1998,Akokala_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR3,1.1968588798283115,3,9.9,1,1
+Hauer & Spencer 1998,Akokala_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR3,1.144040408000032,4,9.9,1,1
+Hauer & Spencer 1998,Akokala_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR3,1.464134057717891,5,9.9,1,1
+Hauer & Spencer 1998,Bowman_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR4,1.2844252245417789,3,11.3,2,2
+Hauer & Spencer 1998,Bowman_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR4,0.5376175802346618,4,11.3,2,2
+Hauer & Spencer 1998,Bowman_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR4,0.8274961058239492,5,11.3,2,2
+Hauer & Spencer 1998,Quartz_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR5,2.4314632577693227,1,29.4,3,3
+Hauer & Spencer 1998,Quartz_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR5,2.1956752619491127,2,29.4,3,3
+Hauer & Spencer 1998,Quartz_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR5,1.4865638267876355,3,29.4,3,3
+Hauer & Spencer 1998,Red_Bench_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR1,1.911426272610421,1,95.6,10,10
+Hauer & Spencer 1998,Red_Bench_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR1,0.9052735213660048,2,95.6,10,10
+Hauer & Spencer 1998,Red_Bench_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR1,0.5730656823751883,3,95.6,10,10
+Hauer & Spencer 1998,Red_Bench_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR1,0.6206869330306183,4,95.6,10,10
+Hauer & Spencer 1998,Red_Bench_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR1,0.16719947859094442,5,95.6,10,10
+Hauer & Spencer 1998,Red_Meadow_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR2,1.872308461156119,1,24.087,3,3
+Hauer & Spencer 1998,Red_Meadow_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR2,1.7931305712867058,2,24.087,3,3
+Hauer & Spencer 1998,Red_Meadow_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR2,2.123237518978183,3,24.087,3,3
+Hauer & Spencer 1998,Red_Meadow_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR2,2.355939128240543,4,24.087,3,3
+Hauer & Spencer 1998,Red_Meadow_Creek,NO3_Interp,Dfc,MTBS_1988Ws,Cold,lnR2,2.4331464456086973,5,24.087,3,3
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.05198944083147036,1,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.05198944083147036,1,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.23267430480315815,1,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.23267430480315815,1,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.05485661026893528,2,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.05485661026893528,2,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.33386212088645906,3,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.33386212088645906,3,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.06876044186758228,4,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.06876044186758228,4,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.9217624797354468,1,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.9217624797354468,1,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.6938414248359014,2,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.6938414248359014,2,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.6238798035979927,3,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.6238798035979927,3,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.4513944740791651,4,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.4513944740791651,4,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.05198944083147036,1,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.05198944083147036,1,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.23267430480315815,1,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.23267430480315815,1,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.05485661026893528,2,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.05485661026893528,2,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.33386212088645906,3,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.33386212088645906,3,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.06876044186758228,4,51,6,6
+Mast & Clow; 2008,Coal,DOC_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,-0.06876044186758228,4,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.9217624797354468,1,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.9217624797354468,1,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.6938414248359014,2,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.6938414248359014,2,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.6238798035979927,3,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.6238798035979927,3,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.4513944740791651,4,51,6,6
+Mast & Clow; 2008,Coal,NO3_Interp,Dfc,MTBS_2003Ws,Cold,lnR1,0.4513944740791651,4,51,6,6
+Murphy et al. 2018,DS1,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR1,-0.19586948633799223,0,16.3095,2,2
+Murphy et al. 2018,DS1,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR1,-0.09253034556904192,1,16.3095,2,2
+Murphy et al. 2018,DS1,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR1,-0.4059504771372809,2,16.3095,2,2
+Murphy et al. 2018,DS1,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR1,-0.4838929792642086,3,16.3095,2,2
+Murphy et al. 2018,DS1,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR1,-0.3881077782646473,4,16.3095,2,2
+Murphy et al. 2018,DS1,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR1,-0.3676420649753068,5,16.3095,2,2
+Murphy et al. 2018,DS1,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR1,-0.9251679798500448,0,16.3095,2,2
+Murphy et al. 2018,DS1,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR1,0.34874637041195555,1,16.3095,2,2
+Murphy et al. 2018,DS1,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR1,0.4896719200329616,2,16.3095,2,2
+Murphy et al. 2018,DS1,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR1,0.5260874760635659,3,16.3095,2,2
+Murphy et al. 2018,DS1,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR1,0.10679525211943049,4,16.3095,2,2
+Murphy et al. 2018,DS1,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR1,0.27085562181965056,5,16.3095,2,2
+Murphy et al. 2018,DS2,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR2,5.568617996321454e-4,0,27.1144,3,3
+Murphy et al. 2018,DS2,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR2,-0.2794571534661146,1,27.1144,3,3
+Murphy et al. 2018,DS2,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR2,-0.42051599123248457,2,27.1144,3,3
+Murphy et al. 2018,DS2,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR2,-0.5412446599785048,3,27.1144,3,3
+Murphy et al. 2018,DS2,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR2,-0.5762560227751916,4,27.1144,3,3
+Murphy et al. 2018,DS2,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR2,-0.5510697334216398,5,27.1144,3,3
+Murphy et al. 2018,DS2,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR2,-0.5401482686656407,0,27.1144,3,3
+Murphy et al. 2018,DS2,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR2,0.4924902954548207,1,27.1144,3,3
+Murphy et al. 2018,DS2,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR2,1.0609399607508578,2,27.1144,3,3
+Murphy et al. 2018,DS2,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR2,0.9631628551436824,3,27.1144,3,3
+Murphy et al. 2018,DS2,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR2,0.3707771777527453,4,27.1144,3,3
+Murphy et al. 2018,DS2,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR2,0.5277273450124165,5,27.1144,3,3
+Murphy et al. 2018,DS3,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR3,-0.5290874956151702,1,27.1121,3,3
+Murphy et al. 2018,DS3,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR3,-0.504700788827816,2,27.1121,3,3
+Murphy et al. 2018,DS3,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR3,-0.6939952120636859,3,27.1121,3,3
+Murphy et al. 2018,DS3,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR3,-0.7185013536732262,4,27.1121,3,3
+Murphy et al. 2018,DS3,DOC_Interp,Cfb,MTBS_2010Ws,Temperate,lnR3,-0.7218292413374722,5,27.1121,3,3
+Murphy et al. 2018,DS3,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR3,-0.5324776921953114,1,27.1121,3,3
+Murphy et al. 2018,DS3,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR3,0.6606550881027107,2,27.1121,3,3
+Murphy et al. 2018,DS3,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR3,0.5319120776509874,3,27.1121,3,3
+Murphy et al. 2018,DS3,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR3,-0.04505357676425826,4,27.1121,3,3
+Murphy et al. 2018,DS3,NO3_Interp,Cfb,MTBS_2010Ws,Temperate,lnR3,0.13000465508024311,5,27.1121,3,3
+Neary & Currier; 1982,Wash Branch,NO3_Interp,Cfa,MTBS_1978Ws,Temperate,lnR1,1.5739271177981005,0,31.3,4,4
+Neary & Currier; 1982,Wash Branch,NO3_Interp,Cfa,MTBS_1978Ws,Temperate,lnR1,0.7765290563903371,1,31.3,4,4
+Oliver et al. 2012,Site 2,NO3_Interp,Csb,MTBS_2007Ws,Temperate,lnR1,0.7146311795090584,1,76.4673,8,8
+Oliver et al. 2012,Site 2,NO3_Interp,Csb,MTBS_2007Ws,Temperate,lnR1,-0.5396214946346434,2,76.4673,8,8
+Oliver et al. 2012,Site 3,NO3_Interp,Csb,MTBS_2007Ws,Temperate,lnR2,0.1083671999910158,1,41,5,5
+Oliver et al. 2012,Site 3,NO3_Interp,Csb,MTBS_2007Ws,Temperate,lnR2,-1.76671099295381,2,41,5,5
+Oliver et al. 2012,Site 4,NO3_Interp,Csb,MTBS_2007Ws,Temperate,lnR3,-1.2564969709571707,1,56,6,6
+Oliver et al. 2012,Site 4,NO3_Interp,Csb,MTBS_2007Ws,Temperate,lnR3,-2.169919002561115,2,56,6,6
+Uzun et al. 2020,Rocky Fire,DOC_Interp,Csa,MTBS_2015Ws,Temperate,lnR1,-3.5873302571008643,1,12.8141,2,2
+Uzun et al. 2020,Rocky Fire,DOC_Interp,Csa,MTBS_2015Ws,Temperate,lnR1,-3.488635457510704,2,12.8141,2,2
+Uzun et al. 2020,Rocky Fire,NO3_Interp,Csa,MTBS_2015Ws,Temperate,lnR1,-2.343905190475006,1,12.8141,2,2
+Uzun et al. 2020,Rocky Fire,NO3_Interp,Csa,MTBS_2015Ws,Temperate,lnR1,-2.523624055603431,2,12.8141,2,2
+Uzun et al. 2020,Wragg Fire,DOC_Interp,Csa,MTBS_2015Ws,Temperate,lnR2,-2.781397262801667,1,70.0648,8,8
+Uzun et al. 2020,Wragg Fire,DOC_Interp,Csa,MTBS_2015Ws,Temperate,lnR2,-2.8617192837255008,2,70.0648,8,8
+Uzun et al. 2020,Wragg Fire,NO3_Interp,Csa,MTBS_2015Ws,Temperate,lnR2,-1.4038784576475674,1,70.0648,8,8
+Uzun et al. 2020,Wragg Fire,NO3_Interp,Csa,MTBS_2015Ws,Temperate,lnR2,-1.9038360329879964,2,70.0648,8,8
+Wagner et al. 2015,PNF,DOC_Interp,Dfb,MTBS_2012Ws,Cold,lnR2,-0.6091057775083416,1,16.7187,2,2
+Wagner et al. 2015,PSF,DOC_Interp,Dfb,MTBS_2012Ws,Cold,lnR1,-0.4217573948728868,1,1.5243,1,1
+Writer et al. 2014,PNF,DOC_Interp,Dfb,MTBS_2012Ws,Cold,lnR1,-0.3651480585147016,0,16.7187,2,2
+Writer et al. 2014,PNF,DOC_Interp,Dfb,MTBS_2012Ws,Cold,lnR1,-0.619805853304341,1,16.7187,2,2
+Writer et al. 2014,PNF,NO3_Interp,Dfb,MTBS_2012Ws,Cold,lnR1,-0.22445633786858216,0,16.7187,2,2
+Writer et al. 2014,PNF,NO3_Interp,Dfb,MTBS_2012Ws,Cold,lnR1,-0.73752899074672,1,16.7187,2,2
+Writer et al. 2014,PSF,DOC_Interp,Dfb,MTBS_2012Ws,Cold,lnR2,-0.4623748929438658,0,1.5243,1,1
+Writer et al. 2014,PSF,DOC_Interp,Dfb,MTBS_2012Ws,Cold,lnR2,-0.3994634277186648,1,1.5243,1,1
+Writer et al. 2014,PSF,NO3_Interp,Dfb,MTBS_2012Ws,Cold,lnR2,-0.1726924417168119,0,1.5243,1,1
+Writer et al. 2014,PSF,NO3_Interp,Dfb,MTBS_2012Ws,Cold,lnR2,0.6342845717183738,1,1.5243,1,1
