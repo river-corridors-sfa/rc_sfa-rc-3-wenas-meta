@@ -1,6 +1,6 @@
 # =================================== Objectives =================================
 # 
-# Script: 04_exploratory_null_hypotheses.R
+# Script: 03b_exploratory_null_hypotheses.R
 # Purpose: Explore distributions and relationships between DOC/nitrate and key
 #          catchment predictors (watershed area, burn %, climate, TSF, burn
 #          severity). Produces visualizations and formal statistical tests for
