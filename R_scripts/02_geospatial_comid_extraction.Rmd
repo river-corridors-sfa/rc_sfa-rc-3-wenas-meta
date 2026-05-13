@@ -357,25 +357,35 @@ sites_sev_bp_geo <- sites_bp_geo %>%
   )
 
 # ---- 7. Based on comid_fact_check.Rmd we need to manually change some bp and severity values -------
+# Define site groups once to keep it readable
+unburn_sites <- c("Logging_Creek", "Wally_Creek", "Pinchot", "Site_1",
+                  "Crow Creek", "U3",
+                  "Reference First Rainy Season",
+                  "Reference Second Rainy Season",
+                  "Reference Subsequent Flush")
+
+na_sites_all <- c("East Fork Kootenai", "Middle Fork Kootenai",
+                  "Middle_Fork_American", "Trout_Creek",
+                  "Wash Branch", "Camas Creek")
+
+na_sites_sev_only <- c("East Fork Kootenai", "Middle Fork Kootenai")
+
 sites_sev_bp_geo <- sites_sev_bp_geo %>%
-  mutate(burn_percent_fire_year = case_when(
-    site == "Logging_Creek" ~ 0,
-    site == "Wally_Creek" ~ 0,
-    site == "Pinchot" ~ 0,
-    site == "Site_1" ~ 0,
-    site == "Crow Creek" ~ 0,
-    site == "U3" ~ 0,
-    site == "Reference First Rainy Season" ~ 0,
-    site == "Reference Second Rainy Season" ~ 0,
-    site == "Reference Subsequent Flush" ~ 0,
-    site == "East Fork Kootenai" ~ NA_real_,
-    site == "Middle Fork Kootenai" ~ NA_real_,
-    site == "Middle_Fork_American" ~ NA_real_,
-    site == "Trout_Creek" ~ NA_real_,
-    site == "Wash Branch" ~ NA_real_,
-    site == "Camas Creek" ~ NA_real_,
-    TRUE ~ burn_percent_fire_year   # keep existing values
-  ))
+  mutate(
+    # --- burn_percent_fire_year ---
+    burn_percent_fire_year = case_when(
+      site %in% unburn_sites  ~ 0,
+      site %in% na_sites_all  ~ NA_real_,
+      TRUE                    ~ burn_percent_fire_year
+    ),
+    # --- all burn_sev_* columns ---
+    across(starts_with("burn_sev"),
+           ~ case_when(
+               site %in% unburn_sites      ~ 0,
+               site %in% na_sites_sev_only ~ NA_real_,
+               TRUE                        ~ .x
+             ))
+  )
 
 
 

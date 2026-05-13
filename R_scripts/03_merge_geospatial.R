@@ -43,8 +43,8 @@ geo_vars <- read_csv(
   show_col_types = FALSE
 )
 
-# wally <- geo_vars %>% 
-#   filter(site == "Wally_Creek") %>% 
+# wally <- geo_vars %>%
+#   filter(site == "Wally_Creek") %>%
 #   select(burn_percent_fire_year)
 
 # ---- 2. Harmonize the join key --------------------------------------------
@@ -128,6 +128,20 @@ nobueno <- control %>%
 nobuenoburn <- control %>% 
   filter(Burn_Unburn == "Burn") %>% 
   filter(burn_percent_fire_year == 0)
+
+# Are there any unburned watersheds that have a burn severity?
+MTBS <- merged %>% 
+  select(Study_ID, Site, Burn_Unburn, fire_years_used, burn_sev_high, burn_sev_mod, burn_sev_low) %>%
+  distinct(Site, .keep_all = TRUE)
+
+bad <- MTBS %>% 
+  filter(Burn_Unburn == "Unburn") %>% 
+  filter(burn_sev_high > 0 | burn_sev_mod > 0 | burn_sev_low > 0)
+
+badburn <- MTBS %>% 
+  filter(Burn_Unburn == "Burn") %>% 
+  filter(burn_sev_high == 0 | burn_sev_mod == 0 | burn_sev_low == 0)
+
 
 vars_to_check <- c("Climate", "Area_watershed_km", "Time_Since_Fire", "comid",
                    "burn_percent_fire_year", "burn_sev_high", "burn_sev_mod",

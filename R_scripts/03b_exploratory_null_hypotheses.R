@@ -65,9 +65,8 @@ out_dir <- here("Output_for_analysis", "03b_exploratory_null_hypothesis")
 fig_dir <- file.path(out_dir, "figures")
 dir.create(fig_dir, showWarnings = FALSE, recursive = TRUE)
 
-# ==============================================================================
+
 # SECTION A: Summary statistics (calculated on raw, reported in both scales)
-# ==============================================================================
 
 summary_stats <- merged %>%
   group_by(Study_ID, Site, Burn_Unburn) %>%
