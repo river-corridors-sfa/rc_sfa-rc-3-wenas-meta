@@ -1,0 +1,919 @@
+---
+title: "03.5_Sparse_Modeling"
+output: html_document
+date: "2026-05-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# Objectives
+
+# GOAL: Use sparse regression (LASSO + SuSiE) to identify which
+# geospatial covariates best explain daily DOC and NO3 concentrations
+# across sites. Following Modelscapes workflow (Zenodo 17101921).
+
+Script : 03.5_Sparse_Modeling.R
+Project: rc_sfa-rc-3-wenas-meta
+Purpose: Introduction to Sparse Modeling in R
+          
+Follows this workflow: https://zenodo.org/records/17101921
+  # title: "Sparse Modeling Introduction and Practice"
+  # author: "Modelscapes"
+  # date: "2025-05-15"
+  # output: html_document
+  # self-contained: true
+Inputs :
+   - Output_for_analysis/03_merge_geospatial/03_master_merged.csv
+
+ Output :
+   - 
+
+
+ # Authorship
+ Author: Jake Cavaiani
+ 13 May 2026
+ 
+#  Libraries 
+```{r read in libraries}
+# install.packages("devtools")
+#  library(devtools)
+#  devtools::install_github("DOI-USGS/streamMetabolizer")
+
+rm(list=ls(all=T)) #this clears your Environment
+
+library(pacman)
+p_load(tidyverse,
+       here,
+       glmnet, # LASSO
+       susieR,  # SuSiE
+       corrplot, # covariate collinearity check
+       janitor) # clean names
+
+
+```
+
+#  1. Read inputs 
+```{r read in master file}
+master_df <- read_csv(
+  here("Output_for_analysis", "03_merge_geospatial",
+       "03_master_merged.csv"),
+  na = c("", "NA", "-9999", "N/A"),
+  show_col_types = FALSE
+)
+
+```
+# Define responses and covariates
+```{r define variables}
+# --- Response variables ---
+response_vars <- c("DOC_Interp_mg_C_L", "NO3_Interp_mg_N_L")
+
+# --- Metadata columns to EXCLUDE from covariates ---
+id_vars <- c("Study_ID", "Comparison_ID", "Pair", "Site", "Sampling_Date",
+             "latitude", "longitude", "comid", "fire_years_used",
+             "fdate", "resolution", "gnis_id", "gnis_name", "reachcode",
+             "flowdir", "ftype", "wbareatype", "hwtype", "rpuid", "vpuid",
+             "huc2", "huc4", "huc6", "huc8", "huc10", "huc12",
+             "Burn_Unburn", "Climate",     # categorical - handle separately if desired
+             "Days_Between_Samples",       # observational metadata
+             "burn_sev_NA")                # pivot artifact
+
+# --- Covariate candidates = everything else numeric ---
+candidate_covars <- master_df %>%
+  dplyr::select(-all_of(c(response_vars, id_vars))) %>%
+  dplyr::select(where(is.numeric)) %>%
+  names()
+
+length(candidate_covars)   # should be ~150+ geospatial vars
+
+```
+
+# 3 Aggregate to one row per site (important!)
+```{r aggregate - site}
+site_df <- master_df %>%
+  group_by(Study_ID, Site, comid) %>%
+  summarise(
+    # Response: mean DOC and NO3 per site
+    DOC_mean = mean(DOC_Interp_mg_C_L, na.rm = TRUE),
+    NO3_mean = mean(NO3_Interp_mg_N_L, na.rm = TRUE),
+    # Covariates: first value (they're constant per site)
+    across(all_of(candidate_covars), ~ first(na.omit(.x))),
+    .groups = "drop"
+  ) %>%
+  mutate(across(c(DOC_mean, NO3_mean), ~ if_else(is.nan(.x), NA_real_, .x)))
+
+dim(site_df)
+
+```
+
+# 4. Prep X and y (separately for DOC and NO3)
+```{r prep - DOC}
+# ---- DOC ----
+doc_dat <- site_df %>%
+  dplyr::select(Site, DOC_mean, all_of(candidate_covars)) %>%
+  drop_na()                        # complete cases only
+
+# Drop zero-variance and near-constant covariates
+nzv <- doc_dat %>%
+  dplyr::select(-Site, -DOC_mean) %>%
+  summarise(across(everything(), ~ var(.x, na.rm = TRUE))) %>%
+  pivot_longer(everything(), names_to = "var", values_to = "variance") %>%
+  filter(variance == 0 | is.na(variance)) %>%
+  pull(var)
+
+X_doc <- doc_dat %>%
+  dplyr::select(-Site, -DOC_mean, -any_of(nzv)) %>%
+  as.matrix() %>%
+  scale()                          # standardize (LASSO best practice)
+
+y_doc <- doc_dat$DOC_mean
+
+message("DOC: ", nrow(X_doc), " sites x ", ncol(X_doc), " covariates")
+
+```
+
+```{r prep - NO3}
+# ---- NO3 ----
+no3_dat <- site_df %>%
+  dplyr::select(Site, NO3_mean, all_of(candidate_covars)) %>%
+  drop_na()
+
+nzv_no3 <- no3_dat %>%
+  dplyr::select(-Site, -NO3_mean) %>%
+  summarise(across(everything(), ~ var(.x, na.rm = TRUE))) %>%
+  pivot_longer(everything(), names_to = "var", values_to = "variance") %>%
+  filter(variance == 0 | is.na(variance)) %>%
+  pull(var)
+
+X_no3 <- no3_dat %>%
+  dplyr::select(-Site, -NO3_mean, -any_of(nzv_no3)) %>%
+  as.matrix() %>%
+  scale()
+
+y_no3 <- no3_dat$NO3_mean
+
+message("NO3: ", nrow(X_no3), " sites x ", ncol(X_no3), " covariates")
+
+```
+
+# 5 Check collinearity (optional but useful)
+```{r collinearity}
+cor_mat <- cor(X_doc, use = "pairwise.complete.obs")
+# Flag highly correlated pairs
+high_cor <- which(abs(cor_mat) > 0.9 & abs(cor_mat) < 1, arr.ind = TRUE)
+head(high_cor)
+# Optional: corrplot(cor_mat, method = "color", tl.cex = 0.4)
+
+```
+
+# 6 Run LASSO — DOC
+```{r lasso - DOC}
+set.seed(42)
+cv_doc <- cv.glmnet(x = X_doc, y = y_doc, alpha = 1)
+
+plot(cv_doc)    # dashed lines show best lambda values [1]
+abline(v = log(cv_doc$lambda.min), col = "red")
+abline(v = log(cv_doc$lambda.1se), col = "blue")
+
+best_lambda_doc <- cv_doc$lambda.1se   # more parsimonious than lambda.min
+
+model_doc <- glmnet(x = X_doc, y = y_doc, alpha = 1,
+                    lambda = best_lambda_doc)
+
+coef_doc <- coef(model_doc)[-1]        # drop intercept
+selected_doc <- which(coef_doc != 0)   # nonzero covariates [1]
+
+doc_results <- tibble(
+  covariate   = colnames(X_doc)[selected_doc],
+  coefficient = coef_doc[selected_doc]
+) %>% arrange(desc(abs(coefficient)))
+
+doc_results
+
+# deviance explained (pseudo-R2) [1]
+model_doc$dev.ratio
+
+```
+
+# 7. Run LASSO — NO3
+```{r lasso - NO3}
+set.seed(42)
+cv_no3 <- cv.glmnet(x = X_no3, y = y_no3, alpha = 1)
+plot(cv_no3)
+
+best_lambda_no3 <- cv_no3$lambda.1se
+model_no3 <- glmnet(x = X_no3, y = y_no3, alpha = 1,
+                    lambda = best_lambda_no3)
+
+coef_no3 <- coef(model_no3)[-1]
+selected_no3 <- which(coef_no3 != 0)
+
+no3_results <- tibble(
+  covariate   = colnames(X_no3)[selected_no3],
+  coefficient = coef_no3[selected_no3]
+) %>% arrange(desc(abs(coefficient)))
+
+no3_results
+model_no3$dev.ratio
+
+```
+
+# 8. Run SuSiE — DOC (complementary view)
+```{r susie - DOC}
+susie_doc <- susie(X = X_doc, y = y_doc,
+                   L = 10)          # max number of "signals"
+
+# Credible sets: groups of correlated covariates that likely contain an effect
+susie_doc$sets$cs
+
+# Posterior inclusion probabilities
+pip_doc <- tibble(
+  covariate = colnames(X_doc),
+  pip       = susie_doc$pip
+) %>% arrange(desc(pip))
+
+head(pip_doc, 20)
+
+```
+
+```{r susie - NO3}
+susie_no3 <- susie(X = X_no3, y = y_no3, L = 10)
+susie_no3$sets$cs
+
+pip_no3 <- tibble(
+  covariate = colnames(X_no3),
+  pip       = susie_no3$pip
+) %>% arrange(desc(pip))
+
+head(pip_no3, 20)
+
+```
+
+# 10. Compare LASSO and SuSiE results
+```{r compare}
+doc_compare <- full_join(
+  doc_results %>% rename(lasso_coef = coefficient),
+  pip_doc     %>% rename(susie_pip  = pip),
+  by = "covariate"
+) %>% arrange(desc(susie_pip))
+
+no3_compare <- full_join(
+  no3_results %>% rename(lasso_coef = coefficient),
+  pip_no3     %>% rename(susie_pip  = pip),
+  by = "covariate"
+) %>% arrange(desc(susie_pip))
+
+doc_compare
+no3_compare
+
+```
+
+# 11. Visualize selected covariates
+```{r plot results}
+
+
+```
+
+
+
+# ============================================================
+
+# ============================================================
+
+
+# ATTEMPT 2 #
+
+# ============================================================
+
+# ============================================================
+
+```{r setup, message = FALSE}
+library(pacman)
+p_load(tidyverse,
+       here,
+       glmnet, # LASSO
+       susieR,  # SuSiE
+       corrplot, # covariate collinearity check
+       janitor) # clean names
+```
+
+## 1. Load data
+
+```{r load-data}
+master_df <- read_csv(here("Output_for_analysis", "03_merge_geospatial",
+                           "03_master_merged.csv"),
+                      show_col_types = FALSE)
+
+dim(master_df)
+```
+
+## 2. Define responses and covariates
+
+SuSiE requires a matrix X (each column = covariate, each row = observation) and a vector y of response values [1].
+
+```{r define-vars}
+# --- Response variables ---
+response_vars <- c("DOC_Interp_mg_C_L", "NO3_Interp_mg_N_L")
+
+# --- Metadata columns to EXCLUDE from covariates ---
+id_vars <- c("Study_ID", "Comparison_ID", "Pair", "Site", "Sampling_Date",
+             "latitude", "longitude", "comid", "fire_years_used",
+             "fdate", "resolution", "gnis_id", "gnis_name", "reachcode",
+             "flowdir", "ftype", "wbareatype", "hwtype", "rpuid", "vpuid",
+             "huc2", "huc4", "huc6", "huc8", "huc10", "huc12",
+             "Burn_Unburn", "Climate",     # categorical - handle separately if desired
+             "Days_Between_Samples",       # observational metadata
+             "burn_sev_NA")                # pivot artifact
+
+# --- Covariate candidates = everything else numeric ---
+candidate_covars <- master_df %>%
+  dplyr::select(-all_of(c(response_vars, id_vars))) %>%
+  dplyr::select(where(is.numeric)) %>%
+  names()
+
+candidate_covars <- (c("Area_watershed_km", "Time_Since_Fire", "burn_sev_high", "burn_sev_mod", "burn_sev_low",
+                       "streamorde", "maxelevraw", "pctconif2019ws", "pcthbwet2019ws", "omws", ))
+
+length(candidate_covars)   # should be ~150+ geospatial vars
+```
+
+## 3. Aggregate to one row per site
+
+Your data is ~51k rows because it's daily. Since geospatial covariates are constant within a site, we'll aggregate to one row per site. Start simple, iterate later.
+
+```{r aggregate-site}
+site_df <- master_df %>%
+  group_by(Study_ID, Site, comid) %>%
+  summarise(
+    # Response: mean DOC and NO3 per site
+    DOC_mean = mean(DOC_Interp_mg_C_L, na.rm = TRUE),
+    NO3_mean = mean(NO3_Interp_mg_N_L, na.rm = TRUE),
+    # Covariates: first value (constant per site)
+    across(all_of(candidate_covars), ~ first(na.omit(.x))),
+    .groups = "drop"
+  ) %>%
+  mutate(across(c(DOC_mean, NO3_mean), ~ if_else(is.nan(.x), NA_real_, .x)))
+
+dim(site_df)
+
+# ---- 2. Calculate NA counts for each candidate covariate ----
+covar_completeness <- site_df %>%
+  dplyr::select(all_of(candidate_covars)) %>%
+  summarise(across(everything(),
+                   list(
+                     n_missing = ~ sum(is.na(.x)),
+                     n_total   = ~ length(.x),
+                     pct_complete = ~ round(100 * sum(!is.na(.x)) / length(.x), 1)
+                   ),
+                   .names = "{.col}__{.fn}")) %>%
+  pivot_longer(everything(),
+               names_to = c("covariate", "metric"),
+               names_sep = "__",
+               values_to = "value") %>%
+  pivot_wider(names_from = metric, values_from = value) %>%
+  arrange(desc(n_missing))
+
+covar_completeness
+
+# ---- 3. Summary: how many covariates at each completeness level? ----
+completeness_summary <- covar_completeness %>%
+  mutate(completeness_bin = case_when(
+    pct_complete == 100          ~ "100% (complete)",
+    pct_complete >= 95           ~ "95-99%",
+    pct_complete >= 90           ~ "90-94%",
+    pct_complete >= 75           ~ "75-89%",
+    pct_complete >= 50           ~ "50-74%",
+    TRUE                          ~ "<50%"
+  )) %>%
+  count(completeness_bin, name = "n_covariates") %>%
+  arrange(desc(n_covariates))
+
+completeness_summary
+
+# ---- 4. Visualize completeness distribution ----
+p_completeness <- covar_completeness %>%
+  ggplot(aes(x = pct_complete)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "white") +
+  geom_vline(xintercept = 100, linetype = "dashed", color = "red") +
+  labs(title = "Covariate completeness across sites",
+       subtitle = paste0(nrow(site_df), " total sites, ",
+                         length(candidate_covars), " candidate covariates"),
+       x = "Percent of sites with non-NA value",
+       y = "Number of covariates") +
+  theme_minimal(base_size = 11)
+
+p_completeness
+message("Dropped: ", length(candidate_covars) - length(candidate_covars_complete))
+
+# ---- 5. Identify which sites are driving NAs ----
+# Which sites have the most missing covariate data?
+site_missingness <- site_df %>%
+  dplyr::select(Site, all_of(candidate_covars)) %>%
+  rowwise() %>%
+  mutate(n_missing_covars = sum(is.na(c_across(all_of(candidate_covars))))) %>%
+  ungroup() %>%
+  dplyr::select(Site, n_missing_covars) %>%
+  arrange(desc(n_missing_covars))
+
+site_missingness
+
+# ---- 6. Down-select covariates to those with 100% coverage ----
+complete_covars <- covar_completeness %>%
+  filter(pct_complete > 50) %>%
+  pull(covariate)
+
+message("Covariates with 100% coverage: ", length(complete_covars),
+        " of ", length(candidate_covars))
+
+# Optional: less strict thresholds
+covars_95 <- covar_completeness %>% filter(pct_complete >= 95) %>% pull(covariate)
+covars_90 <- covar_completeness %>% filter(pct_complete >= 90) %>% pull(covariate)
+
+message("Covariates with >=95% coverage: ", length(covars_95))
+message("Covariates with >=90% coverage: ", length(covars_90))
+
+# ---- 7. Preview the complete covariates ----
+tibble(
+  covariate = complete_covars,
+  category = case_when(
+    str_detect(complete_covars, "^qa_|^qc_|^qe_|^va_|^vc_|^ve_") ~ "NHD Flow",
+    str_detect(complete_covars, "ws$") & str_detect(complete_covars, "^pct") ~ "StreamCat land cover/lithology",
+    str_detect(complete_covars, "ws$") ~ "StreamCat soil/climate",
+    str_detect(complete_covars, "^burn") ~ "Fire (StreamCat MTBS)",
+    str_detect(complete_covars, "^huc") ~ "HUC",
+    TRUE ~ "Other NHD"
+  )
+) %>%
+  count(category, name = "n_covariates") %>%
+  arrange(desc(n_covariates))
+
+# ---- 9. Redefine candidate_covars to use only complete ones ----
+# This is what gets passed to LASSO / SuSiE going forward
+candidate_covars_complete <- complete_covars
+```
+
+## 4. Prep X and y (separately for DOC and NO3)
+
+LASSO/SuSiE don't handle NAs — we need complete cases per response [1].
+
+```{r prep-doc}
+# ---- DOC ----
+doc_dat <- site_df %>%
+  dplyr::select(Site, DOC_mean, all_of(candidate_covars_complete)) %>%
+  drop_na()
+
+# Drop zero-variance covariates (SuSiE and scale() can't handle them)
+nzv <- doc_dat %>%
+  dplyr::select(-Site, -DOC_mean) %>%
+  summarise(across(everything(), ~ var(.x, na.rm = TRUE))) %>%
+  pivot_longer(everything(), names_to = "var", values_to = "variance") %>%
+  filter(variance == 0 | is.na(variance)) %>%
+  pull(var)
+
+X_doc <- doc_dat %>%
+  dplyr::select(-Site, -DOC_mean, -any_of(nzv)) %>%
+  as.matrix() %>%
+  scale()
+
+y_doc <- doc_dat$DOC_mean
+
+message("DOC: ", nrow(X_doc), " sites x ", ncol(X_doc), " covariates")
+```
+
+```{r prep-no3}
+# ---- NO3 ----
+no3_dat <- site_df %>%
+  dplyr::select(Site, NO3_mean, all_of(candidate_covars_complete)) %>%
+  drop_na()
+
+nzv_no3 <- no3_dat %>%
+  dplyr::select(-Site, -NO3_mean) %>%
+  summarise(across(everything(), ~ var(.x, na.rm = TRUE))) %>%
+  pivot_longer(everything(), names_to = "var", values_to = "variance") %>%
+  filter(variance == 0 | is.na(variance)) %>%
+  pull(var)
+
+X_no3 <- no3_dat %>%
+  dplyr::select(-Site, -NO3_mean, -any_of(nzv_no3)) %>%
+  as.matrix() %>%
+  scale()
+
+y_no3 <- no3_dat$NO3_mean
+
+message("NO3: ", nrow(X_no3), " sites x ", ncol(X_no3), " covariates")
+```
+
+## 5. Check collinearity (optional but useful)
+
+SuSiE's group selection handles correlated variables well, but it's still good to know how collinear your covariates are.
+
+```{r collinearity}
+cor_mat <- cor(X_doc, use = "pairwise.complete.obs")
+high_cor <- which(abs(cor_mat) > 0.9 & abs(cor_mat) < 1, arr.ind = TRUE)
+head(high_cor)
+corrplot(cor_mat, method = "color", tl.cex = 0.4)
+```
+
+## 6. LASSO — DOC
+
+```{r lasso-doc}
+set.seed(42)
+cv_doc <- cv.glmnet(x = X_doc, y = y_doc, alpha = 1)
+
+plot(cv_doc)
+abline(v = log(cv_doc$lambda.min), col = "red")
+abline(v = log(cv_doc$lambda.1se), col = "blue")
+
+best_lambda_doc <- cv_doc$lambda.1se   # more parsimonious than lambda.min
+
+model_lasso_doc <- glmnet(x = X_doc, y = y_doc, alpha = 1,
+                          lambda = best_lambda_doc)
+
+coef_doc <- coef(model_lasso_doc)[-1]          # drop intercept
+selected_doc <- which(coef_doc != 0)
+
+doc_lasso_results <- tibble(
+  covariate   = colnames(X_doc)[selected_doc],
+  coefficient = coef_doc[selected_doc]
+) %>% arrange(desc(abs(coefficient)))
+
+doc_lasso_results
+model_lasso_doc$dev.ratio     # pseudo-R2
+```
+
+## 7. LASSO — NO3
+
+```{r lasso-no3}
+set.seed(42)
+cv_no3 <- cv.glmnet(x = X_no3, y = y_no3, alpha = 1)
+plot(cv_no3)
+
+best_lambda_no3 <- cv_no3$lambda.1se
+model_lasso_no3 <- glmnet(x = X_no3, y = y_no3, alpha = 1,
+                          lambda = best_lambda_no3)
+
+coef_no3 <- coef(model_lasso_no3)[-1]
+selected_no3 <- which(coef_no3 != 0)
+
+no3_lasso_results <- tibble(
+  covariate   = colnames(X_no3)[selected_no3],
+  coefficient = coef_no3[selected_no3]
+) %>% arrange(desc(abs(coefficient)))
+
+no3_lasso_results
+model_lasso_no3$dev.ratio
+```
+
+## 8. SuSiE — DOC
+
+SuSiE is a Bayesian method similar to forward step-wise selection. It handles correlated variables through group selection, producing "credible sets" — groups of correlated variables that likely contain a true effect but can't be distinguished individually [1].
+
+```{r susie-doc}
+model_susie_doc <- susie(X = X_doc, y = y_doc, L = 10)
+
+# Summary with credible sets and inclusion probabilities [1]
+summary(model_susie_doc)
+
+# Posterior inclusion probabilities [1]
+pip_doc <- tibble(
+  covariate = colnames(X_doc),
+  pip       = model_susie_doc$pip
+) %>% arrange(desc(pip))
+
+head(pip_doc, 20)
+
+# Credible sets: groups of correlated covariates likely containing a true effect [1]
+model_susie_doc$sets$cs
+
+# R-squared for SuSiE model [1]
+rsq_doc <- cor(predict(model_susie_doc, X_doc), y_doc)^2
+rsq_doc
+```
+
+```{r susie-doc-plots}
+# SuSiE's built-in plot - color-coded by credible set [1]
+susie_plot(model_susie_doc, y = "PIP")
+
+# Coefficient plot
+plot(coef(model_susie_doc)[-1],
+     pch = 20,
+     main = "SuSiE covariates for DOC",
+     ylab = "Effect on DOC concentration",
+     xlab = "Explanatory variables")
+abline(h = 0, col = "gray")
+# Label variables with notable effects
+big_effects <- which(abs(coef(model_susie_doc)[-1]) > 0.1)
+if(length(big_effects) > 0){
+  text(x = big_effects,
+       y = coef(model_susie_doc)[-1][big_effects],
+       labels = colnames(X_doc)[big_effects],
+       pos = 3, cex = 0.7)
+}
+
+coef_df <- tibble(
+  covariate = colnames(X_doc),
+  coef      = coef(model_susie_doc)[-1],
+  index     = seq_along(coef)
+) %>%
+  mutate(label = if_else(abs(coef) > 0.1, covariate, NA_character_))
+
+ggplot(coef_df, aes(x = index, y = coef)) +
+  geom_hline(yintercept = 0, color = "gray") +
+  geom_point(size = 2) +
+  geom_text(aes(label = label), nudge_y = 0.02, size = 3, na.rm = TRUE) +
+  labs(title = "SuSiE covariates for DOC",
+       x = "Explanatory variables",
+       y = "Effect on DOC concentration") +
+  theme_minimal()
+```
+
+## 9. SuSiE — NO3
+
+```{r susie-no3}
+model_susie_no3 <- susie(X = X_no3, y = y_no3, L = 10)
+summary(model_susie_no3)
+
+pip_no3 <- tibble(
+  covariate = colnames(X_no3),
+  pip       = model_susie_no3$pip
+) %>% arrange(desc(pip))
+
+head(pip_no3, 20)
+
+model_susie_no3$sets$cs
+
+rsq_no3 <- cor(predict(model_susie_no3, X_no3), y_no3)^2
+rsq_no3
+```
+
+```{r susie-no3-plots}
+susie_plot(model_susie_no3, y = "PIP")
+
+plot(coef(model_susie_no3)[-1],
+     pch = 20,
+     main = "SuSiE covariates for NO3",
+     ylab = "Effect on NO3 concentration",
+     xlab = "Explanatory variables")
+abline(h = 0, col = "gray")
+big_effects_no3 <- which(abs(coef(model_susie_no3)[-1]) > 0.1)
+if(length(big_effects_no3) > 0){
+  text(x = big_effects_no3,
+       y = coef(model_susie_no3)[-1][big_effects_no3],
+       labels = colnames(X_no3)[big_effects_no3],
+       pos = 3, cex = 0.7)
+}
+
+library(ggplot2)
+
+# ---- SuSiE PIP plot (built-in) ----
+susie_plot(model_susie_no3, y = "PIP")
+
+# ---- Coefficient plot with ggplot ----
+coef_df_no3 <- tibble(
+  covariate = colnames(X_no3),
+  coef      = coef(model_susie_no3)[-1],
+  index     = seq_along(coef)
+) %>%
+  mutate(label = if_else(abs(coef) > 0.1, covariate, NA_character_))
+
+p_susie_coef_no3 <- ggplot(coef_df_no3, aes(x = index, y = coef)) +
+  geom_hline(yintercept = 0, color = "gray") +
+  geom_point(size = 2) +
+  geom_text(aes(label = label), nudge_y = 0.02, size = 3, na.rm = TRUE) +
+  labs(title = "SuSiE covariates for NO3",
+       x = "Explanatory variables",
+       y = "Effect on NO3 concentration") +
+  theme_minimal()
+
+p_susie_coef_no3
+
+
+
+```
+
+## 10. Compare LASSO and SuSiE results
+
+```{r compare}
+doc_compare <- full_join(
+  doc_lasso_results %>% rename(lasso_coef = coefficient),
+  pip_doc           %>% rename(susie_pip  = pip),
+  by = "covariate"
+) %>% arrange(desc(susie_pip))
+
+no3_compare <- full_join(
+  no3_lasso_results %>% rename(lasso_coef = coefficient),
+  pip_no3           %>% rename(susie_pip  = pip),
+  by = "covariate"
+) %>% arrange(desc(susie_pip))
+
+doc_compare
+no3_compare
+```
+tmin8110ws: lasso_coef = NA, susie_pip = 0.55 → LASSO zeroed it out, but SuSiE gives it moderate support.
+pctsallakews: lasso_coef = 2.78, susie_pip = 0.20 → LASSO selected it, SuSiE is less confident.
+bfiws: lasso_coef = NA, susie_pip = 0.03 → neither method gave it much weight, but it appears because SuSiE reports PIPs for every covariate.
+
+## 11. Visualize selected covariates
+
+```{r plot-lasso-doc, fig.width=8, fig.height=6}
+p_lasso_doc <- doc_lasso_results %>%
+  mutate(covariate = fct_reorder(covariate, coefficient)) %>%
+  ggplot(aes(x = coefficient, y = covariate,
+             fill = coefficient > 0)) +
+  geom_col() +
+  scale_fill_manual(values = c("firebrick", "steelblue"),
+                    labels = c("Negative", "Positive"),
+                    name = "Direction") +
+  labs(title = "LASSO-selected covariates for DOC",
+       subtitle = paste0("Deviance explained: ",
+                         round(model_lasso_doc$dev.ratio, 3)),
+       x = "Standardized coefficient",
+       y = NULL) +
+  theme_minimal(base_size = 11)
+
+p_lasso_doc
+```
+
+```{r plot-lasso-no3, fig.width=8, fig.height=6}
+p_lasso_no3 <- no3_lasso_results %>%
+  mutate(covariate = fct_reorder(covariate, coefficient)) %>%
+  ggplot(aes(x = coefficient, y = covariate,
+             fill = coefficient > 0)) +
+  geom_col() +
+  scale_fill_manual(values = c("firebrick", "steelblue"),
+                    labels = c("Negative", "Positive"),
+                    name = "Direction") +
+  labs(title = "LASSO-selected covariates for NO3",
+       subtitle = paste0("Deviance explained: ",
+                         round(model_lasso_no3$dev.ratio, 3)),
+       x = "Standardized coefficient",
+       y = NULL) +
+  theme_minimal(base_size = 11)
+
+p_lasso_no3
+```
+
+```{r plot-susie-pip, fig.width=8, fig.height=6}
+# SuSiE PIP bar charts - top 20 variables for each response
+p_pip_doc <- pip_doc %>%
+  slice_max(pip, n = 20) %>%
+  mutate(covariate = fct_reorder(covariate, pip)) %>%
+  ggplot(aes(x = pip, y = covariate)) +
+  geom_col(fill = "darkorange") +
+  geom_vline(xintercept = 0.5, linetype = "dashed", color = "gray40") +
+  labs(title = "SuSiE posterior inclusion probabilities - DOC",
+       subtitle = paste0("Model R2 = ", round(rsq_doc, 3)),
+       x = "Posterior inclusion probability (PIP)",
+       y = NULL) +
+  xlim(0, 1) +
+  theme_minimal(base_size = 11)
+
+p_pip_no3 <- pip_no3 %>%
+  slice_max(pip, n = 20) %>%
+  mutate(covariate = fct_reorder(covariate, pip)) %>%
+  ggplot(aes(x = pip, y = covariate)) +
+  geom_col(fill = "darkorange") +
+  geom_vline(xintercept = 0.5, linetype = "dashed", color = "gray40") +
+  labs(title = "SuSiE posterior inclusion probabilities - NO3",
+       subtitle = paste0("Model R2 = ", round(rsq_no3, 3)),
+       x = "Posterior inclusion probability (PIP)",
+       y = NULL) +
+  xlim(0, 1) +
+  theme_minimal(base_size = 11)
+
+p_pip_doc
+p_pip_no3
+```
+
+```{r plot-method-comparison, fig.width=8, fig.height=6}
+# Highlight covariates selected by BOTH methods
+p_compare_doc <- doc_compare %>%
+  mutate(
+    selected_by = case_when(
+      !is.na(lasso_coef) & susie_pip > 0.5 ~ "Both",
+      !is.na(lasso_coef)                    ~ "LASSO only",
+      susie_pip > 0.5                       ~ "SuSiE only",
+      TRUE                                  ~ "Neither"
+    )
+  ) %>%
+  filter(selected_by != "Neither") %>%
+  mutate(covariate = fct_reorder(covariate, susie_pip)) %>%
+  ggplot(aes(x = susie_pip, y = covariate, color = selected_by)) +
+  geom_point(size = 3) +
+  scale_color_manual(values = c("Both" = "purple",
+                                "LASSO only" = "steelblue",
+                                "SuSiE only" = "darkorange")) +
+  labs(title = "Method agreement for DOC covariates",
+       x = "SuSiE posterior inclusion probability",
+       y = NULL,
+       color = "Selected by") +
+  theme_minimal(base_size = 11)
+
+p_compare_doc
+
+p_compare_no3 <- no3_compare %>%
+  mutate(
+    selected_by = case_when(
+      !is.na(lasso_coef) & susie_pip > 0.5 ~ "Both",
+      !is.na(lasso_coef)                    ~ "LASSO only",
+      susie_pip > 0.5                       ~ "SuSiE only",
+      TRUE                                  ~ "Neither"
+    )
+  ) %>%
+  filter(selected_by != "Neither") %>%
+  mutate(covariate = fct_reorder(covariate, susie_pip)) %>%
+  ggplot(aes(x = susie_pip, y = covariate, color = selected_by)) +
+  geom_point(size = 3) +
+  scale_color_manual(values = c("Both" = "purple",
+                                "LASSO only" = "steelblue",
+                                "SuSiE only" = "darkorange")) +
+  labs(title = "Method agreement for NO3 covariates",
+       x = "SuSiE posterior inclusion probability",
+       y = NULL,
+       color = "Selected by") +
+  theme_minimal(base_size = 11)
+
+p_compare_no3
+```
+
+## 12. Save outputs
+
+```{r save-outputs}
+out_dir <- here("Output_for_analysis", "03.5_Sparse_Modeling")
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+
+# --- Tables ---
+write_csv(doc_lasso_results, file.path(out_dir, "doc_lasso_selected.csv"))
+write_csv(no3_lasso_results, file.path(out_dir, "no3_lasso_selected.csv"))
+write_csv(pip_doc,           file.path(out_dir, "doc_susie_pip.csv"))
+write_csv(pip_no3,           file.path(out_dir, "no3_susie_pip.csv"))
+write_csv(doc_compare,       file.path(out_dir, "doc_lasso_vs_susie.csv"))
+write_csv(no3_compare,       file.path(out_dir, "no3_lasso_vs_susie.csv"))
+
+# --- Save aggregated site-level data (useful for later re-runs) ---
+write_csv(site_df, file.path(out_dir, "site_level_master_df.csv"))
+
+# --- Plots ---
+ggsave(file.path(out_dir, "doc_lasso_coefficients.png"),
+       p_lasso_doc, width = 8, height = 6, dpi = 150)
+ggsave(file.path(out_dir, "no3_lasso_coefficients.png"),
+       p_lasso_no3, width = 8, height = 6, dpi = 150)
+ggsave(file.path(out_dir, "doc_susie_pip.png"),
+       p_pip_doc, width = 8, height = 6, dpi = 150)
+ggsave(file.path(out_dir, "no3_susie_pip.png"),
+       p_pip_no3, width = 8, height = 6, dpi = 150)
+ggsave(file.path(out_dir, "doc_method_comparison.png"),
+       p_compare_doc, width = 8, height = 6, dpi = 150)
+ggsave(file.path(out_dir, "no3_method_comparison.png"),
+       p_compare_no3, width = 8, height = 6, dpi = 150)
+
+# --- Save fitted model objects (for reuse / inspection) ---
+saveRDS(model_lasso_doc, file.path(out_dir, "model_lasso_doc.rds"))
+saveRDS(model_lasso_no3, file.path(out_dir, "model_lasso_no3.rds"))
+saveRDS(model_susie_doc, file.path(out_dir, "model_susie_doc.rds"))
+saveRDS(model_susie_no3, file.path(out_dir, "model_susie_no3.rds"))
+
+message("All results saved to: ", out_dir)
+```
+
+## 13. Summary report
+
+```{r summary}
+cat("============================================================\n")
+cat("SPARSE MODELING SUMMARY\n")
+cat("============================================================\n\n")
+
+cat("--- DOC ---\n")
+cat("Sites with complete data:", nrow(X_doc), "\n")
+cat("Candidate covariates:", ncol(X_doc), "\n")
+cat("LASSO-selected covariates:", nrow(doc_lasso_results), "\n")
+cat("LASSO deviance explained:", round(model_lasso_doc$dev.ratio, 3), "\n")
+cat("SuSiE R-squared:", round(rsq_doc, 3), "\n")
+cat("SuSiE credible sets:", length(model_susie_doc$sets$cs), "\n")
+cat("SuSiE PIP > 0.5 covariates:", sum(pip_doc$pip > 0.5), "\n\n")
+
+cat("--- NO3 ---\n")
+cat("Sites with complete data:", nrow(X_no3), "\n")
+cat("Candidate covariates:", ncol(X_no3), "\n")
+cat("LASSO-selected covariates:", nrow(no3_lasso_results), "\n")
+cat("LASSO deviance explained:", round(model_lasso_no3$dev.ratio, 3), "\n")
+cat("SuSiE R-squared:", round(rsq_no3, 3), "\n")
+cat("SuSiE credible sets:", length(model_susie_no3$sets$cs), "\n")
+cat("SuSiE PIP > 0.5 covariates:", sum(pip_no3$pip > 0.5), "\n")
+```
+
+## 14. Next steps (optional extensions)
+
+Based on the Modelscapes workflow, consider these follow-ups [1]:
+
+1. **Cross-validation for predictive performance**: Split sites into train/test folds, evaluate RMSE for LASSO vs SuSiE vs linear regression to see which method generalizes best [1].
+
+2. **Inspect credible sets closely**: When SuSiE puts multiple variables in one credible set, it means they're correlated and the model can't distinguish them — useful domain info [1].
+
+3. **Revisit daily structure**: Instead of site-level means, try mixed-effects LASSO (`glmmLasso`) to use the full daily time series with site as a random effect.
+
+4. **Stratify by `Burn_Unburn`**: Run separate models for burned vs unburned sites to see if covariate importance differs.
+
+5. **Log-transform responses**: DOC and NO3 concentrations are often log-normal — try `y_doc <- log(doc_dat

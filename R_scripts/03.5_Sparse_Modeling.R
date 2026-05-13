@@ -4,7 +4,12 @@
 # Project: rc_sfa-rc-3-wenas-meta
 # Purpose: Introduction to Sparse Modeling in R
 #          
-# Follow this workflow: https://zenodo.org/records/17101921
+# Follows this workflow: https://zenodo.org/records/17101921
+  # title: "Sparse Modeling Introduction and Practice"
+  # author: "Modelscapes"
+  # date: "2025-05-15"
+  # output: html_document
+  # self-contained: true
 # Inputs :
 #   - Output_for_analysis/03_merge_geospatial/03_master_merged.csv
 #
@@ -29,3 +34,25 @@ p_load(tidyverse,
        janitor)
 
 # ---- 1. Read inputs --------------------------------------------------------
+master_df <- read_csv(
+  here("Output_for_analysis", "03_merge_geospatial",
+       "03_master_merged.csv"),
+  na = c("", "NA", "-9999", "N/A"),
+  show_col_types = FALSE
+)
+
+---
+  title: "03.5 Sparse Modeling — Identifying Key Covariates for DOC and NO3"
+author: "Your name"
+date: "`r Sys.Date()`"
+output: html_document
+---
+  
+
+library(tidyverse)
+library(here)
+library(glmnet)      # LASSO
+library(susieR)      # SuSiE
+library(corrplot)    # covariate collinearity check
+library(janitor)     # clean names
+
