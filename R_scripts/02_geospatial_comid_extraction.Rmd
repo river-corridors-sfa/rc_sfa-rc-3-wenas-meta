@@ -356,6 +356,92 @@ sites_sev_bp_geo <- sites_bp_geo %>%
     by = c("site", "comid")
   )
 
+# ---- 7. Based on comid_fact_check.Rmd we need to manually change some bp and severity values -------
+sites_sev_bp_geo <- sites_sev_bp_geo %>%
+  mutate(burn_percent_fire_year = case_when(
+    site == "Logging_Creek" ~ 0,
+    site == "Wally_Creek" ~ 0,
+    site == "Pinchot" ~ 0,
+    site == "Site_1" ~ 0,
+    site == "Crow Creek" ~ 0,
+    site == "U3" ~ 0,
+    site == "Reference First Rainy Season" ~ 0,
+    site == "Reference Second Rainy Season" ~ 0,
+    site == "Reference Subsequent Flush" ~ 0,
+    site == "East Fork Kootenai" ~ NA_real_,
+    site == "Middle Fork Kootenai" ~ NA_real_,
+    site == "Middle_Fork_American" ~ NA_real_,
+    site == "Trout_Creek" ~ NA_real_,
+    site == "Wash Branch" ~ NA_real_,
+    site == "Camas Creek" ~ NA_real_,
+    TRUE ~ burn_percent_fire_year   # keep existing values
+  ))
+
+
+
+```
+
+# StreamCat pulls for the rest of the variables of interest
+```{r}
+unique_comids <- unique(sites_sev_bp_geo$comid)
+
+# ---- Define metrics by category --------------------------------
+# See full list: sc_get_params(param = "name")
+
+metrics_list <- c(
+  # NLCD 2019 (most recent) - land cover %
+  "pcturbop2019", "pcturblo2019", "pcturbmd2019", "pcturbhi2019",
+  "pctdecid2019", "pctconif2019", "pctmxfst2019",
+  "pctshrb2019", "pctgrs2019", "pcthay2019", "pctcrop2019",
+  "pctwdwet2019", "pcthbwet2019", "pctbl2019", "pctice2019", "pctow2019",
+  
+  # BFI - base flow index
+  "bfi",
+  
+  # NADP - atmospheric deposition (2008)
+  "inorgnwetdep_2008", "sn_2008", "no3_2008", "nh4_2008",
+  
+  # Reference stream temperature
+  "mast_2014", "mwst_2014", "msst_2014",   # mean annual/winter/summer stream temp
+  
+  # Runoff
+  "runoff",
+  
+  # STATSGO soils (Set 1)
+  "clay", "sand", "wtdep", "om", "perm", "rckdep",
+  
+  # STATSGO soils (Set 2)
+  "hydrlcond", "kffact",
+  
+  # Lithology
+  "pctalkintruvol", "pctsilicic", "pctcarbresid", "pctnoncarbresid",
+  "pctsallake", "pctalluvcoast", "pctcolluvsed", "pctglactilclay",
+  "pctglactilcrs", "pctglactilloam", "pctglaclakecrs", "pctglaclakefine",
+  "pctglacoutcrs", "pctglacoutfine", "pcthydric", "pcteolcrs", "pcteolfine",
+  "pctsaline", "pctwater", "pctextruvol", "pctintruvol", "pctmetvol",
+  "pctcoastcrs", "pctwatr",
+  
+  # PRISM climate (1981-2010 normals)
+  "precip8110", "tmean8110", "tmin8110", "tmax8110",
+  
+  # Surface water (sw) - may refer to SurfaceWater or WetIndex
+  "wetindexws"
+)
+
+# Pull all at once (watershed-scale)
+sc_data <- sc_get_data(
+  metric = paste(metrics_list, collapse = ","),
+  aoi    = "watershed",
+  comid  = paste(unique_comids, collapse = ",")
+)
+
+names(sc_data) <- tolower(names(sc_data))
+message("Pulled ", ncol(sc_data) - 1, " StreamCat variables for ",
+        nrow(sc_data), " COMIDs")
+
+# ---- Join onto sites -------------------------------------------
+sites_sc <- sites_sev_bp_geo %>%
+  left_join(sc_data, by = "comid")
 
 ```
 
@@ -365,28 +451,25 @@ sites_sev_bp_geo <- sites_bp_geo %>%
 # ---- Deduplicate: one row per site ---------------------------------
 # Some sites get expanded when multiple input sites share a COMID.
 # Collapse to a single row per site.
+n_before <- nrow(sites_sc)
 
-n_before <- nrow(sites_sev_bp_geo)
-
-sites_sev_bp_geo <- sites_sev_bp_geo %>%
+sites_sc <- sites_sc %>%
   distinct(site, .keep_all = TRUE)
 
-n_after <- nrow(sites_sev_bp_geo)
+n_after <- nrow(sites_sc)
 
 message("Deduplicated: ", n_before, " rows -> ", n_after, " rows (",
         n_before - n_after, " duplicates removed)")
 
 # Verify no remaining duplicates
-dup_check <- sites_sev_bp_geo %>% count(site) %>% filter(n > 1)
+dup_check <- sites_sc %>% count(site) %>% filter(n > 1)
 stopifnot(nrow(dup_check) == 0)
 message("Confirmed: one row per site in final geospatial data frame.")
 
-
-# ---- Export ---------------------------------------------
+# ---- Export --------------------------------------------------------
 out_dir <- here("Output_for_analysis/02_geospatial_comid_extraction")
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
-
-write_csv(sites_sev_bp_geo,
+write_csv(sites_sc,
           file.path(out_dir, "geospatial_variables_bp_severity_pull.csv"))
 
 

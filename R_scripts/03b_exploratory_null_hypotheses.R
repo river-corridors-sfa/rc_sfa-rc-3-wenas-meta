@@ -61,7 +61,7 @@ continuous_predictors <- c(log_predictors, linear_predictors)
 categorical_predictors <- c("Climate", "Burn_Unburn")
 
 # ---- 3. Output directories -------------------------------------------------
-out_dir <- here("Output_for_analysis", "04_null_hypothesis_exploration")
+out_dir <- here("Output_for_analysis", "03b_exploratory_null_hypothesis")
 fig_dir <- file.path(out_dir, "figures")
 dir.create(fig_dir, showWarnings = FALSE, recursive = TRUE)
 
@@ -84,9 +84,7 @@ summary_stats <- merged %>%
 
 # write_csv(summary_stats, file.path(out_dir, "04_summary_statistics.csv"))
 
-# ==============================================================================
 # SECTION B: Continuous predictors (scatter plots + Spearman correlations)
-# ==============================================================================
 # Spearman is rank-based so it's scale-invariant — running on raw values is fine.
 # We log-transform axes only for visualization.
 
@@ -185,9 +183,7 @@ walk2(
   ~ make_scatter(merged, .x, .y)
 )
 
-# ==============================================================================
 # SECTION C: Categorical predictors (boxplots with log-y)
-# ==============================================================================
 
 test_categorical <- function(df, response, predictor){
   sub <- df %>% dplyr::select(all_of(c(response, predictor))) %>% drop_na()

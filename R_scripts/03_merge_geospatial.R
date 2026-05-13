@@ -43,6 +43,10 @@ geo_vars <- read_csv(
   show_col_types = FALSE
 )
 
+# wally <- geo_vars %>% 
+#   filter(site == "Wally_Creek") %>% 
+#   select(burn_percent_fire_year)
+
 # ---- 2. Harmonize the join key --------------------------------------------
 # daily_ts uses "Site" (capital S, with underscores e.g., "Akokala_Creek")
 # geo_vars uses "site" (lowercase, with underscores too based on your file)
@@ -112,6 +116,19 @@ merged <- merged %>%
   )
 
 # ---- 8. Sanity Check  ------------------------------------------------------------
+# Are there any unburned watersheds that have a burn percent?
+control <- merged %>% 
+  select(Study_ID, Site, Burn_Unburn, fire_years_used, burn_percent_fire_year, totdasqkm) %>%
+  distinct(Site, .keep_all = TRUE)
+
+nobueno <- control %>% 
+  filter(Burn_Unburn == "Unburn") %>% 
+  filter(burn_percent_fire_year > 0)
+
+nobuenoburn <- control %>% 
+  filter(Burn_Unburn == "Burn") %>% 
+  filter(burn_percent_fire_year == 0)
+
 vars_to_check <- c("Climate", "Area_watershed_km", "Time_Since_Fire", "comid",
                    "burn_percent_fire_year", "burn_sev_high", "burn_sev_mod",
                    "burn_sev_low")
@@ -159,7 +176,11 @@ for(v in vars_to_check){
   message("\n--- Sites with NA for '", v, "' (", nrow(sites_na), " sites) ---")
   if(nrow(sites_na) > 0) print(sites_na, n = Inf)
 }
-# ---- 9. Export ------------------------------------------------------------
+
+# ---- 9. Explore variables ------------------------------------------------------------
+names(merged)
+
+# ---- 10. Export ------------------------------------------------------------
 
 out_dir <- here("Output_for_analysis", "03_merge_geospatial")
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)

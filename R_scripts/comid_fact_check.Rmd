@@ -1,0 +1,211 @@
+---
+title: "02a_geospatial_comid_extraction.Rmd"
+output: html_document
+date: "2026-05-13"
+---
+# ==============================================================================
+# Author: Kathryn Willi & Matthew R. V. Ross: https://doi.org/10.5281/zenodo.8140272
+
+# Adapted by Jake Cavaiani for the manuscript: Catchment characteristics modulate the influence of wildfires on nitrate and dissolved organic carbon across space and time: A meta-analysis; jake.cavaiani@pnnl.gov
+
+# 13 May 2026
+# ==============================================================================
+
+
+```{r setup, include=TRUE, echo = T, warning = F, comment = F, message = FALSE}
+rm(list = ls())
+library(sf)
+library(tidyverse)
+library(terra)
+library(nhdplusTools)
+library(mapview)
+library(dataRetrieval)
+library(lubridate)
+library(prism)
+library(ggspatial)
+library(nngeo)# Added from original code
+library(stars)# Added from original code
+library(here)
+library(webshot)
+library(readxl)
+library(StreamCatTools)
+
+# this gives you an error, but it can be ignored:
+try(plyr::ldply(list.files(path = here("R_scripts", "data", "src"),
+                           pattern="*.R",
+                           full.names=TRUE),
+                source))
+# Rmarkdown options
+knitr::opts_chunk$set(echo = T, warning = F, comment = F, message = F)
+
+# mapview options
+mapviewOptions(basemaps.color.shuffle=FALSE,basemaps='OpenTopoMap')
+```
+
+### Setting up your site data set.
+
+For this code to run properly, your site data must be configured as follows:
+
+1)  Each site is identified with a unique site name. In the data set, this column must be called `site`.
+2)  Each site has coordinates, with column names `longitude` and `latitude`. Knowledge of coordinate projection required. **OR:**
+    Each site has their known COMID, with column name `comid`. 
+4)  Site data table is a CSV, and stored in the `data/` folder. 
+
+I have included an example data set called `placeholder.csv`, along with all of the additional data sets necessary for the code to run, stored in the `data` folder. 
+
+#### Downloading necessary data sets
+
+Currently, this workflow requires downloading several data sets locally for much speedier run times. This includes: PRISM climate & aridity rasters, NHD flow direction data, and CONUS-wide NHD catchments. All data sets are found in the shared `data` folder.
+
+### Site data assumptions.
+
+This analysis is only appropriate for locations along adequately-sized streams. Some streams are too small to be captured by NHDPlusV2; it is also common for coordinates to fall in the wrong catchment (especially for big rivers). For that reason, review each site and make sure that the NHD feature attributes were appropriately captured.
+
+# National Hydrodraphy Dataset (NHD) data extraction
+
+Identify each sample's NHD COMID. This COMID will allow site linkages with all datasets in this workflow. If COMID is already listed in the CSV, make `site_type = "comid"`.
+
+```{r}
+sf_use_s2(FALSE)
+
+site_type = "xy" # OR site_type = "comid"
+
+sites <- read_csv(here("Output_for_analysis", "01_read_and_gapfill", "01_daily_time_series_paired.csv"), na = c('-9999', 'N/A')) %>%
+  distinct(Site, .keep_all = TRUE) %>%
+  dplyr::select('Site','latitude','longitude') %>% 
+  rename(site = Site) %>% 
+  drop_na()
+
+sites <- sites %>% 
+  filter(site %in% c("East Fork Kootenai"))
+
+# sites <- sites %>%
+#   mutate(latitude  = replace(latitude,  1, 48.496899),
+#          longitude = replace(longitude, 1, -114.195313))
+
+
+```
+
+Additional steps for sites with coordinates, and no COMID:
+
+```{r}
+if(site_type == "xy"){
+  sites <- sites %>%
+    dplyr::select(site, latitude, longitude) %>% 
+    sf::st_as_sf(coords = c("longitude","latitude"), crs = 4269) # 4269 = NAD83 CRS
+  
+  if(sf::st_crs(sites) != sf::st_crs(4269)){
+    sites <- sites %>% st_transform(., crs = 4269)
+  }
+  
+  mapview(sites)
+}
+```
+
+Pull all meta data associated with each site's COMID. 
+
+```{r}
+
+sites$comid <- NA
+for(i in 1:nrow(sites)){
+  result <- try(discover_nhdplus_id(sites[i,]), silent = TRUE)
+  if(!inherits(result, "try-error") && length(result) > 0){
+    sites$comid[i] <- result
+  } else {
+    message("No COMID for site: ", sites$site[i])
+  }
+}
+
+# NEW: extract coordinates into plain columns and drop geometry
+sites_1 <- sites %>%
+  mutate(
+    longitude = sf::st_coordinates(.)[,1],
+    latitude  = sf::st_coordinates(.)[,2]
+  ) %>%
+  sf::st_drop_geometry()
+
+
+```
+
+```{r}
+site_watersheds <- getWatersheds(df = sites_1, make_pretty = TRUE) %>%
+  inner_join(., select(sf::st_drop_geometry(sites_1), site, comid), by = "comid")
+
+mapview(site_watersheds, col.regions = "#56B4E9", alpha.regions = 0.2, lwd = 3, layer.name = "Watershed") +
+  mapview(sites, cex = 5, col.regions = "black", layer.name = "Points") + 
+  mapview(st_read('data/site_flowlines.gpkg', quiet = T), lwd = 3, color = "red", layer.name = "Flowline")
+
+```
+
+### Setting up your site data set.
+
+For this code to run properly, your site data must be configured as follows:
+
+1)  Each site is identified with a unique site name. In the data set, this column must be called `site`.
+2)  Each site has their known COMID, with column name `comid`. 
+4)  Site data table is a CSV, and stored in the `data/` folder. 
+
+
+#### Downloading necessary data sets
+
+Currently, this workflow requires downloading several data sets locally for much speedier run times. This includes: PRISM climate & aridity rasters, NHD flow direction data, and CONUS-wide NHD catchments. All data sets are found in the shared `data` folder.
+
+
+# National Hydrodraphy Dataset (NHD) data extraction
+
+Use COMID to allow site linkages with all datasets in this workflow. 
+Pull all meta data associated with each site's COMID. 
+```{r}
+# site_type = "comid" # This steps assumes you have checked your COMIDs
+# 
+# if(site_type == "comid"){
+#   sites <- getNHDcomid(df = dplyr::select(sites, site, comid))
+# }
+
+site_type = "comid"
+
+if(site_type == "comid"){
+  
+  # 1. Save the full site list (with lat/long preserved)
+  sites_all <- sites_1
+  
+  # 2. Identify sites without COMIDs
+  sites_no_comid <- sites_all %>% dplyr::filter(is.na(comid))
+  
+  if(nrow(sites_no_comid) > 0){
+    message("Skipping NHD extraction for ", nrow(sites_no_comid),
+            " site(s) without COMIDs: ",
+            paste(sites_no_comid$site, collapse = ", "))
+  }
+  
+  # 3. Run getNHDcomid() only on sites WITH valid COMIDs
+  sites_with_comid <- sites_all %>%
+    dplyr::filter(!is.na(comid)) %>%
+    dplyr::select(site, comid)
+  
+  sites_nhd <- getNHDcomid(df = sites_with_comid)
+  
+  # 4. Drop sf geometry so we can join as a regular data frame
+  sites_nhd_df <- sites_nhd %>% 
+    sf::st_drop_geometry() %>%
+    dplyr::select(-any_of(c("latitude", "longitude")))   # drop NHD-snapped coords
+  
+  # 5. Use sites_all as the spine (keeps original lat/long for ALL sites),
+  #    then left_join the NHD metadata onto it
+  sites <- sites_all %>%
+    dplyr::left_join(sites_nhd_df, by = c("site", "comid"))
+  
+  # 6. Sanity checks
+  message("Total rows: ", nrow(sites),
+          " | With NHD data: ", sum(!is.na(sites$comid)),
+          " | Without (NA): ", sum(is.na(sites$comid)))
+}
+
+# Remove data frames that are not needed
+rm(sites_all)
+rm(sites_nhd)
+rm(sites_nhd_df)
+rm(sites_no_comid)
+rm(sites_with_comid)
+
+```

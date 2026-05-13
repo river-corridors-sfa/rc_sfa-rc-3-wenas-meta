@@ -1,0 +1,202 @@
+variable,category,description
+site,Site ID,Your site identifier
+comid,Site ID,NHDPlus Common Identifier for the flowline
+longitude,Site ID,Site longitude (NAD83)
+latitude,Site ID,Site latitude (NAD83)
+objectid,Basic,Internal NHD object ID
+fdate,Basic,Feature date (last modified)
+resolution,Basic,NHD resolution (Medium or High)
+gnis_id,Basic,Geographic Names Information System ID
+gnis_name,Basic,Official stream or river name
+lengthkm,Basic,Flowline length in km
+reachcode,Basic,14-digit NHD reach code
+flowdir,Basic,Flow direction (0 = uninitialized; 1 = with digitized)
+wbareacomi,Basic,COMID of associated waterbody if flowline passes through a lake
+ftype,Basic,Feature type (e.g. StreamRiver ArtificialPath CanalDitch)
+fcode,Basic,Numeric feature code (more detailed than ftype)
+shape_length,Basic,Geometric length in native units
+streamleve,Topology,Stream level (1 = mainstem to ocean)
+streamorde,Topology,Strahler stream order (modified)
+streamcalc,Topology,Calculated stream order (excludes divergent paths)
+fromnode,Topology,Upstream node ID
+tonode,Topology,Downstream node ID
+hydroseq,Topology,Hydrologic sequence number for network navigation
+levelpathi,Topology,Level path identifier for mainstem tracking
+pathlength,Topology,Distance to terminal flowline in km
+terminalpa,Topology,Terminal path identifier (outlet)
+arbolatesu,Topology,Arbolate sum - total upstream flowline length in km
+divergence,Topology,0 = not divergent; 1 = main; 2 = minor path
+startflag,Topology,1 = headwater flowline
+terminalfl,Topology,1 = terminal (most downstream) flowline
+dnlevel,Topology,Downstream stream level
+uplevelpat,Topology,Upstream level path
+uphydroseq,Topology,Upstream hydrologic sequence
+dnlevelpat,Topology,Downstream level path
+dnminorhyd,Topology,Downstream minor hydrosequence
+dndraincou,Topology,Downstream drainage count
+dnhydroseq,Topology,Downstream hydrologic sequence
+frommeas,Topology,Reach measure at from-node (0-100)
+tomeas,Topology,Reach measure at to-node (0-100)
+rtndiv,Topology,Return divergence flag
+vpuin,Topology,Flag for flowlines entering VPU
+vpuout,Topology,Flag for flowlines leaving VPU
+areasqkm,Drainage,Local catchment area in km2
+totdasqkm,Drainage,Total upstream drainage area in km2 (KEY VARIABLE)
+divdasqkm,Drainage,Divergence-routed drainage area in km2
+tidal,Drainage,1 = tidally influenced
+totma,Drainage,Total cumulative mean annual flow parameter
+wbareatype,Drainage,Waterbody area type
+pathtimema,Drainage,Mean annual travel time along path
+hwnodesqkm,Drainage,Headwater node drainage area in km2
+maxelevraw,Elevation,Raw maximum elevation in cm
+minelevraw,Elevation,Raw minimum elevation in cm
+maxelevsmo,Elevation,Smoothed maximum elevation in cm (used for slope)
+minelevsmo,Elevation,Smoothed minimum elevation in cm (used for slope)
+slope,Elevation,Flowline slope in m/m (KEY VARIABLE; -9998 = no data)
+elevfixed,Elevation,Elevation fix flag
+hwtype,Elevation,Headwater type
+slopelenkm,Elevation,Length used in slope calculation in km
+qa_ma,Flow,Gage-adjusted mean annual flow in cfs (KEY VARIABLE)
+va_ma,Flow,Gage-adjusted mean annual velocity in ft/s
+qc_ma,Flow,Reference (gage) mean annual flow in cfs
+vc_ma,Flow,Reference mean annual velocity in ft/s
+qe_ma,Flow,EROM-estimated mean annual flow unadjusted in cfs
+ve_ma,Flow,EROM mean annual velocity unadjusted in ft/s
+qa_01,Flow,Gage-adjusted January flow in cfs
+va_01,Flow,Gage-adjusted January velocity in ft/s
+qc_01,Flow,Reference January flow in cfs
+vc_01,Flow,Reference January velocity in ft/s
+qe_01,Flow,EROM January flow unadjusted in cfs
+ve_01,Flow,EROM January velocity unadjusted in ft/s
+qa_02,Flow,Gage-adjusted February flow in cfs
+va_02,Flow,Gage-adjusted February velocity in ft/s
+qc_02,Flow,Reference February flow in cfs
+vc_02,Flow,Reference February velocity in ft/s
+qe_02,Flow,EROM February flow unadjusted in cfs
+ve_02,Flow,EROM February velocity unadjusted in ft/s
+qa_03,Flow,Gage-adjusted March flow in cfs
+va_03,Flow,Gage-adjusted March velocity in ft/s
+qc_03,Flow,Reference March flow in cfs
+vc_03,Flow,Reference March velocity in ft/s
+qe_03,Flow,EROM March flow unadjusted in cfs
+ve_03,Flow,EROM March velocity unadjusted in ft/s
+qa_04,Flow,Gage-adjusted April flow in cfs
+va_04,Flow,Gage-adjusted April velocity in ft/s
+qc_04,Flow,Reference April flow in cfs
+vc_04,Flow,Reference April velocity in ft/s
+qe_04,Flow,EROM April flow unadjusted in cfs
+ve_04,Flow,EROM April velocity unadjusted in ft/s
+qa_05,Flow,Gage-adjusted May flow in cfs
+va_05,Flow,Gage-adjusted May velocity in ft/s
+qc_05,Flow,Reference May flow in cfs
+vc_05,Flow,Reference May velocity in ft/s
+qe_05,Flow,EROM May flow unadjusted in cfs
+ve_05,Flow,EROM May velocity unadjusted in ft/s
+qa_06,Flow,Gage-adjusted June flow in cfs
+va_06,Flow,Gage-adjusted June velocity in ft/s
+qc_06,Flow,Reference June flow in cfs
+vc_06,Flow,Reference June velocity in ft/s
+qe_06,Flow,EROM June flow unadjusted in cfs
+ve_06,Flow,EROM June velocity unadjusted in ft/s
+qa_07,Flow,Gage-adjusted July flow in cfs
+va_07,Flow,Gage-adjusted July velocity in ft/s
+qc_07,Flow,Reference July flow in cfs
+vc_07,Flow,Reference July velocity in ft/s
+qe_07,Flow,EROM July flow unadjusted in cfs
+ve_07,Flow,EROM July velocity unadjusted in ft/s
+qa_08,Flow,Gage-adjusted August flow in cfs
+va_08,Flow,Gage-adjusted August velocity in ft/s
+qc_08,Flow,Reference August flow in cfs
+vc_08,Flow,Reference August velocity in ft/s
+qe_08,Flow,EROM August flow unadjusted in cfs
+ve_08,Flow,EROM August velocity unadjusted in ft/s
+qa_09,Flow,Gage-adjusted September flow in cfs
+va_09,Flow,Gage-adjusted September velocity in ft/s
+qc_09,Flow,Reference September flow in cfs
+vc_09,Flow,Reference September velocity in ft/s
+qe_09,Flow,EROM September flow unadjusted in cfs
+ve_09,Flow,EROM September velocity unadjusted in ft/s
+qa_10,Flow,Gage-adjusted October flow in cfs
+va_10,Flow,Gage-adjusted October velocity in ft/s
+qc_10,Flow,Reference October flow in cfs
+vc_10,Flow,Reference October velocity in ft/s
+qe_10,Flow,EROM October flow unadjusted in cfs
+ve_10,Flow,EROM October velocity unadjusted in ft/s
+qa_11,Flow,Gage-adjusted November flow in cfs
+va_11,Flow,Gage-adjusted November velocity in ft/s
+qc_11,Flow,Reference November flow in cfs
+vc_11,Flow,Reference November velocity in ft/s
+qe_11,Flow,EROM November flow unadjusted in cfs
+ve_11,Flow,EROM November velocity unadjusted in ft/s
+qa_12,Flow,Gage-adjusted December flow in cfs
+va_12,Flow,Gage-adjusted December velocity in ft/s
+qc_12,Flow,Reference December flow in cfs
+vc_12,Flow,Reference December velocity in ft/s
+qe_12,Flow,EROM December flow unadjusted in cfs
+ve_12,Flow,EROM December velocity unadjusted in ft/s
+lakefract,Lake,Fraction of catchment that is lake
+surfarea,Lake,Lake surface area
+rareahload,Lake,Reservoir area hydraulic load
+rpuid,Processing,Raster Processing Unit ID
+vpuid,Processing,Vector Processing Unit ID (hydrologic region e.g. 10U)
+enabled,Processing,Network enabled flag
+huc2,HUC,2-digit Hydrologic Unit (region e.g. HUC-10)
+huc4,HUC,4-digit HUC (subregion)
+huc6,HUC,6-digit HUC (basin)
+huc8,HUC,8-digit HUC (subbasin)
+huc10,HUC,10-digit HUC (watershed)
+huc12,HUC,12-digit HUC (subwatershed)
+burn_percent_fire_year,Fire (StreamCat MTBS),Percent of upstream watershed burned during the site's fire year(s); source = StreamCat PctBurnArea{year}Ws; summed across multi-year fires; coverage 1984-2018
+fire_years_used,Fire (StreamCat MTBS),Fire year(s) used to compute burn metrics for each site (underscore-separated if multi-year)
+burn_sev_high,Fire (StreamCat MTBS),Percent of upstream watershed burned at HIGH severity during the site's fire year(s); source = StreamCat PctHighSev{year}Ws
+burn_sev_mod,Fire (StreamCat MTBS),Percent of upstream watershed burned at MODERATE severity during the site's fire year(s); source = StreamCat PctModSev{year}Ws
+burn_sev_low,Fire (StreamCat MTBS),Percent of upstream watershed burned at LOW severity during the site's fire year(s); source = StreamCat PctLowSev{year}Ws
+burn_sev_NA,Fire (StreamCat MTBS),Percent of upstream watershed with unclassified / NA burn severity during the site's fire year(s); likely artifact of pivot_wider when severity_class was NA - consider dropping
+pctbl2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Barren Land (NLCD code 31) in 2019
+pctconif2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Evergreen Forest (conifer; NLCD code 42) in 2019
+pctcrop2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Cultivated Crops (NLCD code 82) in 2019
+pctdecid2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Deciduous Forest (NLCD code 41) in 2019
+pctgrs2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Grassland/Herbaceous (NLCD code 71) in 2019
+pcthay2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Hay/Pasture (NLCD code 81) in 2019
+pcthbwet2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Herbaceous Wetlands (NLCD code 95) in 2019
+pctice2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Perennial Ice/Snow (NLCD code 12) in 2019
+pctmxfst2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Mixed Forest (NLCD code 43) in 2019
+pctow2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Open Water (NLCD code 11) in 2019
+pctshrb2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Shrub/Scrub (NLCD code 52) in 2019
+pcturbhi2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Developed High Intensity (NLCD code 24) in 2019
+pcturblo2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Developed Low Intensity (NLCD code 22) in 2019
+pcturbmd2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Developed Medium Intensity (NLCD code 23) in 2019
+pcturbop2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Developed Open Space (NLCD code 21) in 2019
+pctwdwet2019ws,NLCD 2019 (Watershed),Percent of watershed classified as Woody Wetlands (NLCD code 90) in 2019
+precip8110ws,PRISM Climate (Watershed),Mean annual precipitation (mm) averaged over the watershed from 1981-2010 PRISM normals
+tmean8110ws,PRISM Climate (Watershed),Mean annual air temperature (deg C) averaged over the watershed from 1981-2010 PRISM normals
+tmax8110ws,PRISM Climate (Watershed),Mean annual maximum air temperature (deg C) averaged over the watershed from 1981-2010 PRISM normals
+tmin8110ws,PRISM Climate (Watershed),Mean annual minimum air temperature (deg C) averaged over the watershed from 1981-2010 PRISM normals
+runoffws,Runoff (Watershed),Mean annual runoff (mm) averaged over the watershed
+bfiws,Base Flow (Watershed),Base Flow Index - ratio of base flow to total streamflow as percent (watershed mean)
+clayws,STATSGO Soils (Watershed),Mean percent clay content of soils in the watershed
+sandws,STATSGO Soils (Watershed),Mean percent sand content of soils in the watershed
+omws,STATSGO Soils (Watershed),Mean percent organic matter content of soils in the watershed
+permws,STATSGO Soils (Watershed),Mean soil permeability (inches/hour) in the watershed
+rckdepws,STATSGO Soils (Watershed),Mean depth to bedrock (inches) in the watershed
+wtdepws,STATSGO Soils (Watershed),Mean depth to seasonally high water table (cm) in the watershed
+kffactws,STATSGO Soils (Watershed),Mean soil erodibility (K-factor; Universal Soil Loss Equation) in the watershed
+hydrlcondws,STATSGO Soils (Watershed),Mean hydraulic conductivity (micrometers/sec) of soils in the watershed
+pcthydricws,STATSGO Soils (Watershed),Percent of watershed covered by hydric soils (soils formed under saturated/flooded conditions)
+pctalkintruvolws,Lithology (Watershed),Percent of watershed underlain by alkaline intrusive volcanic rock
+pctsilicicws,Lithology (Watershed),Percent of watershed underlain by silicic (felsic) rock
+pctextruvolws,Lithology (Watershed),Percent of watershed underlain by extrusive volcanic rock
+pctcarbresidws,Lithology (Watershed),Percent of watershed underlain by carbonate residual material
+pctnoncarbresidws,Lithology (Watershed),Percent of watershed underlain by non-carbonate residual material
+pctalluvcoastws,Lithology (Watershed),Percent of watershed underlain by alluvium and coastal sediment
+pctcolluvsedws,Lithology (Watershed),Percent of watershed underlain by colluvial sediment
+pctcoastcrsws,Lithology (Watershed),Percent of watershed underlain by coarse coastal sediment
+pcteolcrsws,Lithology (Watershed),Percent of watershed underlain by coarse eolian (wind-deposited) sediment
+pcteolfinews,Lithology (Watershed),Percent of watershed underlain by fine eolian (wind-deposited) sediment
+pctglactilclayws,Lithology (Watershed),Percent of watershed underlain by clayey glacial till
+pctglactilcrsws,Lithology (Watershed),Percent of watershed underlain by coarse glacial till
+pctglactilloamws,Lithology (Watershed),Percent of watershed underlain by loamy glacial till
+pctglaclakecrsws,Lithology (Watershed),Percent of watershed underlain by coarse glacial lake sediment
+pctglaclakefinews,Lithology (Watershed),Percent of watershed underlain by fine glacial lake sediment
+pctsallakews,Lithology (Watershed),Percent of watershed underlain by saline lake sediment
+pctwaterws,Lithology (Watershed),Percent of watershed classified as open water (lithology layer)
