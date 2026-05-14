@@ -565,7 +565,7 @@ p_scree <- fviz_eig(pca_result,
   theme_minimal() +
   labs(x = "Principal Component", y = "% of Variance Explained")
 
-ggsave("covariate_reduction_plots/03_scree_plot.png",
+ggsave("~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03b_exploratory_null_hypothesis/figures/03_scree_plot.png",
        p_scree, width = 8, height = 6, dpi = 300)
 
 # Determine how many PCs to retain (Kaiser criterion: eigenvalue > 1)
@@ -591,7 +591,7 @@ p_biplot <- fviz_pca_biplot(pca_result,
   theme_minimal() +
   theme(legend.position = "right")
 
-ggsave("covariate_reduction_plots/04_pca_biplot.png",
+ggsave("~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03b_exploratory_null_hypothesis/figures/04_pca_biplot.png",
        p_biplot, width = 12, height = 10, dpi = 300)
 
 # --- PLOT 5: Variable contributions to top PCs ---
@@ -614,7 +614,7 @@ p_contrib3 <- fviz_contrib(pca_result, choice = "var", axes = 3, top = 20,
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
 
 p_contrib_combined <- p_contrib1 / p_contrib2 / p_contrib3
-ggsave("covariate_reduction_plots/05_pca_contributions.png",
+ggsave("~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03b_exploratory_null_hypothesis/figures/05_pca_contributions.png",
        p_contrib_combined, width = 12, height = 14, dpi = 300)
 
 # --- PLOT 6: Variable map (correlation circle) ---
@@ -625,7 +625,7 @@ p_var_map <- fviz_pca_var(pca_result,
                           title = "Variables in PC1-PC2 Space (colored by contribution)") +
   theme_minimal()
 
-ggsave("covariate_reduction_plots/06_variable_map.png",
+ggsave("~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03b_exploratory_null_hypothesis/figures/06_variable_map.png",
        p_var_map, width = 10, height = 10, dpi = 300)
 
 # --- PLOT 7: Individual sites in PC space (colored by burn status) ---
@@ -639,7 +639,7 @@ p_ind <- fviz_pca_ind(pca_result,
                       title = "Sites in PC1-PC2 Space") +
   theme_minimal()
 
-ggsave("covariate_reduction_plots/07_pca_individuals.png",
+ggsave("~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03b_exploratory_null_hypothesis/figures/07_pca_individuals.png",
        p_ind, width = 10, height = 8, dpi = 300)
 
 # --- Export top variables per PC as a table ---
@@ -652,7 +652,7 @@ top_contrib_df <- as.data.frame(var_contrib) %>%
   ungroup() %>%
   arrange(PC, desc(contribution))
 
-write_csv(top_contrib_df, "covariate_reduction_plots/top_pca_contributors.csv")
+write_csv(top_contrib_df, "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03b_exploratory_null_hypothesis/figures/top_pca_contributors.csv")
 cat("Top PCA contributors saved to top_pca_contributors.csv\n\n")
 
 # STEP 6: HYPOTHESIS-BASED FINAL SELECTION ####
