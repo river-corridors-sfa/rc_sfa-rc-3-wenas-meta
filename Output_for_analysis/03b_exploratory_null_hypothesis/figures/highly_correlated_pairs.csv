@@ -1,0 +1,14 @@
+var1,var2,correlation
+totdasqkm,divdasqkm,0.9982332121188654
+areasqkm,divdasqkm,0.9964951004214926
+divdasqkm,qa_ma,0.9955838597623197
+areasqkm,totdasqkm,0.9950773060540047
+totdasqkm,qa_ma,0.9936897551233429
+areasqkm,qa_ma,0.9903152561629363
+tmax8110ws,tmean8110ws,0.9884249303329348
+tmean8110ws,tmin8110ws,0.9863286497917596
+burn_percent_fire_year,burn_severity_index,0.9748741109201869
+tmax8110ws,tmin8110ws,0.9499114007537784
+pctsallakews,pct_urban,0.8661451879708204
+permws,sandws,0.8522692704820095
+clayws,kffactws,0.8516690587157892

@@ -1,0 +1,12 @@
+Study_ID,Site,Burn_Unburn,fire_years_used,burn_percent_fire_year,totdasqkm,paper area,Checked,
+Hauer,Logging Creek,Unburn,1988,1.5154,101.0205,238,Y,Should be 0
+Hauer,Wally Creek ,Unburn,1988,93.5391,1.866,2.38,Y,Should be 0
+Mast & Clow,Pinchot,Unburn,2003,0.2982,47.3841,,Y,Should be 0
+Oliver et al. 2012,Site 1,Unburn,2007,42.7861,2.7135,,Y,Should be 0
+Gerla,Crow Creek,Unburn,1988,9.1827,49.9266,,Y,Should be 0
+Gluns,East Fork Kootenai,Burn,1985,0,20156.0085,,Y,Should be NA
+Gluns,Middle Fork Kootenai,Burn,1985,0,20156.0085,,Y,Should be NA
+Hhickenbottom,Middle Fork American,Burn,2021_2022,0,1520.7759,,Y,Should be NA
+Hhickenbottom,Trout_Creek,Burn,2021_2022,0,1520.7759,,Y,Should be NA
+Neary Currier,Wash Branch,Burn,1978,0,8.739,,Y,Should be NA
+Tiedemann,Camas Creek ,Burn,1970,0,NA,,Y,Should be NA
