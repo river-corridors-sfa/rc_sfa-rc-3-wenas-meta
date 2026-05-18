@@ -106,6 +106,191 @@ site_df <- master_df %>%
 
 dim(site_df)
 
+doc_site <- site_df %>% 
+  select(Study_ID, DOC_mean) %>% 
+  na.omit()
+
+no3_site <- site_df %>% 
+  select(Study_ID, NO3_mean) %>% 
+  na.omit()
+
+# ---- 2. Yearly (one row per site-year) ----
+yearly_df <- master_df %>%
+  mutate(Year = lubridate::year(Sampling_Date)) %>%
+  group_by(Study_ID, Site, comid, Year) %>%
+  summarise(
+    DOC_mean = mean(DOC_Interp_mg_C_L, na.rm = TRUE),
+    NO3_mean = mean(NO3_Interp_mg_N_L, na.rm = TRUE),
+    # Time-varying covariate(s): take mean within year
+    TSF_mean = mean(Time_Since_Fire, na.rm = TRUE),   
+    # Static covariates: first non-NA
+    across(all_of(setdiff(candidate_covars, "TSF")),
+           ~ first(na.omit(.x))),
+    n_obs = sum(!is.na(DOC_Interp_mg_C_L) | !is.na(NO3_Interp_mg_N_L)),
+    .groups = "drop"
+  ) %>%
+  mutate(across(c(DOC_mean, NO3_mean), ~ if_else(is.nan(.x), NA_real_, .x)))
+
+doc_site <- yearly_df %>% 
+  select(Study_ID, DOC_mean, Year, Time_Since_Fire) %>% 
+  na.omit()
+
+no3_site <- yearly_df %>% 
+  select(Study_ID, NO3_mean, Year, Time_Since_Fire) %>% 
+  na.omit()
+
+
+
+# ---- 3. Monthly (one row per site-year-month) ----
+monthly_df <- master_df %>%
+  mutate(Year  = lubridate::year(Sampling_Date),
+         Month = lubridate::month(Sampling_Date),
+         YearMonth = lubridate::floor_date(Sampling_Date, "month")) %>%
+  group_by(Study_ID, Site, comid, Year, Month, YearMonth) %>%
+  summarise(
+    DOC_mean = mean(DOC_Interp_mg_C_L, na.rm = TRUE),
+    NO3_mean = mean(NO3_Interp_mg_N_L, na.rm = TRUE),
+    TSF_mean = mean(Time_Since_Fire, na.rm = TRUE),
+    across(all_of(setdiff(candidate_covars, "TSF")),
+           ~ first(na.omit(.x))),
+    n_obs = sum(!is.na(DOC_Interp_mg_C_L) | !is.na(NO3_Interp_mg_N_L)),
+    .groups = "drop"
+  ) %>%
+  mutate(across(c(DOC_mean, NO3_mean), ~ if_else(is.nan(.x), NA_real_, .x)))
+
+doc_site <- monthly_df %>% 
+  select(Study_ID,  DOC_mean, Year, Month, Time_Since_Fire) %>% 
+  na.omit()
+
+no3_site <- monthly_df %>% 
+  select(Study_ID, NO3_mean, Year, Month, Time_Since_Fire) %>% 
+  na.omit()
+
+```
+
+# 3.5 EXPLORATORY ANALYSIS: BOOT STRAPPING
+```{r}
+# Covariates of interest:
+# Watershed area - areasqkm
+# Maximum Watershed elevation smooth - maxelevsmo - should correlate with slope?
+# Watershed Slope - slope
+# 30-year max air temp - tmax8110ws
+# 30-year mean air temp - tmean8110ws
+# 30-year min air temp - tmin8110ws
+# Forest cover 
+  # pctconif2019ws - Evergreen
+  # pctdecid2019ws - Deciduous 
+  # pctmxfst2019ws - Mixed forest
+# Urban cover:
+  # pcturbhi2019ws - high intensity
+  # pcturbmd2019ws - medium intensity 
+  # pcturblo2019ws - low intensity
+  # pcturbop2019ws - Developed open space
+# Grassland cover - pctgrs2019ws
+# Wetland cover
+  # pcthbwet2019ws - Herbaceous Wetlands
+  # pctwdwet2019ws - Woody wetlands
+# Ag cover
+  # pctcrop2019ws - cultivated crop
+  # pcthay2019ws - Hay pasture
+# OM mean - omws
+# Mean Bedrock depth - rckdepws
+# Carbonate Residual Material - pctcarbresidws
+# Non-carbonate Residual material - pctnoncarbresidws
+# Silicic Residual materia
+# Glacier Till
+  # pctglactilclayws - clayey glacial till
+  # pctglactilcrsws - coarse glacial till
+  # pctglactilloamws - loamy glacial till
+# Saline Lake Sediment - pctsallakews
+# Baseflow index - bfiws
+# Soil permeability - permws
+# Mean runoff - runoffws
+# Watershed burn percentage - burn_percent_fire_year
+# burn severity
+  # burn_sev_high
+  # burn_sev_mod
+  # burn_sev_low
+# TSF
+set.seed(42)
+n_boot <- 1000
+
+na_frac <- colMeans(is.na(X_full))
+keep_covars <- names(na_frac)[na_frac < 0.2]
+
+X_keep <- site_df %>% select(all_of(keep_covars)) %>% as.matrix()
+X_imp  <- apply(X_keep, 2, function(col) {
+  col[is.na(col)] <- median(col, na.rm = TRUE); col
+})
+
+ok <- !is.na(site_df$NO3_mean)
+X_ok <- X_imp[ok, , drop = FALSE]
+y_ok <- site_df$NO3_mean[ok]
+
+cat("n =", nrow(X_ok), "p =", ncol(X_ok), "unique y =", length(unique(y_ok)), "\n")
+
+fit_orig <- cv.glmnet(X_ok, y_ok, alpha = 1)
+
+beta_orig <- as.numeric(coef(fit_orig, s = "lambda.1se"))[-1]
+
+# Steps 2–6 inside each bootstrap iteration
+boot_betas <- matrix(NA, n_boot, length(candidate_covars))
+colnames(boot_betas) <- candidate_covars
+
+for (b in 1:n_boot) {
+  resampled <- sample(sites, N, replace = TRUE)
+  d <- purrr::map_dfr(resampled, ~ filter(site_df, Site == .x))
+  X <- as.matrix(d[, candidate_covars])
+  y <- d$NO3_mean
+  ok <- complete.cases(X, y)
+  if (sum(ok) < 10) next
+  fit <- cv.glmnet(X[ok,], y[ok], alpha = 1, nfolds = 10)
+  boot_betas[b, ] <- as.numeric(coef(fit, s = "lambda.1se"))[-1]
+}
+
+# Stability selection (right panel of Fig 6.4 in your chapter)
+selection_prob <- colMeans(boot_betas != 0, na.rm = TRUE)
+
+# Coefficient distributions (boxplots, left panel of Fig 6.4)
+boot_betas_df <- as.data.frame(boot_betas) %>%
+  tidyr::pivot_longer(everything(), names_to = "var", values_to = "coef")
+
+# Plot
+ggplot(boot_betas_df, aes(x = reorder(var, coef, median), y = coef)) +
+  geom_boxplot(outlier.size = 0.5) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  coord_flip() +
+  labs(x = NULL, y = "Bootstrap LASSO coefficient",
+       title = "Nonparametric cluster bootstrap (1000 reps)")
+
+
+#### OPTION 2 ####
+
+boot_betas_nested <- matrix(NA, n_boot, length(candidate_covars))
+
+for (b in 1:n_boot) {
+  resampled_sites <- sample(sites, N, replace = TRUE)
+  
+  d <- purrr::imap_dfr(resampled_sites, function(s, i) {
+    master_df %>%
+      filter(Site == s) %>%
+      slice_sample(prop = 1, replace = TRUE) %>%   # temporal resample
+      summarise(
+        DOC_mean = mean(DOC_Interp_mg_C_L, na.rm = TRUE),
+        NO3_mean = mean(NO3_Interp_mg_N_L, na.rm = TRUE),
+        across(all_of(candidate_covars), ~ first(na.omit(.x)))
+      ) %>%
+      mutate(boot_site = paste0(s, "_", i))
+  })
+  
+  X <- as.matrix(d[, candidate_covars])
+  y <- d$NO3_mean
+  ok <- complete.cases(X, y)
+  if (sum(ok) < 10) next
+  fit <- cv.glmnet(X[ok,], y[ok], alpha = 1, nfolds = 10)
+  boot_betas_nested[b, ] <- as.numeric(coef(fit, s = "lambda.1se"))[-1]
+}
+
 ```
 
 # 4. Prep X and y (separately for DOC and NO3)
