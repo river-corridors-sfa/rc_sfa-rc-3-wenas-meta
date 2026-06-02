@@ -203,6 +203,96 @@ write_csv(merged, file.path(out_dir, "03_master_merged.csv"))
 
 message("Wrote: ", file.path(out_dir, "03_master_merged.csv"))
 
+# BRIE LASSO csv with the 24 variables of interest:
+# admin_vars <- c("rpuid", "vpuid", "enabled",
+#                 "huc2", "huc4", "huc6", "huc8", "huc10", "huc12",
+#                 "Study_ID", "Comparison_ID", "Pair", "Sampling_Date",
+#                 "latitude", "longitude", "comid", "DOC_Interp_mg_C_L", "NO3_Interp_mg_N_L", 
+#                 "Days_Between_Samples", "objectid", "fdate", "resolution", "gnis_id",
+#                 "gnis_name", "reachcode", "flowdir", "wbareacomi", "ftype", "fcode", "shape_length",
+#                 "streamleve", "streamcalc", "fromnode", "tonode", "hydroseq", "levelpathi",
+#                 "pathlength", "terminalpa", "arbolatesu")
+
+# watershed area
+# Maximum watershed elevation smooth
+# Watershed slope
+# 30 year max temp 
+# 30 year mean temp 
+# 30 year min air temp 
+# Forest cover
+# Urban cover
+# Grassland cover 
+# Wetland cover 
+# AG cover
+# OM mean
+# mean bedrock depth 
+# Carbonate residual material
+# Non-carbonate residual material 
+# Silicic Residual material 
+# Glacial till
+# Saline lake sediment 
+# Baseflow index
+# soil permeability 
+# mean runoff
+# watershed burn percentage 
+# Burn severity 
+# Time since fire 
+
+# 
+merged_Brie_LASSO <- merged %>%
+  mutate(
+    # --- Combined land cover classes ---
+    forest_cover  = rowSums(across(c(pctconif2019ws, pctdecid2019ws, pctmxfst2019ws)), na.rm = TRUE),
+    urban_cover   = rowSums(across(c(pcturbhi2019ws, pcturbmd2019ws, pcturblo2019ws, pcturbop2019ws)), na.rm = TRUE),
+    wetland_cover = rowSums(across(c(pcthbwet2019ws, pctwdwet2019ws)), na.rm = TRUE),
+    ag_cover      = rowSums(across(c(pctcrop2019ws, pcthay2019ws)), na.rm = TRUE),
+    glacial_till  = rowSums(across(c(pctglactilloamws, pctglactilcrsws, pctglactilclayws)), na.rm = TRUE),
+    grassland_cover = pctgrs2019ws
+  ) %>%
+  select(
+    # --- Identifiers / response variables (keep these!) ---
+    Study_ID, Comparison_ID, Pair, Site, Sampling_Date,
+    latitude, longitude, comid, Burn_Unburn, Climate,
+    DOC_Interp_mg_C_L, NO3_Interp_mg_N_L,
+    
+    # 1. Watershed area
+    Area_watershed_km,
+    # 2. Max watershed elevation (smooth)
+    maxelevsmo,
+    # 3. Watershed slope
+    slope,
+    # 4-6. 30-yr climate normals
+    tmax8110ws, tmean8110ws, tmin8110ws,
+    # 7-11. Land cover (combined)
+    forest_cover, urban_cover, grassland_cover, wetland_cover, ag_cover,
+    # 12. Soil organic matter
+    omws,
+    # 13. Bedrock depth
+    rckdepws,
+    # 14-16. Residual lithology
+    pctcarbresidws, pctnoncarbresidws, pctsilicicws,
+    # 17. Glacial till (combined)
+    glacial_till,
+    # 18. Saline lake sediment
+    pctsallakews,
+    # 19. Baseflow index
+    bfiws,
+    # 20. Soil permeability
+    permws,
+    # 21. Mean runoff
+    runoffws,
+    # 22. Watershed burn percentage
+    burn_percent_fire_year,
+    # 23. Burn severity
+    burn_sev_high, burn_sev_mod, burn_sev_low,
+    # 24. Time since fire
+    Time_Since_Fire
+  )
+
+write_csv(merged_Brie_LASSO, file.path(out_dir, "03_master_merged_Brie_LASSO.csv"))
+
+
+
 
 
 
