@@ -314,8 +314,7 @@ merged_Brie_LASSO_03 <- merged_Brie_LASSO_02 %>%
 # test <- merged_Brie_LASSO_03 %>% 
 #   filter(Study_ID == "Hickenbottom et al. 2023")
 
-
-merged_Brie_LASSO_final <- merged_Brie_LASSO_03 %>%
+merged_Brie_LASSO_04 <- merged_Brie_LASSO_03 %>%
   mutate(
     burn_sev_low = case_when(
       Study_ID == "Hickenbottom et al. 2023" & Site == "Middle_Fork_American" ~ 58,
@@ -334,13 +333,16 @@ merged_Brie_LASSO_final <- merged_Brie_LASSO_03 %>%
     )
   )
 
+merged_Brie_LASSO_final <- merged_Brie_LASSO_04 %>%
+  mutate(
+    burn_percent_fire_year = case_when(
+      Study_ID == "Hickenbottom et al. 2023" & Site == "Middle_Fork_American" ~ 20.68,
+      Study_ID == "Hickenbottom et al. 2023" & Site == "Trout_Creek" ~ 43.38,
+      TRUE ~ burn_percent_fire_year
+    )
+  )
+
 write_csv(merged_Brie_LASSO_final, file.path(out_dir, "03_master_merged_Brie_LASSO.csv"))
-
-
-# test <- merged_Brie_LASSO_final %>% 
-#   filter(Study_ID == "Hickenbottom et al. 2023") %>% 
-#   select(Site, burn_sev_low, burn_sev_mod, burn_sev_high)
-
 
 # # Read in Katie dNBR workflow:
 # DNBR_Severity <- read_csv("Output_for_analysis/archive/14_Meta_calculate_burn_severity/DNBR_Severity.csv")
