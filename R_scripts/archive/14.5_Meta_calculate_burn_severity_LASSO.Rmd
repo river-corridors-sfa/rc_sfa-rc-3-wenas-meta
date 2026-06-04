@@ -1,0 +1,206 @@
+---
+title: "14.5_Meta_calculate_burn_severity_LASSO"
+output: html_document
+date: "2026-06-04"
+---
+# load libraries and functions
+```{r Load packages}
+#for Jake/mac
+
+rm(list=ls(all=T)) #this clears your Environment
+
+p_load(tidyverse,
+       raster,
+       sf,
+       exactextractr, 
+       readr, 
+       here, 
+       nhdplusTools, 
+       purrr, 
+       stringr, 
+       ggplot2, 
+       forcats, 
+       lwgeom)
+
+
+```
+
+# Convert crs function 
+```{r crs function}
+convert_crs <- function (input, goal, type = "numeric", res = NULL) 
+{
+    stopifnot(class(input)[1] %in% c("sf", "RasterLayer"), class(goal)[1] %in% 
+        c("sf", "RasterLayer"), type %in% c("numeric", "categorical"))
+    if (raster::compareCRS(goal, input) == T) {
+        message("CRS already matches that of your goal object")
+        return(input)
+    }
+    else {
+        if (class(input)[1] == "RasterLayer") {
+            if (is.null(res)) {
+                if (class(goal)[1] == "RasterLayer") {
+                  res <- terra::res(goal)[1]
+                }
+                else {
+                  unit <- sf::st_crs(goal, parameters = TRUE)$units_gdal
+                  res <- ifelse(unit == "degree", 0.0003280119, 
+                    30)
+                }
+            }
+            method <- ifelse(type == "numeric", "bilinear", "ngb")
+            input_prj <- raster::projectRaster(input, crs = raster::crs(goal), 
+                method = method, res = res)
+        }
+        else {
+            input_prj <- sf::st_transform(input, raster::crs(goal))
+        }
+        return(input_prj)
+    }
+}
+
+```
+
+# Function to clip raster to a shapefile 
+```{r function}
+# This function will ensure the projection is the same between the raster the shapefile and then clip the raster to the basin boundry. It can return a raster (for further analysis) or a dataframe (for plotting)
+
+#' @param raster the raster you want to clip
+#' @param sf the shapefile you want to use to clip the raster
+#' @param type either 'numeric' or 'categorical' depending on if your raster is discrete or continuous values
+#' @param res the resolution of the projected raster, if not specified with default to 30m
+#' @param return either 'df' or 'raster' to specify the form of the returned raster
+#'
+#' @return if 'return' is df it will return the raster as a dataframe suitable 
+#' for plotting in ggplot2. If 'return' is raster it will return the raster as a rasterLayer object
+
+clean_raster <- function (raster, sf, type = "numeric", 
+                            res = NULL, return = "df") {stopifnot(class(raster) == "RasterLayer", class(sf)[1] == 
+                c("sf"), type %in% c("numeric", "categorical"), return %in% 
+                c("df", "raster"))
+    unit <- sf::st_crs(sf, parameters = TRUE)$units_gdal
+    buffer <- ifelse(unit == "degree", 0.1, 5000)
+    res <- ifelse(unit == "degree", 0.0003280119, 30)
+    method <- ifelse(type == "numeric", "bilinear", "ngb")
+    if (compareCRS(raster, sf) == T) {
+      raster_crop <- raster::crop(raster, sf)
+      raster_crop <- raster::mask(raster_crop, sf)
+      raster_df <- as.data.frame(raster::rasterToPoints(raster_crop))
+      colnames(raster_df) <- c("x", "y", "val")
+    }
+    else {
+      sf_prj <- convert_crs(sf::st_buffer(sf, dist = buffer), 
+                            raster)
+      raster_crop <- raster::crop(raster, sf_prj)
+      raster_crop <- raster::mask(raster_crop, sf_prj)
+      raster_prj <- raster::projectRaster(raster_crop, crs = crs(sf), 
+                                          method = method, res = res)
+      raster_crop <- raster::crop(raster_prj, sf)
+      raster_crop <- raster::mask(raster_crop, sf)
+      raster_df <- as.data.frame(raster::rasterToPoints(raster_crop))
+      colnames(raster_df) <- c("x", "y", "val")
+    }
+    if (return == "df") {
+      raster_df
+    }
+    else {
+      raster_crop
+    }
+} 
+
+```
+
+# Hickenbottom et al. 2023 
+```{r}
+# Read in Middle Fork for Hickenbottom paper 
+middle_fork <- st_read("~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/archive/06_Meta_geospatial_extraction_with_comids/watershed_shapefiles/Middle_Fork_watershed.shp")
+
+# Add location of the fire in the data frame
+fire_names <- read_csv(here("inputs", "catchment_characteristics", "archive", "fire_watershed_lat_long_comids.csv")) %>%
+  dplyr::select(site = Site, comid, fire_name, fire_year, mtbs_id)
+
+fire_names <- fire_names %>%
+  mutate(fire_name = str_to_lower(fire_name))
+
+# Add columns for file paths to the fire_names data frame
+fire_names <- fire_names %>%
+  mutate(
+    dnbr_path = paste0("gis_data/Fire_Perimeters/", fire_name, "/mtbs/", fire_year, "/", mtbs_id, "/", fire_name, "_dnbr.tif"),
+    fire_shape_path = paste0("gis_data/Fire_Perimeters/", fire_name, "/mtbs/", fire_year, "/", mtbs_id, "/", fire_name, "_burn_bndy.shp")
+  )
+
+# Join the site shape and fire names data
+site_shape_fire_combined <- full_join(site_shape, fire_names)
+
+# site_shape_fire_combined <- site_shape_fire_combined %>% 
+#   filter(fire_name == "gaviota")
+
+# Initialize the results data frame
+burn_severity <- tibble(
+  site = character(),
+  fire_name = character(),
+  mean_dnbr = numeric())
+
+# Read in thresholds data frame
+thresholds <- read_csv(here("Output_for_analysis", "archive", "13_Meta_calculate_thresholds_per_fire", "Fire_thresholds.csv")) %>% 
+  dplyr::select(!zone)
+
+# CLIP ONLY HICKENBOTTOM SITES
+# Middle Fork
+# Trout Creek 
+
+site_shape_fire_combined <- site_shape_fire_combined %>% 
+  filter(site %in% c())
+
+# Iterate through each site in the combined shapefile
+for (i in 1:nrow(site_shape_fire_combined)) {
+  # Get the site name, fire name, and file paths
+  site_name <- site_shape_fire_combined$site[i]
+ 
+  fire_name <- site_shape_fire_combined$fire_name[i]
+  dnbr_path <- site_shape_fire_combined$dnbr_path[i]
+  fire_shape_path <- site_shape_fire_combined$fire_shape_path[i] 
+  
+  if (file.exists(here(dnbr_path)) && file.exists(here(fire_shape_path))) {
+    # Load the corresponding dnbr raster and fire shapefile
+    dnbr <- raster(here(dnbr_path))
+    plot(dnbr)
+    
+  
+    fire_shape <- st_read(here(fire_shape_path))
+    plot(fire_shape)
+    
+    # Clip the dNBR data to the fire boundary
+    dnbr <- mask(dnbr, st_as_sf(fire_shape))
+    plot(dnbr)
+    
+    # Get the watershed boundary
+    watershed_boundary <- site_shape_fire_combined[i, ]
+    plot(watershed_boundary)
+    
+    # Ensure the CRS of the layers are compatible
+    if (!st_crs(watershed_boundary) == crs(dnbr)) {
+      watershed_boundary <- st_transform(watershed_boundary, crs(dnbr))
+    }
+    
+    # Clip the dNBR data to the watershed boundary
+    dnbr_clipped <- mask(dnbr, st_as_sf(watershed_boundary))
+    plot(dnbr_clipped)
+    # Extract data and calculate the mean dNBR
+    mean_dnbr_value <- exactextractr::exact_extract(dnbr_clipped, watershed_boundary, "mean", progress = FALSE)
+    
+    # Add a new row to the dataframe
+    burn_severity <- burn_severity %>%
+      add_row(
+        site = site_name,  # use the scalar value directly
+        fire_name = fire_name,  # use the scalar value directly
+        mean_dnbr = mean_dnbr_value
+      )
+  
+  }
+}
+
+# Merge burn_severity with thresholds on fire_name
+burn_severity_thresholds <- burn_severity %>%
+  left_join(thresholds, by = "fire_name")
+
+```

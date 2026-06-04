@@ -239,7 +239,7 @@ message("Wrote: ", file.path(out_dir, "03_master_merged.csv"))
 # Time since fire 
 
 # 
-merged_Brie_LASSO <- merged %>%
+merged_Brie_LASSO_01 <- merged %>%
   mutate(
     # --- Combined land cover classes ---
     forest_cover  = rowSums(across(c(pctconif2019ws, pctdecid2019ws, pctmxfst2019ws)), na.rm = TRUE),
@@ -288,13 +288,119 @@ merged_Brie_LASSO <- merged %>%
     # 24. Time since fire
     Time_Since_Fire
   )
+# remove pre post sites
+merged_Brie_LASSO_02 <- merged_Brie_LASSO_01 %>% 
+  filter(!Pair %in% c("Site_2_post", "Site_3_post", "Site_4_post"))
 
-write_csv(merged_Brie_LASSO, file.path(out_dir, "03_master_merged_Brie_LASSO.csv"))
+# deal with burn percent and severity for a few sites:
+# Gluns & Toews; 1989 - East Fork Kootenai - remove (Canada)
+# Gluns & Toews; 1989 - Middle Fork Kootenai - remove (Canada)
+# Hickenbottom et al. 2023 - Middle_Fork_American - burn severity from text 
+# Hickenbottom et al. 2023 - North_Fork_American - burn severity from text 
+# Hickenbottom et al. 2023 - Trout_Creek - burn severity from text 
+# Neary & Currier; 1982 - Crane Creek - remove (fire too old)
+# Neary & Currier; 1982  - Wash Branch - remove (fire too old)
+# Tiedemann; 1973 - Camas Creek - remove (fire too old)
+# Tiedemann; 1973 - Grade Creek - remove (fire too old)
+
+# test <- merged_Brie_LASSO_02 %>% 
+#   filter(Study_ID == "Hickenbottom et al. 2023")
+
+# Manually put in burn severity values for Hickenbottom based on the text and remove the papers that are too old or in canada 
+merged_Brie_LASSO_03 <- merged_Brie_LASSO_02 %>% 
+  filter(!Study_ID %in% c("Burd et al 2018", "Gluns & Toews; 1989", 
+                          "Neary & Currier; 1982", "Tiedemann; 1973"))
+
+# test <- merged_Brie_LASSO_03 %>% 
+#   filter(Study_ID == "Hickenbottom et al. 2023")
 
 
+merged_Brie_LASSO_final <- merged_Brie_LASSO_03 %>%
+  mutate(
+    burn_sev_low = case_when(
+      Study_ID == "Hickenbottom et al. 2023" & Site == "Middle_Fork_American" ~ 58,
+      Study_ID == "Hickenbottom et al. 2023" & Site == "Trout_Creek" ~ 39,
+      TRUE ~ burn_sev_low
+    ),
+    burn_sev_mod = case_when(
+      Study_ID == "Hickenbottom et al. 2023" & Site == "Middle_Fork_American" ~ 25,
+      Study_ID == "Hickenbottom et al. 2023" & Site == "Trout_Creek" ~ 45,
+      TRUE ~ burn_sev_mod
+    ),
+    burn_sev_high = case_when(
+      Study_ID == "Hickenbottom et al. 2023" & Site == "Middle_Fork_American" ~ 9,
+      Study_ID == "Hickenbottom et al. 2023" & Site == "Trout_Creek" ~ 3,
+      TRUE ~ burn_sev_high
+    )
+  )
+
+write_csv(merged_Brie_LASSO_final, file.path(out_dir, "03_master_merged_Brie_LASSO.csv"))
 
 
+# test <- merged_Brie_LASSO_final %>% 
+#   filter(Study_ID == "Hickenbottom et al. 2023") %>% 
+#   select(Site, burn_sev_low, burn_sev_mod, burn_sev_high)
 
 
-
-
+# # Read in Katie dNBR workflow:
+# DNBR_Severity <- read_csv("Output_for_analysis/archive/14_Meta_calculate_burn_severity/DNBR_Severity.csv")
+# 
+# brie_site_list <- merged_Brie_LASSO_02 %>% 
+#   select(Study_ID, Site, Burn_Unburn, burn_sev_low, burn_sev_mod, burn_sev_high) %>% 
+#   distinct()
+# 
+# # Function to standardize site names
+# standardize_sites <- function(df) {
+#   df %>%
+#     mutate(Site = Site %>%
+#              str_replace_all("[_\\-\\.]", " ") %>%  # Replace _, -, . with space
+#              str_squish() %>%                       # Remove extra whitespace
+#              str_to_title())                        # Title Case (e.g., "Coal Creek")
+# }
+# 
+# # Apply to both data frames
+# DNBR_Severity <- standardize_sites(DNBR_Severity)
+# brie_site_list <- standardize_sites(brie_site_list)
+# 
+# # Now merge
+# merged_df <- DNBR_Severity %>%
+#   full_join(brie_site_list, by = "Site") %>% 
+#   select(Study_ID, Site, Burn_Unburn, mean_dnbr, burn_sev_low, burn_sev_mod, burn_sev_high) %>% 
+#   filter(!is.na(Study_ID))
+# 
+#     #  * Burd et al 2018 - in Canada so no burn metrics. This will have to go. 
+# # Coombs & Melack; 2013 - has both dNBR and low/mod/high
+# # Crandall et al. 2021 - has both dNBR and low/mod/high
+# # Gerla & Galloway; 1998 - has both dNBR and low/mod/high
+#     # * Gluns & Toews; 1989 - *does not have dNBR or low/mod/high* - in Canada so no burn metrics. This will have to go.
+# # Hauer & Spencer 1998 - has both dNBR and low/mod/high
+#     # * Hickenbottom et al. 2023 - *does not have dNBR or low/mod/high*
+#           # Middle Fork - 58 low, 25 moderate, 9 high 
+#           # Trout Creek - 39 low, 45 moderate, 3 high 
+#     # * Mast & Clow; 2008 - has both dNBR and low/mod/high but dNBR is negative...
+# # Murphy et al. 2018 - has both dNBR and low/mod/high
+#     # * Neary & Currier; 1982 - *does not have dNBR or low/mod/high*
+#         # Fire from 1978 - remove 
+#     # * Oliver et al. 2012 - has both dNBR and low/mod/high but dNBR is weird
+#   # Rhea et al. 2021 - has low/mod/high but NO dNBR
+#     # * Tiedemann; 1973 - *does not have dNBR or low/mod/high*
+#   # * Uzun et al. 2020 - has low/mod/high but NO dNBR
+# # Wagner et al. 2015 - has both dNBR and low/mod/high
+# # Writer et al. 2014 - has both dNBR and low/mod/high
+# 
+# 
+# 
+# merged_Brie_LASSO_03 <- merged_Brie_LASSO_02 %>% 
+#   filter(!Pair %in% c("Site_2_post", "Site_3_post", "Site_4_post"))
+# 
+# 
+# 
+# write_csv(merged_Brie_LASSO, file.path(out_dir, "03_master_merged_Brie_LASSO.csv"))
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 

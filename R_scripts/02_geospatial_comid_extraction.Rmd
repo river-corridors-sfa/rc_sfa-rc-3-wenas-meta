@@ -16,21 +16,21 @@ date: "2026-04-30"
 
 ```{r setup, include=TRUE, echo = T, warning = F, comment = F, message = FALSE}
 rm(list = ls())
-library(sf)
-library(tidyverse)
-library(terra)
-library(nhdplusTools)
-library(mapview)
-library(dataRetrieval)
-library(lubridate)
-library(prism)
-library(ggspatial)
-library(nngeo)# Added from original code
-library(stars)# Added from original code
-library(here)
-library(webshot)
-library(readxl)
-library(StreamCatTools)
+p_load(sf, 
+       tidyverse, 
+       terra, 
+       nhdplusTools, 
+       mapview, 
+       dataRetrieval,
+       lubridate, 
+       prism, 
+       ggspatial, 
+       nngeo, 
+       stars, 
+       here,
+       webshot, 
+       readxl, 
+       StreamCatTools)
 
 # this gives you an error, but it can be ignored:
 try(plyr::ldply(list.files(path = here("R_scripts", "data", "src"),

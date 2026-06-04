@@ -135,10 +135,10 @@ clean_raster <- function (raster, sf, type = "numeric",
 # I can do this for loop for all the studies except the crandall study because there are multiple fires that make up a complex and getting the comids for some of these watersheds needed to be manually clipped. 
 
 # Read in site shapefiles
-site_shape <- st_read("~/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/06_Meta_geospatial_extraction_with_comids/watershed_shapefile.shp")
+site_shape <- st_read("~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/archive/06_Meta_geospatial_extraction_with_comids/watershed_shapefile.shp")
 
 # Add location of the fire in the data frame
-fire_names <- read_csv(here("inputs", "catchment_characteristics", "fire_watershed_lat_long_comids.csv")) %>%
+fire_names <- read_csv(here("inputs", "catchment_characteristics", "archive", "fire_watershed_lat_long_comids.csv")) %>%
   dplyr::select(site = Site, comid, fire_name, fire_year, mtbs_id)
 
 fire_names <- fire_names %>%
@@ -164,9 +164,15 @@ burn_severity <- tibble(
   mean_dnbr = numeric())
 
 # Read in thresholds data frame
-thresholds <- read_csv(here("Output_for_analysis", "13_Meta_calculate_thresholds_per_fire", "Fire_thresholds.csv")) %>% 
-  dplyr::select(!zone) %>% 
-  dplyr::select(!...1)
+thresholds <- read_csv(here("Output_for_analysis", "archive", "13_Meta_calculate_thresholds_per_fire", "Fire_thresholds.csv")) %>% 
+  dplyr::select(!zone)
+
+# CLIP ONLY HICKENBOTTOM SITES
+# Middle Fork
+# Trout Creek 
+
+site_shape_fire_combined <- site_shape_fire_combined %>% 
+  filter(site %in% c())
 
 # Iterate through each site in the combined shapefile
 for (i in 1:nrow(site_shape_fire_combined)) {
