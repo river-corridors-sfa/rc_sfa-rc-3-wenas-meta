@@ -140,156 +140,187 @@ corrplot(pearson_cubed, type = "upper", method = "number",
          number.cex = 0.9, cl.cex = 1.25, mar = c(0, 0, 2, 0), bg = "black")
 dev.off()
 
-# # ======== LASSO  ============
-# 
-# ## scale data
-# scale_cube_variables = as.data.frame(scale(cube_data %>% select(-Parent_ID, -Site_ID)))%>% 
-#   rename_with(where(is.numeric), .fn = ~ paste0("scale_", .x))
-# 
-# ## Loop through LASSO to get average over a lot of seeds ####
-# for (variable in response_variable) {
-#   
-#   
-#   num_seeds = 100
-#   seeds = sample(1:500, num_seeds)
-#   
-#   ## Set response variable (scale_cube_Mean_Decay_Rate_per_day/scale_cube_Mean_degree_decay_rate) and scale
-#   yvar <- data.matrix(scale_cube_variables %>% pull(variable))
-#   round(mean(yvar), 4)
-#   sd(yvar)
-#   
-#   # list for storing LASSO iterations
-#   norm_coeffs = list()
-#   lasso_coefs_pull = list()
-#   r2_scores = numeric(num_seeds)
-#   
-#   ## Set predictor variables; exclude response variable(s)
-#   
-#   x_cube_variables = scale_cube_variables %>%
-#     select(-response_variable)
-#   
-#   if(variable == 'scale_cube_Mean_degree_decay_rate'){
-#     
-#     x_cube_variables = x_cube_variables %>%
-#       select( -scale_cube_Mean_sum_mean_daily_temp)
-#   }
-#   
-#   xvars <- data.matrix(x_cube_variables)
-#   
-#   
-#   for (i in 1:num_seeds) {
-#     
-#     seed = seeds[i]
-#     set.seed(seed)
-#     
-    # lasso = cv.glmnet(xvars, yvar, alpha = 1, nfolds = 5,
-    #                   standardize = FALSE, standardize.response = FALSE, intercept = FALSE
-    #                   #,standardize = TRUE, standardize.response = TRUE, intercept = FALSE
-    #                   # , standardize = TRUE, standardize.response = FALSE, intercept = FALSE
-    # )
-#     
-#     best_lambda <- lasso$lambda.min
-#     #best_lambda
-#     #plot(lasso)
-#     
-#     best_lasso_model <- glmnet(xvars, yvar, alpha = 1, lambda = best_lambda, family = "gaussian",
-#                                standardize = FALSE, standardize.response = FALSE, intercept = FALSE
-#                                #  , standardize = TRUE, standardize.response = TRUE, intercept = FALSE
-#                                #, standardize = TRUE, standardize.response = FALSE, intercept = FALSE
-#     )
-#     
-#     
-#     lasso_coefs = as.matrix(coef(best_lasso_model, s = best_lambda))
-#     
-#     lasso_coefs_pull[[as.character(seed)]] = lasso_coefs[-1, , drop = FALSE]
-#     
-#     norm_coeffs_scale = lasso_coefs/max(abs(lasso_coefs[-1]))
-#     
-#     norm_coeffs[[as.character(seed)]] = norm_coeffs_scale[-1, , drop = FALSE]
-#     
-#     y_pred = predict(best_lasso_model, newx = xvars, s = best_lambda)
-#     
-#     sst = sum((yvar - mean(yvar))^2)
-#     sse = sum((y_pred - yvar)^2)
-#     r2_scores[i] = 1 - (sse / sst)
-#     
-#   }
-#   
-#   lasso_coef_mat = as.data.frame(do.call(cbind, lasso_coefs_pull)) 
-#   colnames(lasso_coef_mat) <- paste0("s", seq_len(ncol(lasso_coef_mat)))
-#   # Make DF of all LASSO results with mean and std. dev  
-#   lasso_coef_means = lasso_coef_mat %>% 
-#     mutate(RowNames = rownames(lasso_coef_mat)) %>% 
-#     rowwise() %>% 
-#     mutate(mean = mean(c_across(contains("s1"))), 
-#            sd = sd(c_across(contains("s1"))),
-#            cv = sd/mean) %>% 
-#     relocate(mean, .before = s1) %>% 
-#     relocate(sd, .before = s1) %>% 
-#     relocate(RowNames, .before = mean)%>% 
-#     relocate(cv, .after = sd) %>%
-#     add_column(response_variable = variable)
-#   
-#   norm_coeffs_matrix = do.call(cbind, norm_coeffs)
-#   
-#   mean_coeffs = as.data.frame(norm_coeffs_matrix, row.names = rownames(norm_coeffs_matrix))
-#   colnames(mean_coeffs) <- paste0("s", seq_len(ncol(mean_coeffs)))
-#   
-#   norm_lasso_coef_means = mean_coeffs %>% 
-#     mutate(RowNames = rownames(mean_coeffs)) %>% 
-#     rowwise() %>% 
-#     mutate(mean = mean(c_across(contains("s1"))), 
-#            sd = sd(c_across(contains("s1"))),
-#            cv = sd/mean) %>% 
-#     relocate(mean, .before = s1) %>% 
-#     relocate(sd, .before = s1) %>% 
-#     relocate(RowNames, .before = mean)%>% 
-#     relocate(cv, .after = sd) %>% 
-#     add_column(response_variable = variable)
-#   
-#   results_r2 = as.data.frame(r2_scores) 
-#   mean(results_r2$r2_scores)
-#   sd(results_r2$r2_scores)
-#   
-#   if(match(variable, response_variable) == 1){
-#     
-#     lasso_coef_means_all <- lasso_coef_means
-#     norm_lasso_coef_means_all <- norm_lasso_coef_means
-#     mean_r2_all <- tibble(mean_r2 = mean(results_r2$r2_scores),
-#                           sd = sd(results_r2$r2_scores),
-#                           response_variable = variable)
-#     
-#   } else{
-#     
-#     lasso_coef_means_all <- lasso_coef_means_all %>%
-#       add_row(lasso_coef_means)
-#     
-#     norm_lasso_coef_means_all <- norm_lasso_coef_means_all %>%
-#       add_row(norm_lasso_coef_means)
-#     
-#     mean_r2_all <- mean_r2_all %>%
-#       add_row(mean_r2 = mean(results_r2$r2_scores),
-#               sd = sd(results_r2$r2_scores),
-#               response_variable = variable)
-#   }
-#   
-#   
-#   
-# }
-# 
-# # ================================ investigate cv ==============================
-# 
-# all_results_long <- bind_rows(
-#   lasso_coef_means_all %>%
-#     select(RowNames, mean, sd, cv, response_variable) %>%
-#     add_column(type = 'Not_Normalized'),
-#   
-#   norm_lasso_coef_means_all %>%
-#     select(RowNames, mean, sd, cv, response_variable) %>%
-#     add_column(type = 'Normalized')
-# ) %>%
-#   mutate(cv = round(cv, 3))
-# 
+# ======== LASSO  ============
+
+
+tests <- c('c_burn', 'c_unburn', 'n_burn', 'n_unburn')
+
+## Loop through LASSO to get average over a lot of seeds ####
+for (test in tests) {
+  
+  if(test == 'c_burn'){
+    scale_cube_variables <- cube_data %>%
+      filter(!is.na(cube_mean_DOC_Interp_mg_C_L)) %>%
+      filter(Burn_Unburn == 'Burn') %>%
+      select(-Burn_Unburn, -Study_ID, -Site, -cube_mean_NO3_Interp_mg_N_L) %>%
+      mutate(across(where(is.numeric), ~ as.numeric(scale(.x)))) %>%  # Scale only numeric
+      rename_with(.cols = where(is.numeric), .fn = ~ paste0("scale_", .x)) %>%  # Fix syntax
+      as.data.frame()
+    response_variable <- 'scale_cube_mean_DOC_Interp_mg_C_L'
+    
+  } else if (test == 'c_unburn'){
+    scale_cube_variables <- cube_data %>%
+      filter(!is.na(cube_mean_DOC_Interp_mg_C_L)) %>%
+      filter(Burn_Unburn == 'Unburn') %>%
+      select(-Burn_Unburn, -Study_ID, -Site, -cube_mean_NO3_Interp_mg_N_L, -cube_mean_burn_percent_fire_year, -cube_mean_burn_sev_high, -cube_mean_burn_sev_mod, -cube_mean_burn_sev_low) %>%
+      mutate(across(where(is.numeric), ~ as.numeric(scale(.x)))) %>%  # Scale only numeric
+      rename_with(.cols = where(is.numeric), .fn = ~ paste0("scale_", .x)) %>%  # Fix syntax
+      as.data.frame()
+    response_variable <- 'scale_cube_mean_DOC_Interp_mg_C_L'
+    
+  } else if(test == 'n_burn'){
+    scale_cube_variables <- cube_data %>%
+      filter(!is.na(cube_mean_NO3_Interp_mg_N_L)) %>%
+      filter(Burn_Unburn == 'Burn') %>%
+      select(-Burn_Unburn, -Study_ID, -Site, -cube_mean_DOC_Interp_mg_C_L) %>%
+      mutate(across(where(is.numeric), ~ as.numeric(scale(.x)))) %>%  # Scale only numeric
+      rename_with(.cols = where(is.numeric), .fn = ~ paste0("scale_", .x)) %>%  # Fix syntax
+      as.data.frame()
+    response_variable <- 'scale_cube_mean_NO3_Interp_mg_N_L'
+    
+  } else if (test == 'n_unburn'){
+    scale_cube_variables <- cube_data %>%
+      filter(!is.na(cube_mean_NO3_Interp_mg_N_L)) %>%
+      filter(Burn_Unburn == 'Unburn') %>%
+      select(-Burn_Unburn, -Study_ID, -Site, -cube_mean_DOC_Interp_mg_C_L, -cube_mean_burn_percent_fire_year, -cube_mean_burn_sev_high, -cube_mean_burn_sev_mod, -cube_mean_burn_sev_low) %>%
+      mutate(across(where(is.numeric), ~ as.numeric(scale(.x)))) %>%  # Scale only numeric
+      rename_with(.cols = where(is.numeric), .fn = ~ paste0("scale_", .x)) %>%  # Fix syntax
+      as.data.frame()
+    response_variable <- 'scale_cube_mean_NO3_Interp_mg_N_L'
+  }
+
+  num_seeds = 100
+  seeds = sample(1:500, num_seeds)
+
+  ## Set response variable and scale
+  yvar <- data.matrix(scale_cube_variables %>% pull(response_variable))
+  round(mean(yvar), 4) # mean should be 0 and sd should 1
+  sd(yvar)
+
+  # list for storing LASSO iterations
+  norm_coeffs = list()
+  lasso_coefs_pull = list()
+  r2_scores = numeric(num_seeds)
+
+  ## Set predictor variables; exclude response variable(s)
+
+  x_cube_variables = scale_cube_variables %>%
+    select(-response_variable)
+
+
+  xvars <- data.matrix(x_cube_variables)
+
+
+  for (i in 1:num_seeds) {
+
+    seed = seeds[i]
+    set.seed(seed)
+    
+    lasso = cv.glmnet(xvars, yvar, alpha = 1, nfolds = 5,
+                  standardize = FALSE, standardize.response = FALSE, intercept = FALSE)
+
+    best_lambda <- lasso$lambda.min
+    #best_lambda
+    #plot(lasso)
+
+    best_lasso_model <- glmnet(xvars, yvar, alpha = 1, lambda = best_lambda, family = "gaussian",
+                               standardize = FALSE, standardize.response = FALSE, intercept = FALSE
+                               #  , standardize = TRUE, standardize.response = TRUE, intercept = FALSE
+                               #, standardize = TRUE, standardize.response = FALSE, intercept = FALSE
+    )
+
+
+    lasso_coefs = as.matrix(coef(best_lasso_model, s = best_lambda))
+
+    lasso_coefs_pull[[as.character(seed)]] = lasso_coefs[-1, , drop = FALSE]
+
+    norm_coeffs_scale = lasso_coefs/max(abs(lasso_coefs[-1]))
+
+    norm_coeffs[[as.character(seed)]] = norm_coeffs_scale[-1, , drop = FALSE]
+
+    y_pred = predict(best_lasso_model, newx = xvars, s = best_lambda)
+
+    sst = sum((yvar - mean(yvar))^2)
+    sse = sum((y_pred - yvar)^2)
+    r2_scores[i] = 1 - (sse / sst)
+
+  }
+
+  lasso_coef_mat = as.data.frame(do.call(cbind, lasso_coefs_pull))
+  colnames(lasso_coef_mat) <- paste0("s", seq_len(ncol(lasso_coef_mat)))
+  # Make DF of all LASSO results with mean and std. dev
+  lasso_coef_means = lasso_coef_mat %>%
+    mutate(RowNames = rownames(lasso_coef_mat)) %>%
+    rowwise() %>%
+    mutate(mean = mean(c_across(contains("s1"))),
+           sd = sd(c_across(contains("s1"))),
+           cv = sd/mean) %>%
+    relocate(mean, .before = s1) %>%
+    relocate(sd, .before = s1) %>%
+    relocate(RowNames, .before = mean)%>%
+    relocate(cv, .after = sd) %>%
+    add_column(test = test)
+
+  norm_coeffs_matrix = do.call(cbind, norm_coeffs)
+
+  mean_coeffs = as.data.frame(norm_coeffs_matrix, row.names = rownames(norm_coeffs_matrix))
+  colnames(mean_coeffs) <- paste0("s", seq_len(ncol(mean_coeffs)))
+
+  norm_lasso_coef_means = mean_coeffs %>%
+    mutate(RowNames = rownames(mean_coeffs)) %>%
+    rowwise() %>%
+    mutate(mean = mean(c_across(contains("s1"))),
+           sd = sd(c_across(contains("s1"))),
+           cv = sd/mean) %>%
+    relocate(mean, .before = s1) %>%
+    relocate(sd, .before = s1) %>%
+    relocate(RowNames, .before = mean)%>%
+    relocate(cv, .after = sd) %>%
+    add_column(test = test)
+
+  results_r2 = as.data.frame(r2_scores)
+  mean(results_r2$r2_scores)
+  sd(results_r2$r2_scores)
+
+  if(match(test, tests) == 1){
+
+    lasso_coef_means_all <- lasso_coef_means
+    norm_lasso_coef_means_all <- norm_lasso_coef_means
+    mean_r2_all <- tibble(mean_r2 = mean(results_r2$r2_scores),
+                          sd = sd(results_r2$r2_scores),
+                          test = test)
+
+  } else{
+
+    lasso_coef_means_all <- lasso_coef_means_all %>%
+      add_row(lasso_coef_means)
+
+    norm_lasso_coef_means_all <- norm_lasso_coef_means_all %>%
+      add_row(norm_lasso_coef_means)
+
+    mean_r2_all <- mean_r2_all %>%
+      add_row(mean_r2 = mean(results_r2$r2_scores),
+              sd = sd(results_r2$r2_scores),
+              test = test)
+  }
+
+
+
+}
+
+# ================================ investigate cv ==============================
+
+all_results_long <- bind_rows(
+  lasso_coef_means_all %>%
+    select(RowNames, mean, sd, cv, test) %>%
+    add_column(type = 'Not_Normalized'),
+
+  norm_lasso_coef_means_all %>%
+    select(RowNames, mean, sd, cv, test) %>%
+    add_column(type = 'Normalized')
+) %>%
+  mutate(cv = round(cv, 3))
+
 # # absolute cv vs absolute mean; all norm/not norm + response variables
 # ggplot(data = all_results_long, aes(x = abs(cv), y = abs(mean))) + 
 #   geom_point()+
@@ -394,36 +425,30 @@ dev.off()
 #   theme_bw()+
 #   ggtitle("not norm degree decay rate")
 # 
-# # ================================ create out table ============================
-# 
-# output <- all_results_long %>%
-#   mutate(mean = signif(mean, 3),
-#          abs_mean = abs(mean),
-#          sd = signif(sd, 3),
-#          cv = signif(cv, 3),
-#          abs_cv = abs(cv),
-#          cv = case_when(is.na(cv) ~ '',
-#                         TRUE ~ as.character(cv)),
-#          RowNames = str_remove(RowNames, 'scale_cube_'),
-#          response_variable = case_when(response_variable == 'scale_cube_Mean_degree_decay_rate' ~ 'Kdd',
-#                                        response_variable == 'scale_cube_Mean_Decay_Rate_per_day' ~ 'Kcd'),
-#          type = str_replace(type, 'Not_Normalized', 'Not Normalized' )) %>%
-#   left_join(variable_names %>% select(original, labels), by = c('RowNames' = 'original')) %>%
-#   rename(Predictor = labels)%>% 
-#   # group_by(response_variable, type) %>%
-#   # arrange(desc(abs_mean)) %>%
-#   # ungroup() %>%
-#   # select(response_variable, type, Predictor, mean, sd, cv)
-#   clipr::write_clip()
-# 
-# out_r2 <- mean_r2_all %>%
-#   mutate(mean_r2 = signif(mean_r2, 3),
-#          sd = signif(sd, 3))%>%
-#   rename('Mean R2' = mean_r2) %>%
-#   mutate('Response Variable' = case_when(response_variable == 'scale_cube_Mean_degree_decay_rate' ~ 'Kdd',
-#                                          response_variable == 'scale_cube_Mean_Decay_Rate_per_day' ~ 'Kcd')) %>%
-#   select('Response Variable', 'Mean R2', sd) %>%
-#   clipr::write_clip()
-# 
-# 
-# 
+# ================================ create out table ============================
+
+output <- all_results_long %>%
+  mutate(mean = signif(mean, 3),
+         abs_mean = abs(mean),
+         sd = signif(sd, 3),
+         cv = signif(cv, 3),
+         abs_cv = abs(cv),
+         cv = case_when(is.na(cv) ~ '',
+                        TRUE ~ as.character(cv)),
+         RowNames = str_remove(RowNames, 'scale_cube_'),
+         type = str_replace(type, 'Not_Normalized', 'Not Normalized' )) %>%
+  left_join(variable_names %>% select(original, labels), by = c('RowNames' = 'original')) %>%
+  rename(Predictor = labels)%>%
+  clipr::write_clip()
+
+out_r2 <- mean_r2_all %>%
+  mutate(mean_r2 = signif(mean_r2, 3),
+         sd = signif(sd, 3))%>%
+  rename('Mean R2' = mean_r2) %>%
+  mutate('Response Variable' = case_when(response_variable == 'scale_cube_Mean_degree_decay_rate' ~ 'Kdd',
+                                         response_variable == 'scale_cube_Mean_Decay_Rate_per_day' ~ 'Kcd')) %>%
+  select('Response Variable', 'Mean R2', sd) %>%
+  clipr::write_clip()
+
+
+
