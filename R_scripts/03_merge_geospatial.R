@@ -262,7 +262,7 @@ merged_Brie_LASSO_01 <- merged %>%
     # 3. Watershed slope
     slope,
     # 4-6. 30-yr climate normals
-    tmax8110ws, tmean8110ws, tmin8110ws,
+    tmax8110ws, tmean8110ws, tmin8110ws, precip8110ws,
     # 7-11. Land cover (combined)
     forest_cover, urban_cover, grassland_cover, wetland_cover, ag_cover,
     # 12. Soil organic matter
@@ -270,7 +270,7 @@ merged_Brie_LASSO_01 <- merged %>%
     # 13. Bedrock depth
     rckdepws,
     # 14-16. Residual lithology
-    pctcarbresidws, pctnoncarbresidws, pctsilicicws,
+    pctcarbresidws, pctnoncarbresidws, pctsilicicws, clayws,
     # 17. Glacial till (combined)
     glacial_till,
     # 18. Saline lake sediment
