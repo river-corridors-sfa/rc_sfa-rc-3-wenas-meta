@@ -30,6 +30,7 @@ input <- read_csv("./Output_for_analysis/03_merge_geospatial/03_master_merged_Br
   select(-c(Comparison_ID, Pair, Sampling_Date, latitude, longitude, comid, Time_Since_Fire)) %>% #remove columns that wont go into the LASSO
   select(-c(maxelevsmo, slope)) %>% # remove because they have too many NA values
   select(-c(Climate)) %>% # remove because its categorical
+  select(-c(pctcarbresidws, pctnoncarbresidws, pctsallakews, pctsilicicws, tmax8110ws, tmin8110ws)) %>% # removing because they shouldnt directly affect the stream
   group_by(Study_ID, Site, Burn_Unburn) %>%
   summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) %>%  # Updated this line
   rename_with(.fn = ~ paste0("mean_", .x), .cols = where(is.numeric)) %>%
@@ -45,7 +46,7 @@ c_burn <- input %>%
 c_unburn <- input %>%
   select(-c(mean_NO3_Interp_mg_N_L, mean_burn_percent_fire_year, mean_burn_sev_high, mean_burn_sev_mod, mean_burn_sev_low))%>%
   filter(!is.na(mean_DOC_Interp_mg_C_L))%>%
-  filter(Burn_Unburn == 'Unurn')%>%
+  filter(Burn_Unburn == 'Unburn')%>%
   select(-Burn_Unburn)
 
 # remove doc as a variable for nitrate lasso and burn categories for unburned lasso
@@ -58,7 +59,7 @@ n_burn <- input %>%
 n_unburn <- input %>%
   select(-c(mean_DOC_Interp_mg_C_L, mean_burn_percent_fire_year, mean_burn_sev_high, mean_burn_sev_mod, mean_burn_sev_low))%>%
   filter(!is.na(mean_NO3_Interp_mg_N_L))%>%
-  filter(Burn_Unburn == 'Unurn')%>%
+  filter(Burn_Unburn == 'Unburn')%>%
   select(-Burn_Unburn)
 
 # =============================== check NAs ===============================
@@ -445,9 +446,6 @@ out_r2 <- mean_r2_all %>%
   mutate(mean_r2 = signif(mean_r2, 3),
          sd = signif(sd, 3))%>%
   rename('Mean R2' = mean_r2) %>%
-  mutate('Response Variable' = case_when(response_variable == 'scale_cube_Mean_degree_decay_rate' ~ 'Kdd',
-                                         response_variable == 'scale_cube_Mean_Decay_Rate_per_day' ~ 'Kcd')) %>%
-  select('Response Variable', 'Mean R2', sd) %>%
   clipr::write_clip()
 
 
