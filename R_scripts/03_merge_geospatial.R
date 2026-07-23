@@ -11,7 +11,7 @@
 # Output :
 #   - Output_for_analysis/03_merge_geospatial/03_daily_time_series_with_geospatial.csv
 #
-#
+# THIS IS WHERE THE LASSO DATA FRAME IS GENERATED FOR BRIE TO RUN
 #
 # ============================= Authorship ===========================
 # Author: Jake Cavaiani
@@ -333,7 +333,7 @@ merged_Brie_LASSO_04 <- merged_Brie_LASSO_03 %>%
     )
   )
 
-merged_Brie_LASSO_final <- merged_Brie_LASSO_04 %>%
+merged_Brie_LASSO_05 <- merged_Brie_LASSO_04 %>%
   mutate(
     burn_percent_fire_year = case_when(
       Study_ID == "Hickenbottom et al. 2023" & Site == "Middle_Fork_American" ~ 20.68,
@@ -341,6 +341,270 @@ merged_Brie_LASSO_final <- merged_Brie_LASSO_04 %>%
       TRUE ~ burn_percent_fire_year
     )
   )
+
+
+# ======================== Fetch watershed boundaries for each unique COMID ====================================
+library(nhdplusTools)
+library(sf)
+library(dplyr)
+library(purrr)
+
+# ---------- User settings ----------
+# Replace this with your actual data frame
+# Assumes columns: Site, comid (and any other metadata)
+
+OUT_DIR <- "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/shape_files"
+
+# ---------- Function to fetch one watershed ----------
+get_ws_from_comid <- function(comid, Site) {
+  message(sprintf("Fetching site %s (COMID %s)...", Site, comid))
+  
+  ws <- tryCatch({
+    get_nldi_basin(
+      nldi_feature = list(featureSource = "comid",
+                          featureID = as.character(comid))
+    )
+  }, error = function(e) {
+    warning(sprintf("Failed for %s (COMID %s): %s", Site, comid, e$message))
+    return(NULL)
+  })
+  
+  if (is.null(ws) || nrow(ws) == 0) {
+    warning(sprintf("Empty result for %s (COMID %s)", Site, comid))
+    return(NULL)
+  }
+  
+  ws$Site <- Site
+  ws$comid   <- comid
+  ws$area_km2 <- as.numeric(st_area(st_transform(ws, 5070))) / 1e6
+  ws
+}
+
+# ---------- Loop over unique COMIDs ----------
+unique_sites <- merged_Brie_LASSO_05 %>%  
+  distinct(Site, comid)
+
+ws_list <- pmap(
+  list(unique_sites$comid, unique_sites$Site),
+  get_ws_from_comid
+)
+
+# Drop failures
+ws_list <- ws_list[!sapply(ws_list, is.null)]
+
+# Combine into one sf object
+ws_all <- do.call(rbind, ws_list)
+
+# ---------- Save ----------
+# One GeoPackage with all watersheds (recommended)
+st_write(ws_all, file.path(OUT_DIR, "all_watersheds.gpkg"),
+         delete_dsn = TRUE, quiet = TRUE)
+
+# Also save one file per site (useful for the AI workflow)
+for (i in seq_len(nrow(ws_all))) {
+  sid <- ws_all$Site[i]
+  st_write(ws_all[i, ],
+           file.path(OUT_DIR, sprintf("%s.gpkg", sid)),
+           delete_dsn = TRUE, quiet = TRUE)
+}
+
+# ---------- Quick QA ----------
+cat("\n=== Summary ===\n")
+print(ws_all %>%  st_drop_geometry() %>% 
+        select(Site, comid, area_km2))
+
+# Plot all watersheds
+plot(st_geometry(ws_all), border = "steelblue", lwd = 1)
+title(sprintf("Delineated watersheds (n = %d)", nrow(ws_all)))
+
+# Compare delineated area vs. reported area from your meta-analysis
+sites_with_area <- merged_Brie_LASSO_05 %>% 
+  left_join(st_drop_geometry(ws_all), by = c("Site", "comid"))
+
+# Look for large mismatches
+sites_with_area <- sites_with_area %>% 
+  mutate(pct_diff = 100 * (area_km2 - Area_watershed_km) / Area_watershed_km) %>% 
+  arrange(desc(abs(pct_diff)))
+
+# Get aridity TEST start ####
+merged_Brie_LASSO_final_TEST <- merged_Brie_LASSO_05 
+
+# =============== Batch Aridity Index workflow for multiple watersheds ===============
+# Inputs:  one GeoPackage per site in ./shapes_input/
+# Outputs: annual + long-term AI tables, per-site PNG maps
+
+# Install remotes if you don't have it
+# install.packages("remotes")
+# 
+# # Install climateR from GitHub
+# remotes::install_github("mikejohnson51/climateR")
+
+library(sf)
+library(terra)
+library(climateR)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(lubridate)
+library(ggplot2)
+
+# ---------- User settings ----------
+SHAPE_DIR   <- "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/shape_files"
+OUT_DIR     <- "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/gridmet_downloads"
+MAP_DIR     <- "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/ai_maps"
+START_DATE  <- as.Date("2020-01-01")
+END_DATE    <- as.Date("2024-12-31")
+BUFFER_M    <- 2000
+MIN_DAYS    <- 300
+
+# ---------- Helper: compute AI for one watershed ----------
+weighted_daily_mean <- function(r_stack, frac_r) {
+  if (!compareGeom(r_stack, frac_r, stopOnError = FALSE)) {
+    frac_r <- resample(frac_r, r_stack[[1]], method = "near")
+  }
+  w  <- as.numeric(values(frac_r))     # length ncell
+  vs <- values(r_stack)                # ncell x nlyr matrix
+  
+  num <- colSums(vs * w, na.rm = TRUE)
+  den <- colSums((!is.na(vs)) * w)
+  
+  out <- num / den
+  out[!is.finite(out)] <- NA
+  out
+}
+
+compute_ai <- function(gpkg_path, Site,
+                       start_date = START_DATE,
+                       end_date   = END_DATE,
+                       buffer_m   = BUFFER_M,
+                       min_days   = MIN_DAYS,
+                       out_dir    = OUT_DIR,
+                       map_dir    = MAP_DIR) {
+  
+  message(sprintf("--- Processing %s ---", Site))
+  
+  # 1. Load and buffer watershed
+  ws <- st_read(gpkg_path, quiet = TRUE) |> st_union() |> st_sf()
+  ws_buff_ll <- ws |> st_transform(5070) |> st_buffer(buffer_m) |> st_transform(4326)
+  ws_ll      <- st_transform(ws, 4326)
+  
+  # 2. Download / load gridMET
+  pr_file  <- file.path(out_dir, sprintf("%s_pr_%s_%s.tif",  Site, start_date, end_date))
+  pet_file <- file.path(out_dir, sprintf("%s_pet_%s_%s.tif", Site, start_date, end_date))
+  
+  if (!file.exists(pr_file)) {
+    pr <- getGridMET(ws_buff_ll, "pr", start_date, end_date)[[1]]
+    writeRaster(pr, pr_file, overwrite = TRUE)
+  } else pr <- rast(pr_file)
+  
+  if (!file.exists(pet_file)) {
+    pet <- getGridMET(ws_buff_ll, "pet", start_date, end_date)[[1]]
+    writeRaster(pet, pet_file, overwrite = TRUE)
+  } else pet <- rast(pet_file)
+  
+  # 3. Align pet to pr if needed; build fraction weights
+  if (!compareGeom(pr, pet, stopOnError = FALSE)) pet <- resample(pet, pr, method = "near")
+  frac <- rasterize(vect(ws_ll), pr[[1]], cover = TRUE, background = 0)
+  mask <- frac > 0
+  
+  pr_dates  <- as.Date(gsub(".*_", "", names(pr)))
+  pet_dates <- as.Date(gsub(".*_", "", names(pet)))
+  
+  # 4. Weighted daily means
+  pr_daily  <- weighted_daily_mean(pr,  frac)
+  pet_daily <- weighted_daily_mean(pet, frac)
+  
+  # 5. Align to common dates
+  common <- as.Date(intersect(pr_dates, pet_dates), origin = "1970-01-01")
+  pr_daily  <- pr_daily[match(common, pr_dates)]
+  pet_daily <- pet_daily[match(common, pet_dates)]
+  
+  daily_df <- tibble(Site = Site, date = common,
+                     year = year(common), P = pr_daily, PET = pet_daily)
+  
+  # 6. Annual summary
+  annual_df <- daily_df |>
+    group_by(Site, year) |>
+    summarise(n_days     = sum(!is.na(P) & !is.na(PET)),
+              P_annual   = sum(P,   na.rm = TRUE),
+              PET_annual = sum(PET, na.rm = TRUE),
+              AI         = P_annual / PET_annual,
+              .groups = "drop") |>
+    filter(n_days >= min_days)
+  
+  # 7. Long-term mean
+  longterm_df <- annual_df |>
+    summarise(AI_longterm = mean(AI, na.rm = TRUE),
+              P_mean      = mean(P_annual, na.rm = TRUE),
+              PET_mean    = mean(PET_annual, na.rm = TRUE),
+              n_years     = n()) |>
+    mutate(Site = Site, .before = 1)
+  
+  list(annual = annual_df, longterm = longterm_df)
+}
+
+# ---------- Loop over all site GeoPackages ----------
+gpkg_files <- list.files(SHAPE_DIR, pattern = "\\.gpkg$", full.names = TRUE)
+gpkg_files <- gpkg_files[!grepl("all_watersheds", gpkg_files)]  # exclude combined
+
+Sites <- tools::file_path_sans_ext(basename(gpkg_files))
+
+# Sites <- Sites[1:15]
+# gpkg_files <- gpkg_files[1:15]
+
+Sites <- Sites[17:56]
+gpkg_files <- gpkg_files[17:56]
+
+# TEST START 
+# res_test <- compute_ai(gpkg_files[1:15], Sites[1:15])
+# print(res_test)
+# print(res_test$annual)
+# print(res_test$longterm)
+
+# TEST END 
+
+results <- map2(gpkg_files, Sites, compute_ai)
+results <- results[!sapply(results, is.null)]
+
+results2 <- map2(gpkg_files, Sites, compute_ai)
+# results2 <- results[!sapply(results2, is.null)]
+
+# ---------- Combine results ----------
+annual_all   <- bind_rows(map(results, "annual"))
+longterm_all <- bind_rows(map(results, "longterm"))
+
+annual_all2   <- bind_rows(map(results2, "annual"))
+longterm_all2 <- bind_rows(map(results2, "longterm"))
+
+annual_all_final <- bind_rows(annual_all, annual_all2)
+longterm_all_final <- bind_rows(longterm_all, longterm_all2)
+
+# Save tables
+write.csv(annual_all_final,   "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/ai_maps/aridity_annual.csv",   row.names = FALSE)
+write.csv(longterm_all_final, "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/ai_maps/aridity_longterm.csv", row.names = FALSE)
+
+cat("\n=== Long-term AI summary ===\n")
+print(longterm_all_final)
+
+# ---------- Optional: comparison plot across sites ----------
+ggplot(annual_all_final, aes(year, AI, color = Site)) +
+  geom_line() + geom_point() +
+  labs(title = "Annual aridity index across sites",
+       y = "AI = P / PET", x = "Year") +
+  theme_bw()
+
+ggplot(longterm_all_final, aes(reorder(Site, AI_longterm), AI_longterm)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Long-term aridity index by site",
+       x = NULL, y = "AI (mean P / mean PET)") +
+  theme_bw()
+
+# Get aridity TEST end 
+
+# Merge Aridity with BRIE LASSO 
+merged_Brie_LASSO_final <- merged_Brie_LASSO_final_TEST %>% 
+  left_join(longterm_all_final, by = "Site")
 
 write_csv(merged_Brie_LASSO_final, file.path(out_dir, "03_master_merged_Brie_LASSO.csv"))
 
