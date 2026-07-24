@@ -608,6 +608,303 @@ merged_Brie_LASSO_final <- merged_Brie_LASSO_final_TEST %>%
 
 write_csv(merged_Brie_LASSO_final, file.path(out_dir, "03_master_merged_Brie_LASSO.csv"))
 
+
+
+
+
+
+
+
+
+
+# ====================== LETS CONFIRM THAT THE SHAPE FILES MATCH THE LAT/LONGs FROM META ============
+library(sf)
+library(dplyr)
+library(readr)
+library(stringr)
+library(purrr)
+library(ggplot2)
+library(tigris)
+
+options(tigris_use_cache = TRUE)
+
+# ----- Paths ----
+gpkg_dir <- "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/shape_files"
+
+csv_file <- "/Users/cava304/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/03_master_merged_Brie_LASSO.csv"
+
+# ----- Read master data ----
+master <- read_csv(csv_file)
+
+# Change these if your column names differ
+lat_col  <- "latitude"
+lon_col  <- "longitude"
+site_col <- "Site"
+
+
+# ----- Convert lat/lon to sf points ----
+pts <- st_as_sf(
+  master,
+  coords = c(lon_col, lat_col),
+  crs = 4326,
+  remove = FALSE
+)
+
+# ----- Read all geopackages ----
+gpkg_files <- list.files(
+  gpkg_dir,
+  pattern = "\\.gpkg$",
+  full.names = TRUE
+) 
+
+# Filter out "all_watersheds.gpkg"
+gpkg_files <- gpkg_files[c(1, 3:16, 18:57)]
+
+watersheds <- map_dfr(gpkg_files, function(f){
+  
+  x <- st_read(f, quiet = TRUE)
+  
+  x$Site <- tools::file_path_sans_ext(basename(f))
+  
+  x
+})
+
+# ----- US map ----
+us <- states(cb = TRUE) |>
+  filter(!STUSPS %in% c("AK","HI","PR", "AS", "MP", "GU", "VI"))
+
+# ----- Plot ----
+ggplot() +
+  geom_sf(data = us,
+          fill = "grey95",
+          color = "grey60") +
+  geom_sf(data = pts,
+          color = "red",
+          size = 1.2) +
+  geom_sf(data = watersheds,
+          fill = "dodgerblue",
+          alpha = 0.35,
+          color = "blue",
+          linewidth = 0.2) +
+  coord_sf() +
+  theme_classic() +
+  labs(
+    title = "Comparison of Original Sampling Coordinates and NLDI Watersheds",
+    subtitle = "Red = published coordinates, Blue = watershed polygons"
+  )
+
+# Calculate whether each point falls inside its watershed
+watersheds <- watersheds %>%
+  mutate(Site = str_trim(Site))
+
+pts <- pts %>%
+  mutate(Site = str_trim(.data[[site_col]]))
+
+comparison <- pts %>%
+  left_join(
+    watersheds %>%
+      st_drop_geometry() %>%
+      distinct(Site),
+    by = "Site"
+  )
+
+# LOOP 
+results <- map_dfr(unique(pts$Site), function(s){
+  
+  pt <- pts %>% filter(Site == s)
+  
+  poly <- watersheds %>% filter(Site == s)
+  
+  if(nrow(poly)==0){
+    
+    return(data.frame(
+      Site = s,
+      inside = NA,
+      distance_m = NA
+    ))
+    
+  }
+  
+  inside <- lengths(st_within(pt, poly)) > 0
+  
+  dist <- as.numeric(
+    st_distance(
+      st_transform(pt, 5070),
+      st_transform(poly, 5070)
+    )
+  )
+  
+  data.frame(
+    Site = s,
+    inside = inside,
+    distance_m = dist
+  )
+  
+})
+
+results_test <- results %>% 
+  distinct(Site, .keep_all = TRUE) 
+  
+
+
+# TAKE 2 #
+library(sf)
+library(dplyr)
+library(readr)
+library(purrr)
+library(ggplot2)
+library(tools)
+
+#-------------------------------------------------------
+# Paths
+#-------------------------------------------------------
+
+gpkg_dir <- "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/shape_files"
+
+csv_file <- "/Users/cava304/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/03_master_merged_Brie_LASSO.csv"
+
+out_dir <- file.path(gpkg_dir, "QC_maps")
+
+dir.create(out_dir, showWarnings = FALSE)
+
+#-------------------------------------------------------
+# Read master data
+#-------------------------------------------------------
+
+master <- read_csv(csv_file)
+
+# CHANGE THESE TO MATCH YOUR COLUMN NAMES
+site_col <- "Site"
+lat_col  <- "latitude"
+lon_col  <- "longitude"
+
+pts <- st_as_sf(
+  master,
+  coords = c(lon_col, lat_col),
+  crs = 4326,
+  remove = FALSE
+)
+
+#-------------------------------------------------------
+# List watershed files
+#-------------------------------------------------------
+
+gpkg_files <- list.files(
+  gpkg_dir,
+  pattern = "\\.gpkg$",
+  full.names = TRUE
+)
+
+gpkg_files <- gpkg_files[c(1, 3:16, 18:57)]
+
+
+#-------------------------------------------------------
+# Loop over every watershed
+#-------------------------------------------------------
+
+for(f in gpkg_files){
+  
+  site <- file_path_sans_ext(basename(f))
+  
+  message(site)
+  
+  ws <- st_read(f, quiet = TRUE)
+  
+  pt <- pts %>%
+    filter(.data[[site_col]] == site)
+  
+  if(nrow(pt)==0){
+    
+    message("No point found for ", site)
+    next
+    
+  }
+  
+  # Make everything projected
+  ws_proj <- st_transform(ws, 5070)
+  pt_proj <- st_transform(pt, 5070)
+  
+  # Is point inside watershed?
+  inside <- lengths(st_within(pt_proj, ws_proj)) > 0
+  
+  # Distance (meters)
+  dist_m <- as.numeric(st_distance(pt_proj, ws_proj))
+  
+  # Build bounding box with 5 km padding
+  bbox <- st_bbox(ws_proj)
+  
+  pad <- 5000
+  
+  bbox["xmin"] <- bbox["xmin"] - pad
+  bbox["xmax"] <- bbox["xmax"] + pad
+  bbox["ymin"] <- bbox["ymin"] - pad
+  bbox["ymax"] <- bbox["ymax"] + pad
+  
+  bbox_sf <- st_as_sfc(bbox)
+  
+  # Plot
+  p <- ggplot() +
+    
+    geom_sf(
+      data = bbox_sf,
+      fill = "grey98",
+      color = NA
+    ) +
+    
+    geom_sf(
+      data = ws_proj,
+      fill = "lightblue",
+      color = "blue",
+      linewidth = 0.6,
+      alpha = 0.6
+    ) +
+    
+    geom_sf(
+      data = pt_proj,
+      color = ifelse(inside, "forestgreen", "red"),
+      size = 3
+    ) +
+    
+    coord_sf(
+      xlim = c(bbox["xmin"], bbox["xmax"]),
+      ylim = c(bbox["ymin"], bbox["ymax"])
+    ) +
+    
+    theme_bw() +
+    
+    labs(
+      title = site,
+      subtitle = paste0(
+        "Inside watershed: ",
+        inside,
+        "   Distance = ",
+        round(dist_m,1),
+        " m"
+      )
+    )
+  
+  ggsave(
+    filename = file.path(out_dir,
+                         paste0(site, "_QC.png")),
+    plot = p,
+    width = 6,
+    height = 6,
+    dpi = 300
+  )
+  
+}
+
+
+#
+
+
+
+
+
+
+
+
+
 # # Read in Katie dNBR workflow:
 # DNBR_Severity <- read_csv("Output_for_analysis/archive/14_Meta_calculate_burn_severity/DNBR_Severity.csv")
 # 
