@@ -389,6 +389,16 @@ ws_list <- pmap(
   get_ws_from_comid
 )
 
+# GAVIOTA 
+# Looks like its pulling the wrong watershed. 
+# gaviota <- unique_sites |> 
+#   filter(Site == "Gaviota")
+# 
+# ws_list <- pmap(
+#   list(gaviota$comid, gaviota$Site),
+#   get_ws_from_comid
+# )
+
 # Drop failures
 ws_list <- ws_list[!sapply(ws_list, is.null)]
 
@@ -549,51 +559,31 @@ gpkg_files <- gpkg_files[!grepl("all_watersheds", gpkg_files)]  # exclude combin
 
 Sites <- tools::file_path_sans_ext(basename(gpkg_files))
 
-# Sites <- Sites[1:15]
-# gpkg_files <- gpkg_files[1:15]
-
-Sites <- Sites[17:56]
-gpkg_files <- gpkg_files[17:56]
-
-# TEST START 
-# res_test <- compute_ai(gpkg_files[1:15], Sites[1:15])
-# print(res_test)
-# print(res_test$annual)
-# print(res_test$longterm)
-
-# TEST END 
-
 results <- map2(gpkg_files, Sites, compute_ai)
 results <- results[!sapply(results, is.null)]
 
-results2 <- map2(gpkg_files, Sites, compute_ai)
-# results2 <- results[!sapply(results2, is.null)]
+# results2 <- map2(gpkg_files, Sites, compute_ai)
+# # results2 <- results[!sapply(results2, is.null)]
 
 # ---------- Combine results ----------
-annual_all   <- bind_rows(map(results, "annual"))
-longterm_all <- bind_rows(map(results, "longterm"))
-
-annual_all2   <- bind_rows(map(results2, "annual"))
-longterm_all2 <- bind_rows(map(results2, "longterm"))
-
-annual_all_final <- bind_rows(annual_all, annual_all2)
-longterm_all_final <- bind_rows(longterm_all, longterm_all2)
+annual_all   <- bind_rows(purrr::map(results, "annual"))
+longterm_all <- bind_rows(purrr::map(results, "longterm"))
 
 # Save tables
-write.csv(annual_all_final,   "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/ai_maps/aridity_annual.csv",   row.names = FALSE)
-write.csv(longterm_all_final, "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/ai_maps/aridity_longterm.csv", row.names = FALSE)
+write.csv(annual_all,   "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/ai_maps/aridity_annual.csv",   row.names = FALSE)
+write.csv(longterm_all, "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/ai_maps/aridity_longterm.csv", row.names = FALSE)
 
 cat("\n=== Long-term AI summary ===\n")
-print(longterm_all_final)
+print(longterm_all)
 
 # ---------- Optional: comparison plot across sites ----------
-ggplot(annual_all_final, aes(year, AI, color = Site)) +
+ggplot(annual_all, aes(year, AI, color = Site)) +
   geom_line() + geom_point() +
   labs(title = "Annual aridity index across sites",
        y = "AI = P / PET", x = "Year") +
   theme_bw()
 
-ggplot(longterm_all_final, aes(reorder(Site, AI_longterm), AI_longterm)) +
+ggplot(longterm_all, aes(reorder(Site, AI_longterm), AI_longterm)) +
   geom_col(fill = "steelblue") +
   coord_flip() +
   labs(title = "Long-term aridity index by site",
@@ -604,7 +594,7 @@ ggplot(longterm_all_final, aes(reorder(Site, AI_longterm), AI_longterm)) +
 
 # Merge Aridity with BRIE LASSO 
 merged_Brie_LASSO_final <- merged_Brie_LASSO_final_TEST %>% 
-  left_join(longterm_all_final, by = "Site")
+  left_join(longterm_all, by = "Site")
 
 write_csv(merged_Brie_LASSO_final, file.path(out_dir, "03_master_merged_Brie_LASSO.csv"))
 

@@ -111,6 +111,10 @@ for(i in 1:nrow(sites)){
   }
 }
 
+sites <- sites |> 
+  mutate(comid = case_when(site == "Gaviota" ~ 17594763, 
+                           TRUE ~ comid))
+
 # NEW: extract coordinates into plain columns and drop geometry
 sites_1 <- sites %>%
   mutate(
@@ -487,10 +491,113 @@ write_csv(sites_sc,
 
 
 
+# GAVIOTA TEST 
+```{r}
+library(nhdplusTools)
+library(sf)
+library(ggplot2)
+library(maps)
+
+# Define your COMID of interest
+my_comid <- 17594969
+
+# Set up the NLDI feature list
+nldi_feature <- list(featureSource = "comid", featureID = as.integer(my_comid))
+
+# Retrieve the watershed basin polygon
+watershed_basin <- get_nldi_basin(nldi_feature = nldi_feature)
+
+# Quick base R plot
+plot(st_geometry(watershed_basin), col = "lightblue", border = "darkblue")
+
+# Or plot using ggplot2
+ggplot(watershed_basin) +
+  geom_sf(fill = "lightblue", color = "darkblue", alpha = 0.5) +
+  theme_minimal() +
+  labs(title = paste("Watershed Basin for COMID:", my_comid))
+
+# 1. Fetch the watershed basin polygon
+my_comid <- 17594969 # Replace with your target COMID
+nldi_feature <- list(featureSource = "comid", featureID = as.integer(my_comid))
+watershed_basin <- get_nldi_basin(nldi_feature = nldi_feature)
+
+# 2. Get the USA state boundaries and convert to an sf object
+usa_states <- st_as_sf(map("state", plot = FALSE, fill = TRUE))
+
+# 3. Match Coordinate Reference Systems (CRS) to ensure perfect overlay
+# Albers Equal Area (EPSG: 5070) is ideal for nationwide USA mapping
+target_crs <- 5070
+usa_states <- st_transform(usa_states, crs = target_crs)
+watershed_basin <- st_transform(watershed_basin, crs = target_crs)
+
+# 4. Generate the plot
+ggplot() +
+  # Draw the USA base map
+  geom_sf(data = usa_states, fill = "gray95", color = "gray80")
+
+ggplot() +
+  # Draw the USA base map
+  geom_sf(data = usa_states, fill = "gray95", color = "gray80") +
+  # Overlay the watershed basin (bright color makes it visible at a national scale)
+  geom_sf(data = watershed_basin, fill = "red", color = "darkred", size = 1.5) +
+  theme_minimal() +
+  labs(
+    title = paste("Location of Watershed COMID", my_comid, "in the USA"),
+    x = "Longitude", 
+    y = "Latitude"
+  )
+
+```
+
+```{r}
+library(nhdplusTools)
+library(sf)
+library(ggplot2)
+
+# Start with your current (incorrect/too far downstream) COMID
+wrong_comid <- 17594969 
+
+# 1. Trace all upstream tributaries (this finds all nested stream segments)
+upstream_network <- navigate_nldi(
+  nldi_feature = list(featureSource = "comid", featureID = as.integer(wrong_comid)),
+  mode = "upstreamTributaries", # Traces every single branch upstream
+  data_source = "flowlines"
+)
+
+# 2. View a list of all potential nested COMIDs
+nested_comids <- upstream_network$UT_flowlines$nhdplus_comid
+print(head(nested_comids))
+
+# 3. Plot them interactively to visually locate your target stream segment
+# Click on a segment in the map viewer to see its true nhdplus_comid
+library(mapview)
+mapview(upstream_network$UT_flowlines, zcol = "nhdplus_comid")
 
 
 
+```
+
+```{r}
+# Define your COMID of interest
+my_comid <- 17594763
+
+# Set up the NLDI feature list
+nldi_feature <- list(featureSource = "comid", featureID = as.integer(my_comid))
+
+# Retrieve the watershed basin polygon
+watershed_basin <- get_nldi_basin(nldi_feature = nldi_feature)
+
+# Quick base R plot
+plot(st_geometry(watershed_basin), col = "lightblue", border = "darkblue")
+
+# Or plot using ggplot2
+ggplot(watershed_basin) +
+  geom_sf(fill = "lightblue", color = "darkblue", alpha = 0.5) +
+  theme_minimal() +
+  labs(title = paste("Watershed Basin for COMID:", my_comid))
 
 
+
+```
 
 
