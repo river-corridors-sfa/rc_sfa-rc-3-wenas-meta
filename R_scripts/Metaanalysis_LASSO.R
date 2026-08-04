@@ -30,6 +30,7 @@ input <- read_csv("./Output_for_analysis/03_merge_geospatial/03_master_merged_Br
   select(-c(Comparison_ID, Pair, Sampling_Date, latitude, longitude, comid, Time_Since_Fire)) %>% #remove columns that wont go into the LASSO
   select(-c(maxelevsmo, slope)) %>% # remove because they have too many NA values
   select(-c(Climate)) %>% # remove because its categorical
+  select(-c(P_mean, PET_mean, n_years)) %>% # remove columns that were used to calculate aridity 
   select(-c(pctcarbresidws, pctnoncarbresidws, pctsallakews, pctsilicicws, tmax8110ws, tmin8110ws)) %>% # removing because they shouldnt directly affect the stream
   group_by(Study_ID, Site, Burn_Unburn) %>%
   summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE))) %>%  # Updated this line
