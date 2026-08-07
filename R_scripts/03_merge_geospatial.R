@@ -389,16 +389,6 @@ ws_list <- pmap(
   get_ws_from_comid
 )
 
-# GAVIOTA 
-# Looks like its pulling the wrong watershed. 
-# gaviota <- unique_sites |> 
-#   filter(Site == "Gaviota")
-# 
-# ws_list <- pmap(
-#   list(gaviota$comid, gaviota$Site),
-#   get_ws_from_comid
-# )
-
 # Drop failures
 ws_list <- ws_list[!sapply(ws_list, is.null)]
 
@@ -436,9 +426,6 @@ sites_with_area <- sites_with_area %>%
   mutate(pct_diff = 100 * (area_km2 - Area_watershed_km) / Area_watershed_km) %>% 
   arrange(desc(abs(pct_diff)))
 
-# Get aridity TEST start ####
-merged_Brie_LASSO_final_TEST <- merged_Brie_LASSO_05 
-
 # =============== Batch Aridity Index workflow for multiple watersheds ===============
 # Inputs:  one GeoPackage per site in ./shapes_input/
 # Outputs: annual + long-term AI tables, per-site PNG maps
@@ -457,6 +444,8 @@ library(tidyr)
 library(purrr)
 library(lubridate)
 library(ggplot2)
+
+merged_Brie_LASSO_final_TEST <- merged_Brie_LASSO_05 
 
 # ---------- User settings ----------
 SHAPE_DIR   <- "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/shape_files"
@@ -590,11 +579,34 @@ ggplot(longterm_all, aes(reorder(Site, AI_longterm), AI_longterm)) +
        x = NULL, y = "AI (mean P / mean PET)") +
   theme_bw()
 
-# Get aridity TEST end 
-
 # Merge Aridity with BRIE LASSO 
-merged_Brie_LASSO_final <- merged_Brie_LASSO_final_TEST %>% 
+merged_Brie_LASSO_06 <- merged_Brie_LASSO_final_TEST %>% 
   left_join(longterm_all, by = "Site")
+
+effect_sizes_daily <- read_csv("Output_for_analysis/04_calculate_effect_sizes/effect_sizes_daily.csv") |> 
+  select(Study_ID:response_var, Pair_Burn, Site_Burn, lnRR, lnRR_area)
+
+effect_sizes_wide <- effect_sizes_daily %>%
+  pivot_wider(
+    names_from = response_var,
+    values_from = c(lnRR, lnRR_area),
+    names_glue = "{.value}_{response_var}"
+  )
+
+merged_data <- merged_Brie_LASSO_06 %>%
+  left_join(
+    effect_sizes_wide,
+    by = c(
+      "Study_ID",
+      "Comparison_ID",
+      "Pair" = "Pair_Burn",
+      "Sampling_Date"
+    )
+  )
+
+merged_Brie_LASSO_final <- merged_data
+
+# Write final merged_Brie_LASSO data frame with daily effect sizes calculated 
 
 write_csv(merged_Brie_LASSO_final, file.path(out_dir, "03_master_merged_Brie_LASSO.csv"))
 

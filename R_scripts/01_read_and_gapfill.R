@@ -50,19 +50,61 @@ read_study <- function(path) {
 
 all_studies <- map_dfr(csv_files, read_study)
 
+# 
+all_studies_clean <- all_studies %>%
+  mutate(
+    DOC = ifelse(DOC == -9999, NA, DOC),
+    NO3 = ifelse(NO3 == -9999, NA, NO3)
+  )
+
+all_studies_daily <- all_studies_clean %>%
+  group_by(
+    Study_ID,
+    DOI,
+    Pair,
+    Site,
+    Sampling_Date,
+    Burn_Unburn
+  ) %>%
+  summarize(
+    DOC = mean(DOC, na.rm = TRUE),
+    NO3 = mean(NO3, na.rm = TRUE),
+    
+    # retain metadata
+    across(
+      c(
+        Design_Control_Burn_Pre_Post,
+        latitude,
+        longitude,
+        Area_watershed,
+        Area_unit,
+        Climate,
+        Time_Since_Fire,
+        Mean_Median_or_IndividualSample,
+        DOC_unit,
+        NO3_unit,
+        Data_Found,
+        Notes,
+        Source_File
+      ),
+      first
+    ),
+    .groups = "drop"
+  )
+
 # Filter out Abbott:
-all_studies <- all_studies %>% 
+all_studies_daily <- all_studies_daily %>% 
   filter(Study_ID != "Abbott et al. 2021")
 
 # Replace sentinel NA codes (-9999) with real NAs in numeric fields
-all_studies <- all_studies %>%
+all_studies_daily <- all_studies_daily %>%
   mutate(
     DOC = ifelse(DOC == -9999, NA_real_, DOC),
     NO3 = ifelse(NO3 == -9999, NA_real_, NO3)
   )
 
-message("Total rows read: ", nrow(all_studies))
-message("Studies present: ", paste(unique(all_studies$Study_ID), collapse = "; "))
+message("Total rows read: ", nrow(all_studies_daily))
+message("Studies present: ", paste(unique(all_studies_daily$Study_ID), collapse = "; "))
 
 # ---- 3. Unit Harmonization ----------------------------------
 # Convert all concentrations to BOTH mg/L and µM so that downstream
@@ -82,7 +124,7 @@ message("Studies present: ", paste(unique(all_studies$Study_ID), collapse = "; "
 # but the supplemental Notes field clarifies the values are µM [1].
 # The conversions below treat "um" as µM, matching the authors' intent.
 
-control_impact_units <- all_studies %>%
+control_impact_units <- all_studies_daily %>%
   mutate(
     # --- Watershed area -> km^2 ------------------------------
     Area_watershed_km = case_when(

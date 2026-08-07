@@ -120,9 +120,8 @@ burn_DOC <- all_variables %>%
     Burn_Unburn == "Burn",
     !is.na(DOC_Interp_mg_C_L)
   ) %>%
-  group_by(Comparison_ID, Pair) %>%
-  slice(1) %>%
-  ungroup()
+  group_by(Comparison_ID, Pair) |> ungroup()
+
 
 # This should be 0 rows 
 burn_DOC %>%
@@ -210,8 +209,7 @@ burn_NO3 <- all_variables %>%
     Burn_Unburn == "Burn",
     !is.na(NO3_Interp_mg_N_L)
   ) %>%
-  group_by(Comparison_ID, Pair) %>%
-  slice(1) %>%
+  group_by(Comparison_ID, Pair) |> 
   ungroup()
 
 # This should be 0 rows 
@@ -291,23 +289,6 @@ no3_burn_loadings %>%
 # + (random effects)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 variable_names <- tibble(
   original = c("mean_DOC_Interp_mg_C_L", "mean_NO3_Interp_mg_N_L", "mean_Area_watershed_km", "mean_tmax8110ws", 
                "mean_tmean8110ws", "mean_tmin8110ws", "mean_forest_cover", "mean_urban_cover", 
@@ -334,8 +315,7 @@ unburn_DOC <- all_variables %>%
     Burn_Unburn == "Unburn",
     !is.na(DOC_Interp_mg_C_L)
   ) %>%
-  group_by(Comparison_ID, Pair) %>%
-  slice(1) %>%
+  group_by(Comparison_ID, Pair) |> 
   ungroup()
 
 # This should be 0 rows 
@@ -437,9 +417,7 @@ unburn_NO3 <- all_variables %>%
     Burn_Unburn == "Unburn",
     !is.na(NO3_Interp_mg_N_L)
   ) %>%
-  group_by(Comparison_ID, Pair) %>%
-  slice(1) %>%
-  ungroup()
+  group_by(Comparison_ID, Pair) 
 
 # This should be 0 rows 
 unburn_NO3 %>%
