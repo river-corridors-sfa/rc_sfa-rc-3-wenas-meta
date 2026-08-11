@@ -5,8 +5,6 @@
 #
 # Review status: Not reviewed
 #
-#
-# Notes: I removed climate for first go, probably should add back in 
 # ==============================================================================
 #
 # Author: Brieanne Forbes
@@ -105,14 +103,14 @@ variable_names <- tibble(
                "mean_rckdepws", "mean_pctcarbresidws", "mean_pctnoncarbresidws", "mean_pctsilicicws", 
                "mean_glacial_till", "mean_pctsallakews", "mean_bfiws", "mean_permws", 
                "mean_runoffws", "mean_burn_percent_fire_year", "mean_burn_sev_high", "mean_burn_sev_mod", 
-               "mean_burn_sev_low"),
+               "mean_burn_sev_low", "mean_precip8110ws","mean_clayws","mean_AI_longterm"),
   labels = c("DOC Interpolated", "NO3 Interpolated", "Watershed Area", "Maximum Temperature", 
              "Mean Temperature", "Minimum Temperature", "Forest Cover", "Urban Cover", 
              "Grassland Cover", "Wetland Cover", "Agricultural Cover", "Soil Organic Matter", 
              "Depth to Bedrock", "Carbonate Residual Material", "Non-carbonate Residual Material", "Silicic Rock", 
              "Glacial Till", "Saline Lake Sediment", "Base Flow Index", "Soil Permeability", 
              "Annual Runoff", "Fire Burn Percentage", "High Severity Burn", "Moderate Severity Burn", 
-             "Low Severity Burn")
+             "Low Severity Burn", "Mean Precipitation","Soil Clay Content","Long-term Aridity Index")
 ) %>%
   mutate(cubed = paste0("cube_",original))
 
@@ -133,6 +131,18 @@ renamed_cube_data <- cube_data %>%
 
 pearson_cubed <- cor(renamed_cube_data, method = "pearson", use = "complete.obs")
 
+pearson_long <- pearson_cubed %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column("variable_1") %>%
+  tidyr::pivot_longer(
+    cols = -variable_1,
+    names_to = "variable_2",
+    values_to = "correlation"
+  ) %>%
+  filter(variable_1 != variable_2) %>%       # remove 1:1 correlations
+  filter(variable_1 < variable_2) %>%        # remove duplicate pairs
+  arrange(desc(abs(correlation)))
+
 rdylbu_colors <- c("#a50026", "#d73027", "#f46d43", "#fdae61", "#fee090",
                    "#ffffbf", "#e0f3f8", "#abd9e9", "#74add1", "#4575b4", "#313695")
 
@@ -141,6 +151,47 @@ corrplot(pearson_cubed, type = "upper", method = "number",
          col = colorRampPalette(rdylbu_colors)(200), tl.col = "black", tl.cex = .5,
          number.cex = 0.9, cl.cex = 1.25, mar = c(0, 0, 2, 0), bg = "black")
 dev.off()
+
+## ======== Violin plots with Cube Transformation ===========
+
+predictors_long <- renamed_cube_data %>%
+  select(
+    -`DOC Interpolated`,
+    -`NO3 Interpolated`
+  ) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "predictor",
+    values_to = "value"
+  )
+
+violin_plot <- ggplot(predictors_long, aes(x = predictor, y = value)) +
+  geom_violin(fill = "steelblue", alpha = 0.7, na.rm = TRUE) +
+  geom_boxplot(
+    width = 0.12,
+    fill = "white",
+    outlier.shape = NA,
+    na.rm = TRUE
+  ) +
+  facet_wrap(~ predictor, scales = "free", ncol = 4) +
+  labs(
+    x = NULL,
+    y = "Cube-root-transformed value"
+  ) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+
+ggsave(
+  filename = "./initial_plots/LASSO_Figs/Predictor_Violin_Plots.png",
+  plot = violin_plot,
+  width = 12,
+  height = 14,
+  units = "in",
+  dpi = 300
+)
 
 # ======== LASSO  ============
 
