@@ -606,6 +606,28 @@ merged_data <- merged_Brie_LASSO_06 %>%
 
 merged_Brie_LASSO_final <- merged_data
 
+# Fix the effect size columns:
+library(dplyr)
+
+cols_to_fix <- c(
+  "lnRR_DOC",
+  "lnRR_NO3",
+  "lnRR_area_DOC",
+  "lnRR_area_NO3"
+)
+
+merged_Brie_LASSO_final <- merged_Brie_LASSO_final %>%
+  mutate(
+    across(
+      all_of(cols_to_fix),
+      ~ vapply(.x, function(x) {
+        if (length(x) == 0) NA_real_ else as.numeric(x[[1]])
+      }, numeric(1))
+    )
+  )
+
+str(merged_Brie_LASSO_final[cols_to_fix])
+
 # Write final merged_Brie_LASSO data frame with daily effect sizes calculated 
 
 write_csv(merged_Brie_LASSO_final, file.path(out_dir, "03_master_merged_Brie_LASSO.csv"))
