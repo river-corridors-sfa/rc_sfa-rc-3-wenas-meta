@@ -588,9 +588,11 @@ effect_sizes_daily <- read_csv("Output_for_analysis/04_calculate_effect_sizes/ef
 
 effect_sizes_wide <- effect_sizes_daily %>%
   pivot_wider(
-    names_from = response_var,
+    id_cols     = c(Study_ID, Comparison_ID, Sampling_Date,
+                    Pair_Burn, Site_Burn),
+    names_from  = response_var,
     values_from = c(lnRR, lnRR_area),
-    names_glue = "{.value}_{response_var}"
+    values_fn   = mean            # or median, etc.
   )
 
 merged_data <- merged_Brie_LASSO_06 %>%
@@ -606,320 +608,98 @@ merged_data <- merged_Brie_LASSO_06 %>%
 
 merged_Brie_LASSO_final <- merged_data
 
-# Fix the effect size columns:
-library(dplyr)
-
-cols_to_fix <- c(
-  "lnRR_DOC",
-  "lnRR_NO3",
-  "lnRR_area_DOC",
-  "lnRR_area_NO3"
-)
-
-merged_Brie_LASSO_final <- merged_Brie_LASSO_final %>%
-  mutate(
-    across(
-      all_of(cols_to_fix),
-      ~ vapply(.x, function(x) {
-        if (length(x) == 0) NA_real_ else as.numeric(x[[1]])
-      }, numeric(1))
-    )
-  )
-
-str(merged_Brie_LASSO_final[cols_to_fix])
+# # Fix the effect size columns:
+# library(dplyr)
+# 
+# cols_to_fix <- c(
+#   "lnRR_DOC",
+#   "lnRR_NO3",
+#   "lnRR_area_DOC",
+#   "lnRR_area_NO3"
+# )
+# 
+# merged_Brie_LASSO_final <- merged_Brie_LASSO_final %>%
+#   mutate(
+#     across(
+#       all_of(cols_to_fix),
+#       ~ vapply(.x, function(x) {
+#         if (length(x) == 0) NA_real_ else as.numeric(x[[1]])
+#       }, numeric(1))
+#     )
+#   )
+# 
+# str(merged_Brie_LASSO_final[cols_to_fix])
 
 # Write final merged_Brie_LASSO data frame with daily effect sizes calculated 
-
-write_csv(merged_Brie_LASSO_final, file.path(out_dir, "03_master_merged_Brie_LASSO.csv"))
-
+write_csv(merged_Brie_LASSO_final, file.path(out_dir, "03_master_merged_Brie_LASSO.csv")) 
 
 
+# Summary of watersheds
 
-
-
-
-
-
-
-# ====================== LETS CONFIRM THAT THE SHAPE FILES MATCH THE LAT/LONGs FROM META ============
-library(sf)
-library(dplyr)
-library(readr)
-library(stringr)
-library(purrr)
-library(ggplot2)
-library(tigris)
-
-options(tigris_use_cache = TRUE)
-
-# ----- Paths ----
-gpkg_dir <- "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/shape_files"
-
-csv_file <- "/Users/cava304/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/03_master_merged_Brie_LASSO.csv"
-
-# ----- Read master data ----
-master <- read_csv(csv_file)
-
-# Change these if your column names differ
-lat_col  <- "latitude"
-lon_col  <- "longitude"
-site_col <- "Site"
-
-
-# ----- Convert lat/lon to sf points ----
-pts <- st_as_sf(
-  master,
-  coords = c(lon_col, lat_col),
-  crs = 4326,
-  remove = FALSE
-)
-
-# ----- Read all geopackages ----
-gpkg_files <- list.files(
-  gpkg_dir,
-  pattern = "\\.gpkg$",
-  full.names = TRUE
-) 
-
-# Filter out "all_watersheds.gpkg"
-gpkg_files <- gpkg_files[c(1, 3:16, 18:57)]
-
-watersheds <- map_dfr(gpkg_files, function(f){
-  
-  x <- st_read(f, quiet = TRUE)
-  
-  x$Site <- tools::file_path_sans_ext(basename(f))
-  
-  x
-})
-
-# ----- US map ----
-us <- states(cb = TRUE) |>
-  filter(!STUSPS %in% c("AK","HI","PR", "AS", "MP", "GU", "VI"))
-
-# ----- Plot ----
-ggplot() +
-  geom_sf(data = us,
-          fill = "grey95",
-          color = "grey60") +
-  geom_sf(data = pts,
-          color = "red",
-          size = 1.2) +
-  geom_sf(data = watersheds,
-          fill = "dodgerblue",
-          alpha = 0.35,
-          color = "blue",
-          linewidth = 0.2) +
-  coord_sf() +
-  theme_classic() +
-  labs(
-    title = "Comparison of Original Sampling Coordinates and NLDI Watersheds",
-    subtitle = "Red = published coordinates, Blue = watershed polygons"
+# TEST START # 
+test <- merged_Brie_LASSO_final %>%
+  mutate(DOC_Interp_mg_C_L = as.numeric(DOC_Interp_mg_C_L),
+         NO3_Interp_mg_N_L = as.numeric(NO3_Interp_mg_N_L)
   )
 
-# Calculate whether each point falls inside its watershed
-watersheds <- watersheds %>%
-  mutate(Site = str_trim(Site))
+DOC_only <- test |> 
+group_by(Comparison_ID) %>%
+  filter(any(!is.na(DOC_Interp_mg_C_L))) %>%
+  ungroup() |> 
+  select(Study_ID:Sampling_Date, DOC_Interp_mg_C_L, lnRR_DOC, lnRR_area_DOC)|> 
+  distinct(Site, .keep_all = TRUE)
 
-pts <- pts %>%
-  mutate(Site = str_trim(.data[[site_col]]))
+doc_sites_per_study <- test %>%
+  group_by(Study_ID, Site) %>%
+  summarise(has_DOC = any(!is.na(lnRR_DOC)), .groups = "drop") %>%
+  filter(has_DOC) %>%
+  count(Study_ID, name = "n_sites_DOC")
 
-comparison <- pts %>%
-  left_join(
-    watersheds %>%
-      st_drop_geometry() %>%
-      distinct(Site),
-    by = "Site"
+doc <- test %>%
+  group_by(Study_ID, Site) %>%
+  summarise(
+    has_DOC = any(!is.na(lnRR_DOC)),
+    has_NO3 = any(!is.na(lnRR_NO3)),
+    .groups = "drop"
+  ) %>%
+  group_by(Study_ID) %>%
+  summarise(
+    n_sites_DOC = sum(has_DOC),
+    sites_DOC   = list(sort(Site[has_DOC])),
+    n_sites_NO3 = sum(has_NO3),
+    sites_NO3   = list(sort(Site[has_NO3])),
+    .groups = "drop"
   )
 
-# LOOP 
-results <- map_dfr(unique(pts$Site), function(s){
-  
-  pt <- pts %>% filter(Site == s)
-  
-  poly <- watersheds %>% filter(Site == s)
-  
-  if(nrow(poly)==0){
-    
-    return(data.frame(
-      Site = s,
-      inside = NA,
-      distance_m = NA
-    ))
-    
-  }
-  
-  inside <- lengths(st_within(pt, poly)) > 0
-  
-  dist <- as.numeric(
-    st_distance(
-      st_transform(pt, 5070),
-      st_transform(poly, 5070)
-    )
+NO3_only <- test |> 
+  group_by(Comparison_ID) %>%
+  filter(any(!is.na(NO3_Interp_mg_N_L))) %>%
+  ungroup() |> 
+  select(Study_ID:Sampling_Date, NO3_Interp_mg_N_L, lnRR_NO3, lnRR_area_NO3)|> 
+  distinct(Site, .keep_all = TRUE)
+
+# TEST END # 
+
+summary_DOC <- df_DOC_only %>%
+  distinct(Study_ID, Pair) %>%
+  group_by(Study_ID) %>%
+  summarise(
+    n_Site = sum(str_detect(Pair, regex("Site", ignore_case = TRUE))),
+    n_Control = sum(str_detect(Pair, regex("Control", ignore_case = TRUE))),
+    .groups = "drop"
   )
-  
-  data.frame(
-    Site = s,
-    inside = inside,
-    distance_m = dist
+
+df_NO3_only <- merged_Brie_LASSO_final %>%
+  filter(is.na(lnRR_DOC) & !is.na(lnRR_NO3))
+
+summary_NO3 <- df_NO3_only %>%
+  distinct(Study_ID, Pair) %>%
+  group_by(Study_ID) %>%
+  summarise(
+    n_Site = sum(str_detect(Pair, regex("Site", ignore_case = TRUE))),
+    n_Control = sum(str_detect(Pair, regex("Control", ignore_case = TRUE))),
+    .groups = "drop"
   )
-  
-})
-
-results_test <- results %>% 
-  distinct(Site, .keep_all = TRUE) 
-  
-
-
-# TAKE 2 #
-library(sf)
-library(dplyr)
-library(readr)
-library(purrr)
-library(ggplot2)
-library(tools)
-
-#-------------------------------------------------------
-# Paths
-#-------------------------------------------------------
-
-gpkg_dir <- "~/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/shape_files"
-
-csv_file <- "/Users/cava304/Library/CloudStorage/OneDrive-PNNL/Documents/GitHub/rc_sfa-rc-3-wenas-meta/Output_for_analysis/03_merge_geospatial/03_master_merged_Brie_LASSO.csv"
-
-out_dir <- file.path(gpkg_dir, "QC_maps")
-
-dir.create(out_dir, showWarnings = FALSE)
-
-#-------------------------------------------------------
-# Read master data
-#-------------------------------------------------------
-
-master <- read_csv(csv_file)
-
-# CHANGE THESE TO MATCH YOUR COLUMN NAMES
-site_col <- "Site"
-lat_col  <- "latitude"
-lon_col  <- "longitude"
-
-pts <- st_as_sf(
-  master,
-  coords = c(lon_col, lat_col),
-  crs = 4326,
-  remove = FALSE
-)
-
-#-------------------------------------------------------
-# List watershed files
-#-------------------------------------------------------
-
-gpkg_files <- list.files(
-  gpkg_dir,
-  pattern = "\\.gpkg$",
-  full.names = TRUE
-)
-
-gpkg_files <- gpkg_files[c(1, 3:16, 18:57)]
-
-
-#-------------------------------------------------------
-# Loop over every watershed
-#-------------------------------------------------------
-
-for(f in gpkg_files){
-  
-  site <- file_path_sans_ext(basename(f))
-  
-  message(site)
-  
-  ws <- st_read(f, quiet = TRUE)
-  
-  pt <- pts %>%
-    filter(.data[[site_col]] == site)
-  
-  if(nrow(pt)==0){
-    
-    message("No point found for ", site)
-    next
-    
-  }
-  
-  # Make everything projected
-  ws_proj <- st_transform(ws, 5070)
-  pt_proj <- st_transform(pt, 5070)
-  
-  # Is point inside watershed?
-  inside <- lengths(st_within(pt_proj, ws_proj)) > 0
-  
-  # Distance (meters)
-  dist_m <- as.numeric(st_distance(pt_proj, ws_proj))
-  
-  # Build bounding box with 5 km padding
-  bbox <- st_bbox(ws_proj)
-  
-  pad <- 5000
-  
-  bbox["xmin"] <- bbox["xmin"] - pad
-  bbox["xmax"] <- bbox["xmax"] + pad
-  bbox["ymin"] <- bbox["ymin"] - pad
-  bbox["ymax"] <- bbox["ymax"] + pad
-  
-  bbox_sf <- st_as_sfc(bbox)
-  
-  # Plot
-  p <- ggplot() +
-    
-    geom_sf(
-      data = bbox_sf,
-      fill = "grey98",
-      color = NA
-    ) +
-    
-    geom_sf(
-      data = ws_proj,
-      fill = "lightblue",
-      color = "blue",
-      linewidth = 0.6,
-      alpha = 0.6
-    ) +
-    
-    geom_sf(
-      data = pt_proj,
-      color = ifelse(inside, "forestgreen", "red"),
-      size = 3
-    ) +
-    
-    coord_sf(
-      xlim = c(bbox["xmin"], bbox["xmax"]),
-      ylim = c(bbox["ymin"], bbox["ymax"])
-    ) +
-    
-    theme_bw() +
-    
-    labs(
-      title = site,
-      subtitle = paste0(
-        "Inside watershed: ",
-        inside,
-        "   Distance = ",
-        round(dist_m,1),
-        " m"
-      )
-    )
-  
-  ggsave(
-    filename = file.path(out_dir,
-                         paste0(site, "_QC.png")),
-    plot = p,
-    width = 6,
-    height = 6,
-    dpi = 300
-  )
-  
-}
-
-
-#
 
 
 
@@ -929,65 +709,9 @@ for(f in gpkg_files){
 
 
 
-# # Read in Katie dNBR workflow:
-# DNBR_Severity <- read_csv("Output_for_analysis/archive/14_Meta_calculate_burn_severity/DNBR_Severity.csv")
-# 
-# brie_site_list <- merged_Brie_LASSO_02 %>% 
-#   select(Study_ID, Site, Burn_Unburn, burn_sev_low, burn_sev_mod, burn_sev_high) %>% 
-#   distinct()
-# 
-# # Function to standardize site names
-# standardize_sites <- function(df) {
-#   df %>%
-#     mutate(Site = Site %>%
-#              str_replace_all("[_\\-\\.]", " ") %>%  # Replace _, -, . with space
-#              str_squish() %>%                       # Remove extra whitespace
-#              str_to_title())                        # Title Case (e.g., "Coal Creek")
-# }
-# 
-# # Apply to both data frames
-# DNBR_Severity <- standardize_sites(DNBR_Severity)
-# brie_site_list <- standardize_sites(brie_site_list)
-# 
-# # Now merge
-# merged_df <- DNBR_Severity %>%
-#   full_join(brie_site_list, by = "Site") %>% 
-#   select(Study_ID, Site, Burn_Unburn, mean_dnbr, burn_sev_low, burn_sev_mod, burn_sev_high) %>% 
-#   filter(!is.na(Study_ID))
-# 
-#     #  * Burd et al 2018 - in Canada so no burn metrics. This will have to go. 
-# # Coombs & Melack; 2013 - has both dNBR and low/mod/high
-# # Crandall et al. 2021 - has both dNBR and low/mod/high
-# # Gerla & Galloway; 1998 - has both dNBR and low/mod/high
-#     # * Gluns & Toews; 1989 - *does not have dNBR or low/mod/high* - in Canada so no burn metrics. This will have to go.
-# # Hauer & Spencer 1998 - has both dNBR and low/mod/high
-#     # * Hickenbottom et al. 2023 - *does not have dNBR or low/mod/high*
-#           # Middle Fork - 58 low, 25 moderate, 9 high 
-#           # Trout Creek - 39 low, 45 moderate, 3 high 
-#     # * Mast & Clow; 2008 - has both dNBR and low/mod/high but dNBR is negative...
-# # Murphy et al. 2018 - has both dNBR and low/mod/high
-#     # * Neary & Currier; 1982 - *does not have dNBR or low/mod/high*
-#         # Fire from 1978 - remove 
-#     # * Oliver et al. 2012 - has both dNBR and low/mod/high but dNBR is weird
-#   # Rhea et al. 2021 - has low/mod/high but NO dNBR
-#     # * Tiedemann; 1973 - *does not have dNBR or low/mod/high*
-#   # * Uzun et al. 2020 - has low/mod/high but NO dNBR
-# # Wagner et al. 2015 - has both dNBR and low/mod/high
-# # Writer et al. 2014 - has both dNBR and low/mod/high
-# 
-# 
-# 
-# merged_Brie_LASSO_03 <- merged_Brie_LASSO_02 %>% 
-#   filter(!Pair %in% c("Site_2_post", "Site_3_post", "Site_4_post"))
-# 
-# 
-# 
-# write_csv(merged_Brie_LASSO, file.path(out_dir, "03_master_merged_Brie_LASSO.csv"))
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
+
+
+
+
+
+
