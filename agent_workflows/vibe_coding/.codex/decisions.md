@@ -89,3 +89,14 @@ The following remain preserved elsewhere in the repository but are not part of t
 - Pairs flagged as sharing a reference are provisionally classified as `designated_shared_reference` and retain `shared_control_id` for dependence handling.
 - `Comparison_ID` is used as `Fire_ID_Analysis` until multi-fire attribution is confirmed; final fire identifiers are not inferred.
 - Final analysis and manuscript reporting remain conditional on co-author confirmation or completion of the review workbook.
+
+## Runnable provisional workflow
+
+- Scripts 02–07 are executable as a linear provisional workflow, with `run_all_agent_v1.R` as the entry point.
+- **Provisional exception:** `effect_sizes_yearly.csv` is used as the response source so the established pair inventory is preserved while pairing provenance is confirmed. It remains subject to final rebuilding or variance revision.
+- Burned-watershed attributes are joined from the daily and geospatial source snapshots; no new burned × reference combinations are generated.
+- `post_fire_year` uses reported `Time_Since_Fire` when available and pair-specific follow-up year otherwise. The fallback must be reviewed for multi-fire studies.
+- The predictor dictionary is generated from prespecified scientific groups plus completeness and variation checks; its inclusion flags remain provisional.
+- The meta-analysis fits reported-variance models and family-adjusted sensitivity models. Family adjustment is not presented as an exact shared-control covariance matrix.
+- LASSO performance uses leave-one-study-out outer validation, grouped inner folds, training-fold preprocessing, `lambda.1se`, and held-out predictions.
+- Study-bootstrap stability defaults to 100 iterations for routine runs; set `N_BOOTSTRAP=1000` for final estimates.

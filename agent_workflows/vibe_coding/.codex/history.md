@@ -60,3 +60,12 @@
 - Decisions made: Provisionally include all 36 established pairs; classify 24 as shared-reference comparisons; keep every confirmation status pending; use `Comparison_ID` as the temporary fire/comparison identifier; and leave the review workbook and original decision fields unchanged.
 - Unresolved issues: A co-author must confirm that the established lnRR pairs were manually vetted. Shared/composite reference interpretation and final multi-fire assignments still require confirmation.
 - Next steps: Implement the annual model-table construction using `pairing_decisions_analysis.csv`, then replace provisional fields with the completed review export before final modeling.
+
+## 2026-08-20 — Runnable provisional analysis workflow
+
+- Task: Replace analysis placeholders with scripts that can be run from source data through provisional tables and figures.
+- Files changed: `R/02_prepare_analysis_data_agent_v1.R` through `R/07_make_results_agent_v1.R`, new `R/run_all_agent_v1.R`, `.codex/decisions.md`, and this history file.
+- Decisions made: Use the established annual lnRR table provisionally; join burned-watershed predictors without generating new pairs; generate an auditable predictor dictionary; fit reported and family-adjusted meta-analysis models; use leave-one-study-out grouped LASSO; and estimate study-bootstrap stability under LASSO, elastic-net, and unweighted scenarios.
+- Verification: Removed all placeholder stops, checked input/output contracts across scripts, and confirmed balanced delimiters and quotes. R execution was unavailable in the current environment.
+- Unresolved issues: Co-author pairing confirmation, exact shared-control covariance, final fire-year attribution, variance construction, predictor approval, and full runtime validation remain required before manuscript reporting.
+- Next steps: Run `R/run_all_agent_v1.R` locally with the listed packages, inspect any runtime errors and audit outputs, then increase `N_BOOTSTRAP` to 1000 only after the workflow is stable.
