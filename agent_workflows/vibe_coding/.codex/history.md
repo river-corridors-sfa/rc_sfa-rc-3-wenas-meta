@@ -52,3 +52,11 @@
 - Decisions made: Continue the linear numbered workflow after scripts 00–01; cite rather than overwrite the human scripts; use annual non-area-normalized lnRR; reserve study-grouped validation as primary; and make every placeholder stop safely before incomplete analysis can produce results.
 - Unresolved issues: Pair approval, shared-control treatment, effect-size variance, post-fire-year definition, final predictor dictionary, weighting, and the strength of DOC inference remain open.
 - Next steps: Finish and import the pairing review, then implement script 02 and use its audit outputs to finalize the remaining modeling choices.
+
+## 2026-08-20 — Provisional adoption of established lnRR pairings
+
+- Task: Continue workflow development under the assumption that pairs already used by the lnRR script were manually reviewed, while preserving formal co-author review.
+- Files changed: `agent_workflows/vibe_coding/R/01a_create_provisional_pairings_agent_v1.R`, `R/02_prepare_analysis_data_agent_v1.R`, `config/pairing_decisions_analysis.csv`, `.codex/decisions.md`, and this history file.
+- Decisions made: Provisionally include all 36 established pairs; classify 24 as shared-reference comparisons; keep every confirmation status pending; use `Comparison_ID` as the temporary fire/comparison identifier; and leave the review workbook and original decision fields unchanged.
+- Unresolved issues: A co-author must confirm that the established lnRR pairs were manually vetted. Shared/composite reference interpretation and final multi-fire assignments still require confirmation.
+- Next steps: Implement the annual model-table construction using `pairing_decisions_analysis.csv`, then replace provisional fields with the completed review export before final modeling.

@@ -79,3 +79,13 @@ The following remain preserved elsewhere in the repository but are not part of t
 4. Confirm whether annual summaries should use calendar year, discrete time-since-fire year, or both.
 5. Finalize the candidate predictor set after pair-level missingness and redundancy audits.
 6. Decide whether the small DOC study count supports a primary LASSO claim or only an exploratory stability analysis.
+
+## Provisional use of established lnRR pairings
+
+- The 36 distinct pairs already present in `effect_sizes_yearly.csv` are treated as previously manually reviewed for interim workflow development.
+- This is an explicit provisional assumption, not a replacement for co-author confirmation.
+- The original `pairing_decisions.csv`, review workbook, and final review fields remain unchanged.
+- A separate `pairing_decisions_analysis.csv` records all 36 pairs as provisionally included and keeps `Coauthor_Confirmation = pending`.
+- Pairs flagged as sharing a reference are provisionally classified as `designated_shared_reference` and retain `shared_control_id` for dependence handling.
+- `Comparison_ID` is used as `Fire_ID_Analysis` until multi-fire attribution is confirmed; final fire identifiers are not inferred.
+- Final analysis and manuscript reporting remain conditional on co-author confirmation or completion of the review workbook.

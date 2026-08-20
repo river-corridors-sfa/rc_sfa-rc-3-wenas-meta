@@ -1,6 +1,6 @@
 # ==============================================================================
 # Script: 02_prepare_analysis_data_agent_v1.R
-# Status: PLACEHOLDER — complete after pairing review
+# Status: PLACEHOLDER — provisional pair assumption adopted; implementation pending
 # Purpose: Build one non-area-normalized annual lnRR row per approved watershed
 #          pair x analyte x post-fire year.
 # Builds from: R_scripts/03_merge_geospatial.R and
@@ -14,19 +14,18 @@ library(here)
 
 workflow_dir <- here("agent_workflows", "vibe_coding")
 
-pairing_path <- file.path(workflow_dir, "config", "pairing_decisions_reviewed.csv")
+pairing_path <- file.path(workflow_dir, "config", "pairing_decisions_analysis.csv")
 daily_path <- file.path(workflow_dir, "data", "source", "01_daily_time_series_paired.csv")
 geospatial_path <- file.path(workflow_dir, "data", "source", "geospatial_variables_bp_severity_pull.csv")
 metadata_path <- file.path(workflow_dir, "data", "source", "Sites_meta_data.csv")
 qc_effect_size_path <- file.path(workflow_dir, "data", "source", "effect_sizes_yearly.csv")
 output_path <- file.path(workflow_dir, "data", "derived", "lasso_model_table.csv")
 
-# ---- 2. Block analysis until pair review is final ---------------------------
+# ---- 2. Confirm the provisional analysis pairing table ----------------------
 
 if (!file.exists(pairing_path)) {
   stop(
-    "Pair review is incomplete. Run 01_pairing_review_workbook_agent_v1.R ",
-    "in import mode to create pairing_decisions_reviewed.csv."
+    "Run 01a_create_provisional_pairings_agent_v1.R before preparing data."
   )
 }
 
@@ -34,21 +33,29 @@ pairing_decisions <- read_csv(pairing_path, show_col_types = FALSE)
 
 required_pair_fields <- c(
   "Study_ID", "Comparison_ID", "Pair_Burn", "Pair_Unburn",
-  "Fire_ID_Final", "Pairing_Type_Final", "Include", "Decision_Status"
+  "Fire_ID_Analysis", "Pairing_Type_Analysis", "Include_Analysis",
+  "Analysis_Decision_Status", "Coauthor_Confirmation"
 )
 
 stopifnot(all(required_pair_fields %in% names(pairing_decisions)))
 
 unresolved_pairs <- pairing_decisions %>%
-  mutate(include_value = str_to_upper(as.character(Include)) == "TRUE") %>%
   filter(
-    is.na(Include) |
-      !Decision_Status %in% c("approved", "excluded") |
-      (include_value & (is.na(Fire_ID_Final) | is.na(Pairing_Type_Final)))
+    is.na(Include_Analysis) |
+      !Analysis_Decision_Status %in% c("provisionally_approved", "confirmed") |
+      (Include_Analysis &
+        (is.na(Fire_ID_Analysis) | is.na(Pairing_Type_Analysis)))
   )
 
 if (nrow(unresolved_pairs) > 0) {
   stop(nrow(unresolved_pairs), " pairing decisions remain unresolved.")
+}
+
+if (any(pairing_decisions$Coauthor_Confirmation == "pending")) {
+  message(
+    "Proceeding provisionally with established lnRR pairs; co-author ",
+    "confirmation remains required before final reporting."
+  )
 }
 
 # This explicit stop prevents a partially implemented effect-size calculation
@@ -64,9 +71,9 @@ stop(
 
 # ---- 4. Apply approved watershed pairs -------------------------------------
 
-# TODO: Keep Include == TRUE only.
+# TODO: Keep Include_Analysis == TRUE only.
 # TODO: Map Pair_Burn and Pair_Unburn to the daily source's site columns.
-# TODO: Retain Fire_ID_Final, Pairing_Type_Final, and shared_control_id.
+# TODO: Retain Fire_ID_Analysis, Pairing_Type_Analysis, and shared_control_id.
 # TODO: Never regenerate a burned x reference cross-product here.
 
 # ---- 5. Calculate daily paired responses -----------------------------------
