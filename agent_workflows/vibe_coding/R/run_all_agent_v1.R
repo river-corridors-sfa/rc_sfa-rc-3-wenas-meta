@@ -75,6 +75,7 @@ format_predictor_text <- function(lines) {
 
   output_lines <- as.character(lines)
   raw_names <- names(predictor_labels)
+  raw_names <- setdiff(raw_names, "slope")
   raw_names <- raw_names[order(nchar(raw_names), decreasing = TRUE)]
 
   for (raw_name in raw_names) {
@@ -85,6 +86,10 @@ format_predictor_text <- function(lines) {
       fixed = TRUE
     )
   }
+
+  output_lines <- gsub(", slope,", ", Watershed slope,", output_lines, fixed = TRUE)
+  output_lines <- gsub(": slope,", ": Watershed slope,", output_lines, fixed = TRUE)
+  output_lines <- gsub(", slope$", ", Watershed slope", output_lines)
 
   output_lines
 }
@@ -257,6 +262,8 @@ append_audit_diagnostics <- function() {
       file.path(audit_dir, "response_audit.csv"),
       file.path(audit_dir, "predictor_missingness.csv"),
       file.path(audit_dir, "predictor_correlations.csv"),
+      file.path(audit_dir, "predictor_correlation_matrix.csv"),
+      file.path(audit_dir, "predictor_selection_diagnostics.csv"),
       file.path(config_dir, "predictor_dictionary.csv")
     ),
     "Generated Files"
@@ -559,6 +566,8 @@ append_file_status(
     file.path(audit_dir, "response_audit.csv"),
     file.path(audit_dir, "predictor_missingness.csv"),
     file.path(audit_dir, "predictor_correlations.csv"),
+    file.path(audit_dir, "predictor_correlation_matrix.csv"),
+    file.path(audit_dir, "predictor_selection_diagnostics.csv"),
     file.path(config_dir, "predictor_dictionary.csv"),
     file.path(table_dir, "meta_model_summary.csv"),
     file.path(table_dir, "grouped_lasso_performance.csv"),

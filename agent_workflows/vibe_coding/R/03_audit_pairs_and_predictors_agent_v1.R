@@ -74,6 +74,33 @@ predictor_definitions <- tribble(
   "maxelevsmo", "topography", "none", FALSE, "Maximum smoothed elevation"
 )
 
+predictor_labels <- tribble(
+  ~predictor, ~predictor_label,
+  "post_fire_year", "Post-fire year",
+  "time_since_fire", "Time since fire",
+  "burn_percent_fire_year", "Burned watershed area (%)",
+  "burn_sev_high", "High-severity burn (%)",
+  "burn_sev_mod", "Moderate-severity burn (%)",
+  "burn_sev_low", "Low-severity burn (%)",
+  "Area_watershed_km", "Watershed area (km)",
+  "runoffws", "Mean annual runoff",
+  "bfiws", "Baseflow index",
+  "permws", "Soil permeability",
+  "forest_cover", "Forest cover (%)",
+  "grassland_cover", "Grassland cover (%)",
+  "wetland_cover", "Wetland cover (%)",
+  "ag_cover", "Agricultural cover (%)",
+  "urban_cover", "Urban cover (%)",
+  "omws", "Soil organic matter",
+  "clayws", "Soil clay content",
+  "rckdepws", "Depth to bedrock",
+  "glacial_till", "Glacial till (%)",
+  "precip8110ws", "1981-2010 precipitation",
+  "tmean8110ws", "1981-2010 mean temperature",
+  "slope", "Watershed slope",
+  "maxelevsmo", "Maximum smoothed elevation"
+)
+
 available_predictors <- intersect(predictor_definitions$predictor, names(model_table))
 predictor_missingness <- map_dfr(available_predictors, function(variable) {
   values <- model_table[[variable]]
@@ -88,6 +115,7 @@ predictor_missingness <- map_dfr(available_predictors, function(variable) {
 
 predictor_dictionary <- predictor_definitions %>%
   filter(predictor %in% available_predictors) %>%
+  left_join(predictor_labels, by = "predictor") %>%
   left_join(predictor_missingness, by = "predictor") %>%
   mutate(
     include_primary = primary_candidate & proportion_missing <= 0.50 & n_unique >= 3,
@@ -99,6 +127,55 @@ predictor_dictionary <- predictor_definitions %>%
       TRUE ~ "Available for sensitivity analysis."
     )
   )
+
+predictor_selection_diagnostics <- predictor_definitions %>%
+  left_join(predictor_labels, by = "predictor") %>%
+  left_join(predictor_missingness, by = "predictor") %>%
+  mutate(
+    predictor_label = coalesce(predictor_label, predictor),
+    available_in_model_table = predictor %in% available_predictors,
+    passes_missingness = available_in_model_table & proportion_missing <= 0.50,
+    passes_variation = available_in_model_table & n_unique >= 3,
+    include_primary = primary_candidate & passes_missingness & passes_variation,
+    decision_status = case_when(
+      include_primary ~ "provisional_include",
+      !available_in_model_table ~ "excluded_unavailable",
+      !primary_candidate ~ "available_sensitivity",
+      !passes_missingness ~ "excluded_missingness",
+      !passes_variation ~ "excluded_low_variation",
+      TRUE ~ "available_sensitivity_or_excluded"
+    ),
+    decision_note = case_when(
+      include_primary ~ "Included in the primary predictor set.",
+      !available_in_model_table ~ "Not present in the model table.",
+      !primary_candidate ~ "Available, but not pre-specified as a primary candidate.",
+      !passes_missingness ~ "Excluded from primary set: >50% missing.",
+      !passes_variation ~ "Excluded from primary set: fewer than 3 unique values.",
+      TRUE ~ "Available for sensitivity analysis."
+    )
+  ) %>%
+  select(
+    predictor_label,
+    predictor,
+    predictor_group,
+    transformation,
+    definition,
+    primary_candidate,
+    available_in_model_table,
+    n,
+    n_missing,
+    proportion_missing,
+    n_unique,
+    minimum,
+    median,
+    maximum,
+    passes_missingness,
+    passes_variation,
+    include_primary,
+    decision_status,
+    decision_note
+  ) %>%
+  arrange(desc(include_primary), predictor_group, predictor_label)
 
 correlation_variables <- predictor_dictionary %>%
   filter(proportion_missing < 0.80, n_unique >= 3) %>% pull(predictor)
@@ -112,19 +189,101 @@ if (length(correlation_variables) >= 2) {
     rownames_to_column("predictor_1") %>%
     pivot_longer(-predictor_1, names_to = "predictor_2", values_to = "rho") %>%
     filter(predictor_1 < predictor_2) %>% arrange(desc(abs(rho)))
+  correlation_matrix_print <- correlation_matrix
+  rownames(correlation_matrix_print) <- predictor_labels$predictor_label[
+    match(rownames(correlation_matrix_print), predictor_labels$predictor)
+  ]
+  colnames(correlation_matrix_print) <- predictor_labels$predictor_label[
+    match(colnames(correlation_matrix_print), predictor_labels$predictor)
+  ]
+  correlation_matrix_output <- as.data.frame(correlation_matrix_print, check.names = FALSE) %>%
+    rownames_to_column("predictor")
 } else {
   predictor_correlations <- tibble(predictor_1 = character(), predictor_2 = character(), rho = double())
+  correlation_matrix_print <- matrix(numeric(), nrow = 0, ncol = 0)
+  correlation_matrix_output <- tibble()
 }
+
+predictor_correlations_print <- predictor_correlations %>%
+  left_join(predictor_labels, by = c("predictor_1" = "predictor")) %>%
+  rename(predictor_1_label = predictor_label) %>%
+  left_join(predictor_labels, by = c("predictor_2" = "predictor")) %>%
+  rename(predictor_2_label = predictor_label) %>%
+  mutate(
+    predictor_1_label = coalesce(predictor_1_label, predictor_1),
+    predictor_2_label = coalesce(predictor_2_label, predictor_2)
+  ) %>%
+  select(predictor_1_label, predictor_2_label, predictor_1, predictor_2, rho)
 
 write_csv(pair_structure, file.path(audit_dir, "pair_structure.csv"))
 write_csv(shared_reference_structure, file.path(audit_dir, "shared_reference_structure.csv"))
 write_csv(response_audit, file.path(audit_dir, "response_audit.csv"))
 write_csv(predictor_missingness, file.path(audit_dir, "predictor_missingness.csv"))
 write_csv(predictor_correlations, file.path(audit_dir, "predictor_correlations.csv"))
+write_csv(correlation_matrix_output, file.path(audit_dir, "predictor_correlation_matrix.csv"))
+write_csv(predictor_selection_diagnostics, file.path(audit_dir, "predictor_selection_diagnostics.csv"))
 write_csv(predictor_dictionary, predictor_dictionary_path)
 
 message("Wrote audit tables to: ", audit_dir)
-message("Primary provisional predictors: ", paste(
-  predictor_dictionary %>% filter(include_primary) %>% pull(predictor), collapse = ", "
-))
+message("Primary predictor rule: pre-specified primary candidate, <=50% missing, and at least 3 unique values.")
 
+message("\nAnalysis structure by analyte:")
+print(pair_structure, n = Inf, width = Inf)
+
+message("\nResponse-value and variance audit:")
+print(response_audit, n = Inf, width = Inf)
+
+message("\nPredictor selection diagnostics:")
+print(
+  predictor_selection_diagnostics %>%
+    select(
+      predictor_label,
+      predictor_group,
+      primary_candidate,
+      proportion_missing,
+      n_unique,
+      passes_missingness,
+      passes_variation,
+      include_primary,
+      decision_status
+    ),
+  n = Inf,
+  width = Inf
+)
+
+message("\nPrimary provisional predictors:")
+print(
+  predictor_selection_diagnostics %>%
+    filter(include_primary) %>%
+    select(predictor_label, predictor_group, transformation, proportion_missing, n_unique),
+  n = Inf,
+  width = Inf
+)
+
+message("\nPredictors not included in the primary set:")
+print(
+  predictor_selection_diagnostics %>%
+    filter(!include_primary) %>%
+    select(predictor_label, predictor_group, decision_status, decision_note),
+  n = Inf,
+  width = Inf
+)
+
+if (nrow(predictor_correlations_print) > 0) {
+  message("\nSpearman correlation matrix among screened predictors:")
+  print(round(correlation_matrix_print, 3))
+
+  message("\nLargest absolute Spearman correlations among screened predictors:")
+  print(
+    predictor_correlations_print %>%
+      arrange(desc(abs(rho))) %>%
+      select(predictor_1_label, predictor_2_label, rho) %>%
+      head(10),
+    n = 10,
+    width = Inf
+  )
+}
+
+message("Primary provisional predictors: ", paste(
+  predictor_selection_diagnostics %>% filter(include_primary) %>% pull(predictor_label), collapse = ", "
+))

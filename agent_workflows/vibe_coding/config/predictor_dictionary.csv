@@ -1,21 +1,21 @@
-predictor,predictor_group,transformation,primary_candidate,definition,n,n_missing,proportion_missing,n_unique,minimum,median,maximum,include_primary,decision_status,decision_note
-post_fire_year,recovery,none,TRUE,Reported time since fire; follow-up year used when unavailable,120,0,0,7,0,2,15,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
-burn_percent_fire_year,fire,none,TRUE,Percent of burned watershed affected in the fire year,120,18,0.15,24,1.5243,27.1121,100,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
-burn_sev_high,fire,none,TRUE,Percent high-severity burn,120,18,0.15,25,0.19,9.23,64.15,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
-Area_watershed_km,topography,log1p,TRUE,Burned watershed area,120,0,0,34,1.83,63.1,3017,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
-runoffws,hydrology,log1p,TRUE,Mean annual runoff,120,1,0.008333333333333333,27,39.1054,248,968.0682,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
-bfiws,hydrology,none,FALSE,Baseflow index,120,1,0.008333333333333333,31,28,68.2947,74.5288,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
-permws,hydrology,log1p,FALSE,Soil permeability,120,1,0.008333333333333333,30,2.4213029989029153,9.57308279531159,26.69,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
-forest_cover,landscape,none,TRUE,Combined forest-cover percentage,120,1,0.008333333333333333,31,3.5999999999999996,59.86000000000001,94.67,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
-grassland_cover,landscape,none,FALSE,Grassland-cover percentage,120,1,0.008333333333333333,30,0,13.07,65.3,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
-wetland_cover,landscape,none,FALSE,Combined wetland-cover percentage,120,1,0.008333333333333333,23,0,0.72,3.77,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
-ag_cover,landscape,none,FALSE,Combined agricultural-cover percentage,120,1,0.008333333333333333,12,0,0,34.730000000000004,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
-urban_cover,landscape,none,FALSE,Combined urban-cover percentage,120,1,0.008333333333333333,29,0,1.56,14.19,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
-omws,soil,none,TRUE,Watershed soil organic matter,120,1,0.008333333333333333,30,0.19,0.7733302811359897,2.5924974146845914,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
-clayws,soil,none,FALSE,Watershed clay content,120,1,0.008333333333333333,30,4.306314835023752,12.658438667029143,26.80751668661552,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
-rckdepws,geology,log1p,FALSE,Depth to bedrock,120,1,0.008333333333333333,30,48.49447382063246,109.2732020696984,151.201887971435,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
-glacial_till,geology,none,FALSE,Combined glacial-till percentage,120,1,0.008333333333333333,14,0,0,78.74,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
-precip8110ws,climate,none,FALSE,1981-2010 precipitation normal,120,1,0.008333333333333333,31,502.32296909,723.394409686,1790.14124474,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
-tmean8110ws,climate,none,FALSE,1981-2010 mean temperature,120,1,0.008333333333333333,31,0.55106015658788,5.4318975716999995,16.3194393942,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
-slope,topography,none,FALSE,Watershed slope,120,22,0.18333333333333332,23,1e-5,0.018583864999999998,0.13779638,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
-maxelevsmo,topography,none,FALSE,Maximum smoothed elevation,120,22,0.18333333333333332,25,2708,160639,252026,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
+predictor,predictor_group,transformation,primary_candidate,definition,predictor_label,n,n_missing,proportion_missing,n_unique,minimum,median,maximum,include_primary,decision_status,decision_note
+post_fire_year,recovery,none,TRUE,Reported time since fire; follow-up year used when unavailable,Post-fire year,120,0,0,7,0,2,15,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
+burn_percent_fire_year,fire,none,TRUE,Percent of burned watershed affected in the fire year,Burned watershed area (%),120,18,0.15,24,1.5243,27.1121,100,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
+burn_sev_high,fire,none,TRUE,Percent high-severity burn,High-severity burn (%),120,18,0.15,25,0.19,9.23,64.15,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
+Area_watershed_km,topography,log1p,TRUE,Burned watershed area,Watershed area (km),120,0,0,34,1.83,63.1,3017,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
+runoffws,hydrology,log1p,TRUE,Mean annual runoff,Mean annual runoff,120,1,0.008333333333333333,27,39.1054,248,968.0682,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
+bfiws,hydrology,none,FALSE,Baseflow index,Baseflow index,120,1,0.008333333333333333,31,28,68.2947,74.5288,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
+permws,hydrology,log1p,FALSE,Soil permeability,Soil permeability,120,1,0.008333333333333333,30,2.4213029989029153,9.57308279531159,26.69,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
+forest_cover,landscape,none,TRUE,Combined forest-cover percentage,Forest cover (%),120,1,0.008333333333333333,31,3.5999999999999996,59.86000000000001,94.67,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
+grassland_cover,landscape,none,FALSE,Grassland-cover percentage,Grassland cover (%),120,1,0.008333333333333333,30,0,13.07,65.3,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
+wetland_cover,landscape,none,FALSE,Combined wetland-cover percentage,Wetland cover (%),120,1,0.008333333333333333,23,0,0.72,3.77,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
+ag_cover,landscape,none,FALSE,Combined agricultural-cover percentage,Agricultural cover (%),120,1,0.008333333333333333,12,0,0,34.730000000000004,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
+urban_cover,landscape,none,FALSE,Combined urban-cover percentage,Urban cover (%),120,1,0.008333333333333333,29,0,1.56,14.19,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
+omws,soil,none,TRUE,Watershed soil organic matter,Soil organic matter,120,1,0.008333333333333333,30,0.19,0.7733302811359897,2.5924974146845914,TRUE,provisional_include,Provisional primary predictor; confirm after audit review.
+clayws,soil,none,FALSE,Watershed clay content,Soil clay content,120,1,0.008333333333333333,30,4.306314835023752,12.658438667029143,26.80751668661552,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
+rckdepws,geology,log1p,FALSE,Depth to bedrock,Depth to bedrock,120,1,0.008333333333333333,30,48.49447382063246,109.2732020696984,151.201887971435,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
+glacial_till,geology,none,FALSE,Combined glacial-till percentage,Glacial till (%),120,1,0.008333333333333333,14,0,0,78.74,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
+precip8110ws,climate,none,FALSE,1981-2010 precipitation normal,1981-2010 precipitation,120,1,0.008333333333333333,31,502.32296909,723.394409686,1790.14124474,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
+tmean8110ws,climate,none,FALSE,1981-2010 mean temperature,1981-2010 mean temperature,120,1,0.008333333333333333,31,0.55106015658788,5.4318975716999995,16.3194393942,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
+slope,topography,none,FALSE,Watershed slope,Watershed slope,120,22,0.18333333333333332,23,1e-5,0.018583864999999998,0.13779638,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
+maxelevsmo,topography,none,FALSE,Maximum smoothed elevation,Maximum smoothed elevation,120,22,0.18333333333333332,25,2708,160639,252026,FALSE,available_sensitivity_or_excluded,Available for sensitivity analysis.
