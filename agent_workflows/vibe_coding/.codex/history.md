@@ -44,3 +44,11 @@
 - Decisions made: Use one linear script with a create mode and an import mode. The workbook includes instructions, study summaries, actual watershed names, review priorities, controlled decision values, dropdowns, and highlighted editable fields. Import writes a new reviewed CSV and a validation report; it does not overwrite the original candidate table.
 - Unresolved issues: The workbook has not yet been completed by reviewers. Final fire IDs, pairing types, inclusion decisions, evidence citations, and shared-reference treatment remain pending.
 - Next steps: Run the script locally with `review_action <- "create"`, review the workbook by Study_ID, then rerun with `review_action <- "import"` and `allow_partial_import <- FALSE` for the final export.
+
+## 2026-08-20 — Remaining analysis-script placeholders
+
+- Task: Create the remaining proposed analysis scripts while authors review watershed pairings.
+- Files changed: `agent_workflows/vibe_coding/R/02_prepare_analysis_data_agent_v1.R`, `03_audit_pairs_and_predictors_agent_v1.R`, `04_fit_meta_analysis_agent_v1.R`, `05_fit_grouped_lasso_agent_v1.R`, `06_run_stability_sensitivity_agent_v1.R`, `07_make_results_agent_v1.R`, and this history file.
+- Decisions made: Continue the linear numbered workflow after scripts 00–01; cite rather than overwrite the human scripts; use annual non-area-normalized lnRR; reserve study-grouped validation as primary; and make every placeholder stop safely before incomplete analysis can produce results.
+- Unresolved issues: Pair approval, shared-control treatment, effect-size variance, post-fire-year definition, final predictor dictionary, weighting, and the strength of DOC inference remain open.
+- Next steps: Finish and import the pairing review, then implement script 02 and use its audit outputs to finalize the remaining modeling choices.
