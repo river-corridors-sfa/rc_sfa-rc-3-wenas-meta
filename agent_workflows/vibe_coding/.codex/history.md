@@ -28,3 +28,11 @@
 - Decisions made: Recorded current workflow organization, scientific scope, observational hierarchy, model roles, validation requirements, predictor-selection principles, and inactive historical analyses.
 - Unresolved issues: Pair definitions, shared-control treatment, effect-size weighting, temporal aggregation, the final predictor set, and the strength of inference supported by the DOC sample size remain provisional.
 - Next steps: Build and review `pairing_decisions.csv`, then construct and audit the annual pair-level modeling table.
+
+## 2026-08-20 — Candidate pairing decisions table
+
+- Task: Generate an author-review table of candidate burned-reference watershed contrasts and document its construction in R.
+- Files changed: `agent_workflows/vibe_coding/config/pairing_decisions.csv`, `agent_workflows/vibe_coding/R/00_build_pairing_decisions_agent_v1.R`, and this history file.
+- Decisions made: Inventory distinct pairings from the existing annual effect-size table; enrich them with study-level fire metadata; flag shared references and multi-fire studies; leave final fire assignment, pairing type, inclusion, and decision fields blank for author review.
+- Unresolved issues: The 36 candidate contrasts have not been validated against the original study designs. Shared-control handling and comparison-specific fire assignments remain unresolved.
+- Next steps: Authors should complete `Fire_ID_Final`, `Pairing_Type_Final`, `Include`, `Decision_Status`, and `Decision_Notes` before the final effect-size table is rebuilt.
