@@ -290,29 +290,29 @@ if (review_action == "create") {
   title_style <- createStyle(
     fontSize = 16,
     textDecoration = "bold",
-    fontColour = "FFFFFF",
-    fgFill = "1F4E78",
+    fontColour = "#FFFFFF",
+    fgFill = "#1F4E78",
     halign = "left",
     valign = "center"
   )
 
   input_style <- createStyle(
-    fgFill = "FFF2CC",
+    fgFill = "#FFF2CC",
     border = "TopBottomLeftRight",
-    borderColour = "D6B656",
+    borderColour = "#D6B656",
     valign = "top",
     wrapText = TRUE
   )
 
   high_priority_style <- createStyle(
-    fgFill = "F4CCCC",
-    fontColour = "9C0006",
+    fgFill = "#F4CCCC",
+    fontColour = "#9C0006",
     textDecoration = "bold"
   )
 
   medium_priority_style <- createStyle(
-    fgFill = "FCE5CD",
-    fontColour = "7F6000"
+    fgFill = "#FCE5CD",
+    fontColour = "#7F6000"
   )
 
   date_style <- createStyle(
@@ -692,3 +692,4 @@ if (review_action == "import") {
     validation_path
   )
 }
+
