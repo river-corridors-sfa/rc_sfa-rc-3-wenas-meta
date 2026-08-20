@@ -77,3 +77,11 @@
 - Decisions made: Require a strict review-workbook import; promote reviewed fields into the analysis pairing configuration; do not rerun the provisional pairing generator after confirmation; run scripts 02–07 individually until the master runner omits script 01a; stop after the audit script to finalize predictors and unresolved modeling choices before final fits.
 - Unresolved issues: Promotion of reviewed decisions into `pairing_decisions_analysis.csv` is not yet automated, and exact shared-reference covariance, final effect-size variance, fire-year attribution, and the final predictor set still require resolution.
 - Next steps: Complete the co-author review, validate the strict import, promote confirmed decisions, and follow the new guide beginning with `02_prepare_analysis_data_agent_v1.R`.
+
+## 2026-08-20 — Meta-analysis summary-function fix
+
+- Task: Fix the missing `robust_model` argument error in `04_fit_meta_analysis_agent_v1.R`.
+- Files changed: `agent_workflows/vibe_coding/R/04_fit_meta_analysis_agent_v1.R` and this history file.
+- Decisions made: Make robust inference optional; use named arguments at the call site; pass the fitting dataset explicitly for the study count instead of relying on `model$data`; use base `if` for the scalar inference label.
+- Verification: Inspected the edited function and call structure. Full R parsing and execution remain unavailable because `Rscript` is not installed in the execution environment.
+- Next steps: Pull the updated `agents` branch and rerun script 04 from a clean R session.

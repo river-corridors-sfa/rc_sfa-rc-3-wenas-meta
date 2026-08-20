@@ -46,15 +46,29 @@ fit_meta_model <- function(data, variance_column, include_time = FALSE) {
   )
 }
 
-tidy_meta_model <- function(model, robust_model, analyte, model_name, variance_approach) {
+tidy_meta_model <- function(
+  model,
+  analyte,
+  model_name,
+  variance_approach,
+  robust_model = NULL,
+  fitting_data = NULL
+) {
   reported_model <- if (is.null(robust_model)) model else robust_model
   term_names <- rownames(reported_model$beta)
   if (is.null(term_names)) term_names <- paste0("term_", seq_along(reported_model$beta))
+
+  n_studies <- if (is.null(fitting_data)) {
+    NA_integer_
+  } else {
+    n_distinct(fitting_data$Study_ID)
+  }
+
   tibble(
     response_var = analyte,
     model = model_name,
     variance_approach = variance_approach,
-    inference = if_else(is.null(robust_model), "model_based", "study_cluster_robust"),
+    inference = if (is.null(robust_model)) "model_based" else "study_cluster_robust",
     term = term_names,
     estimate = as.numeric(reported_model$beta),
     std_error = as.numeric(reported_model$se),
@@ -62,7 +76,7 @@ tidy_meta_model <- function(model, robust_model, analyte, model_name, variance_a
     ci_upper = as.numeric(reported_model$ci.ub),
     p_value = as.numeric(reported_model$pval),
     k = model$k,
-    n_studies = n_distinct(model$data$Study_ID),
+    n_studies = n_studies,
     percent_change = 100 * (exp(as.numeric(reported_model$beta)) - 1)
   )
 }
@@ -125,11 +139,12 @@ for (analyte in sort(unique(model_table$response_var))) {
 
     model_objects[[model_key]] <- fitted_model
     model_summaries[[model_key]] <- tidy_meta_model(
-      fitted_model,
-      robust_model,
-      analyte,
-      specification$model_name,
-      specification$variance_column
+      model = fitted_model,
+      analyte = analyte,
+      model_name = specification$model_name,
+      variance_approach = specification$variance_column,
+      robust_model = robust_model,
+      fitting_data = fitting_data
     )
   }
 }
@@ -143,4 +158,3 @@ saveRDS(model_objects, file.path(model_dir, "meta_models.rds"))
 
 message("Fitted ", length(model_objects), " meta-analysis models.")
 message("Shared-reference family-adjusted models are sensitivity analyses, not exact covariance models.")
-
