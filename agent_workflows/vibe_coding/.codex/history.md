@@ -36,3 +36,11 @@
 - Decisions made: Inventory distinct pairings from the existing annual effect-size table; enrich them with study-level fire metadata; flag shared references and multi-fire studies; leave final fire assignment, pairing type, inclusion, and decision fields blank for author review.
 - Unresolved issues: The 36 candidate contrasts have not been validated against the original study designs. Shared-control handling and comparison-specific fire assignments remain unresolved.
 - Next steps: Authors should complete `Fire_ID_Final`, `Pairing_Type_Final`, `Include`, `Decision_Status`, and `Decision_Notes` before the final effect-size table is rebuilt.
+
+## 2026-08-20 — Pairing review workbook workflow
+
+- Task: Create an R workflow to support structured author review of candidate watershed pairings.
+- Files changed: `agent_workflows/vibe_coding/R/01_pairing_review_workbook_agent_v1.R` and this history file.
+- Decisions made: Use one linear script with a create mode and an import mode. The workbook includes instructions, study summaries, actual watershed names, review priorities, controlled decision values, dropdowns, and highlighted editable fields. Import writes a new reviewed CSV and a validation report; it does not overwrite the original candidate table.
+- Unresolved issues: The workbook has not yet been completed by reviewers. Final fire IDs, pairing types, inclusion decisions, evidence citations, and shared-reference treatment remain pending.
+- Next steps: Run the script locally with `review_action <- "create"`, review the workbook by Study_ID, then rerun with `review_action <- "import"` and `allow_partial_import <- FALSE` for the final export.
