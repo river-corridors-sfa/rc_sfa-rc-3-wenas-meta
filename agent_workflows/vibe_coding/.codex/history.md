@@ -69,3 +69,11 @@
 - Verification: Removed all placeholder stops, checked input/output contracts across scripts, and confirmed balanced delimiters and quotes. R execution was unavailable in the current environment.
 - Unresolved issues: Co-author pairing confirmation, exact shared-control covariance, final fire-year attribution, variance construction, predictor approval, and full runtime validation remain required before manuscript reporting.
 - Next steps: Run `R/run_all_agent_v1.R` locally with the listed packages, inspect any runtime errors and audit outputs, then increase `N_BOOTSTRAP` to 1000 only after the workflow is stable.
+
+## 2026-08-20 — Post-confirmation workflow guide
+
+- Task: Document the next analysis steps after co-author confirmation of sites and watershed pairings.
+- Files changed: `agent_workflows/vibe_coding/NEXT_STEPS_AFTER_SITE_CONFIRMATION.md` and this history file.
+- Decisions made: Require a strict review-workbook import; promote reviewed fields into the analysis pairing configuration; do not rerun the provisional pairing generator after confirmation; run scripts 02–07 individually until the master runner omits script 01a; stop after the audit script to finalize predictors and unresolved modeling choices before final fits.
+- Unresolved issues: Promotion of reviewed decisions into `pairing_decisions_analysis.csv` is not yet automated, and exact shared-reference covariance, final effect-size variance, fire-year attribution, and the final predictor set still require resolution.
+- Next steps: Complete the co-author review, validate the strict import, promote confirmed decisions, and follow the new guide beginning with `02_prepare_analysis_data_agent_v1.R`.
