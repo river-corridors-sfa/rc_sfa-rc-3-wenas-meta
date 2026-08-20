@@ -63,6 +63,7 @@ tidy_meta_model <- function(
   } else {
     n_distinct(fitting_data$Study_ID)
   }
+  model_k <- model$k
 
   tibble(
     response_var = analyte,
@@ -75,7 +76,7 @@ tidy_meta_model <- function(
     ci_lower = as.numeric(reported_model$ci.lb),
     ci_upper = as.numeric(reported_model$ci.ub),
     p_value = as.numeric(reported_model$pval),
-    k = model$k,
+    k = model_k,
     n_studies = n_studies,
     percent_change = 100 * (exp(as.numeric(reported_model$beta)) - 1)
   )
