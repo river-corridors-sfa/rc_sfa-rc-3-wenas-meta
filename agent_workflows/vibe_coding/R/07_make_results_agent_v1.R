@@ -13,6 +13,13 @@ table_dir <- file.path(workflow_dir, "output", "tables")
 figure_dir <- file.path(workflow_dir, "output", "figures")
 dir.create(figure_dir, recursive = TRUE, showWarnings = FALSE)
 
+# Run source scripts: 
+source("02_prepare_analysis_data_agent_v1.R")
+source("03_audit_pairs_and_predictors_agent_v1.R")
+source("04_fit_meta_analysis_agent_v1.R")
+source("05_fit_grouped_lasso_agent_v1.R")
+source("06_run_stability_sensitivity_agent_v1.R")
+
 required_files <- c(
   file.path(audit_dir, "pair_structure.csv"),
   file.path(table_dir, "meta_model_summary.csv"),
