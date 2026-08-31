@@ -1,0 +1,3 @@
+response_var,model,variance_approach,inference,term,estimate,std_error,ci_lower,ci_upper,p_value,k,n_studies,percent_change,model_label
+DOC,intercept_only,lnRR_var,model_based,intrcpt,0.2815137495312739,0.1208322813278848,0.03690158439893462,0.5261259146636131,0.02522970951872016,39,9,32.51342161706114,Reported variance
+NO3,intercept_only,lnRR_var,model_based,intrcpt,0.7996163571668635,0.3320490656756659,0.13842219565558733,1.4608105186781395,0.01842674476431424,78,14,122.46872794240431,Reported variance

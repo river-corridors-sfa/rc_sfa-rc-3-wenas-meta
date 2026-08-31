@@ -1,0 +1,255 @@
+response_var,held_out_study,training_study,inner_fold
+DOC,Burd et al 2018,Crandall et al. 2021,1
+DOC,Burd et al 2018,Hickenbottom et al. 2023,2
+DOC,Burd et al 2018,Mast & Clow; 2008,3
+DOC,Burd et al 2018,Murphy et al. 2018,4
+DOC,Burd et al 2018,Rhea et al. 2021,5
+DOC,Burd et al 2018,Uzun et al. 2020,1
+DOC,Burd et al 2018,Wagner et al. 2015,2
+DOC,Burd et al 2018,Writer et al. 2014,3
+DOC,Crandall et al. 2021,Burd et al 2018,1
+DOC,Crandall et al. 2021,Hickenbottom et al. 2023,2
+DOC,Crandall et al. 2021,Mast & Clow; 2008,3
+DOC,Crandall et al. 2021,Murphy et al. 2018,4
+DOC,Crandall et al. 2021,Rhea et al. 2021,5
+DOC,Crandall et al. 2021,Uzun et al. 2020,1
+DOC,Crandall et al. 2021,Wagner et al. 2015,2
+DOC,Crandall et al. 2021,Writer et al. 2014,3
+DOC,Hickenbottom et al. 2023,Burd et al 2018,1
+DOC,Hickenbottom et al. 2023,Crandall et al. 2021,2
+DOC,Hickenbottom et al. 2023,Mast & Clow; 2008,3
+DOC,Hickenbottom et al. 2023,Murphy et al. 2018,4
+DOC,Hickenbottom et al. 2023,Rhea et al. 2021,5
+DOC,Hickenbottom et al. 2023,Uzun et al. 2020,1
+DOC,Hickenbottom et al. 2023,Wagner et al. 2015,2
+DOC,Hickenbottom et al. 2023,Writer et al. 2014,3
+DOC,Mast & Clow; 2008,Burd et al 2018,1
+DOC,Mast & Clow; 2008,Crandall et al. 2021,2
+DOC,Mast & Clow; 2008,Hickenbottom et al. 2023,3
+DOC,Mast & Clow; 2008,Murphy et al. 2018,4
+DOC,Mast & Clow; 2008,Rhea et al. 2021,5
+DOC,Mast & Clow; 2008,Uzun et al. 2020,1
+DOC,Mast & Clow; 2008,Wagner et al. 2015,2
+DOC,Mast & Clow; 2008,Writer et al. 2014,3
+DOC,Murphy et al. 2018,Burd et al 2018,1
+DOC,Murphy et al. 2018,Crandall et al. 2021,2
+DOC,Murphy et al. 2018,Hickenbottom et al. 2023,3
+DOC,Murphy et al. 2018,Mast & Clow; 2008,4
+DOC,Murphy et al. 2018,Rhea et al. 2021,5
+DOC,Murphy et al. 2018,Uzun et al. 2020,1
+DOC,Murphy et al. 2018,Wagner et al. 2015,2
+DOC,Murphy et al. 2018,Writer et al. 2014,3
+DOC,Rhea et al. 2021,Burd et al 2018,1
+DOC,Rhea et al. 2021,Crandall et al. 2021,2
+DOC,Rhea et al. 2021,Hickenbottom et al. 2023,3
+DOC,Rhea et al. 2021,Mast & Clow; 2008,4
+DOC,Rhea et al. 2021,Murphy et al. 2018,5
+DOC,Rhea et al. 2021,Uzun et al. 2020,1
+DOC,Rhea et al. 2021,Wagner et al. 2015,2
+DOC,Rhea et al. 2021,Writer et al. 2014,3
+DOC,Uzun et al. 2020,Burd et al 2018,1
+DOC,Uzun et al. 2020,Crandall et al. 2021,2
+DOC,Uzun et al. 2020,Hickenbottom et al. 2023,3
+DOC,Uzun et al. 2020,Mast & Clow; 2008,4
+DOC,Uzun et al. 2020,Murphy et al. 2018,5
+DOC,Uzun et al. 2020,Rhea et al. 2021,1
+DOC,Uzun et al. 2020,Wagner et al. 2015,2
+DOC,Uzun et al. 2020,Writer et al. 2014,3
+DOC,Wagner et al. 2015,Burd et al 2018,1
+DOC,Wagner et al. 2015,Crandall et al. 2021,2
+DOC,Wagner et al. 2015,Hickenbottom et al. 2023,3
+DOC,Wagner et al. 2015,Mast & Clow; 2008,4
+DOC,Wagner et al. 2015,Murphy et al. 2018,5
+DOC,Wagner et al. 2015,Rhea et al. 2021,1
+DOC,Wagner et al. 2015,Uzun et al. 2020,2
+DOC,Wagner et al. 2015,Writer et al. 2014,3
+DOC,Writer et al. 2014,Burd et al 2018,1
+DOC,Writer et al. 2014,Crandall et al. 2021,2
+DOC,Writer et al. 2014,Hickenbottom et al. 2023,3
+DOC,Writer et al. 2014,Mast & Clow; 2008,4
+DOC,Writer et al. 2014,Murphy et al. 2018,5
+DOC,Writer et al. 2014,Rhea et al. 2021,1
+DOC,Writer et al. 2014,Uzun et al. 2020,2
+DOC,Writer et al. 2014,Wagner et al. 2015,3
+NO3,Coombs & Melack; 2013,Crandall et al. 2021,1
+NO3,Coombs & Melack; 2013,Gerla & Galloway; 1998,2
+NO3,Coombs & Melack; 2013,Gluns & Toews; 1989,3
+NO3,Coombs & Melack; 2013,Hauer & Spencer 1998,4
+NO3,Coombs & Melack; 2013,Hickenbottom et al. 2023,5
+NO3,Coombs & Melack; 2013,Mast & Clow; 2008,1
+NO3,Coombs & Melack; 2013,Murphy et al. 2018,2
+NO3,Coombs & Melack; 2013,Neary & Currier; 1982,3
+NO3,Coombs & Melack; 2013,Oliver et al. 2012,4
+NO3,Coombs & Melack; 2013,Rhea et al. 2021,5
+NO3,Coombs & Melack; 2013,Tiedemann; 1973,1
+NO3,Coombs & Melack; 2013,Uzun et al. 2020,2
+NO3,Coombs & Melack; 2013,Writer et al. 2014,3
+NO3,Crandall et al. 2021,Coombs & Melack; 2013,1
+NO3,Crandall et al. 2021,Gerla & Galloway; 1998,2
+NO3,Crandall et al. 2021,Gluns & Toews; 1989,3
+NO3,Crandall et al. 2021,Hauer & Spencer 1998,4
+NO3,Crandall et al. 2021,Hickenbottom et al. 2023,5
+NO3,Crandall et al. 2021,Mast & Clow; 2008,1
+NO3,Crandall et al. 2021,Murphy et al. 2018,2
+NO3,Crandall et al. 2021,Neary & Currier; 1982,3
+NO3,Crandall et al. 2021,Oliver et al. 2012,4
+NO3,Crandall et al. 2021,Rhea et al. 2021,5
+NO3,Crandall et al. 2021,Tiedemann; 1973,1
+NO3,Crandall et al. 2021,Uzun et al. 2020,2
+NO3,Crandall et al. 2021,Writer et al. 2014,3
+NO3,Gerla & Galloway; 1998,Coombs & Melack; 2013,1
+NO3,Gerla & Galloway; 1998,Crandall et al. 2021,2
+NO3,Gerla & Galloway; 1998,Gluns & Toews; 1989,3
+NO3,Gerla & Galloway; 1998,Hauer & Spencer 1998,4
+NO3,Gerla & Galloway; 1998,Hickenbottom et al. 2023,5
+NO3,Gerla & Galloway; 1998,Mast & Clow; 2008,1
+NO3,Gerla & Galloway; 1998,Murphy et al. 2018,2
+NO3,Gerla & Galloway; 1998,Neary & Currier; 1982,3
+NO3,Gerla & Galloway; 1998,Oliver et al. 2012,4
+NO3,Gerla & Galloway; 1998,Rhea et al. 2021,5
+NO3,Gerla & Galloway; 1998,Tiedemann; 1973,1
+NO3,Gerla & Galloway; 1998,Uzun et al. 2020,2
+NO3,Gerla & Galloway; 1998,Writer et al. 2014,3
+NO3,Gluns & Toews; 1989,Coombs & Melack; 2013,1
+NO3,Gluns & Toews; 1989,Crandall et al. 2021,2
+NO3,Gluns & Toews; 1989,Gerla & Galloway; 1998,3
+NO3,Gluns & Toews; 1989,Hauer & Spencer 1998,4
+NO3,Gluns & Toews; 1989,Hickenbottom et al. 2023,5
+NO3,Gluns & Toews; 1989,Mast & Clow; 2008,1
+NO3,Gluns & Toews; 1989,Murphy et al. 2018,2
+NO3,Gluns & Toews; 1989,Neary & Currier; 1982,3
+NO3,Gluns & Toews; 1989,Oliver et al. 2012,4
+NO3,Gluns & Toews; 1989,Rhea et al. 2021,5
+NO3,Gluns & Toews; 1989,Tiedemann; 1973,1
+NO3,Gluns & Toews; 1989,Uzun et al. 2020,2
+NO3,Gluns & Toews; 1989,Writer et al. 2014,3
+NO3,Hauer & Spencer 1998,Coombs & Melack; 2013,1
+NO3,Hauer & Spencer 1998,Crandall et al. 2021,2
+NO3,Hauer & Spencer 1998,Gerla & Galloway; 1998,3
+NO3,Hauer & Spencer 1998,Gluns & Toews; 1989,4
+NO3,Hauer & Spencer 1998,Hickenbottom et al. 2023,5
+NO3,Hauer & Spencer 1998,Mast & Clow; 2008,1
+NO3,Hauer & Spencer 1998,Murphy et al. 2018,2
+NO3,Hauer & Spencer 1998,Neary & Currier; 1982,3
+NO3,Hauer & Spencer 1998,Oliver et al. 2012,4
+NO3,Hauer & Spencer 1998,Rhea et al. 2021,5
+NO3,Hauer & Spencer 1998,Tiedemann; 1973,1
+NO3,Hauer & Spencer 1998,Uzun et al. 2020,2
+NO3,Hauer & Spencer 1998,Writer et al. 2014,3
+NO3,Hickenbottom et al. 2023,Coombs & Melack; 2013,1
+NO3,Hickenbottom et al. 2023,Crandall et al. 2021,2
+NO3,Hickenbottom et al. 2023,Gerla & Galloway; 1998,3
+NO3,Hickenbottom et al. 2023,Gluns & Toews; 1989,4
+NO3,Hickenbottom et al. 2023,Hauer & Spencer 1998,5
+NO3,Hickenbottom et al. 2023,Mast & Clow; 2008,1
+NO3,Hickenbottom et al. 2023,Murphy et al. 2018,2
+NO3,Hickenbottom et al. 2023,Neary & Currier; 1982,3
+NO3,Hickenbottom et al. 2023,Oliver et al. 2012,4
+NO3,Hickenbottom et al. 2023,Rhea et al. 2021,5
+NO3,Hickenbottom et al. 2023,Tiedemann; 1973,1
+NO3,Hickenbottom et al. 2023,Uzun et al. 2020,2
+NO3,Hickenbottom et al. 2023,Writer et al. 2014,3
+NO3,Mast & Clow; 2008,Coombs & Melack; 2013,1
+NO3,Mast & Clow; 2008,Crandall et al. 2021,2
+NO3,Mast & Clow; 2008,Gerla & Galloway; 1998,3
+NO3,Mast & Clow; 2008,Gluns & Toews; 1989,4
+NO3,Mast & Clow; 2008,Hauer & Spencer 1998,5
+NO3,Mast & Clow; 2008,Hickenbottom et al. 2023,1
+NO3,Mast & Clow; 2008,Murphy et al. 2018,2
+NO3,Mast & Clow; 2008,Neary & Currier; 1982,3
+NO3,Mast & Clow; 2008,Oliver et al. 2012,4
+NO3,Mast & Clow; 2008,Rhea et al. 2021,5
+NO3,Mast & Clow; 2008,Tiedemann; 1973,1
+NO3,Mast & Clow; 2008,Uzun et al. 2020,2
+NO3,Mast & Clow; 2008,Writer et al. 2014,3
+NO3,Murphy et al. 2018,Coombs & Melack; 2013,1
+NO3,Murphy et al. 2018,Crandall et al. 2021,2
+NO3,Murphy et al. 2018,Gerla & Galloway; 1998,3
+NO3,Murphy et al. 2018,Gluns & Toews; 1989,4
+NO3,Murphy et al. 2018,Hauer & Spencer 1998,5
+NO3,Murphy et al. 2018,Hickenbottom et al. 2023,1
+NO3,Murphy et al. 2018,Mast & Clow; 2008,2
+NO3,Murphy et al. 2018,Neary & Currier; 1982,3
+NO3,Murphy et al. 2018,Oliver et al. 2012,4
+NO3,Murphy et al. 2018,Rhea et al. 2021,5
+NO3,Murphy et al. 2018,Tiedemann; 1973,1
+NO3,Murphy et al. 2018,Uzun et al. 2020,2
+NO3,Murphy et al. 2018,Writer et al. 2014,3
+NO3,Neary & Currier; 1982,Coombs & Melack; 2013,1
+NO3,Neary & Currier; 1982,Crandall et al. 2021,2
+NO3,Neary & Currier; 1982,Gerla & Galloway; 1998,3
+NO3,Neary & Currier; 1982,Gluns & Toews; 1989,4
+NO3,Neary & Currier; 1982,Hauer & Spencer 1998,5
+NO3,Neary & Currier; 1982,Hickenbottom et al. 2023,1
+NO3,Neary & Currier; 1982,Mast & Clow; 2008,2
+NO3,Neary & Currier; 1982,Murphy et al. 2018,3
+NO3,Neary & Currier; 1982,Oliver et al. 2012,4
+NO3,Neary & Currier; 1982,Rhea et al. 2021,5
+NO3,Neary & Currier; 1982,Tiedemann; 1973,1
+NO3,Neary & Currier; 1982,Uzun et al. 2020,2
+NO3,Neary & Currier; 1982,Writer et al. 2014,3
+NO3,Oliver et al. 2012,Coombs & Melack; 2013,1
+NO3,Oliver et al. 2012,Crandall et al. 2021,2
+NO3,Oliver et al. 2012,Gerla & Galloway; 1998,3
+NO3,Oliver et al. 2012,Gluns & Toews; 1989,4
+NO3,Oliver et al. 2012,Hauer & Spencer 1998,5
+NO3,Oliver et al. 2012,Hickenbottom et al. 2023,1
+NO3,Oliver et al. 2012,Mast & Clow; 2008,2
+NO3,Oliver et al. 2012,Murphy et al. 2018,3
+NO3,Oliver et al. 2012,Neary & Currier; 1982,4
+NO3,Oliver et al. 2012,Rhea et al. 2021,5
+NO3,Oliver et al. 2012,Tiedemann; 1973,1
+NO3,Oliver et al. 2012,Uzun et al. 2020,2
+NO3,Oliver et al. 2012,Writer et al. 2014,3
+NO3,Rhea et al. 2021,Coombs & Melack; 2013,1
+NO3,Rhea et al. 2021,Crandall et al. 2021,2
+NO3,Rhea et al. 2021,Gerla & Galloway; 1998,3
+NO3,Rhea et al. 2021,Gluns & Toews; 1989,4
+NO3,Rhea et al. 2021,Hauer & Spencer 1998,5
+NO3,Rhea et al. 2021,Hickenbottom et al. 2023,1
+NO3,Rhea et al. 2021,Mast & Clow; 2008,2
+NO3,Rhea et al. 2021,Murphy et al. 2018,3
+NO3,Rhea et al. 2021,Neary & Currier; 1982,4
+NO3,Rhea et al. 2021,Oliver et al. 2012,5
+NO3,Rhea et al. 2021,Tiedemann; 1973,1
+NO3,Rhea et al. 2021,Uzun et al. 2020,2
+NO3,Rhea et al. 2021,Writer et al. 2014,3
+NO3,Tiedemann; 1973,Coombs & Melack; 2013,1
+NO3,Tiedemann; 1973,Crandall et al. 2021,2
+NO3,Tiedemann; 1973,Gerla & Galloway; 1998,3
+NO3,Tiedemann; 1973,Gluns & Toews; 1989,4
+NO3,Tiedemann; 1973,Hauer & Spencer 1998,5
+NO3,Tiedemann; 1973,Hickenbottom et al. 2023,1
+NO3,Tiedemann; 1973,Mast & Clow; 2008,2
+NO3,Tiedemann; 1973,Murphy et al. 2018,3
+NO3,Tiedemann; 1973,Neary & Currier; 1982,4
+NO3,Tiedemann; 1973,Oliver et al. 2012,5
+NO3,Tiedemann; 1973,Rhea et al. 2021,1
+NO3,Tiedemann; 1973,Uzun et al. 2020,2
+NO3,Tiedemann; 1973,Writer et al. 2014,3
+NO3,Uzun et al. 2020,Coombs & Melack; 2013,1
+NO3,Uzun et al. 2020,Crandall et al. 2021,2
+NO3,Uzun et al. 2020,Gerla & Galloway; 1998,3
+NO3,Uzun et al. 2020,Gluns & Toews; 1989,4
+NO3,Uzun et al. 2020,Hauer & Spencer 1998,5
+NO3,Uzun et al. 2020,Hickenbottom et al. 2023,1
+NO3,Uzun et al. 2020,Mast & Clow; 2008,2
+NO3,Uzun et al. 2020,Murphy et al. 2018,3
+NO3,Uzun et al. 2020,Neary & Currier; 1982,4
+NO3,Uzun et al. 2020,Oliver et al. 2012,5
+NO3,Uzun et al. 2020,Rhea et al. 2021,1
+NO3,Uzun et al. 2020,Tiedemann; 1973,2
+NO3,Uzun et al. 2020,Writer et al. 2014,3
+NO3,Writer et al. 2014,Coombs & Melack; 2013,1
+NO3,Writer et al. 2014,Crandall et al. 2021,2
+NO3,Writer et al. 2014,Gerla & Galloway; 1998,3
+NO3,Writer et al. 2014,Gluns & Toews; 1989,4
+NO3,Writer et al. 2014,Hauer & Spencer 1998,5
+NO3,Writer et al. 2014,Hickenbottom et al. 2023,1
+NO3,Writer et al. 2014,Mast & Clow; 2008,2
+NO3,Writer et al. 2014,Murphy et al. 2018,3
+NO3,Writer et al. 2014,Neary & Currier; 1982,4
+NO3,Writer et al. 2014,Oliver et al. 2012,5
+NO3,Writer et al. 2014,Rhea et al. 2021,1
+NO3,Writer et al. 2014,Tiedemann; 1973,2
+NO3,Writer et al. 2014,Uzun et al. 2020,3
