@@ -1,0 +1,15 @@
+response_var,scenario,predictor,completed_iterations,selection_frequency,median_coefficient,coefficient_q025,coefficient_q975,positive_frequency,negative_frequency,stability_class
+DOC,lasso_family_balanced,Area_watershed_km,100,0.35,0,-0.00558755115406982,0.11880181191178468,0.32,0.03,weak
+DOC,lasso_family_balanced,burn_percent_fire_year,100,0.14,0,-0.01089083433215186,0.12945744945381243,0.09,0.05,weak
+DOC,lasso_family_balanced,burn_sev_high,100,0.06,0,-0.04100716715162646,0.00746343922204565,0.03,0.03,weak
+DOC,lasso_family_balanced,forest_cover,100,0.23,0,-0.06421363645675689,0.04858467207396959,0.11,0.12,weak
+DOC,lasso_family_balanced,omws,100,0.94,0.14099389839821305,0,0.2673234492266573,0.94,0,stable
+DOC,lasso_family_balanced,post_fire_year,100,0.22,0,-0.1039089621772004,0.04448773725873564,0.05,0.17,weak
+DOC,lasso_family_balanced,runoffws,100,0.53,0.00354902363622661,0,0.1138534502184374,0.51,0.02,conditional
+NO3,lasso_family_balanced,Area_watershed_km,100,0.05,0,-0.05388869565906516,0,0.01,0.04,weak
+NO3,lasso_family_balanced,burn_percent_fire_year,100,0.04,0,0,0.05738517554290982,0.04,0,weak
+NO3,lasso_family_balanced,burn_sev_high,100,0.03,0,0,0,0.02,0.01,weak
+NO3,lasso_family_balanced,forest_cover,100,0.03,0,0,0,0.01,0.02,weak
+NO3,lasso_family_balanced,omws,100,0.09,0,-0.28328773707659316,0,0,0.09,weak
+NO3,lasso_family_balanced,post_fire_year,100,0.07,0,0,0.20779475645956996,0.07,0,weak
+NO3,lasso_family_balanced,runoffws,100,0.06,0,-0.11094205666919116,0,0,0.06,weak
