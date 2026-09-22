@@ -22,11 +22,11 @@ library(openxlsx)
 
 # Use "create" to build or refresh the review workbook.
 # After review, change this to "import" to validate and export the decisions.
-review_action <- "create"
+review_action <- "import"
 
 # TRUE allows an in-progress review to be exported with validation warnings.
 # Change to FALSE before producing the final reviewed decisions table.
-allow_partial_import <- TRUE
+allow_partial_import <- FALSE
 
 # ---- 2. Paths ---------------------------------------------------------------
 
@@ -600,9 +600,21 @@ if (review_action == "import") {
           Reviewer,
           Decision_Notes
         ),
-        ~ na_if(str_trim(as.character(.x)), "")
+        ~ na_if(str_trim(str_replace_all(
+          str_replace_all(as.character(.x), "\r\n?", "\n"),
+          "[\t ]+\n", "\n"
+        )), "")
       )
     )
+
+  # Require the complete original inventory and unchanged pair identifiers.
+  pair_keys <- c("candidate_pair_id", "Study_ID", "Comparison_ID", "Pair_Burn", "Pair_Unburn")
+  if (anyDuplicated(reviewed_table$candidate_pair_id) ||
+      anyNA(reviewed_table$candidate_pair_id) ||
+      nrow(anti_join(pairing_decisions, reviewed_table, by = pair_keys)) > 0 ||
+      nrow(anti_join(reviewed_table, pairing_decisions, by = pair_keys)) > 0) {
+    stop("Workbook pair inventory differs from the original candidates; reconcile IDs before import.")
+  }
 
   validation_results <- reviewed_table %>%
     transmute(
@@ -692,4 +704,3 @@ if (review_action == "import") {
     validation_path
   )
 }
-

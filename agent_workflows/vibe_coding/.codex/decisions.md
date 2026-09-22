@@ -1,6 +1,22 @@
 # Project decisions
 
+## September 22 — Corrected full run completed
+
+The full corrected workflow ran with 1000 bootstrap iterations per analyte/scenario. This supersedes earlier notes stating models and figures are stale. Current outputs use corrected chemistry and reviewed named-site selections. Execution is complete, but current variance, predictor, temporal, and bootstrap-method assumptions remain provisional; see output/reports/corrected_run_2026-09-22.md. No scientific defaults were changed during this run.
+
+## September 22 — Named sites and corrected effects are active
+
+Author confirmed exclusion of Fish Creek, Lower MacDonald Creek, and Upper MacDonald Creek from paired analysis: other references are fire-impacted and other burned sites involve multiple fires and/or large-lake influence. Keep source records for provenance; retain Coal–Pinchot. Enforce Rhea U1 and Crandall Hobble Creek Lower/Mill Race at physical-site level. Script 01c generates an evidence-bearing site configuration and corrected annual effects; script 02 now reads those derived inputs. This supersedes use of the established annual source for active model-table responses. Existing annual variance and timing methods remain provisional; models and figures have not been refitted.
+
 This file records current architectural and analytical decisions for the `agent_workflows/vibe_coding/` workflow. Items marked **provisional** require author review before the final analysis.
+
+## September 18, 2026 — Reviewed pairing decisions promoted
+
+- The Excel workbook is authoritative for pair inclusion, fire identifiers, pairing types, and review evidence. Its 28 approved/included and 8 excluded rows passed strict import. This supersedes the provisional pairing-adoption entries below.
+- `01b_promote_reviewed_pairings_agent_v1.R` refreshes the strict import and analysis configuration. Both runners use it instead of the provisional generator.
+- Analysis status maps workbook `approved` to `confirmed`, and retains `excluded` rows for provenance. Shared-control IDs are preserved; family counts are recalculated among included pairs, with original counts retained separately.
+- Pair confirmation does not finalize effect-size construction, timing, predictor choices, or inference. Scripts 02–03 produced 106 annual rows; stop at the pre-model audit checkpoint to resolve these scientific choices.
+- Existing August 20 models, figures, and model-result tables remain provisional and are stale relative to the reviewed configuration. No model rerun occurred in this session.
 
 ## Workflow organization
 

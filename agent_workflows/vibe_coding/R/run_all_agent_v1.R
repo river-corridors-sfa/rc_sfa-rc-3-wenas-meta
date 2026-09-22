@@ -1,13 +1,13 @@
 # ==============================================================================
 # Script: run_all_agent_v1.R
-# Purpose: Run the provisional agent analysis workflow from pair adoption through
+# Purpose: Run the agent analysis workflow from strict workbook import through
 #          manuscript-facing outputs, with a Markdown run report.
 # ==============================================================================
 
 library(here)
 
 required_packages <- c(
-  "tidyverse", "here", "lubridate", "metafor", "glmnet", "forcats"
+  "tidyverse", "here", "lubridate", "metafor", "glmnet", "forcats", "openxlsx"
 )
 missing_packages <- required_packages[
   !vapply(required_packages, requireNamespace, logical(1), quietly = TRUE)
@@ -433,7 +433,7 @@ append_results_diagnostics <- function() {
 append_script_diagnostics <- function(script_name) {
   switch(
     script_name,
-    "01a_create_provisional_pairings_agent_v1.R" = append_pairing_diagnostics(),
+  "01b_promote_reviewed_pairings_agent_v1.R" = append_pairing_diagnostics(),
     "02_prepare_analysis_data_agent_v1.R" = append_model_table_diagnostics(),
     "03_audit_pairs_and_predictors_agent_v1.R" = append_audit_diagnostics(),
     "04_fit_meta_analysis_agent_v1.R" = append_meta_diagnostics(),
@@ -514,7 +514,8 @@ run_script_with_report <- function(script_name) {
 }
 
 scripts <- c(
-  "01a_create_provisional_pairings_agent_v1.R",
+  "01_read_and_gapfill_preserve_observations_agent_v1.R",
+  "01c_apply_reviewed_sites_agent_v1.R",
   "02_prepare_analysis_data_agent_v1.R",
   "03_audit_pairs_and_predictors_agent_v1.R",
   "04_fit_meta_analysis_agent_v1.R",

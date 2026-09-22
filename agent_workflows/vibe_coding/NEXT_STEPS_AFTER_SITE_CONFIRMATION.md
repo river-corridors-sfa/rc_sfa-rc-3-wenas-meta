@@ -1,8 +1,25 @@
 # Next steps after site and watershed-pair confirmation
 
+Latest status: full corrected workflow completed September 22 with 1000 bootstrap
+iterations per analyte/scenario and no logged model failures. Tables, models, and
+figures are current. See `output/reports/corrected_run_2026-09-22.md` for results
+and remaining scientific/methodological review. Older status notes below are historical.
+
+September 22 update: named-site filtering and corrected annual effects are implemented.
+Run correction script `01_read_and_gapfill_preserve_observations_agent_v1.R`, then
+`01c_apply_reviewed_sites_agent_v1.R`, then scripts 02–03 before the model-review checkpoint.
+Both full runners use this sequence. See `output/reports/github_issue_apply_reviewed_site_pairings.md`
+for current outputs and validation. The September 18 counts below are historical.
+
 This guide describes the analysis sequence to follow after a co-author confirms the burned and reference sites, watershed pairings, fire assignments, and inclusion decisions in the review workbook.
 
 Confirmation moves the workflow from **provisional development** to **final analysis preparation**. Historical lnRR pairs should no longer be treated as automatically included.
+
+As of September 18, 2026, strict import, promotion, and scripts 02–03 have completed.
+There are 28 included and 8 excluded pairs, zero review-validation issues, and 106
+annual rows. See `output/reports/reviewed_preparation_2026-09-18.md` for the audit
+checkpoint and remaining modeling decisions. Existing model outputs still belong
+to the August 20 provisional run.
 
 ## 1. Complete the strict pairing-review import
 
@@ -17,14 +34,16 @@ Do not proceed until every candidate pair has a final status and the validation 
 
 ## 2. Promote confirmed decisions into the analysis configuration
 
-The current modeling scripts read `config/pairing_decisions_analysis.csv`. Replace its provisional fields with confirmed values from `config/pairing_decisions_reviewed.csv`:
+Run `R/01b_promote_reviewed_pairings_agent_v1.R`. It performs a fresh strict workbook
+import and writes `config/pairing_decisions_analysis.csv`, retaining excluded rows
+and recalculating reference-family counts among included pairs. The field mapping is:
 
 | Confirmed review field | Analysis field |
 |---|---|
 | `Fire_ID_Final` | `Fire_ID_Analysis` |
 | `Pairing_Type_Final` | `Pairing_Type_Analysis` |
 | `Include` | `Include_Analysis` |
-| `Decision_Status` | `Analysis_Decision_Status` |
+| `Decision_Status` | `confirmed` for approved rows; `excluded` for excluded rows |
 | confirmed evidence and notes | analysis evidence and notes |
 | shared-control identifier | `shared_control_id` |
 | co-author confirmation | `Coauthor_Confirmation = "confirmed"` |
@@ -35,7 +54,9 @@ Preserve excluded rows in the configuration for provenance, with `Include_Analys
 
 Do **not** rerun `R/01a_create_provisional_pairings_agent_v1.R` after confirmed decisions are promoted. It rebuilds the provisional table with all 36 historical pairs and `Coauthor_Confirmation = "pending"`.
 
-The current `R/run_all_agent_v1.R` includes script 01a. Until that runner is revised to omit the provisional generator, run scripts 02–07 individually.
+Both runners now use script 01b instead of 01a. Script 01a refuses to run when a
+reviewed export exists. Run scripts 02–03 first and review the audits before
+running models 04–07; the full runners do not pause for that scientific review.
 
 ## 3. Build the confirmed annual model table
 

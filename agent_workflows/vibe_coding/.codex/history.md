@@ -1,5 +1,64 @@
 # Project history
 
+## 2026-09-22 — Executed corrected full analysis
+
+Task: Run next steps including agent gap-filling fix. Installed missing metafor/glmnet packages, ran the full runner with N_BOOTSTRAP=1000, and passed reviewed-site regression checks. Regenerated corrected daily/annual data, model table, audits, models, tables, figures, and run report/log; added corrected_run_2026-09-22.md. All eight meta specifications and grouped prediction completed; each of six bootstrap scenarios completed 1000 iterations; failure logs are empty. Dataset: 37 DOC / 73 nitrate rows, 35 / 69 usable variances. Decisions: retain current scientific settings, label results conditional on remaining variance, timing, predictor and bootstrap-method review. Models are no longer stale. No commits or external publication.
+
+## 2026-09-22 — Implemented reviewed named-site rebuild
+
+Task: Implement site selection and explicitly exclude the three Mast & Clow sites after author paper review. Files: new 01c and regression-check scripts, generated site configuration and corrected effects/audits, script 02 and both runners, issue draft and workflow guide. Decisions: retain Coal–Pinchot only; record collective fire/lake-confounding rationale; apply Rhea U1 and Crandall Hobble Creek Lower/Mill Race restrictions. Preserve Uzun seasonal labels with unique pair/date/analyte checks. Validation passed for 28 included pairs, all exclusions, corrected Writer n=2, and observation counts. Model table now has 37 DOC / 73 NO3 rows with 35 / 69 usable variances. Four new Murphy 2010 singletons explain increased row counts. Model fits remain stale; temporal variance, predictor decisions and final inference remain open.
+
+## 2026-09-22 — Drafted issue for reviewed named-site selections
+
+- Task: Document dataset revisions from pairing workbook decisions, including the three Mast & Clow sites.
+- Files changed: `output/reports/github_issue_apply_reviewed_site_pairings.md` and this history file.
+- Decisions: Separate named-site filtering from interpolation correction. Document Rhea/Crandall reference restrictions, the three Mast & Clow sites outside the selected Coal–Pinchot comparison, and the eight explicit workbook exclusions. Distinguish Mast & Clow note-based scope from individually excluded workbook rows.
+- Status: Ready-to-post local issue draft; GitHub publication remains unavailable with the current tool/authentication setup. No dataset changes made.
+
+## 2026-09-22 — Created observation-preserving correction script
+
+- Task: Make a runnable upstream correction and name it in the GitHub issue draft.
+- Files changed: New `R/01_read_and_gapfill_preserve_observations_agent_v1.R`, isolated outputs under `data/derived/gapfill_corrected_agent_v1/`, execution log, GitHub issue draft, and this history file.
+- Decisions: Adapt original workflow without changing human scripts; preserve unit conversions, study exclusion, and comparison mapping. Use analyte-specific observed endpoints at most 40 elapsed days apart, preserve observations, and export observation flags. Do not promote corrected output into active analysis yet.
+- Verification: Full script executed; checks passed for 40/41-day boundaries, long gaps, zeros, singleton/all-missing input, and restored Writer February observations. Runtime assertion preserves every nonmissing harmonized observation during interpolation.
+- Unresolved issues: Three Mast & Clow post-fire site identifiers do not link under inherited comparison mapping; annual effects and downstream models still need a reviewed rebuild and broader impact audit.
+
+## 2026-09-18 — Traced Writer missing variances to source data
+
+- Task: Determine whether three nitrate singleton variances reflect sparse data or errors.
+- Files changed: New diagnostic Python script under `R/`, two Writer audit CSVs, expanded preparation report, and this history entry.
+- Findings: PNF and PSF 2012 each have only one positive same-date observed source pair (November 5). PNF 2013 has two source pairs, but the upstream >40-day gap mask removes both February 4 measured endpoints. Preserving observations diagnostically restores n=2, mean lnRR=1.548877, variance=0.372841. PSF 2013 is also affected despite having a usable variance.
+- Verification: Reproduced all current Writer nitrate annual counts, means, and available variance from the daily snapshot; checked original date gaps (91 and 56 days) against the mask implementation.
+- Decisions: No source snapshots, human scripts, or model inputs modified. Findings apply to repository-extracted data; the original publication was not independently audited.
+- Next steps: Create an agent-versioned correction preserving observations, audit all studies/analytes for the same endpoint loss, and rebuild effects after resolving temporal aggregation/variance choices.
+
+## 2026-09-18 — Expanded usable-variance documentation
+
+- Task: Add detail about usable variance to the reviewed preparation report.
+- Files changed: `output/reports/reviewed_preparation_2026-09-18.md` and this history file.
+- Findings: All three missing nitrate variances are Writer singleton summaries (`lnRR_n = 1`). Meta-analysis eligibility is 35 DOC rows / 16 pairs and 68 nitrate rows / 27 pairs; Writer still contributes through nitrate Site_2 in 2013. Prediction retains finite responses with training-fold precision fallback, whereas bootstrap stability uses family/equal weights without inverse variance.
+- Decisions made: Document numerical usability separately from scientific adequacy; no analysis, variance values, or inclusion decisions changed.
+- Verification: Checked the source variance formula, scripts 04–06, and the current derived CSV.
+- Next steps: Trace singleton source coverage and resolve variance, dependence, and weighting choices before final models.
+
+## 2026-09-18 — Strict workbook import and reviewed-data preparation
+
+- Task: Proceed from updated Excel decisions through import, promotion, and preparation/audits.
+- Files changed: Importer defaults and inventory validation; new `R/01b_promote_reviewed_pairings_agent_v1.R`; both runners and the provisional-generator guard; reviewed and analysis pairing CSVs; derived model table, predictor dictionary, audit tables; post-confirmation guide, decisions, this history, and dated preparation report/log/session info. The user-edited workbook was read without modification.
+- Decisions made: Use workbook inclusion and fire assignments as authoritative; retain all 36 candidates for provenance (28 included, 8 excluded); map approval to confirmed analysis status; preserve shared-control IDs and recalculate counts among retained pairs. Stop at the scientific audit checkpoint before fitting models.
+- Verification: Installed missing openxlsx dependency; strict import passed with zero issues; scripts 02–03 completed. All 28 included pairs are represented, excluded pairs are absent, 106 rows have confirmed status, pair/analyte/year keys are unique, burned-site joins are nonmissing, and annual lnRR matches the source exactly. All R scripts parse; the provisional generator refuses to overwrite reviewed decisions.
+- Unresolved issues: Three Writer nitrate variances are missing; burned area and high-severity burn correlate at rho 0.932; variance/dependence, upstream aggregation/fire predictors, time definition, predictor choices, and DOC inference scope require review. Existing models and figures still reflect August 20 provisional data.
+- Next steps: Review the dated preparation report and finalize scientific choices, then run scripts 04–07, investigate the prior NO3 time-model convergence failure, and use 1000 bootstrap iterations for final stability estimates.
+
+## 2026-09-18 — Current workflow assessment
+
+- Task: Assess progress using the current review workbook, scripts, configurations, and saved outputs; no analysis was rerun.
+- Files changed: This history file only.
+- Findings: The August 20 provisional run produced models, audits, and figures with 100 bootstrap iterations. Workbook commits through September 15 now record 28 included and 8 excluded candidate pairs, with fire IDs, pairing types, evidence, and reviewers populated. All 36 statuses remain `approved`, so the eight `Include = FALSE` rows conflict with the strict importer. No reviewed export or review-validation output is present; the analysis configuration still includes all 36 pairs with confirmation pending.
+- Decisions made: Treat current results as provisional and older than the workbook decisions. Assessment did not alter reviewer decisions or generated analysis outputs.
+- Unresolved issues: Reconcile excluded-row statuses; validate and promote reviewed decisions; remove provisional regeneration from both runners before a confirmed run; resolve variance, dependence, timing, and predictor choices. Saved meta-model failures include NO3 time-model nonconvergence.
+- Next steps: Complete strict import and promotion, rebuild and audit scripts 02–03, finalize scientific choices, then rerun models and final stability analysis with 1000 iterations.
+
 ## 2026-08-20 — Repository and analysis assessment
 
 - Task: Assess the current repository against the proposed LASSO-centered manuscript.

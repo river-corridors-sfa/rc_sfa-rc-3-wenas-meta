@@ -26,6 +26,10 @@ analysis_path <- file.path(
 
 # ---- 2. Read the established lnRR pair inventory ---------------------------
 
+if (file.exists(file.path(workflow_dir, "config", "pairing_decisions_reviewed.csv"))) {
+  stop("Reviewed decisions exist. Use 01b_promote_reviewed_pairings_agent_v1.R; provisional regeneration is disabled.")
+}
+
 candidate_pairs <- read_csv(
   candidate_path,
   show_col_types = FALSE,
@@ -92,4 +96,3 @@ message(
   " provisional analysis pairings to: ",
   analysis_path
 )
-

@@ -1,47 +1,52 @@
 # Agent Workflow Run Report
 
-- Generated: 2026-08-20 16:37:38 PDT
-- Repository: /Users/myer056/GitHub/rc_sfa-rc-3-wenas-meta
-- Workflow directory: /Users/myer056/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding
-- N_BOOTSTRAP: 100
+- Generated: 2026-09-22 12:57:59 PDT
+- Repository: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta
+- Workflow directory: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding
+- N_BOOTSTRAP: 1000
 
 This report captures console messages, printed output, warnings, and compact diagnostics after each workflow step.
 
 ## Package Versions
 
 ```
-# A tibble: 6 × 2
+# A tibble: 7 × 2
   package   version
   <chr>     <chr>  
 1 tidyverse 2.0.0  
-2 here      1.0.1  
-3 lubridate 1.9.4  
-4 metafor   4.8.0  
-5 glmnet    4.1.10 
-6 forcats   1.0.0  
+2 here      1.0.2  
+3 lubridate 1.9.5  
+4 metafor   5.2.1  
+5 glmnet    5.0    
+6 forcats   1.0.1  
+7 openxlsx  4.2.9  
 ```
 
-## 01a_create_provisional_pairings_agent_v1.R
+## 01_read_and_gapfill_preserve_observations_agent_v1.R
 
-- Started: 2026-08-20 16:37:38 PDT
-- Finished: 2026-08-20 16:37:38 PDT
-- Runtime seconds: 0.6
+- Started: 2026-09-22 12:57:59 PDT
+- Finished: 2026-09-22 12:58:01 PDT
+- Runtime seconds: 2.2
 - Status: completed
 
 ### Console Messages
 
 ```
 ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.4     ✔ readr     2.1.5
-✔ forcats   1.0.0     ✔ stringr   1.5.1
-✔ ggplot2   4.0.2     ✔ tibble    3.2.1
-✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-✔ purrr     1.0.4
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
 ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-Wrote 36 provisional analysis pairings to: /Users/myer056/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/config/pairing_decisions_analysis.csv
+Found 17 study files in meta_final/.
+Total rows read: 2178
+Studies present: Burd et al 2018; Coombs & Melack; 2013; Crandall et al. 2021; Gerla & Galloway; 1998; Gluns & Toews; 1989; Hauer & Spencer 1998; Hickenbottom et al. 2023; Mast & Clow; 2008; Murphy et al. 2018; Neary & Currier; 1982; Oliver et al. 2012; Rhea et al. 2021; Tiedemann; 1973; Uzun et al. 2020; Wagner et al. 2015; Writer et al. 2014
+Unit harmonization: all unit strings recognized.
+Corrected daily output: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/data/derived/gapfill_corrected_agent_v1/01_daily_time_series_paired.csv
 ```
 
 ### Printed Output
@@ -53,60 +58,61 @@ Wrote 36 provisional analysis pairings to: /Users/myer056/GitHub/rc_sfa-rc-3-wen
 ### Warnings
 
 ```
-package ‘ggplot2’ was built under R version 4.4.3
-package ‘purrr’ was built under R version 4.4.1
-package ‘lubridate’ was built under R version 4.4.1
+Some Pair values did not link — see 01c_missing_comparison_links.csv
 ```
 
 ### Diagnostics
 
 
-**Generated Files**
+## 01c_apply_reviewed_sites_agent_v1.R
 
-```
-# A tibble: 1 × 4
-  file                                                              status 
-  <chr>                                                             <chr>  
-1 agent_workflows/vibe_coding/config/pairing_decisions_analysis.csv present
-   rows size_kb
-  <int>   <dbl>
-1    36    24.8
-```
-
-**Pairing Summary**
-
-```
-# A tibble: 1 × 5
-   rows candidate_pairs included_pairs pending_confirmation
-  <int>           <int>          <int>                <int>
-1    36              36             36                   36
-  shared_reference_pairs
-                   <int>
-1                     24
-```
-
-**Pairing Type Counts**
-
-```
-# A tibble: 2 × 4
-  Pairing_Type_Analysis       Coauthor_Confirmation shared_reference     n
-  <chr>                       <chr>                 <lgl>            <int>
-1 designated_one_to_one       pending               FALSE               12
-2 designated_shared_reference pending               TRUE                24
-```
-
-## 02_prepare_analysis_data_agent_v1.R
-
-- Started: 2026-08-20 16:37:38 PDT
-- Finished: 2026-08-20 16:37:39 PDT
+- Started: 2026-09-22 12:58:01 PDT
+- Finished: 2026-09-22 12:58:02 PDT
 - Runtime seconds: 0.6
 - Status: completed
 
 ### Console Messages
 
 ```
-Proceeding provisionally; co-author pairing confirmation remains pending.
-Wrote 120 annual effect-size rows to: /Users/myer056/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/data/derived/lasso_model_table.csv
+Imported 36 reviewed rows to: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/config/pairing_decisions_reviewed.csv
+Validation issues: 0. See: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/data/audit/pairing_review_validation.csv
+```
+
+### Printed Output
+
+```
+# A tibble: 2 × 3
+  Analysis_Decision_Status Include_Analysis     n
+  <chr>                    <lgl>            <int>
+1 confirmed                TRUE                28
+2 excluded                 FALSE                8
+# A tibble: 2 × 5
+  response_var  rows pairs studies usable_variances
+  <chr>        <int> <int>   <int>            <int>
+1 DOC             37    16       7               35
+2 NO3             73    28      12               69
+```
+
+### Warnings
+
+```
+(none)
+```
+
+### Diagnostics
+
+
+## 02_prepare_analysis_data_agent_v1.R
+
+- Started: 2026-09-22 12:58:02 PDT
+- Finished: 2026-09-22 12:58:02 PDT
+- Runtime seconds: 0.2
+- Status: completed
+
+### Console Messages
+
+```
+Wrote 110 annual effect-size rows to: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/data/derived/lasso_model_table.csv
 Predictor columns joined: Time since fire, Watershed area (km), Maximum smoothed elevation, Watershed slope, 1981-2010 mean temperature, 1981-2010 precipitation, Forest cover (%), Urban cover (%), Grassland cover (%), Wetland cover (%), Agricultural cover (%), Soil organic matter, Depth to bedrock, Soil clay content, Glacial till (%), Baseflow index, Soil permeability, Mean annual runoff, Burned watershed area (%), High-severity burn (%), Moderate-severity burn (%), Low-severity burn (%)
 ```
 
@@ -136,9 +142,9 @@ Predictor columns joined: Time since fire, Watershed area (km), Maximum smoothed
 3 agent_workflows/vibe_coding/data/audit/approved_pairs_without_effect_sizes.csv
   status   rows size_kb
   <chr>   <int>   <dbl>
-1 present   120    84.5
-2 present    68     1.3
-3 present     0     0.5
+1 present   110    77  
+2 present    52     1  
+3 present     0     0.6
 ```
 
 **Model Table by Analyte**
@@ -147,36 +153,37 @@ Predictor columns joined: Time since fire, Watershed area (km), Maximum smoothed
 # A tibble: 2 × 8
   response_var n_rows n_studies n_comparisons n_pairs finite_lnRR
   <chr>         <int>     <int>         <int>   <int>       <int>
-1 DOC              39         9            20      20          39
-2 NO3              81        14            33      33          81
+1 DOC              37         7            16      16          37
+2 NO3              73        12            28      28          73
   usable_variances pending_pair_rows
              <int>             <int>
-1               39                39
-2               78                81
+1               35                 0
+2               69                 0
 ```
 
 **Variance Status**
 
 ```
-# A tibble: 3 × 3
+# A tibble: 4 × 3
   response_var variance_status            n
   <chr>        <chr>                  <int>
-1 DOC          usable                    39
-2 NO3          missing_or_nonpositive     3
-3 NO3          usable                    78
+1 DOC          missing_or_nonpositive     2
+2 DOC          usable                    35
+3 NO3          missing_or_nonpositive     4
+4 NO3          usable                    69
 ```
 
 ## 03_audit_pairs_and_predictors_agent_v1.R
 
-- Started: 2026-08-20 16:37:39 PDT
-- Finished: 2026-08-20 16:37:39 PDT
+- Started: 2026-09-22 12:58:02 PDT
+- Finished: 2026-09-22 12:58:02 PDT
 - Runtime seconds: 0.1
 - Status: completed
 
 ### Console Messages
 
 ```
-Wrote audit tables to: /Users/myer056/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/data/audit
+Wrote audit tables to: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/data/audit
 Primary predictor rule: pre-specified primary candidate, <=50% missing, and at least 3 unique values.
 Analysis structure by analyte:
 Response-value and variance audit:
@@ -194,21 +201,21 @@ Primary provisional predictors: Burned watershed area (%), High-severity burn (%
 # A tibble: 2 × 8
   response_var n_rows n_studies n_comparisons n_pairs n_shared_control_families
   <chr>         <int>     <int>         <int>   <int>                     <int>
-1 DOC              39         9            20      20                        13
-2 NO3              81        14            33      33                        20
+1 DOC              37         7            16      16                        11
+2 NO3              73        12            28      28                        18
   n_calendar_years n_pending_pair_rows
              <int>               <int>
-1               13                  39
-2               29                  81
+1               14                   0
+2               25                   0
 # A tibble: 2 × 7
   response_var lnRR_min lnRR_median lnRR_max n_finite n_usable_variances
   <chr>           <dbl>       <dbl>    <dbl>    <int>              <int>
-1 DOC            -0.377       0.175     1.18       39                 39
-2 NO3            -4.16        1.11      2.81       81                 78
+1 DOC            -0.339       0.175    0.833       37                 35
+2 NO3            -5.00        1.15     3.15        73                 69
   n_matched_doc_no3
               <int>
-1                36
-2                36
+1                37
+2                37
 # A tibble: 20 × 9
    predictor_label            predictor_group primary_candidate
    <chr>                      <chr>           <lgl>            
@@ -234,26 +241,26 @@ Primary provisional predictors: Burned watershed area (%), High-severity burn (%
 20 Watershed slope            topography      FALSE            
    proportion_missing n_unique passes_missingness passes_variation
                 <dbl>    <int> <lgl>              <lgl>           
- 1            0.15          24 TRUE               TRUE            
- 2            0.15          25 TRUE               TRUE            
- 3            0.00833       27 TRUE               TRUE            
- 4            0.00833       31 TRUE               TRUE            
- 5            0              7 TRUE               TRUE            
- 6            0.00833       30 TRUE               TRUE            
- 7            0             34 TRUE               TRUE            
- 8            0.00833       31 TRUE               TRUE            
- 9            0.00833       31 TRUE               TRUE            
-10            0.00833       30 TRUE               TRUE            
-11            0.00833       14 TRUE               TRUE            
-12            0.00833       31 TRUE               TRUE            
-13            0.00833       30 TRUE               TRUE            
-14            0.00833       12 TRUE               TRUE            
-15            0.00833       30 TRUE               TRUE            
-16            0.00833       29 TRUE               TRUE            
-17            0.00833       23 TRUE               TRUE            
-18            0.00833       30 TRUE               TRUE            
-19            0.183         25 TRUE               TRUE            
-20            0.183         23 TRUE               TRUE            
+ 1              0.109       22 TRUE               TRUE            
+ 2              0.109       23 TRUE               TRUE            
+ 3              0           23 TRUE               TRUE            
+ 4              0           27 TRUE               TRUE            
+ 5              0            7 TRUE               TRUE            
+ 6              0           26 TRUE               TRUE            
+ 7              0           28 TRUE               TRUE            
+ 8              0           27 TRUE               TRUE            
+ 9              0           27 TRUE               TRUE            
+10              0           26 TRUE               TRUE            
+11              0           13 TRUE               TRUE            
+12              0           27 TRUE               TRUE            
+13              0           26 TRUE               TRUE            
+14              0           11 TRUE               TRUE            
+15              0           26 TRUE               TRUE            
+16              0           25 TRUE               TRUE            
+17              0           21 TRUE               TRUE            
+18              0           26 TRUE               TRUE            
+19              0.145       22 TRUE               TRUE            
+20              0.145       20 TRUE               TRUE            
    include_primary decision_status      
    <lgl>           <chr>                
  1 TRUE            provisional_include  
@@ -279,22 +286,22 @@ Primary provisional predictors: Burned watershed area (%), High-severity burn (%
 # A tibble: 7 × 5
   predictor_label           predictor_group transformation proportion_missing
   <chr>                     <chr>           <chr>                       <dbl>
-1 Burned watershed area (%) fire            none                      0.15   
-2 High-severity burn (%)    fire            none                      0.15   
-3 Mean annual runoff        hydrology       log1p                     0.00833
-4 Forest cover (%)          landscape       none                      0.00833
-5 Post-fire year            recovery        none                      0      
-6 Soil organic matter       soil            none                      0.00833
-7 Watershed area (km)       topography      log1p                     0      
+1 Burned watershed area (%) fire            none                        0.109
+2 High-severity burn (%)    fire            none                        0.109
+3 Mean annual runoff        hydrology       log1p                       0    
+4 Forest cover (%)          landscape       none                        0    
+5 Post-fire year            recovery        none                        0    
+6 Soil organic matter       soil            none                        0    
+7 Watershed area (km)       topography      log1p                       0    
   n_unique
      <int>
-1       24
-2       25
-3       27
-4       31
+1       22
+2       23
+3       23
+4       27
 5        7
-6       30
-7       34
+6       26
+7       28
 # A tibble: 13 × 4
    predictor_label            predictor_group decision_status      
    <chr>                      <chr>           <chr>                
@@ -327,207 +334,207 @@ Primary provisional predictors: Burned watershed area (%), High-severity burn (%
 12 Available, but not pre-specified as a primary candidate.
 13 Available, but not pre-specified as a primary candidate.
                            Post-fire year Burned watershed area (%)
-Post-fire year                      1.000                     0.285
-Burned watershed area (%)           0.285                     1.000
-High-severity burn (%)              0.397                     0.921
-Watershed area (km)                -0.219                    -0.375
-Mean annual runoff                 -0.005                     0.198
-Baseflow index                      0.040                     0.036
-Soil permeability                   0.185                    -0.090
-Forest cover (%)                   -0.086                    -0.523
-Grassland cover (%)                 0.049                     0.067
-Wetland cover (%)                  -0.050                    -0.406
-Agricultural cover (%)             -0.317                    -0.454
-Urban cover (%)                    -0.278                    -0.309
-Soil organic matter                -0.291                    -0.037
-Soil clay content                  -0.353                    -0.331
-Depth to bedrock                   -0.087                     0.026
-Glacial till (%)                   -0.050                    -0.126
-1981-2010 precipitation            -0.092                    -0.091
-1981-2010 mean temperature         -0.217                     0.074
-Watershed slope                     0.338                     0.512
-Maximum smoothed elevation          0.414                     0.256
+Post-fire year                      1.000                     0.315
+Burned watershed area (%)           0.315                     1.000
+High-severity burn (%)              0.397                     0.930
+Watershed area (km)                -0.226                    -0.305
+Mean annual runoff                  0.070                     0.148
+Baseflow index                      0.055                    -0.035
+Soil permeability                   0.166                    -0.070
+Forest cover (%)                   -0.126                    -0.468
+Grassland cover (%)                 0.051                     0.155
+Wetland cover (%)                  -0.132                    -0.478
+Agricultural cover (%)             -0.279                    -0.450
+Urban cover (%)                    -0.267                    -0.414
+Soil organic matter                -0.288                    -0.133
+Soil clay content                  -0.358                    -0.292
+Depth to bedrock                   -0.018                    -0.090
+Glacial till (%)                   -0.040                    -0.203
+1981-2010 precipitation            -0.067                    -0.137
+1981-2010 mean temperature         -0.177                     0.017
+Watershed slope                     0.265                     0.553
+Maximum smoothed elevation          0.336                     0.208
                            High-severity burn (%) Watershed area (km)
-Post-fire year                              0.397              -0.219
-Burned watershed area (%)                   0.921              -0.375
-High-severity burn (%)                      1.000              -0.393
-Watershed area (km)                        -0.393               1.000
-Mean annual runoff                          0.229               0.020
-Baseflow index                              0.063              -0.176
-Soil permeability                          -0.017              -0.296
-Forest cover (%)                           -0.451              -0.126
-Grassland cover (%)                         0.062               0.143
-Wetland cover (%)                          -0.326               0.152
-Agricultural cover (%)                     -0.548               0.453
-Urban cover (%)                            -0.283              -0.093
-Soil organic matter                        -0.140              -0.010
-Soil clay content                          -0.402               0.511
-Depth to bedrock                           -0.005              -0.012
-Glacial till (%)                           -0.131               0.192
-1981-2010 precipitation                    -0.046               0.186
-1981-2010 mean temperature                  0.015              -0.147
-Watershed slope                             0.472              -0.344
-Maximum smoothed elevation                  0.367              -0.214
+Post-fire year                              0.397              -0.226
+Burned watershed area (%)                   0.930              -0.305
+High-severity burn (%)                      1.000              -0.299
+Watershed area (km)                        -0.299               1.000
+Mean annual runoff                          0.187               0.241
+Baseflow index                              0.018              -0.184
+Soil permeability                          -0.009              -0.296
+Forest cover (%)                           -0.399              -0.253
+Grassland cover (%)                         0.163               0.017
+Wetland cover (%)                          -0.417               0.106
+Agricultural cover (%)                     -0.506               0.366
+Urban cover (%)                            -0.401               0.045
+Soil organic matter                        -0.208               0.025
+Soil clay content                          -0.344               0.477
+Depth to bedrock                           -0.084               0.119
+Glacial till (%)                           -0.215               0.322
+1981-2010 precipitation                    -0.102               0.335
+1981-2010 mean temperature                 -0.034              -0.116
+Watershed slope                             0.494              -0.406
+Maximum smoothed elevation                  0.311              -0.277
                            Mean annual runoff Baseflow index Soil permeability
-Post-fire year                         -0.005          0.040             0.185
-Burned watershed area (%)               0.198          0.036            -0.090
-High-severity burn (%)                  0.229          0.063            -0.017
-Watershed area (km)                     0.020         -0.176            -0.296
-Mean annual runoff                      1.000          0.226            -0.494
-Baseflow index                          0.226          1.000            -0.024
-Soil permeability                      -0.494         -0.024             1.000
-Forest cover (%)                       -0.320          0.200             0.383
-Grassland cover (%)                    -0.543         -0.261             0.138
-Wetland cover (%)                      -0.504         -0.045             0.453
-Agricultural cover (%)                  0.098          0.107            -0.415
-Urban cover (%)                        -0.230         -0.098             0.125
-Soil organic matter                     0.383          0.020            -0.455
-Soil clay content                      -0.145         -0.307            -0.569
-Depth to bedrock                        0.429          0.633            -0.121
-Glacial till (%)                        0.374          0.026            -0.024
-1981-2010 precipitation                 0.766          0.049            -0.402
-1981-2010 mean temperature             -0.114         -0.353            -0.248
-Watershed slope                        -0.196         -0.282             0.137
-Maximum smoothed elevation             -0.591          0.003             0.772
+Post-fire year                          0.070          0.055             0.166
+Burned watershed area (%)               0.148         -0.035            -0.070
+High-severity burn (%)                  0.187          0.018            -0.009
+Watershed area (km)                     0.241         -0.184            -0.296
+Mean annual runoff                      1.000          0.199            -0.618
+Baseflow index                          0.199          1.000            -0.016
+Soil permeability                      -0.618         -0.016             1.000
+Forest cover (%)                       -0.386          0.294             0.469
+Grassland cover (%)                    -0.596         -0.352             0.155
+Wetland cover (%)                      -0.529          0.029             0.551
+Agricultural cover (%)                  0.244          0.109            -0.417
+Urban cover (%)                        -0.443         -0.153             0.110
+Soil organic matter                     0.461         -0.019            -0.455
+Soil clay content                      -0.081         -0.324            -0.538
+Depth to bedrock                        0.394          0.646            -0.184
+Glacial till (%)                        0.463          0.063            -0.066
+1981-2010 precipitation                 0.789          0.076            -0.444
+1981-2010 mean temperature             -0.231         -0.418            -0.197
+Watershed slope                        -0.250         -0.273             0.172
+Maximum smoothed elevation             -0.612         -0.029             0.801
                            Forest cover (%) Grassland cover (%)
-Post-fire year                       -0.086               0.049
-Burned watershed area (%)            -0.523               0.067
-High-severity burn (%)               -0.451               0.062
-Watershed area (km)                  -0.126               0.143
-Mean annual runoff                   -0.320              -0.543
-Baseflow index                        0.200              -0.261
-Soil permeability                     0.383               0.138
-Forest cover (%)                      1.000              -0.151
-Grassland cover (%)                  -0.151               1.000
-Wetland cover (%)                     0.053               0.016
-Agricultural cover (%)               -0.006               0.001
-Urban cover (%)                       0.071               0.346
-Soil organic matter                  -0.038              -0.266
-Soil clay content                    -0.135               0.238
-Depth to bedrock                     -0.064              -0.464
-Glacial till (%)                     -0.026              -0.703
-1981-2010 precipitation               0.012              -0.721
-1981-2010 mean temperature           -0.229               0.464
-Watershed slope                      -0.268               0.123
-Maximum smoothed elevation           -0.088               0.434
+Post-fire year                       -0.126               0.051
+Burned watershed area (%)            -0.468               0.155
+High-severity burn (%)               -0.399               0.163
+Watershed area (km)                  -0.253               0.017
+Mean annual runoff                   -0.386              -0.596
+Baseflow index                        0.294              -0.352
+Soil permeability                     0.469               0.155
+Forest cover (%)                      1.000              -0.126
+Grassland cover (%)                  -0.126               1.000
+Wetland cover (%)                     0.140               0.174
+Agricultural cover (%)               -0.055              -0.115
+Urban cover (%)                       0.167               0.541
+Soil organic matter                   0.023              -0.253
+Soil clay content                    -0.292               0.223
+Depth to bedrock                      0.047              -0.567
+Glacial till (%)                     -0.015              -0.706
+1981-2010 precipitation              -0.051              -0.725
+1981-2010 mean temperature           -0.202               0.604
+Watershed slope                      -0.241               0.173
+Maximum smoothed elevation            0.032               0.494
                            Wetland cover (%) Agricultural cover (%)
-Post-fire year                        -0.050                 -0.317
-Burned watershed area (%)             -0.406                 -0.454
-High-severity burn (%)                -0.326                 -0.548
-Watershed area (km)                    0.152                  0.453
-Mean annual runoff                    -0.504                  0.098
-Baseflow index                        -0.045                  0.107
-Soil permeability                      0.453                 -0.415
-Forest cover (%)                       0.053                 -0.006
-Grassland cover (%)                    0.016                  0.001
-Wetland cover (%)                      1.000                 -0.008
-Agricultural cover (%)                -0.008                  1.000
-Urban cover (%)                        0.328                 -0.080
-Soil organic matter                   -0.197                  0.312
-Soil clay content                     -0.058                  0.317
-Depth to bedrock                      -0.060                  0.304
-Glacial till (%)                       0.123                  0.105
-1981-2010 precipitation               -0.334                  0.224
-1981-2010 mean temperature            -0.110                 -0.095
-Watershed slope                        0.029                 -0.441
-Maximum smoothed elevation             0.660                 -0.492
+Post-fire year                        -0.132                 -0.279
+Burned watershed area (%)             -0.478                 -0.450
+High-severity burn (%)                -0.417                 -0.506
+Watershed area (km)                    0.106                  0.366
+Mean annual runoff                    -0.529                  0.244
+Baseflow index                         0.029                  0.109
+Soil permeability                      0.551                 -0.417
+Forest cover (%)                       0.140                 -0.055
+Grassland cover (%)                    0.174                 -0.115
+Wetland cover (%)                      1.000                 -0.044
+Agricultural cover (%)                -0.044                  1.000
+Urban cover (%)                        0.420                 -0.026
+Soil organic matter                   -0.369                  0.379
+Soil clay content                      0.010                  0.227
+Depth to bedrock                      -0.098                  0.405
+Glacial till (%)                      -0.092                  0.182
+1981-2010 precipitation               -0.423                  0.320
+1981-2010 mean temperature            -0.047                 -0.107
+Watershed slope                        0.073                 -0.470
+Maximum smoothed elevation             0.676                 -0.543
                            Urban cover (%) Soil organic matter
-Post-fire year                      -0.278              -0.291
-Burned watershed area (%)           -0.309              -0.037
-High-severity burn (%)              -0.283              -0.140
-Watershed area (km)                 -0.093              -0.010
-Mean annual runoff                  -0.230               0.383
-Baseflow index                      -0.098               0.020
-Soil permeability                    0.125              -0.455
-Forest cover (%)                     0.071              -0.038
-Grassland cover (%)                  0.346              -0.266
-Wetland cover (%)                    0.328              -0.197
-Agricultural cover (%)              -0.080               0.312
-Urban cover (%)                      1.000               0.255
-Soil organic matter                  0.255               1.000
-Soil clay content                    0.182               0.049
-Depth to bedrock                    -0.280               0.082
-Glacial till (%)                    -0.290               0.192
-1981-2010 precipitation             -0.419               0.289
-1981-2010 mean temperature           0.713               0.355
-Watershed slope                     -0.344              -0.511
-Maximum smoothed elevation           0.148              -0.611
+Post-fire year                      -0.267              -0.288
+Burned watershed area (%)           -0.414              -0.133
+High-severity burn (%)              -0.401              -0.208
+Watershed area (km)                  0.045               0.025
+Mean annual runoff                  -0.443               0.461
+Baseflow index                      -0.153              -0.019
+Soil permeability                    0.110              -0.455
+Forest cover (%)                     0.167               0.023
+Grassland cover (%)                  0.541              -0.253
+Wetland cover (%)                    0.420              -0.369
+Agricultural cover (%)              -0.026               0.379
+Urban cover (%)                      1.000               0.231
+Soil organic matter                  0.231               1.000
+Soil clay content                    0.365               0.116
+Depth to bedrock                    -0.532               0.025
+Glacial till (%)                    -0.421               0.150
+1981-2010 precipitation             -0.556               0.332
+1981-2010 mean temperature           0.732               0.297
+Watershed slope                     -0.287              -0.556
+Maximum smoothed elevation           0.174              -0.765
                            Soil clay content Depth to bedrock Glacial till (%)
-Post-fire year                        -0.353           -0.087           -0.050
-Burned watershed area (%)             -0.331            0.026           -0.126
-High-severity burn (%)                -0.402           -0.005           -0.131
-Watershed area (km)                    0.511           -0.012            0.192
-Mean annual runoff                    -0.145            0.429            0.374
-Baseflow index                        -0.307            0.633            0.026
-Soil permeability                     -0.569           -0.121           -0.024
-Forest cover (%)                      -0.135           -0.064           -0.026
-Grassland cover (%)                    0.238           -0.464           -0.703
-Wetland cover (%)                     -0.058           -0.060            0.123
-Agricultural cover (%)                 0.317            0.304            0.105
-Urban cover (%)                        0.182           -0.280           -0.290
-Soil organic matter                    0.049            0.082            0.192
-Soil clay content                      1.000           -0.221           -0.060
-Depth to bedrock                      -0.221            1.000            0.522
-Glacial till (%)                      -0.060            0.522            1.000
-1981-2010 precipitation               -0.112            0.376            0.573
-1981-2010 mean temperature             0.418           -0.497           -0.457
-Watershed slope                       -0.054           -0.141           -0.087
-Maximum smoothed elevation            -0.376           -0.178           -0.281
+Post-fire year                        -0.358           -0.018           -0.040
+Burned watershed area (%)             -0.292           -0.090           -0.203
+High-severity burn (%)                -0.344           -0.084           -0.215
+Watershed area (km)                    0.477            0.119            0.322
+Mean annual runoff                    -0.081            0.394            0.463
+Baseflow index                        -0.324            0.646            0.063
+Soil permeability                     -0.538           -0.184           -0.066
+Forest cover (%)                      -0.292            0.047           -0.015
+Grassland cover (%)                    0.223           -0.567           -0.706
+Wetland cover (%)                      0.010           -0.098           -0.092
+Agricultural cover (%)                 0.227            0.405            0.182
+Urban cover (%)                        0.365           -0.532           -0.421
+Soil organic matter                    0.116            0.025            0.150
+Soil clay content                      1.000           -0.134            0.064
+Depth to bedrock                      -0.134            1.000            0.559
+Glacial till (%)                       0.064            0.559            1.000
+1981-2010 precipitation               -0.103            0.441            0.624
+1981-2010 mean temperature             0.481           -0.676           -0.533
+Watershed slope                       -0.060           -0.151           -0.121
+Maximum smoothed elevation            -0.336           -0.255           -0.398
                            1981-2010 precipitation 1981-2010 mean temperature
-Post-fire year                              -0.092                     -0.217
-Burned watershed area (%)                   -0.091                      0.074
-High-severity burn (%)                      -0.046                      0.015
-Watershed area (km)                          0.186                     -0.147
-Mean annual runoff                           0.766                     -0.114
-Baseflow index                               0.049                     -0.353
-Soil permeability                           -0.402                     -0.248
-Forest cover (%)                             0.012                     -0.229
-Grassland cover (%)                         -0.721                      0.464
-Wetland cover (%)                           -0.334                     -0.110
-Agricultural cover (%)                       0.224                     -0.095
-Urban cover (%)                             -0.419                      0.713
-Soil organic matter                          0.289                      0.355
-Soil clay content                           -0.112                      0.418
-Depth to bedrock                             0.376                     -0.497
-Glacial till (%)                             0.573                     -0.457
-1981-2010 precipitation                      1.000                     -0.407
-1981-2010 mean temperature                  -0.407                      1.000
-Watershed slope                             -0.176                     -0.069
-Maximum smoothed elevation                  -0.615                     -0.012
+Post-fire year                              -0.067                     -0.177
+Burned watershed area (%)                   -0.137                      0.017
+High-severity burn (%)                      -0.102                     -0.034
+Watershed area (km)                          0.335                     -0.116
+Mean annual runoff                           0.789                     -0.231
+Baseflow index                               0.076                     -0.418
+Soil permeability                           -0.444                     -0.197
+Forest cover (%)                            -0.051                     -0.202
+Grassland cover (%)                         -0.725                      0.604
+Wetland cover (%)                           -0.423                     -0.047
+Agricultural cover (%)                       0.320                     -0.107
+Urban cover (%)                             -0.556                      0.732
+Soil organic matter                          0.332                      0.297
+Soil clay content                           -0.103                      0.481
+Depth to bedrock                             0.441                     -0.676
+Glacial till (%)                             0.624                     -0.533
+1981-2010 precipitation                      1.000                     -0.513
+1981-2010 mean temperature                  -0.513                      1.000
+Watershed slope                             -0.210                     -0.003
+Maximum smoothed elevation                  -0.611                      0.058
                            Watershed slope Maximum smoothed elevation
-Post-fire year                       0.338                      0.414
-Burned watershed area (%)            0.512                      0.256
-High-severity burn (%)               0.472                      0.367
-Watershed area (km)                 -0.344                     -0.214
-Mean annual runoff                  -0.196                     -0.591
-Baseflow index                      -0.282                      0.003
-Soil permeability                    0.137                      0.772
-Forest cover (%)                    -0.268                     -0.088
-Grassland cover (%)                  0.123                      0.434
-Wetland cover (%)                    0.029                      0.660
-Agricultural cover (%)              -0.441                     -0.492
-Urban cover (%)                     -0.344                      0.148
-Soil organic matter                 -0.511                     -0.611
-Soil clay content                   -0.054                     -0.376
-Depth to bedrock                    -0.141                     -0.178
-Glacial till (%)                    -0.087                     -0.281
-1981-2010 precipitation             -0.176                     -0.615
-1981-2010 mean temperature          -0.069                     -0.012
-Watershed slope                      1.000                      0.472
-Maximum smoothed elevation           0.472                      1.000
+Post-fire year                       0.265                      0.336
+Burned watershed area (%)            0.553                      0.208
+High-severity burn (%)               0.494                      0.311
+Watershed area (km)                 -0.406                     -0.277
+Mean annual runoff                  -0.250                     -0.612
+Baseflow index                      -0.273                     -0.029
+Soil permeability                    0.172                      0.801
+Forest cover (%)                    -0.241                      0.032
+Grassland cover (%)                  0.173                      0.494
+Wetland cover (%)                    0.073                      0.676
+Agricultural cover (%)              -0.470                     -0.543
+Urban cover (%)                     -0.287                      0.174
+Soil organic matter                 -0.556                     -0.765
+Soil clay content                   -0.060                     -0.336
+Depth to bedrock                    -0.151                     -0.255
+Glacial till (%)                    -0.121                     -0.398
+1981-2010 precipitation             -0.210                     -0.611
+1981-2010 mean temperature          -0.003                      0.058
+Watershed slope                      1.000                      0.515
+Maximum smoothed elevation           0.515                      1.000
 # A tibble: 10 × 3
-   predictor_1_label          predictor_2_label          rho
-   <chr>                      <chr>                    <dbl>
- 1 Burned watershed area (%)  High-severity burn (%)   0.921
- 2 Maximum smoothed elevation Soil permeability        0.772
- 3 1981-2010 precipitation    Mean annual runoff       0.766
- 4 Grassland cover (%)        1981-2010 precipitation -0.721
- 5 1981-2010 mean temperature Urban cover (%)          0.713
- 6 Glacial till (%)           Grassland cover (%)     -0.703
- 7 Maximum smoothed elevation Wetland cover (%)        0.660
- 8 Baseflow index             Depth to bedrock         0.633
- 9 Maximum smoothed elevation 1981-2010 precipitation -0.615
-10 Maximum smoothed elevation Soil organic matter     -0.611
+   predictor_1_label          predictor_2_label             rho
+   <chr>                      <chr>                       <dbl>
+ 1 Burned watershed area (%)  High-severity burn (%)      0.930
+ 2 Maximum smoothed elevation Soil permeability           0.801
+ 3 1981-2010 precipitation    Mean annual runoff          0.789
+ 4 Maximum smoothed elevation Soil organic matter        -0.765
+ 5 1981-2010 mean temperature Urban cover (%)             0.732
+ 6 Grassland cover (%)        1981-2010 precipitation    -0.725
+ 7 Glacial till (%)           Grassland cover (%)        -0.706
+ 8 Depth to bedrock           1981-2010 mean temperature -0.676
+ 9 Maximum smoothed elevation Wetland cover (%)           0.676
+10 Baseflow index             Depth to bedrock            0.646
 ```
 
 ### Warnings
@@ -556,13 +563,13 @@ Maximum smoothed elevation           0.472                      1.000
   status   rows size_kb
   <chr>   <int>   <dbl>
 1 present     2     0.2
-2 present    22     2.4
+2 present    18     2  
 3 present     2     0.2
-4 present    20     1.4
+4 present    20     1.1
 5 present   190     8.1
-6 present    20     8.4
-7 present    20     4.7
-8 present    20     4.4
+6 present    20     8.5
+7 present    20     4.5
+8 present    20     4.1
 ```
 
 **Pair Structure**
@@ -571,12 +578,12 @@ Maximum smoothed elevation           0.472                      1.000
 # A tibble: 2 × 8
   response_var n_rows n_studies n_comparisons n_pairs n_shared_control_families
   <chr>         <dbl>     <dbl>         <dbl>   <dbl>                     <dbl>
-1 DOC              39         9            20      20                        13
-2 NO3              81        14            33      33                        20
+1 DOC              37         7            16      16                        11
+2 NO3              73        12            28      28                        18
   n_calendar_years n_pending_pair_rows
              <dbl>               <dbl>
-1               13                  39
-2               29                  81
+1               14                   0
+2               25                   0
 ```
 
 **Response Audit**
@@ -585,12 +592,12 @@ Maximum smoothed elevation           0.472                      1.000
 # A tibble: 2 × 7
   response_var lnRR_min lnRR_median lnRR_max n_finite n_usable_variances
   <chr>           <dbl>       <dbl>    <dbl>    <dbl>              <dbl>
-1 DOC            -0.377       0.175     1.18       39                 39
-2 NO3            -4.16        1.11      2.81       81                 78
+1 DOC            -0.339       0.175    0.833       37                 35
+2 NO3            -5.00        1.15     3.15        73                 69
   n_matched_doc_no3
               <dbl>
-1                36
-2                36
+1                37
+2                37
 ```
 
 **Primary Predictor Set**
@@ -599,47 +606,47 @@ Maximum smoothed elevation           0.472                      1.000
 # A tibble: 7 × 6
   predictor                 predictor_group transformation proportion_missing
   <chr>                     <chr>           <chr>                       <dbl>
-1 Post-fire year            recovery        none                      0      
-2 Burned watershed area (%) fire            none                      0.15   
-3 High-severity burn (%)    fire            none                      0.15   
-4 Watershed area (km)       topography      log1p                     0      
-5 Mean annual runoff        hydrology       log1p                     0.00833
-6 Forest cover (%)          landscape       none                      0.00833
-7 Soil organic matter       soil            none                      0.00833
+1 Post-fire year            recovery        none                        0    
+2 Burned watershed area (%) fire            none                        0.109
+3 High-severity burn (%)    fire            none                        0.109
+4 Watershed area (km)       topography      log1p                       0    
+5 Mean annual runoff        hydrology       log1p                       0    
+6 Forest cover (%)          landscape       none                        0    
+7 Soil organic matter       soil            none                        0    
   n_unique decision_status    
      <dbl> <chr>              
 1        7 provisional_include
-2       24 provisional_include
-3       25 provisional_include
-4       34 provisional_include
-5       27 provisional_include
-6       31 provisional_include
-7       30 provisional_include
+2       22 provisional_include
+3       23 provisional_include
+4       28 provisional_include
+5       23 provisional_include
+6       27 provisional_include
+7       26 provisional_include
 ```
 
 **Largest Absolute Spearman Correlations**
 
 ```
 # A tibble: 10 × 3
-   predictor_1                predictor_2                rho
-   <chr>                      <chr>                    <dbl>
- 1 Burned watershed area (%)  High-severity burn (%)   0.921
- 2 Maximum smoothed elevation Soil permeability        0.772
- 3 1981-2010 precipitation    Mean annual runoff       0.766
- 4 Grassland cover (%)        1981-2010 precipitation -0.721
- 5 1981-2010 mean temperature Urban cover (%)          0.713
- 6 Glacial till (%)           Grassland cover (%)     -0.703
- 7 Maximum smoothed elevation Wetland cover (%)        0.660
- 8 Baseflow index             Depth to bedrock         0.633
- 9 Maximum smoothed elevation 1981-2010 precipitation -0.615
-10 Maximum smoothed elevation Soil organic matter     -0.611
+   predictor_1                predictor_2                   rho
+   <chr>                      <chr>                       <dbl>
+ 1 Burned watershed area (%)  High-severity burn (%)      0.930
+ 2 Maximum smoothed elevation Soil permeability           0.801
+ 3 1981-2010 precipitation    Mean annual runoff          0.789
+ 4 Maximum smoothed elevation Soil organic matter        -0.765
+ 5 1981-2010 mean temperature Urban cover (%)             0.732
+ 6 Grassland cover (%)        1981-2010 precipitation    -0.725
+ 7 Glacial till (%)           Grassland cover (%)        -0.706
+ 8 Depth to bedrock           1981-2010 mean temperature -0.676
+ 9 Maximum smoothed elevation Wetland cover (%)           0.676
+10 Baseflow index             Depth to bedrock            0.646
 ```
 
 ## 04_fit_meta_analysis_agent_v1.R
 
-- Started: 2026-08-20 16:37:40 PDT
-- Finished: 2026-08-20 16:37:42 PDT
-- Runtime seconds: 2.2
+- Started: 2026-09-22 12:58:03 PDT
+- Finished: 2026-09-22 12:58:04 PDT
+- Runtime seconds: 1
 - Status: completed
 
 ### Console Messages
@@ -652,9 +659,9 @@ The following objects are masked from ‘package:tidyr’:
     expand, pack, unpack
 Loading required package: metadat
 Loading required package: numDeriv
-Loading the 'metafor' package (version 4.8-0). For an
+Loading the 'metafor' package (version 5.2-1). For an
 introduction to the package please type: help(metafor)
-Fitted 7 meta-analysis models.
+Fitted 8 meta-analysis models.
 Shared-reference family-adjusted models are sensitivity analyses, not exact covariance models.
 ```
 
@@ -667,12 +674,7 @@ Shared-reference family-adjusted models are sensitivity analyses, not exact cova
 ### Warnings
 
 ```
-package ‘metafor’ was built under R version 4.4.1
-package ‘metadat’ was built under R version 4.4.1
-Ratio of largest to smallest sampling variance extremely large. May not be able to obtain stable results.
-Ratio of largest to smallest sampling variance extremely large. May not be able to obtain stable results.
-Ratio of largest to smallest sampling variance extremely large. May not be able to obtain stable results.
-Ratio of largest to smallest sampling variance extremely large. May not be able to obtain stable results.
+(none)
 ```
 
 ### Diagnostics
@@ -684,18 +686,18 @@ Ratio of largest to smallest sampling variance extremely large. May not be able 
 # A tibble: 2 × 4
   file                                                             status   rows
   <chr>                                                            <chr>   <int>
-1 agent_workflows/vibe_coding/output/tables/meta_model_summary.csv present    10
-2 agent_workflows/vibe_coding/output/logs/meta_model_failures.csv  present     1
+1 agent_workflows/vibe_coding/output/tables/meta_model_summary.csv present    12
+2 agent_workflows/vibe_coding/output/logs/meta_model_failures.csv  empty       0
   size_kb
     <dbl>
-1     1.9
-2     0.1
+1     2.3
+2     0  
 ```
 
 **Meta-Analysis Summary**
 
 ```
-# A tibble: 10 × 12
+# A tibble: 12 × 12
    response_var model                          inference   term          
    <chr>        <chr>                          <chr>       <chr>         
  1 DOC          intercept_only                 model_based Intercept     
@@ -706,58 +708,42 @@ Ratio of largest to smallest sampling variance extremely large. May not be able 
  6 DOC          time_family_adjusted           model_based Post-fire year
  7 NO3          intercept_only                 model_based Intercept     
  8 NO3          intercept_only_family_adjusted model_based Intercept     
- 9 NO3          time_family_adjusted           model_based Intercept     
-10 NO3          time_family_adjusted           model_based Post-fire year
-   estimate std_error  ci_lower ci_upper   p_value     k n_studies
-      <dbl>     <dbl>     <dbl>    <dbl>     <dbl> <dbl>     <dbl>
- 1  0.282     0.121    0.0369    0.526   2.52e-  2    39         9
- 2  0.278     0.120    0.0350    0.521   2.61e-  2    39         9
- 3  0.276     0.122    0.0290    0.522   2.95e-  2    39         9
- 4  0.00203   0.00149 -0.000979  0.00504 1.80e-  1    39         9
- 5  0.250     0.124   -0.000957  0.502   5.08e-  2    39         9
- 6  0.00955   0.00244  0.00461   0.0145  3.72e-  4    39         9
- 7  0.800     0.332    0.138     1.46    1.84e-  2    78        14
- 8  0.802     0.333    0.140     1.46    1.82e-  2    78        14
- 9  3.82      1.30     1.23      6.41    4.44e-  3    78        14
-10 -1.36      0.00121 -1.36     -1.35    3.77e-162    78        14
-   percent_change
-            <dbl>
- 1         32.5  
- 2         32.1  
- 3         31.7  
- 4          0.203
- 5         28.4  
- 6          0.959
- 7        122.   
- 8        123.   
- 9       4452.   
-10        -74.2  
+ 9 NO3          time                           model_based Intercept     
+10 NO3          time                           model_based Post-fire year
+11 NO3          time_family_adjusted           model_based Intercept     
+12 NO3          time_family_adjusted           model_based Post-fire year
+   estimate std_error ci_lower ci_upper  p_value     k n_studies percent_change
+      <dbl>     <dbl>    <dbl>    <dbl>    <dbl> <dbl>     <dbl>          <dbl>
+ 1  0.304     0.132    0.0348   0.573   0.0280      35         7         35.5  
+ 2  0.303     0.133    0.0337   0.573   0.0286      35         7         35.5  
+ 3  0.299     0.133    0.0273   0.570   0.0320      35         7         34.8  
+ 4  0.00161   0.00149 -0.00142  0.00463 0.287       35         7          0.161
+ 5  0.277     0.139   -0.00612  0.559   0.0549      35         7         31.9  
+ 6  0.00905   0.00244  0.00408  0.0140  0.000766    35         7          0.909
+ 7  0.799     0.411   -0.0210   1.62    0.0560      69        12        122.   
+ 8  0.797     0.412   -0.0247   1.62    0.0571      69        12        122.   
+ 9  0.822     0.416   -0.00721  1.65    0.0520      69        12        128.   
+10 -0.00798   0.00643 -0.0208   0.00484 0.218       69        12         -0.795
+11  0.809     0.415   -0.0180   1.64    0.0550      69        12        125.   
+12 -0.00435   0.00805 -0.0204   0.0117  0.591       69        12         -0.434
 ```
 
 **Meta-Analysis Failures**
 
-```
-# A tibble: 1 × 3
-  response_var model
-  <chr>        <chr>
-1 NO3          time 
-  error                                                            
-  <chr>                                                            
-1 Optimizer (nlminb) did not achieve convergence (convergence = 1).
-```
+_No rows._
 
 ## 05_fit_grouped_lasso_agent_v1.R
 
-- Started: 2026-08-20 16:37:42 PDT
-- Finished: 2026-08-20 16:37:43 PDT
-- Runtime seconds: 0.7
+- Started: 2026-09-22 12:58:04 PDT
+- Finished: 2026-09-22 12:58:04 PDT
+- Runtime seconds: 0.4
 - Status: completed
 
 ### Console Messages
 
 ```
-Loaded glmnet 4.1-10
-Completed 23 leave-one-study-out LASSO fits.
+Loaded glmnet 5.0
+Completed 19 leave-one-study-out LASSO fits.
 ```
 
 ### Printed Output
@@ -769,7 +755,7 @@ Completed 23 leave-one-study-out LASSO fits.
 ### Warnings
 
 ```
-package ‘glmnet’ was built under R version 4.4.1
+(none)
 ```
 
 ### Diagnostics
@@ -788,10 +774,10 @@ package ‘glmnet’ was built under R version 4.4.1
 5 agent_workflows/vibe_coding/output/logs/grouped_lasso_failures.csv      
   status   rows size_kb
   <chr>   <int>   <dbl>
-1 present   480    35.8
+1 present   440    32.7
 2 present     8     0.7
-3 present   184    11.6
-4 present   254    11.3
+3 present   152     9.5
+4 present   174     7.8
 5 empty       0     0  
 ```
 
@@ -799,16 +785,16 @@ package ‘glmnet’ was built under R version 4.4.1
 
 ```
 # A tibble: 8 × 7
-  response_var model              n n_studies  RMSE   MAE      R2
-  <chr>        <chr>          <dbl>     <dbl> <dbl> <dbl>   <dbl>
-1 DOC          intercept_only    39         9 0.365 0.246 -0.323 
-2 DOC          lasso             39         9 0.249 0.190  0.384 
-3 DOC          time_only         39         9 0.357 0.256 -0.268 
-4 DOC          time_plus_fire    39         9 0.438 0.309 -0.902 
-5 NO3          intercept_only    81        14 1.08  0.766 -0.0340
-6 NO3          lasso             81        14 1.08  0.766 -0.0340
-7 NO3          time_only         81        14 1.12  0.793 -0.119 
-8 NO3          time_plus_fire    81        14 1.15  0.824 -0.181 
+  response_var model              n n_studies  RMSE   MAE       R2
+  <chr>        <chr>          <dbl>     <dbl> <dbl> <dbl>    <dbl>
+1 DOC          intercept_only    37         7 0.331 0.236 -0.476  
+2 DOC          lasso             37         7 0.253 0.214  0.136  
+3 DOC          time_only         37         7 0.327 0.249 -0.442  
+4 DOC          time_plus_fire    37         7 0.441 0.341 -1.62   
+5 NO3          intercept_only    73        12 1.10  0.754 -0.00601
+6 NO3          lasso             73        12 1.10  0.754 -0.00601
+7 NO3          time_only         73        12 1.12  0.775 -0.0468 
+8 NO3          time_plus_fire    73        12 1.18  0.838 -0.156  
 ```
 
 **Nonzero LASSO Coefficients Across Outer Folds**
@@ -817,36 +803,36 @@ package ‘glmnet’ was built under R version 4.4.1
 # A tibble: 14 × 6
    response_var predictor                 selected_folds total_folds
    <chr>        <chr>                              <int>       <int>
- 1 DOC          Soil organic matter                    8           9
- 2 DOC          Mean annual runoff                     8           9
- 3 DOC          High-severity burn (%)                 7           9
- 4 DOC          Watershed area (km)                    5           9
- 5 DOC          Burned watershed area (%)              1           9
- 6 DOC          Forest cover (%)                       1           9
- 7 DOC          Post-fire year                         1           9
- 8 NO3          Watershed area (km)                    0          14
- 9 NO3          Burned watershed area (%)              0          14
-10 NO3          High-severity burn (%)                 0          14
-11 NO3          Forest cover (%)                       0          14
-12 NO3          Soil organic matter                    0          14
-13 NO3          Post-fire year                         0          14
-14 NO3          Mean annual runoff                     0          14
+ 1 DOC          Soil organic matter                    7           7
+ 2 DOC          Mean annual runoff                     6           7
+ 3 DOC          Watershed area (km)                    4           7
+ 4 DOC          High-severity burn (%)                 4           7
+ 5 DOC          Burned watershed area (%)              0           7
+ 6 DOC          Forest cover (%)                       0           7
+ 7 DOC          Post-fire year                         0           7
+ 8 NO3          Watershed area (km)                    0          12
+ 9 NO3          Burned watershed area (%)              0          12
+10 NO3          High-severity burn (%)                 0          12
+11 NO3          Forest cover (%)                       0          12
+12 NO3          Soil organic matter                    0          12
+13 NO3          Post-fire year                         0          12
+14 NO3          Mean annual runoff                     0          12
    selection_rate median_nonzero_coefficient
             <dbl>                      <dbl>
- 1          0.889                    0.0885 
- 2          0.889                    0.118  
- 3          0.778                   -0.0218 
- 4          0.556                    0.0436 
- 5          0.111                    0.197  
- 6          0.111                    0.0341 
- 7          0.111                    0.00643
- 8          0                       NA      
- 9          0                       NA      
-10          0                       NA      
-11          0                       NA      
-12          0                       NA      
-13          0                       NA      
-14          0                       NA      
+ 1          1                         0.0924
+ 2          0.857                     0.136 
+ 3          0.571                     0.0408
+ 4          0.571                    -0.0190
+ 5          0                        NA     
+ 6          0                        NA     
+ 7          0                        NA     
+ 8          0                        NA     
+ 9          0                        NA     
+10          0                        NA     
+11          0                        NA     
+12          0                        NA     
+13          0                        NA     
+14          0                        NA     
 ```
 
 **Grouped LASSO Failures**
@@ -855,15 +841,15 @@ _No rows._
 
 ## 06_run_stability_sensitivity_agent_v1.R
 
-- Started: 2026-08-20 16:37:43 PDT
-- Finished: 2026-08-20 16:38:01 PDT
-- Runtime seconds: 18.5
+- Started: 2026-09-22 12:58:04 PDT
+- Finished: 2026-09-22 12:59:40 PDT
+- Runtime seconds: 96.2
 - Status: completed
 
 ### Console Messages
 
 ```
-Completed 600 clustered bootstrap fits.
+Completed 6000 clustered bootstrap fits.
 Set N_BOOTSTRAP=1000 for final manuscript stability estimates.
 ```
 
@@ -876,7 +862,8 @@ Set N_BOOTSTRAP=1000 for final manuscript stability estimates.
 ### Warnings
 
 ```
-(none)
+from glmnet C++ code (error code -90); Convergence for 90th lambda value not reached after maxit=100000 iterations; solutions for larger lambdas returned
+from glmnet C++ code (error code -89); Convergence for 89th lambda value not reached after maxit=100000 iterations; solutions for larger lambdas returned
 ```
 
 ### Diagnostics
@@ -894,9 +881,9 @@ Set N_BOOTSTRAP=1000 for final manuscript stability estimates.
 4 agent_workflows/vibe_coding/output/logs/bootstrap_failures.csv         
   status   rows size_kb
   <chr>   <int>   <dbl>
-1 present  4200   284. 
-2 present    42     4.1
-3 present    42     2.3
+1 present 42000  2890  
+2 present    42     4.4
+3 present    42     2.4
 4 empty       0     0  
 ```
 
@@ -908,66 +895,66 @@ Set N_BOOTSTRAP=1000 for final manuscript stability estimates.
    <chr>        <chr>                       <chr>                    
  1 DOC          elastic_net_family_balanced Soil organic matter      
  2 DOC          elastic_net_family_balanced Mean annual runoff       
- 3 DOC          elastic_net_family_balanced Forest cover (%)         
- 4 DOC          elastic_net_family_balanced Watershed area (km)      
+ 3 DOC          elastic_net_family_balanced Watershed area (km)      
+ 4 DOC          elastic_net_family_balanced Forest cover (%)         
  5 DOC          elastic_net_family_balanced High-severity burn (%)   
  6 DOC          lasso_family_balanced       Soil organic matter      
  7 DOC          lasso_family_balanced       Mean annual runoff       
  8 DOC          lasso_family_balanced       Watershed area (km)      
  9 DOC          lasso_family_balanced       Forest cover (%)         
-10 DOC          lasso_family_balanced       Post-fire year           
+10 DOC          lasso_family_balanced       Burned watershed area (%)
 11 DOC          lasso_unweighted            Soil organic matter      
 12 DOC          lasso_unweighted            Mean annual runoff       
 13 DOC          lasso_unweighted            Watershed area (km)      
 14 DOC          lasso_unweighted            Forest cover (%)         
-15 DOC          lasso_unweighted            Post-fire year           
-16 NO3          elastic_net_family_balanced Post-fire year           
-17 NO3          elastic_net_family_balanced Soil organic matter      
-18 NO3          elastic_net_family_balanced Mean annual runoff       
-19 NO3          elastic_net_family_balanced Watershed area (km)      
-20 NO3          elastic_net_family_balanced Burned watershed area (%)
+15 DOC          lasso_unweighted            Burned watershed area (%)
+16 NO3          elastic_net_family_balanced Soil organic matter      
+17 NO3          elastic_net_family_balanced Post-fire year           
+18 NO3          elastic_net_family_balanced Burned watershed area (%)
+19 NO3          elastic_net_family_balanced High-severity burn (%)   
+20 NO3          elastic_net_family_balanced Mean annual runoff       
 21 NO3          lasso_family_balanced       Soil organic matter      
 22 NO3          lasso_family_balanced       Post-fire year           
-23 NO3          lasso_family_balanced       Mean annual runoff       
-24 NO3          lasso_family_balanced       Watershed area (km)      
-25 NO3          lasso_family_balanced       Burned watershed area (%)
+23 NO3          lasso_family_balanced       Watershed area (km)      
+24 NO3          lasso_family_balanced       Burned watershed area (%)
+25 NO3          lasso_family_balanced       Mean annual runoff       
 26 NO3          lasso_unweighted            Soil organic matter      
 27 NO3          lasso_unweighted            Post-fire year           
-28 NO3          lasso_unweighted            High-severity burn (%)   
-29 NO3          lasso_unweighted            Burned watershed area (%)
-30 NO3          lasso_unweighted            Mean annual runoff       
+28 NO3          lasso_unweighted            Burned watershed area (%)
+29 NO3          lasso_unweighted            Mean annual runoff       
+30 NO3          lasso_unweighted            Watershed area (km)      
    completed_iterations selection_frequency median_coefficient stability_class
                   <dbl>               <dbl>              <dbl> <chr>          
- 1                  100                0.97            0.133   stable         
- 2                  100                0.75            0.0293  stable         
- 3                  100                0.41            0       conditional    
- 4                  100                0.34            0       weak           
- 5                  100                0.32            0       weak           
- 6                  100                0.94            0.141   stable         
- 7                  100                0.53            0.00355 conditional    
- 8                  100                0.35            0       weak           
- 9                  100                0.23            0       weak           
-10                  100                0.22            0       weak           
-11                  100                0.94            0.147   stable         
-12                  100                0.5             0       conditional    
-13                  100                0.39            0       weak           
-14                  100                0.29            0       weak           
-15                  100                0.23            0       weak           
-16                  100                0.18            0       weak           
-17                  100                0.16            0       weak           
-18                  100                0.1             0       weak           
-19                  100                0.08            0       weak           
-20                  100                0.08            0       weak           
-21                  100                0.09            0       weak           
-22                  100                0.07            0       weak           
-23                  100                0.06            0       weak           
-24                  100                0.05            0       weak           
-25                  100                0.04            0       weak           
-26                  100                0.22            0       weak           
-27                  100                0.15            0       weak           
-28                  100                0.08            0       weak           
-29                  100                0.07            0       weak           
-30                  100                0.07            0       weak           
+ 1                 1000               0.956            0.125   stable         
+ 2                 1000               0.817            0.0481  stable         
+ 3                 1000               0.539            0.00148 conditional    
+ 4                 1000               0.493            0       conditional    
+ 5                 1000               0.297            0       weak           
+ 6                 1000               0.96             0.138   stable         
+ 7                 1000               0.622            0.0249  conditional    
+ 8                 1000               0.493            0       conditional    
+ 9                 1000               0.383            0       weak           
+10                 1000               0.18             0       weak           
+11                 1000               0.934            0.136   stable         
+12                 1000               0.505            0       conditional    
+13                 1000               0.431            0       conditional    
+14                 1000               0.306            0       weak           
+15                 1000               0.162            0       weak           
+16                 1000               0.152            0       weak           
+17                 1000               0.116            0       weak           
+18                 1000               0.087            0       weak           
+19                 1000               0.081            0       weak           
+20                 1000               0.078            0       weak           
+21                 1000               0.149            0       weak           
+22                 1000               0.096            0       weak           
+23                 1000               0.084            0       weak           
+24                 1000               0.081            0       weak           
+25                 1000               0.079            0       weak           
+26                 1000               0.108            0       weak           
+27                 1000               0.094            0       weak           
+28                 1000               0.075            0       weak           
+29                 1000               0.066            0       weak           
+30                 1000               0.055            0       weak           
 ```
 
 **Bootstrap Failures**
@@ -976,17 +963,17 @@ _No rows._
 
 ## 07_make_results_agent_v1.R
 
-- Started: 2026-08-20 16:38:01 PDT
-- Finished: 2026-08-20 16:38:02 PDT
-- Runtime seconds: 0.7
+- Started: 2026-09-22 12:59:41 PDT
+- Finished: 2026-09-22 12:59:41 PDT
+- Runtime seconds: 0.8
 - Status: completed
 
 ### Console Messages
 
 ```
 `height` was translated to `width`.
-Wrote provisional result tables to: /Users/myer056/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/output/tables
-Wrote provisional figures to: /Users/myer056/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/output/figures
+Wrote provisional result tables to: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/output/tables
+Wrote provisional figures to: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/output/figures
 Do not use for final reporting until pairing confirmation and audit review are complete.
 ```
 
@@ -1018,10 +1005,10 @@ Do not use for final reporting until pairing confirmation and audit review are c
 4 agent_workflows/vibe_coding/output/tables/predictor_stability_figure_data.csv 
   status   rows size_kb
   <chr>   <int>   <dbl>
-1 present     2     0.3
+1 present     2     0.2
 2 present     2     0.5
 3 present     8     0.7
-4 present    14     1.5
+4 present    14     1.6
 ```
 
 **Dataset Structure Table**
@@ -1030,16 +1017,12 @@ Do not use for final reporting until pairing confirmation and audit review are c
 # A tibble: 2 × 9
   response_var n_rows n_studies n_comparisons n_pairs n_shared_control_families
   <chr>         <dbl>     <dbl>         <dbl>   <dbl>                     <dbl>
-1 DOC              39         9            20      20                        13
-2 NO3              81        14            33      33                        20
-  n_calendar_years n_pending_pair_rows
-             <dbl>               <dbl>
-1               13                  39
-2               29                  81
-  pairing_status                             
-  <chr>                                      
-1 Provisional: co-author confirmation pending
-2 Provisional: co-author confirmation pending
+1 DOC              37         7            16      16                        11
+2 NO3              73        12            28      28                        18
+  n_calendar_years n_pending_pair_rows pairing_status
+             <dbl>               <dbl> <chr>         
+1               14                   0 Confirmed     
+2               25                   0 Confirmed     
 ```
 
 **Pooled Effects Figure Data**
@@ -1048,12 +1031,12 @@ Do not use for final reporting until pairing confirmation and audit review are c
 # A tibble: 2 × 14
   response_var model          variance_approach inference   term      estimate
   <chr>        <chr>          <chr>             <chr>       <chr>        <dbl>
-1 DOC          intercept_only lnRR_var          model_based Intercept    0.282
-2 NO3          intercept_only lnRR_var          model_based Intercept    0.800
+1 DOC          intercept_only lnRR_var          model_based Intercept    0.304
+2 NO3          intercept_only lnRR_var          model_based Intercept    0.799
   std_error ci_lower ci_upper p_value     k n_studies percent_change
       <dbl>    <dbl>    <dbl>   <dbl> <dbl>     <dbl>          <dbl>
-1     0.121   0.0369    0.526  0.0252    39         9           32.5
-2     0.332   0.138     1.46   0.0184    78        14          122. 
+1     0.132   0.0348    0.573  0.0280    35         7           35.5
+2     0.411  -0.0210    1.62   0.0560    69        12          122. 
   model_label      
   <chr>            
 1 Reported variance
@@ -1064,16 +1047,16 @@ Do not use for final reporting until pairing confirmation and audit review are c
 
 ```
 # A tibble: 8 × 7
-  response_var model              n n_studies  RMSE   MAE      R2
-  <chr>        <chr>          <dbl>     <dbl> <dbl> <dbl>   <dbl>
-1 DOC          intercept_only    39         9 0.365 0.246 -0.323 
-2 DOC          lasso             39         9 0.249 0.190  0.384 
-3 DOC          time_only         39         9 0.357 0.256 -0.268 
-4 DOC          time_plus_fire    39         9 0.438 0.309 -0.902 
-5 NO3          intercept_only    81        14 1.08  0.766 -0.0340
-6 NO3          lasso             81        14 1.08  0.766 -0.0340
-7 NO3          time_only         81        14 1.12  0.793 -0.119 
-8 NO3          time_plus_fire    81        14 1.15  0.824 -0.181 
+  response_var model              n n_studies  RMSE   MAE       R2
+  <chr>        <chr>          <dbl>     <dbl> <dbl> <dbl>    <dbl>
+1 DOC          intercept_only    37         7 0.331 0.236 -0.476  
+2 DOC          lasso             37         7 0.253 0.214  0.136  
+3 DOC          time_only         37         7 0.327 0.249 -0.442  
+4 DOC          time_plus_fire    37         7 0.441 0.341 -1.62   
+5 NO3          intercept_only    73        12 1.10  0.754 -0.00601
+6 NO3          lasso             73        12 1.10  0.754 -0.00601
+7 NO3          time_only         73        12 1.12  0.775 -0.0468 
+8 NO3          time_plus_fire    73        12 1.18  0.838 -0.156  
 ```
 
 **Predictor Stability Figure Data**
@@ -1098,36 +1081,36 @@ Do not use for final reporting until pairing confirmation and audit review are c
 14 NO3          lasso_family_balanced Mean annual runoff       
    completed_iterations selection_frequency median_coefficient coefficient_q025
                   <dbl>               <dbl>              <dbl>            <dbl>
- 1                  100                0.35            0               -0.00559
- 2                  100                0.14            0               -0.0109 
- 3                  100                0.06            0               -0.0410 
- 4                  100                0.23            0               -0.0642 
- 5                  100                0.94            0.141            0      
- 6                  100                0.22            0               -0.104  
- 7                  100                0.53            0.00355          0      
- 8                  100                0.05            0               -0.0539 
- 9                  100                0.04            0                0      
-10                  100                0.03            0                0      
-11                  100                0.03            0                0      
-12                  100                0.09            0               -0.283  
-13                  100                0.07            0                0      
-14                  100                0.06            0               -0.111  
+ 1                 1000               0.493             0            -0.00540  
+ 2                 1000               0.18              0             0        
+ 3                 1000               0.155             0            -0.194    
+ 4                 1000               0.383             0             0        
+ 5                 1000               0.96              0.138         0        
+ 6                 1000               0.145             0            -0.00591  
+ 7                 1000               0.622             0.0249       -0.0000489
+ 8                 1000               0.084             0            -0.175    
+ 9                 1000               0.081             0             0        
+10                 1000               0.059             0            -0.110    
+11                 1000               0.048             0             0        
+12                 1000               0.149             0            -0.455    
+13                 1000               0.096             0             0        
+14                 1000               0.079             0            -0.129    
    coefficient_q975 positive_frequency negative_frequency stability_class
               <dbl>              <dbl>              <dbl> <chr>          
- 1          0.119                 0.32               0.03 weak           
- 2          0.129                 0.09               0.05 weak           
- 3          0.00746               0.03               0.03 weak           
- 4          0.0486                0.11               0.12 weak           
- 5          0.267                 0.94               0    stable         
- 6          0.0445                0.05               0.17 weak           
- 7          0.114                 0.51               0.02 conditional    
- 8          0                     0.01               0.04 weak           
- 9          0.0574                0.04               0    weak           
-10          0                     0.02               0.01 weak           
-11          0                     0.01               0.02 weak           
-12          0                     0                  0.09 weak           
-13          0.208                 0.07               0    weak           
-14          0                     0                  0.06 weak           
+ 1          0.113                0.466              0.027 conditional    
+ 2          0.217                0.17               0.01  weak           
+ 3          0.0535               0.04               0.115 weak           
+ 4          0.170                0.364              0.019 weak           
+ 5          0.272                0.958              0.002 stable         
+ 6          0.0553               0.099              0.046 weak           
+ 7          0.153                0.597              0.025 conditional    
+ 8          0                    0.021              0.063 weak           
+ 9          0.365                0.078              0.003 weak           
+10          0.0171               0.028              0.031 weak           
+11          0.00744              0.026              0.022 weak           
+12          0                    0.004              0.145 weak           
+13          0.192                0.088              0.008 weak           
+14          0.0293               0.026              0.053 weak           
 ```
 
 **Generated Figures**
@@ -1138,12 +1121,12 @@ Do not use for final reporting until pairing confirmation and audit review are c
   <chr>                                                                   <dbl>
 1 agent_workflows/vibe_coding/output/figures/pooled_effects.png            30.3
 2 agent_workflows/vibe_coding/output/figures/predictive_performance.png    65.9
-3 agent_workflows/vibe_coding/output/figures/predictor_stability.png      103  
+3 agent_workflows/vibe_coding/output/figures/predictor_stability.png      104. 
   modified               
   <chr>                  
-1 2026-08-20 16:38:02 PDT
-2 2026-08-20 16:38:02 PDT
-3 2026-08-20 16:38:02 PDT
+1 2026-09-22 12:59:41 PDT
+2 2026-09-22 12:59:41 PDT
+3 2026-09-22 12:59:41 PDT
 ```
 
 ## Final Output Inventory
@@ -1178,25 +1161,25 @@ Do not use for final reporting until pairing confirmation and audit review are c
 21 agent_workflows/vibe_coding/output/logs/bootstrap_failures.csv               
    status   rows size_kb
    <chr>   <int>   <dbl>
- 1 present    36    24.8
- 2 present   120    84.5
+ 1 present    36    43.7
+ 2 present   110    77  
  3 present     2     0.2
- 4 present    22     2.4
+ 4 present    18     2  
  5 present     2     0.2
- 6 present    20     1.4
+ 6 present    20     1.1
  7 present   190     8.1
- 8 present    20     8.4
- 9 present    20     4.7
-10 present    20     4.4
-11 present    10     1.9
+ 8 present    20     8.5
+ 9 present    20     4.5
+10 present    20     4.1
+11 present    12     2.3
 12 present     8     0.7
-13 present    42     4.1
-14 present    42     2.3
-15 present     2     0.3
+13 present    42     4.4
+14 present    42     2.4
+15 present     2     0.2
 16 present     2     0.5
 17 present     8     0.7
-18 present    14     1.5
-19 present     1     0.1
+18 present    14     1.6
+19 empty       0     0  
 20 empty       0     0  
 21 empty       0     0  
 ```
@@ -1213,10 +1196,10 @@ Do not use for final reporting until pairing confirmation and audit review are c
 4 agent_workflows/vibe_coding/output/tables/predictor_stability_figure_data.csv 
   status   rows size_kb
   <chr>   <int>   <dbl>
-1 present     2     0.3
+1 present     2     0.2
 2 present     2     0.5
 3 present     8     0.7
-4 present    14     1.5
+4 present    14     1.6
 ```
 
 **Dataset Structure Table**
@@ -1225,16 +1208,12 @@ Do not use for final reporting until pairing confirmation and audit review are c
 # A tibble: 2 × 9
   response_var n_rows n_studies n_comparisons n_pairs n_shared_control_families
   <chr>         <dbl>     <dbl>         <dbl>   <dbl>                     <dbl>
-1 DOC              39         9            20      20                        13
-2 NO3              81        14            33      33                        20
-  n_calendar_years n_pending_pair_rows
-             <dbl>               <dbl>
-1               13                  39
-2               29                  81
-  pairing_status                             
-  <chr>                                      
-1 Provisional: co-author confirmation pending
-2 Provisional: co-author confirmation pending
+1 DOC              37         7            16      16                        11
+2 NO3              73        12            28      28                        18
+  n_calendar_years n_pending_pair_rows pairing_status
+             <dbl>               <dbl> <chr>         
+1               14                   0 Confirmed     
+2               25                   0 Confirmed     
 ```
 
 **Pooled Effects Figure Data**
@@ -1243,12 +1222,12 @@ Do not use for final reporting until pairing confirmation and audit review are c
 # A tibble: 2 × 14
   response_var model          variance_approach inference   term      estimate
   <chr>        <chr>          <chr>             <chr>       <chr>        <dbl>
-1 DOC          intercept_only lnRR_var          model_based Intercept    0.282
-2 NO3          intercept_only lnRR_var          model_based Intercept    0.800
+1 DOC          intercept_only lnRR_var          model_based Intercept    0.304
+2 NO3          intercept_only lnRR_var          model_based Intercept    0.799
   std_error ci_lower ci_upper p_value     k n_studies percent_change
       <dbl>    <dbl>    <dbl>   <dbl> <dbl>     <dbl>          <dbl>
-1     0.121   0.0369    0.526  0.0252    39         9           32.5
-2     0.332   0.138     1.46   0.0184    78        14          122. 
+1     0.132   0.0348    0.573  0.0280    35         7           35.5
+2     0.411  -0.0210    1.62   0.0560    69        12          122. 
   model_label      
   <chr>            
 1 Reported variance
@@ -1259,16 +1238,16 @@ Do not use for final reporting until pairing confirmation and audit review are c
 
 ```
 # A tibble: 8 × 7
-  response_var model              n n_studies  RMSE   MAE      R2
-  <chr>        <chr>          <dbl>     <dbl> <dbl> <dbl>   <dbl>
-1 DOC          intercept_only    39         9 0.365 0.246 -0.323 
-2 DOC          lasso             39         9 0.249 0.190  0.384 
-3 DOC          time_only         39         9 0.357 0.256 -0.268 
-4 DOC          time_plus_fire    39         9 0.438 0.309 -0.902 
-5 NO3          intercept_only    81        14 1.08  0.766 -0.0340
-6 NO3          lasso             81        14 1.08  0.766 -0.0340
-7 NO3          time_only         81        14 1.12  0.793 -0.119 
-8 NO3          time_plus_fire    81        14 1.15  0.824 -0.181 
+  response_var model              n n_studies  RMSE   MAE       R2
+  <chr>        <chr>          <dbl>     <dbl> <dbl> <dbl>    <dbl>
+1 DOC          intercept_only    37         7 0.331 0.236 -0.476  
+2 DOC          lasso             37         7 0.253 0.214  0.136  
+3 DOC          time_only         37         7 0.327 0.249 -0.442  
+4 DOC          time_plus_fire    37         7 0.441 0.341 -1.62   
+5 NO3          intercept_only    73        12 1.10  0.754 -0.00601
+6 NO3          lasso             73        12 1.10  0.754 -0.00601
+7 NO3          time_only         73        12 1.12  0.775 -0.0468 
+8 NO3          time_plus_fire    73        12 1.18  0.838 -0.156  
 ```
 
 **Predictor Stability Figure Data**
@@ -1293,36 +1272,36 @@ Do not use for final reporting until pairing confirmation and audit review are c
 14 NO3          lasso_family_balanced Mean annual runoff       
    completed_iterations selection_frequency median_coefficient coefficient_q025
                   <dbl>               <dbl>              <dbl>            <dbl>
- 1                  100                0.35            0               -0.00559
- 2                  100                0.14            0               -0.0109 
- 3                  100                0.06            0               -0.0410 
- 4                  100                0.23            0               -0.0642 
- 5                  100                0.94            0.141            0      
- 6                  100                0.22            0               -0.104  
- 7                  100                0.53            0.00355          0      
- 8                  100                0.05            0               -0.0539 
- 9                  100                0.04            0                0      
-10                  100                0.03            0                0      
-11                  100                0.03            0                0      
-12                  100                0.09            0               -0.283  
-13                  100                0.07            0                0      
-14                  100                0.06            0               -0.111  
+ 1                 1000               0.493             0            -0.00540  
+ 2                 1000               0.18              0             0        
+ 3                 1000               0.155             0            -0.194    
+ 4                 1000               0.383             0             0        
+ 5                 1000               0.96              0.138         0        
+ 6                 1000               0.145             0            -0.00591  
+ 7                 1000               0.622             0.0249       -0.0000489
+ 8                 1000               0.084             0            -0.175    
+ 9                 1000               0.081             0             0        
+10                 1000               0.059             0            -0.110    
+11                 1000               0.048             0             0        
+12                 1000               0.149             0            -0.455    
+13                 1000               0.096             0             0        
+14                 1000               0.079             0            -0.129    
    coefficient_q975 positive_frequency negative_frequency stability_class
               <dbl>              <dbl>              <dbl> <chr>          
- 1          0.119                 0.32               0.03 weak           
- 2          0.129                 0.09               0.05 weak           
- 3          0.00746               0.03               0.03 weak           
- 4          0.0486                0.11               0.12 weak           
- 5          0.267                 0.94               0    stable         
- 6          0.0445                0.05               0.17 weak           
- 7          0.114                 0.51               0.02 conditional    
- 8          0                     0.01               0.04 weak           
- 9          0.0574                0.04               0    weak           
-10          0                     0.02               0.01 weak           
-11          0                     0.01               0.02 weak           
-12          0                     0                  0.09 weak           
-13          0.208                 0.07               0    weak           
-14          0                     0                  0.06 weak           
+ 1          0.113                0.466              0.027 conditional    
+ 2          0.217                0.17               0.01  weak           
+ 3          0.0535               0.04               0.115 weak           
+ 4          0.170                0.364              0.019 weak           
+ 5          0.272                0.958              0.002 stable         
+ 6          0.0553               0.099              0.046 weak           
+ 7          0.153                0.597              0.025 conditional    
+ 8          0                    0.021              0.063 weak           
+ 9          0.365                0.078              0.003 weak           
+10          0.0171               0.028              0.031 weak           
+11          0.00744              0.026              0.022 weak           
+12          0                    0.004              0.145 weak           
+13          0.192                0.088              0.008 weak           
+14          0.0293               0.026              0.053 weak           
 ```
 
 **Generated Figures**
@@ -1333,24 +1312,24 @@ Do not use for final reporting until pairing confirmation and audit review are c
   <chr>                                                                   <dbl>
 1 agent_workflows/vibe_coding/output/figures/pooled_effects.png            30.3
 2 agent_workflows/vibe_coding/output/figures/predictive_performance.png    65.9
-3 agent_workflows/vibe_coding/output/figures/predictor_stability.png      103  
+3 agent_workflows/vibe_coding/output/figures/predictor_stability.png      104. 
   modified               
   <chr>                  
-1 2026-08-20 16:38:02 PDT
-2 2026-08-20 16:38:02 PDT
-3 2026-08-20 16:38:02 PDT
+1 2026-09-22 12:59:41 PDT
+2 2026-09-22 12:59:41 PDT
+3 2026-09-22 12:59:41 PDT
 ```
 
 ## Session Info
 
 ```
-R version 4.4.0 (2024-04-24)
-Platform: aarch64-apple-darwin20
-Running under: macOS 15.7.9
+R version 4.6.1 (2026-06-24)
+Platform: aarch64-apple-darwin23
+Running under: macOS Tahoe 26.6.2
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
-LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+BLAS:   /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
 
 locale:
 [1] C.UTF-8/C.UTF-8/C.UTF-8/C/C.UTF-8/C.UTF-8
@@ -1362,26 +1341,26 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] glmnet_4.1-10       metafor_4.8-0       numDeriv_2016.8-1.1
- [4] metadat_1.4-0       Matrix_1.7-0        lubridate_1.9.4    
- [7] forcats_1.0.0       stringr_1.5.1       dplyr_1.1.4        
-[10] purrr_1.0.4         readr_2.1.5         tidyr_1.3.1        
-[13] tibble_3.2.1        ggplot2_4.0.2       tidyverse_2.0.0    
-[16] here_1.0.1         
+ [1] glmnet_5.0          metafor_5.2-1       numDeriv_2016.8-1.1
+ [4] metadat_1.6-0       Matrix_1.7-5        openxlsx_4.2.9     
+ [7] lubridate_1.9.5     forcats_1.0.1       stringr_1.6.0      
+[10] dplyr_1.2.1         purrr_1.2.2         readr_2.2.0        
+[13] tidyr_1.3.2         tibble_3.3.1        ggplot2_4.0.3      
+[16] tidyverse_2.0.0     here_1.0.2         
 
 loaded via a namespace (and not attached):
- [1] utf8_1.2.4         generics_0.1.3     shape_1.4.6.1      stringi_1.8.7     
- [5] lattice_0.22-6     hms_1.1.3          digest_0.6.37      magrittr_2.0.3    
- [9] grid_4.4.0         timechange_0.3.0   RColorBrewer_1.1-3 iterators_1.0.14  
-[13] foreach_1.5.2      rprojroot_2.0.4    survival_3.5-8     scales_1.4.0      
-[17] textshaping_0.3.7  codetools_0.2-20   cli_3.6.4          crayon_1.5.3      
-[21] rlang_1.1.6        bit64_4.6.0-1      splines_4.4.0      withr_3.0.2       
-[25] parallel_4.4.0     tools_4.4.0        tzdb_0.5.0         mathjaxr_2.0-0    
-[29] vctrs_0.6.5        R6_2.6.1           lifecycle_1.0.4    bit_4.6.0         
-[33] vroom_1.6.5        ragg_1.3.2         pkgconfig_2.0.3    pillar_1.10.2     
-[37] gtable_0.3.6       glue_1.8.0         Rcpp_1.0.14        systemfonts_1.1.0 
-[41] tidyselect_1.2.1   farver_2.1.2       nlme_3.1-168       labeling_0.4.3    
-[45] compiler_4.4.0     S7_0.2.1          
+ [1] utf8_1.2.6         generics_0.1.4     shape_1.4.6.1      stringi_1.8.9     
+ [5] lattice_0.22-9     hms_1.1.4          digest_0.6.39      magrittr_2.0.5    
+ [9] grid_4.6.1         timechange_0.4.0   RColorBrewer_1.1-3 iterators_1.0.14  
+[13] foreach_1.5.2      rprojroot_2.1.1    zip_3.0.2          survival_3.8-6    
+[17] scales_1.4.0       textshaping_1.0.5  codetools_0.2-20   cli_3.6.6         
+[21] crayon_1.5.3       rlang_1.3.0        bit64_4.8.6        splines_4.6.1     
+[25] withr_3.0.3        parallel_4.6.1     tools_4.6.1        tzdb_0.5.0        
+[29] mathjaxr_2.0-0     vctrs_0.7.3        R6_2.6.1           lifecycle_1.0.5   
+[33] bit_4.6.0          vroom_1.7.1        ragg_1.5.2         pkgconfig_2.0.3   
+[37] pillar_1.11.1      gtable_0.3.6       glue_1.8.1         Rcpp_1.1.2        
+[41] systemfonts_1.3.2  tidyselect_1.2.1   farver_2.1.2       nlme_3.1-169      
+[45] labeling_0.4.3     compiler_4.6.1     S7_0.2.2          
 ```
 
 ## Workflow Status

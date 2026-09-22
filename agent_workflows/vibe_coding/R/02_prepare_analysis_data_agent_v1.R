@@ -12,9 +12,9 @@ library(lubridate)
 
 workflow_dir <- here("agent_workflows", "vibe_coding")
 pairing_path <- file.path(workflow_dir, "config", "pairing_decisions_analysis.csv")
-daily_path <- file.path(workflow_dir, "data", "source", "01_daily_time_series_paired.csv")
+daily_path <- file.path(workflow_dir, "data", "derived", "reviewed_sites_agent_v1", "01_daily_time_series_paired.csv")
 geospatial_path <- file.path(workflow_dir, "data", "source", "geospatial_variables_bp_severity_pull.csv")
-effect_size_path <- file.path(workflow_dir, "data", "source", "effect_sizes_yearly.csv")
+effect_size_path <- file.path(workflow_dir, "data", "derived", "reviewed_sites_agent_v1", "effect_sizes_yearly.csv")
 derived_dir <- file.path(workflow_dir, "data", "derived")
 audit_dir <- file.path(workflow_dir, "data", "audit")
 output_path <- file.path(derived_dir, "lasso_model_table.csv")
@@ -114,7 +114,7 @@ burned_annual <- burned_daily %>%
   )
 
 model_table <- annual_effect_sizes %>%
-  select(all_of(required_effect_fields), any_of(c("lnRR_sd", "pair_key"))) %>%
+  select(all_of(required_effect_fields), any_of(c("lnRR_sd", "pair_key", "n_both_observed", "n_with_interpolation"))) %>%
   inner_join(
     approved_pairs %>%
       select(all_of(required_pair_fields), any_of(c("shared_reference", "Composite_Reference_Candidate"))),
@@ -129,7 +129,7 @@ model_table <- annual_effect_sizes %>%
     post_fire_year = coalesce(time_since_fire, as.numeric(followup_year)),
     shared_control_year_id = paste(shared_control_id, response_var, year, sep = " | "),
     reference_family_weight = 1 / pmax(n_pairs_sharing_reference, 1),
-    effect_size_source = "established_effect_sizes_yearly_provisional",
+    effect_size_source = "corrected_gapfill_reviewed_named_sites",
     variance_status = if_else(is.finite(lnRR_var) & lnRR_var > 0, "usable", "missing_or_nonpositive"),
     pairing_confirmation_pending = Coauthor_Confirmation == "pending"
   ) %>%

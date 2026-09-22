@@ -1,6 +1,6 @@
 # ==============================================================================
 # Script: source_all_analysis_scripts_agent_v1.R
-# Purpose: Lightweight helper to re-run the provisional agent analysis workflow
+# Purpose: Lightweight helper to re-run the reviewed-pair agent analysis workflow
 #          by sourcing the analysis scripts in dependency order.
 #
 # Notes:
@@ -16,7 +16,7 @@ source_pairing_inventory <- FALSE
 source_review_workbook <- FALSE
 
 required_packages <- c(
-  "tidyverse", "here", "lubridate", "metafor", "glmnet", "forcats"
+  "tidyverse", "here", "lubridate", "metafor", "glmnet", "forcats", "openxlsx"
 )
 
 if (source_review_workbook) {
@@ -38,7 +38,8 @@ if (length(missing_packages) > 0) {
 script_dir <- here("agent_workflows", "vibe_coding", "R")
 
 analysis_scripts <- c(
-  "01a_create_provisional_pairings_agent_v1.R",
+  "01_read_and_gapfill_preserve_observations_agent_v1.R",
+  "01c_apply_reviewed_sites_agent_v1.R",
   "02_prepare_analysis_data_agent_v1.R",
   "03_audit_pairs_and_predictors_agent_v1.R",
   "04_fit_meta_analysis_agent_v1.R",
