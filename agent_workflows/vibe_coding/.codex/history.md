@@ -144,3 +144,44 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Decisions made: Make robust inference optional; use named arguments at the call site; pass the fitting dataset explicitly for the study count instead of relying on `model$data`; use base `if` for the scalar inference label.
 - Verification: Inspected the edited function and call structure. Full R parsing and execution remain unavailable because `Rscript` is not installed in the execution environment.
 - Next steps: Pull the updated `agents` branch and rerun script 04 from a clean R session.
+
+
+## 2026-09-23 — Response box plots
+
+- Task: Plot nitrate and DOC responses from the latest corrected model dataset.
+- Files added: `R/08_plot_response_boxplots_agent_v1.R`, `output/figures/final_response_boxplots.png`, and `output/tables/final_response_boxplot_summary.csv`.
+- Decisions: Use annual mean lnRR from `data/derived/lasso_model_table.csv`; retain all 73 nitrate and 37 DOC finite responses, including rows lacking variance. Display unweighted boxes, jittered points, sample sizes, and the zero-effect reference line.
+- Verification: Ran the R script and visually checked the PNG; counts agree with the corrected run report. PNG export used because SVG dependencies are unavailable.
+- Next steps: None for this plotting request.
+
+## 2026-09-28 — Issue #6 human-curated LASSO rerun
+
+- Task: Rerun paired annual lnRR LASSOs using the human-curated predictor lists in GitHub issue #6 and compare them with the current shared list.
+- Files added: `R/09_issue6_curated_lasso_agent_v1.R`, `config/issue6_predictor_dictionary.csv`, and `output/issue_6_curated_lasso/` results and report. Updated `.codex/decisions.md` and this history.
+- Decisions: Use analyte-specific unions of burned and reference predictor lists, retain post-fire year, select one burn metric per analyte, test baseflow as a runoff replacement, and omit unavailable long-term aridity without proxy substitution.
+- Verification: Script completed leave-one-study-out fits for 7 DOC and 12 nitrate studies and 1,000 study bootstrap refits for each analyte; no fit failures. DOC curated RMSE 0.263 versus current 0.253; nitrate models all RMSE 1.100, matching intercept-only.
+- Unresolved: Source long-term aridity; effect-size variance and shared-reference covariance; inner-fold-specific preprocessing; limited DOC study count. These results do not finalize manuscript inference.
+
+## 2026-09-29 — Issue #6 predictor boxplots
+
+- Task: Plot the distributions and sample variances of the variables used across the DOC and nitrate LASSO sets.
+- Files added: `R/10_plot_issue6_predictor_boxplots_agent_v1.R`, `output/issue_6_curated_lasso/doc_predictor_boxplots.png`, `no3_predictor_boxplots.png`, and `predictor_distribution_summary.csv`. Updated the issue #6 README and this history.
+- Decisions: Show raw predictor values with free vertical scales and per-panel sample variance; use one watershed-pair value for static attributes and one pair-year value for post-fire year. Include curated, current-set-only, and baseflow sensitivity predictors.
+- Verification: R script completed; both 300-dpi PNGs were visually inspected.
+- Next steps: None for this plotting request.
+
+## 2026-09-29 — Issue #6 predictor violin plots
+
+- Task: Make violin versions of the DOC and nitrate predictor distribution figures.
+- Files changed: `R/10_plot_issue6_predictor_boxplots_agent_v1.R`, `output/issue_6_curated_lasso/README.md`, and this history. Added `doc_predictor_violins.png` and `no3_predictor_violins.png`.
+- Decisions: Use the same observations, panel labels, and sample variances as the boxplots; overlay individual points and a median bar so the underlying small samples remain visible.
+- Verification: R script completed and both 300-dpi violin figures were visually inspected.
+- Next steps: None for this plotting request.
+
+## 2026-09-29 — User-defined primary sets and combined violin figure
+
+- Task: Define the exact eight-variable DOC and nitrate primary sets supplied by the user, rerun the LASSOs, and make one violin figure containing all variables.
+- Files added: `config/issue6_revised_primary_predictors.csv`, `config/issue6_revised_primary_dictionary.csv`, `R/11_fit_issue6_revised_primary_agent_v1.R`, `R/12_plot_issue6_revised_primary_violins_agent_v1.R`, and `output/issue_6_revised_primary/` results and figure. Updated both issue #6 READMEs, `.codex/decisions.md`, and this history.
+- Decisions: Preserve earlier issue #6 outputs; use both burn and hydrology measures in the new primary sets; display the nine-variable union in one DOC/nitrate violin figure.
+- Verification: Leave-one-study-out fits completed for 7 DOC and 12 nitrate studies; 1,000 study bootstrap iterations completed for each. Increased glmnet iteration limit to remove convergence warnings. Visually inspected the 300-dpi combined figure. DOC revised-primary RMSE 0.247; nitrate 1.100.
+- Unresolved: High correlation between burn measures, limited DOC study count, inner-fold-specific preprocessing, and provisional variance/shared-control assumptions remain relevant to inference.

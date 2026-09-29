@@ -10,6 +10,20 @@ Author confirmed exclusion of Fish Creek, Lower MacDonald Creek, and Upper MacDo
 
 This file records current architectural and analytical decisions for the `agent_workflows/vibe_coding/` workflow. Items marked **provisional** require author review before the final analysis.
 
+## September 28, 2026 — Issue #6 curated predictor rerun
+
+- Adapt the human burned and unburned concentration predictor lists as analyte-specific unions for paired annual lnRR, retaining post-fire year. DOC uses high-severity burn, wetland cover, forest cover, runoff, soil organic matter, and watershed area. Nitrate uses burned watershed percentage, clay, forest cover, runoff, soil organic matter, and watershed area.
+- Do not enter the two burn measures together because their audited Spearman correlation is 0.92. Use baseflow index in a hydrology sensitivity that replaces runoff.
+- Long-term aridity is unavailable in the current source snapshot and model table; omit it without a proxy. The curated sets therefore remain incomplete relative to the human lists.
+- The issue #6 run is a separate comparison and does not replace the primary outputs or settle earlier variance and shared-control decisions. Leave-one-study-out results and 1,000-bootstrap stability are recorded under `output/issue_6_curated_lasso/`; predictor choices are in `config/issue6_predictor_dictionary.csv`.
+
+## September 29, 2026 — Revised primary sets requested by user
+
+- The primary DOC set is `post_fire_year`, `burn_percent_fire_year`, `burn_sev_high`, `Area_watershed_km`, `runoffws`, `bfiws`, `forest_cover`, and `omws`.
+- The primary nitrate set is the same first seven predictors, with `clayws` in place of `omws`.
+- These explicit user-defined sets supersede the earlier issue #6 curated candidate sets as the active primary specification. Both correlated burn metrics and both hydrology metrics are included by request. Keep the earlier results for comparison.
+- The authoritative ordered lists are in `config/issue6_revised_primary_predictors.csv`; flagged metadata are in `config/issue6_revised_primary_dictionary.csv`. Updated fits and the combined nine-variable violin plot are in `output/issue_6_revised_primary/`.
+
 ## September 18, 2026 — Reviewed pairing decisions promoted
 
 - The Excel workbook is authoritative for pair inclusion, fire identifiers, pairing types, and review evidence. Its 28 approved/included and 8 excluded rows passed strict import. This supersedes the provisional pairing-adoption entries below.

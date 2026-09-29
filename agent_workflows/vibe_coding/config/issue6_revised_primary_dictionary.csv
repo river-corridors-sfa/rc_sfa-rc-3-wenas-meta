@@ -1,0 +1,21 @@
+predictor,predictor_label,predictor_group,transformation,proportion_missing,n_unique,DOC_primary,NO3_primary,decision_note
+post_fire_year,Post-fire year,recovery,none,0,7,TRUE,TRUE,"User-defined primary set, 2026-09-29. Both burn measures and both hydrology measures are included by request."
+burn_percent_fire_year,Burned watershed area (%),fire,none,0.10909090909090909,22,TRUE,TRUE,"User-defined primary set, 2026-09-29. Both burn measures and both hydrology measures are included by request."
+burn_sev_high,High-severity burn (%),fire,none,0.10909090909090909,23,TRUE,TRUE,"User-defined primary set, 2026-09-29. Both burn measures and both hydrology measures are included by request."
+Area_watershed_km,Watershed area (km),topography,log1p,0,28,TRUE,TRUE,"User-defined primary set, 2026-09-29. Both burn measures and both hydrology measures are included by request."
+runoffws,Mean annual runoff,hydrology,log1p,0,23,TRUE,TRUE,"User-defined primary set, 2026-09-29. Both burn measures and both hydrology measures are included by request."
+bfiws,Baseflow index,hydrology,none,0,27,TRUE,TRUE,"User-defined primary set, 2026-09-29. Both burn measures and both hydrology measures are included by request."
+permws,Soil permeability,hydrology,log1p,0,26,FALSE,FALSE,Not in the user-defined primary sets.
+forest_cover,Forest cover (%),landscape,none,0,27,TRUE,TRUE,"User-defined primary set, 2026-09-29. Both burn measures and both hydrology measures are included by request."
+grassland_cover,Grassland cover (%),landscape,none,0,26,FALSE,FALSE,Not in the user-defined primary sets.
+wetland_cover,Wetland cover (%),landscape,none,0,21,FALSE,FALSE,Not in the user-defined primary sets.
+ag_cover,Agricultural cover (%),landscape,none,0,11,FALSE,FALSE,Not in the user-defined primary sets.
+urban_cover,Urban cover (%),landscape,none,0,25,FALSE,FALSE,Not in the user-defined primary sets.
+omws,Soil organic matter,soil,none,0,26,TRUE,FALSE,"User-defined primary set, 2026-09-29. Both burn measures and both hydrology measures are included by request."
+clayws,Soil clay content,soil,none,0,26,FALSE,TRUE,"User-defined primary set, 2026-09-29. Both burn measures and both hydrology measures are included by request."
+rckdepws,Depth to bedrock,geology,log1p,0,26,FALSE,FALSE,Not in the user-defined primary sets.
+glacial_till,Glacial till (%),geology,none,0,13,FALSE,FALSE,Not in the user-defined primary sets.
+precip8110ws,1981-2010 precipitation,climate,none,0,27,FALSE,FALSE,Not in the user-defined primary sets.
+tmean8110ws,1981-2010 mean temperature,climate,none,0,27,FALSE,FALSE,Not in the user-defined primary sets.
+slope,Watershed slope,topography,none,0.14545454545454545,20,FALSE,FALSE,Not in the user-defined primary sets.
+maxelevsmo,Maximum smoothed elevation,topography,none,0.14545454545454545,22,FALSE,FALSE,Not in the user-defined primary sets.
