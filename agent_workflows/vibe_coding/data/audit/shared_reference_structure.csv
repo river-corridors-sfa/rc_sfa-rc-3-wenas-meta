@@ -1,0 +1,19 @@
+Study_ID,shared_control_id,Pair_Unburn,n_pairs,burned_pairs,pairing_types,composite_reference_candidate
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Control_1_2_3,Control_1_2_3,3,Site_1;Site_2;Site_3,designated_shared_reference,FALSE
+Crandall et al. 2021,Crandall et al. 2021 | Control_1,Control_1,1,Site_1,designated_one_to_one,FALSE
+Crandall et al. 2021,Crandall et al. 2021 | Control_2,Control_2,1,Site_2,designated_one_to_one,FALSE
+Crandall et al. 2021,Crandall et al. 2021 | Control_3_4,Control_3_4,1,Site_3,designated_one_to_one,FALSE
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Control_1,Control_1,1,Site_1,designated_one_to_one,FALSE
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Control_1_2,Control_1_2,2,Site_1;Site_2,designated_shared_reference,FALSE
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Control_1,Control_1,1,Site_1,designated_shared_reference,FALSE
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Control_2,Control_2,1,Site_2,designated_shared_reference,FALSE
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Control_3_4_5,Control_3_4_5,3,Site_3;Site_4;Site_5,designated_shared_reference,FALSE
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Control_1,Control_1,1,Site_1,designated_one_to_one,FALSE
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Control_2,Control_2,1,Site_2,designated_one_to_one,FALSE
+Mast & Clow; 2008,Mast & Clow; 2008 | Control_1,Control_1,1,Site_1,designated_one_to_one,FALSE
+Murphy et al. 2018,Murphy et al. 2018 | Control_1_2_3,Control_1_2_3,3,Site_1;Site_2;Site_3,designated_shared_reference,FALSE
+Oliver et al. 2012,Oliver et al. 2012 | Control_1_2_3,Control_1_2_3,1,Site_3,designated_one_to_one,FALSE
+Rhea et al. 2021,Rhea et al. 2021 | Control_1,Control_1,1,Site_1,designated_one_to_one,FALSE
+Rhea et al. 2021,Rhea et al. 2021 | Control_2_3,Control_2_3,2,Site_2;Site_3,designated_shared_reference,FALSE
+Uzun et al. 2020,Uzun et al. 2020 | Control_1_2,Control_1_2,2,Site_1;Site_2,designated_shared_reference,FALSE
+Writer et al. 2014,Writer et al. 2014 | Control_1_2,Control_1_2,2,Site_1;Site_2,designated_shared_reference,FALSE

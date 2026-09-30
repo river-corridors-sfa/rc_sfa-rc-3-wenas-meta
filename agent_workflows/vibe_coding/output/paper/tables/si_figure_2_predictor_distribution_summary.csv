@@ -1,0 +1,17 @@
+response_var,predictor,n,sample_variance,minimum,q1,median,q3,maximum,predictor_label,observation_unit
+DOC,Area_watershed_km,16,807078.7327710119,3.25,46.75,79.75,1314.235425,3017,Watershed area (km),watershed pair
+DOC,bfiws,16,149.12039893395837,29.6645,62.969750000000005,66.80879999999999,68.93285,74.5288,Baseflow index,watershed pair
+DOC,burn_percent_fire_year,14,1213.22646637978,1.5243,16.4118,26.8388,66.510625,100,Burned watershed area (%),watershed pair
+DOC,burn_sev_high,14,484.58050549450553,0.43,4.16,7.645,32.917500000000004,64.15,High-severity burn (%),watershed pair
+DOC,forest_cover,16,664.3158929166668,7.77,16.507500000000004,42.400000000000006,65.1025,75.43,Forest cover (%),watershed pair
+DOC,omws,16,0.2575197206327836,0.19,0.5763332185468945,0.7733089614840188,1.098015496072453,2.103174990371036,Soil organic matter,watershed pair
+DOC,post_fire_year,35,12.25546218487395,0,0.5,2,4,15,Post-fire year,pair-year
+DOC,runoffws,16,66968.89033686735,39.1054,91,176.0881,307.231825,881,Mean annual runoff,watershed pair
+Nitrate,Area_watershed_km,28,544557.2956309194,1.83,19.432499999999997,59.5904,181.9675,3017,Watershed area (km),watershed pair
+Nitrate,bfiws,28,236.95223074109788,28,62.969750000000005,68.29465,71.38235,74.5288,Baseflow index,watershed pair
+Nitrate,burn_percent_fire_year,24,1333.0855983820109,1.5243,13.83985,25.32625,75.12570000000001,100,Burned watershed area (%),watershed pair
+Nitrate,burn_sev_high,24,426.0177563405798,0.19,3.6475,5.865,22.6325,64.15,High-severity burn (%),watershed pair
+Nitrate,clayws,28,40.218063054774426,4.306314835023752,10.539567873867384,12.669720538667299,19.737801987485536,26.80751668661552,Soil clay content,watershed pair
+Nitrate,forest_cover,28,668.9954544973546,3.5999999999999996,21.3875,48.195,65.1025,81.30000000000001,Forest cover (%),watershed pair
+Nitrate,post_fire_year,69,7.341858482523443,0,1,2,3,15,Post-fire year,pair-year
+Nitrate,runoffws,28,67698.35715098349,39.1054,106,267.91485,574.1666,881,Mean annual runoff,watershed pair
