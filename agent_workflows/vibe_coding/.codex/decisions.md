@@ -1,5 +1,28 @@
 # Project decisions
 
+## September 30, 2026 — Sampling support and primary weighting
+
+- User authorized implementation of the proposed uncertainty/weighting approach. Primary LASSO assigns equal total mass to each study, equal mass to its retained pairs, then equal mass to retained annual records within each pair. Weights are recomputed within training subsets; study-bootstrap draw multiplicity is preserved. Primary fits do not use daily-derived inverse precision.
+- Implement equal-row and provisional precision/family sensitivities, plus observed-only and matched-interpolated analyses on identical 89-record inventories (32 DOC, 57 nitrate). The main paper inventory stays 104 records. Observed-only eligibility requires at least two positive same-date observations in both watersheds.
+- Inner preprocessing is fold-specific; original study IDs define tuning groups even when resampled multiple times. Use a fixed 80-value penalty grid from 100 to 0.0001 and the one-SE rule over study-level validation losses. Bootstrap draws with fewer than three distinct studies are logged as failures and excluded from selection-frequency denominators.
+- Sampling audit separates observed dates from interpolated coverage. An exploratory screen of at least 20 matched observed dates spanning at least 90 days identifies only 18 records, all Murphy, still with 42–57-day maximum gaps. This screen is not a validated minimum. Do not automatically promote temporal block-bootstrap variances without resolving time dependence and seasonal resampling for those series; sparse annual records remain unsupported.
+- Pooled/time REML sensitivity fits use study/pair random intercepts and positive-semidefinite working covariance mixtures over reference rho and temporal phi in {0, 0.5, 0.8}. CR2 study-clustered inference uses Satterthwaite degrees of freedom via clubSandwich. These results remain conditional on provisional daily delta variances; they are not final validated annual-uncertainty estimates.
+
+## September 30, 2026 — Time since fire selected as analysis axis
+
+- Author selected time since fire as the analysis time axis. The annual arithmetic-mean concentration ratio remains the response. Verify fire-specific attribution and resolve follow-up-year fallbacks so the modeled time variable reflects this choice.
+- This specifies the analysis axis; it does not by itself change calendar-year aggregation to fire-anniversary windows. Annual coverage and aggregation-window details remain separate implementation checks.
+
+## September 30, 2026 — Study-identification provenance confirmed
+
+- Author confirmed that study-identification provenance is established in previous versions. Remove the corresponding manuscript-readiness task; no reconstruction of search queries or provenance is required by this issue.
+
+## September 30, 2026 — Exclude singleton annual records from paper
+
+- User requested removal of the six singleton annual records from all paper analyses and figures. Script 02 filters `lnRR_n >= 2`, writes excluded records with reasons to `data/audit/paper_singleton_exclusions.csv`, and retains complete annual summaries upstream for provenance. Recompute matched-analyte flags after filtering.
+- Current paper inventory is 104 responses (35 DOC, 69 nitrate), 12 publications, 28 approved pairs, 14 unique fires, and 46 study-specific physical watersheds (28 burned, 18 reference). DOC spans 7 studies and 16 pairs; nitrate spans all 12 studies and 28 pairs. Shared controls count once per study; Uzun seasonal labels map to the same approved site IDs. Neither Murphy nor Writer is excluded as a study.
+- The prior Methods count of 52 watersheds (32 burned, 20 reference) does not describe the retained analysis. The three-biome classification and original screening counts require separate evidence.
+
 ## September 30, 2026 — Annual arithmetic mean ratio selected
 
 - User selected `log(mean annual C_b / mean annual C_u)` as the primary response, superseding the mean of daily log ratios. Compute both arithmetic means on the same existing eligible matched positive-concentration dates within each calendar year; retain current interpolation, site selections, and time predictors. Partial-year summaries describe available coverage, not a reconstructed complete year. Zero/nonpositive-date eligibility remains a separate methods review.

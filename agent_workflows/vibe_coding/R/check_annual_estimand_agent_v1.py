@@ -14,7 +14,9 @@ with (root / 'data/derived/reviewed_sites_agent_v1/effect_sizes_daily.csv').open
                 (float(row['burn']), float(row['reference'])))
 with (root / 'data/derived/lasso_model_table.csv').open() as stream:
     rows = list(csv.DictReader(stream))
-assert len(rows) == len(groups) == 110
+assert len(groups) == 110
+assert len(rows) == 104
+assert {(r["candidate_pair_id"], r["response_var"], r["year"]) for r in rows} == {k for k,v in groups.items() if len(v) >= 2}
 changed = 0
 singletons = 0
 for row in rows:
@@ -37,6 +39,6 @@ for row in rows:
         variance = (statistics.variance(burn)/mb**2 + statistics.variance(ref)/mr**2
                     - 2*covariance/(mb*mr))/len(values)
         assert math.isclose(float(row['lnRR_var']), variance, rel_tol=1e-9, abs_tol=1e-12)
-assert singletons == 6
+assert singletons == 0
 assert changed > 0
 print(f'PASS: {len(rows)} annual ratios and variances; {singletons} singleton variances missing; {changed} responses differ from daily-log means.')

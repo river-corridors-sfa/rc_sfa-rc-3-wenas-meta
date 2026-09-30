@@ -139,6 +139,15 @@ model_table <- annual_effect_sizes %>%
   ungroup() %>%
   arrange(response_var, Study_ID, Comparison_ID, Pair_Burn, year)
 
+# Paper eligibility excludes annual records with only one matched date.
+# Keep the complete reviewed annual table upstream and export exclusion evidence.
+paper_exclusions <- model_table %>% filter(lnRR_n < 2 | is.na(lnRR_n)) %>%
+  mutate(exclusion_reason = "Fewer than two eligible matched dates in annual summary")
+write_csv(paper_exclusions, file.path(audit_dir, "paper_singleton_exclusions.csv"), na = "")
+model_table <- model_table %>% filter(!is.na(lnRR_n), lnRR_n >= 2) %>%
+  group_by(candidate_pair_id, year) %>%
+  mutate(matched_doc_no3 = all(c("DOC", "NO3") %in% response_var)) %>% ungroup()
+
 duplicate_rows <- model_table %>% count(candidate_pair_id, response_var, year) %>% filter(n > 1)
 if (nrow(duplicate_rows) > 0) stop("Model table is not unique at pair x analyte x year.")
 

@@ -8,9 +8,14 @@ library(glmnet)
 
 set.seed(20260929)
 root <- here("agent_workflows", "vibe_coding")
-out <- file.path(root, "output", "paper", "tables")
+scenario <- Sys.getenv("PAPER_SCENARIO", "primary")
+weight_method <- Sys.getenv("PAPER_WEIGHT_METHOD", "equal_study")
+stopifnot(weight_method %in% c("equal_study", "equal_row", "precision_family"))
+out <- if (scenario == "primary") file.path(root,"output/paper/tables") else
+  file.path(root,"output/paper/sensitivity",scenario)
+model_path <- Sys.getenv("PAPER_MODEL_TABLE",file.path(root,"data/derived/lasso_model_table.csv"))
 dir.create(out, recursive = TRUE, showWarnings = FALSE)
-data <- read_csv(file.path(root, "data/derived/lasso_model_table.csv"), show_col_types = FALSE) %>%
+data <- read_csv(model_path, show_col_types = FALSE) %>%
   mutate(row_id = row_number()) %>% filter(is.finite(lnRR_mean))
 if (!"effect_size_definition" %in% names(data) ||
     any(is.na(data$effect_size_definition)) ||
@@ -31,7 +36,7 @@ sets <- list()
 for (a in c("DOC", "NO3")) {
   selected <- primary_config %>% filter(response_var == a) %>% arrange(position) %>% pull(predictor)
   if (length(selected) != 8) stop("Expected eight primary predictors for ", a)
-  sets[[a]] <- list(current_shared = old_set, revised_primary = selected)
+  sets[[a]] <- list(revised_primary = selected)
 }
 required <- unique(unlist(sets))
 missing <- setdiff(required, names(data))
@@ -74,6 +79,16 @@ prepare <- function(train, test, candidates) {
 }
 
 weights_for <- function(rows) {
+  if (weight_method == "equal_row") return(rep(1,nrow(rows)))
+  if (weight_method == "equal_study") {
+    # Bootstrap multiplicity is preserved: each draw receives equal total mass.
+    cluster <- if ("bootstrap_cluster" %in% names(rows)) rows$bootstrap_cluster else rows$Study_ID
+    pair <- interaction(cluster,rows$candidate_pair_id,drop=TRUE)
+    n_years <- as.numeric(table(pair)[as.character(pair)])
+    n_pairs <- tapply(rows$candidate_pair_id,cluster,function(x) length(unique(x)))
+    w <- 1 / (n_years * as.numeric(n_pairs[as.character(cluster)]))
+    return(w/mean(w))
+  }
   precision <- ifelse(is.finite(rows$lnRR_var) & rows$lnRR_var > 0,
                       1 / rows$lnRR_var, NA_real_)
   if (all(is.na(precision))) precision[] <- 1
@@ -82,6 +97,47 @@ weights_for <- function(rows) {
   w <- precision * rows$reference_family_weight
   w / mean(w)
 }
+
+# Fold-specific preprocessing and weighting; fixed penalty grid avoids using validation
+# outcomes to define a tuning range. Every copy of an original study shares a fold.
+fit_nested <- function(raw, candidates) {
+  studies <- sort(unique(raw$Study_ID))
+  if(length(studies)<3) stop("Fewer than three unique studies available for inner tuning")
+  fold_map <- setNames(rep(seq_len(min(5,length(studies))),length.out=length(studies)),studies)
+  lambdas <- 10^seq(2,-4,length.out=80)
+  errors <- matrix(NA_real_,length(studies),length(lambdas))
+  for(f in unique(fold_map)) {
+    tr <- raw[fold_map[raw$Study_ID]!=f,,drop=FALSE]
+    va <- raw[fold_map[raw$Study_ID]==f,,drop=FALSE]
+    stopifnot(!any(tr$Study_ID %in% va$Study_ID))
+    prep <- prepare(tr,va,candidates)
+    if(length(prep$predictors)<2) stop("Fewer than two usable inner predictors")
+    fit <- glmnet(as.matrix(prep$train[prep$predictors]),prep$train$lnRR_mean,
+      weights=weights_for(prep$train),alpha=1,lambda=lambdas,standardize=FALSE,control=list(maxit=1000000))
+    pred <- predict(fit,newx=as.matrix(prep$test[prep$predictors]),s=lambdas)
+    # Equal study scoring for the primary transferability target. Within a study,
+    # equal pair weighting prevents long follow-up pairs dominating tuning.
+    for(st in unique(va$Study_ID)) {
+      ix <- which(va$Study_ID==st)
+      ew <- if(weight_method=="equal_study") weights_for(va[ix,,drop=FALSE]) else rep(1,length(ix))
+      errors[match(st,studies),] <- colSums((pred[ix,,drop=FALSE]-va$lnRR_mean[ix])^2*ew)/sum(ew)
+    }
+  }
+  mult <- if("bootstrap_cluster" %in% names(raw))
+    vapply(studies,function(st) length(unique(raw$bootstrap_cluster[raw$Study_ID==st])),integer(1)) else rep(1,length(studies))
+  avg <- colSums(errors*mult)/sum(mult)
+  # Use unique original studies for SE, not duplicated bootstrap copies.
+  se <- apply(errors,2,sd)/sqrt(length(studies))
+  best <- which.min(avg)
+  selected <- which(avg <= avg[best]+se[best])[1]
+  prep <- prepare(raw,raw,candidates)
+  fit <- glmnet(as.matrix(prep$train[prep$predictors]),prep$train$lnRR_mean,
+    weights=weights_for(prep$train),alpha=1,lambda=lambdas,standardize=FALSE,control=list(maxit=1000000))
+  structure(list(glmnet.fit=fit,lambda.1se=lambdas[selected],lambda.min=lambdas[best]),class="cv.glmnet")
+}
+
+write_csv(data %>% group_by(response_var) %>% mutate(fitting_weight=weights_for(pick(everything()))) %>% ungroup() %>%
+  select(response_var,Study_ID,candidate_pair_id,year,fitting_weight),file.path(out,"fitting_weights.csv"))
 
 predictions <- list()
 coefficients <- list()
@@ -99,16 +155,8 @@ for (a in names(sets)) {
       test <- prepared$test
       usable <- prepared$predictors
       if (!length(usable)) stop("No usable predictors: ", a, " / ", set_name)
-      train_studies <- sort(unique(train$Study_ID))
-      fold_map <- setNames(rep(seq_len(min(5, length(train_studies))),
-                               length.out = length(train_studies)), train_studies)
-      fold_id <- unname(fold_map[train$Study_ID])
       w <- weights_for(train)
-      fit <- tryCatch(cv.glmnet(as.matrix(train[usable]), train$lnRR_mean,
-                                weights = w, alpha = 1, foldid = fold_id,
-                                standardize = FALSE, type.measure = "mse",
-                                control = list(maxit = 1000000)),
-                      error = function(e) e)
+      fit <- tryCatch(fit_nested(filter(rows,Study_ID != held_out),candidates),error=function(e)e)
       if (inherits(fit, "error")) {
         failures[[length(failures) + 1]] <- tibble(response_var = a, predictor_set = set_name,
           held_out_study = held_out, error = conditionMessage(fit))
@@ -152,6 +200,13 @@ write_csv(predictions, file.path(out, "heldout_predictions.csv"))
 write_csv(coefficients, file.path(out, "outer_coefficients.csv"))
 write_csv(performance, file.path(out, "performance.csv"))
 write_csv(failures, file.path(out, "outer_failures.csv"))
+per_study <- predictions %>% group_by(response_var,predictor_set,model,held_out_study) %>%
+  summarise(n=n(),MSE=mean((observed-predicted)^2),MAE=mean(abs(observed-predicted)),.groups="drop")
+write_csv(per_study,file.path(out,"performance_by_study.csv"))
+write_csv(per_study %>% group_by(response_var,predictor_set,model) %>% summarise(
+  equal_study_RMSE=sqrt(mean(MSE)),mean_study_RMSE=mean(sqrt(MSE)),equal_study_MAE=mean(MAE),.groups="drop"),
+  file.path(out,"performance_equal_study.csv"))
+
 
 n_bootstrap <- as.integer(Sys.getenv("N_BOOTSTRAP", "1000"))
 if (!is.finite(n_bootstrap) || n_bootstrap < 10) stop("N_BOOTSTRAP must be >= 10")
@@ -168,16 +223,11 @@ for (a in names(sets)) {
     prepared <- prepare(sample_rows, sample_rows, candidates)
     boot <- prepared$train
     usable <- prepared$predictors
-    if (!length(usable)) next
-    clusters <- unique(boot$bootstrap_cluster)
-    fold_map <- setNames(rep(seq_len(min(5, length(clusters))), length.out = length(clusters)),
-                         clusters)
-    fit <- tryCatch(cv.glmnet(as.matrix(boot[usable]), boot$lnRR_mean,
-                              weights = weights_for(boot), alpha = 1,
-                              foldid = unname(fold_map[as.character(boot$bootstrap_cluster)]),
-                              standardize = FALSE, type.measure = "mse",
-                              control = list(maxit = 1000000)),
-                    error = function(e) e)
+    if (!length(usable)) {
+      boot_failures[[length(boot_failures)+1]] <- tibble(response_var=a,iteration=iteration,error="No usable predictors")
+      next
+    }
+    fit <- tryCatch(fit_nested(sample_rows,candidates),error=function(e)e)
     if (inherits(fit, "error")) {
       boot_failures[[length(boot_failures) + 1]] <- tibble(response_var = a,
         iteration = iteration, error = conditionMessage(fit))
@@ -204,4 +254,7 @@ stability <- complete_grid %>% group_by(response_var, predictor) %>%
 write_csv(boot_coefs, file.path(out, "bootstrap_coefficients.csv"))
 write_csv(boot_failures, file.path(out, "bootstrap_failures.csv"))
 write_csv(stability, file.path(out, "selection_stability.csv"))
+write_csv(tibble(response_var=names(sets),attempted=n_bootstrap) %>%
+  left_join(boot_coefs %>% distinct(response_var,iteration) %>% count(response_var,name="successful"),by="response_var") %>%
+  mutate(successful=replace_na(successful,0L),failed=attempted-successful),file.path(out,"bootstrap_summary.csv"))
 message("Issue #6 revised-primary rerun complete. Outputs: ", out)

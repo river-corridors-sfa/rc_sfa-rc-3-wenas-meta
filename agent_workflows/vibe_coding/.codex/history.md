@@ -290,3 +290,42 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Decisions: Preserve calendar-year grouping and existing matched positive-date eligibility. Export both annual concentration means and explicit estimand/variance labels. Use provisional paired delta variance including same-date covariance rather than the old daily-log variance; retain missing singleton variances. Daily-log summaries remain named diagnostics. The model script rejects tables lacking the new estimand label.
 - Verification: Strict import passed with 28 included and 8 excluded pairs. Independent Python checks passed for all 110 responses and covariance-based variances; 104 responses differ from the prior daily-log estimand, and six singleton variances remain missing. Counts remain 37 DOC/73 nitrate with 35/69 usable variances. Paper runner completed 1,000 bootstrap refits per analyte; outer/bootstrap failure files are empty. Figure 2 was visually checked and git diff whitespace checks passed.
 - Limitations: Rebuilt from the existing corrected daily chemistry rather than rerunning interpolation. Final temporal/interpolation uncertainty, zero-date eligibility, shared-control inference, inner-fold preprocessing and bootstrap grouping remain tracked in the manuscript issue; this response change does not resolve them.
+
+## 2026-09-30 — Removed singleton paper records and verified inventory
+
+- Task: Exclude the six singleton annual records and verify manuscript study/site counts.
+- Files changed: Script 02 now exports `data/audit/paper_singleton_exclusions.csv` and filters paper inputs to at least two matched dates; matched-analyte flags are recalculated. Added `R/16_verify_paper_inventory_agent_v1.R` to the paper runner, four inventory CSVs, `output/paper/paper_inventory_report.md`, and a run log. Updated the estimand regression check, decisions, issue, READMEs, and all regenerated paper outputs.
+- Findings: Retained 104 annual records (35 DOC, 69 nitrate), 12 publications, 28 pairs, 14 fires, and 46 study-specific physical watersheds (28 burned, 18 reference). DOC spans 7 publications, 16 pairs and 9 fires; nitrate spans the full inventory. All pairs, publications and fires remain represented. Seasonal Uzun labels are not additional watersheds; shared references are counted once per study.
+- Verification: Exact retained/excluded partition checked against all 110 upstream annual records. Independent effect-size/variance checks passed for all retained records. Refit models and 1,000 bootstrap iterations per analyte completed without recorded failures; all five figures regenerated. Figure 2 counts visually checked; whitespace checks passed.
+- Decisions: Preserve excluded annual records upstream for provenance; exclude from every active paper analysis and figure. Replace the Methods count of 52 watersheds with 46 for the retained dataset.
+- Remaining limits: Original 226-paper screening count and three-biome classification are not verified by this inventory. Existing uncertainty and resampling-method tasks remain open. No new original-publication or field-site review was performed.
+
+## 2026-09-30 — Recorded resolved Methods decisions in issue
+
+- Task: Explicitly record the author-selected effect-size definition and verified retained study inventory in the manuscript issue.
+- Files changed: `output/paper/manuscript_readiness_issue.md` and this history entry.
+- Decisions: Mark the annual arithmetic-mean ratio and retained inventory as resolved; document provisional paired delta variance, six singleton exclusions, 104-row analyte subsets, and inventory evidence. Keep the original 226-paper screening count and three-category biome claim as separate unchecked verification tasks.
+- Verification: Compared issue text with current decisions and completed inventory history; no data, models, or figures changed.
+
+## 2026-09-30 — Removed study-identification provenance task
+
+- Task: Remove the study-identification provenance checklist item following author confirmation that previous versions establish provenance.
+- Files changed: `output/paper/manuscript_readiness_issue.md`, `.codex/decisions.md`, and this history entry.
+- Decisions: Treat study-identification provenance as established; preserve other inventory and manuscript tasks. No analysis changes.
+- Verification: Removed the single matching checklist item.
+
+## 2026-09-30 — Recorded time since fire axis
+
+- Task: Update the manuscript issue to specify time since fire as the selected analysis axis.
+- Files changed: `output/paper/manuscript_readiness_issue.md`, `.codex/decisions.md`, and this history entry.
+- Decisions: Mark the time-axis selection complete; retain checks for fire attribution, follow-up-year fallbacks, and annual coverage. Distinguish the time axis from annual aggregation windows.
+- Verification: Documentation-only update; no data or model changes.
+
+## 2026-09-30 — Implemented sampling audit and weighting sensitivities
+
+- Task: Implement the proposed separation of observed sampling information, primary predictive weighting, interpolation sensitivities, and conditional multilevel inference.
+- Files changed: Updated model script 11 and paper runner; added sampling audit script 17, sensitivity runner 18, working-covariance inference script 19, and targeted weighting/support regression checks. Added observed-only and matched model inputs, audits, four sensitivity output folders, conditional inference tables/model objects, run/session logs, and `output/paper/uncertainty_weighting_report.md`. Updated issue, decisions and paper README; regenerated five figures. Installed clubSandwich in ignored workflow-local `.R-library/`.
+- Decisions: Primary LASSO weights studies equally, pairs equally within studies, and years equally within pairs. Daily delta precision is sensitivity-only for prediction. Fold-specific preprocessing and original-study bootstrap grouping replace the former tuning implementation; fixed penalty grid and study-level one-SE rule are documented. CR2/Satterthwaite inference is conditional on provisional delta variances and nine assumed reference/temporal covariance scenarios.
+- Findings: Observed-only eligibility retains 32 DOC and 57 nitrate records; matching interpolated runs isolate changes in record coverage. Only 18 annual records, all Murphy, pass the exploratory temporal-resampling support screen, and long gaps remain. No automatic block-bootstrap variance was promoted. The primary 104-record inventory is unchanged.
+- Verification: Full runner completed; all outer fits and 36 conditional multilevel fits succeeded. Each scenario completed 994 DOC and 1,000 nitrate bootstraps out of 1,000 attempts; six DOC draws with fewer than three distinct studies are logged and excluded from frequency denominators. Targeted weight/preprocessing/support checks and independent output-coverage checks passed; Figure 3 visually checked; whitespace checks passed.
+- Remaining limits: Final annual uncertainty remains unresolved. Temporal block construction, sparse-year precision, and seasonal dependence need scientific review before final inference. The issue retains this limitation explicitly; sensitivity output completion is not presented as validated annual precision.

@@ -13,7 +13,11 @@ steps <- c(
     "02_prepare_analysis_data_agent_v1.R",
     "03_audit_pairs_and_predictors_agent_v1.R"
   ),
+  "16_verify_paper_inventory_agent_v1.R",
+  "17_audit_sampling_support_agent_v1.R",
   "11_fit_issue6_revised_primary_agent_v1.R",
+  "18_run_weighting_sensitivities_agent_v1.R",
+  "19_fit_working_covariance_inference_agent_v1.R",
   "13_plot_paper_maps_agent_v1.R",
   "08_plot_response_boxplots_agent_v1.R",
   "14_plot_paper_lasso_results_agent_v1.R",
