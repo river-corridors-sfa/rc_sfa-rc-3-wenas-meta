@@ -81,10 +81,23 @@ write_csv(paired %>% group_by(candidate_pair_id,response_var,year) %>%
   file.path(audit,'reviewed_chemistry_coverage.csv'))
 annual <- paired %>% filter(valid) %>%
   group_by(Study_ID,Comparison_ID,Pair_Burn,Pair_Unburn,candidate_pair_id,shared_control_id,response_var,year) %>%
-  summarise(lnRR_mean=mean(lnRR),lnRR_sd=sd(lnRR),lnRR_n=n(),
+  summarise(
+    annual_mean_burn=mean(burn), annual_mean_reference=mean(reference),
+    lnRR_mean=log(annual_mean_burn/annual_mean_reference),
+    # Paired first-order delta variance includes burned/reference covariance.
+    # Daily independence is provisional; this is not a temporal-correlation correction.
+    lnRR_var=var(burn/mean(burn) - reference/mean(reference))/n(),
+    daily_lnRR_mean=mean(lnRR), daily_lnRR_sd=sd(lnRR), lnRR_n=n(),
     n_both_observed=sum(burn_observed & reference_observed),
     n_with_interpolation=sum(!burn_observed | !reference_observed),.groups='drop') %>%
-  mutate(lnRR_var=lnRR_sd^2/lnRR_n,pair_key=candidate_pair_id)
+  mutate(pair_key=candidate_pair_id,
+    effect_size_definition="log_ratio_annual_arithmetic_means",
+    variance_method="paired_delta_daily_independence_provisional")
+# Preserve a direct estimand comparison on exactly the same eligible dates.
+write_csv(annual %>% transmute(candidate_pair_id,response_var,year,lnRR_n,
+    annual_mean_burn,annual_mean_reference,daily_lnRR_mean,
+    lnRR_mean,estimand_change=lnRR_mean-daily_lnRR_mean,lnRR_var,variance_method),
+  file.path(audit,'annual_estimand_comparison.csv'),na='')
 write_csv(annual,file.path(out,'effect_sizes_yearly.csv'),na='')
 write_csv(p %>% filter(Include_Analysis) %>% anti_join(annual,by='candidate_pair_id'),file.path(audit,'reviewed_pairs_without_valid_chemistry.csv'),na='')
 old <- read_csv(file.path(b,'data/source/effect_sizes_yearly.csv'),show_col_types=FALSE) %>%

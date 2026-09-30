@@ -3,8 +3,10 @@ library(tidyverse)
 library(here)
 
 workflow_dir <- here("agent_workflows", "vibe_coding")
-figure_dir <- file.path(workflow_dir, "output", "figures")
+figure_dir <- file.path(workflow_dir, "output", "paper", "figures", "figure_2_response_boxplots")
+table_dir <- file.path(workflow_dir, "output", "paper", "tables")
 dir.create(figure_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(table_dir, recursive = TRUE, showWarnings = FALSE)
 
 responses <- read_csv(
   file.path(workflow_dir, "data", "derived", "lasso_model_table.csv"),
@@ -24,36 +26,35 @@ response_summary <- responses %>%
             maximum = max(lnRR_mean), .groups = "drop")
 axis_labels <- setNames(
   paste0(response_summary$analyte, "\nn = ", response_summary$n,
-         " | ", response_summary$studies, " studies"),
+         "; ", response_summary$studies, " studies"),
   response_summary$analyte
 )
 
 response_plot <- ggplot(responses, aes(analyte, lnRR_mean, fill = analyte)) +
-  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey45") +
-  geom_boxplot(width = 0.45, alpha = 0.65, outlier.shape = NA,
-               linewidth = 0.6) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "#555555",
+             linewidth = 0.45) +
+  geom_boxplot(width = 0.45, alpha = 0.55, outlier.shape = NA,
+               linewidth = 0.55, colour = "#222222") +
   geom_point(position = position_jitter(width = 0.12, height = 0, seed = 42),
-             shape = 21, size = 2.1, alpha = 0.65, stroke = 0.3) +
+             shape = 21, size = 2, alpha = 0.78, stroke = 0.25,
+             colour = "#222222") +
   scale_fill_manual(values = c(Nitrate = "#4386B5", DOC = "#D49B47")) +
   scale_x_discrete(labels = axis_labels) +
-  labs(title = "Nitrate and DOC responses",
-       subtitle = "Annual burned-to-reference log response ratios",
-       x = NULL, y = "Annual mean lnRR (unitless)",
-       caption = paste(
-         "Each point is one watershed-pair year; all finite responses included, unweighted.",
-         "Boxes: median and interquartile range; whiskers: within 1.5 × IQR.",
-         "Dashed line: no difference between burned and reference watersheds.",
-         sep = "\n")) +
-  theme_bw(base_size = 12) +
-  theme(legend.position = "none", panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank(),
-        plot.title = element_text(face = "bold", size = 17),
-        plot.caption = element_text(hjust = 0, colour = "grey35", size = 9),
-        axis.text.x = element_text(size = 12),
-        plot.margin = margin(15, 18, 12, 12))
+  scale_y_continuous(expand = expansion(mult = c(0.035, 0.045))) +
+  labs(x = NULL, y = "Annual log response ratio (lnRR)") +
+  theme_classic(base_size = 13) +
+  theme(text = element_text(colour = "#222222"),
+        axis.text = element_text(colour = "#222222", size = 11),
+        axis.text.x = element_text(lineheight = 1.15, margin = margin(t = 7)),
+        axis.title = element_text(colour = "#222222", size = 12),
+        axis.line = element_blank(),
+        axis.ticks = element_line(colour = "#222222", linewidth = 0.45),
+        panel.border = element_rect(colour = "#222222", fill = NA,
+                                    linewidth = 0.45),
+        legend.position = "none",
+        plot.margin = margin(10, 14, 10, 10))
 
-ggsave(file.path(figure_dir, "final_response_boxplots.png"), response_plot,
-       width = 7, height = 6.5, dpi = 300, bg = "white")
-write_csv(response_summary, file.path(workflow_dir, "output", "tables",
-                                      "final_response_boxplot_summary.csv"))
+ggsave(file.path(figure_dir, "figure_2_response_boxplots.png"), response_plot,
+       width = 6.6, height = 5.7, dpi = 300, bg = "white")
+write_csv(response_summary, file.path(table_dir, "figure_2_response_summary.csv"))
 print(response_summary)

@@ -8,10 +8,15 @@ library(glmnet)
 
 set.seed(20260929)
 root <- here("agent_workflows", "vibe_coding")
-out <- file.path(root, "output", "issue_6_revised_primary")
+out <- file.path(root, "output", "paper", "tables")
 dir.create(out, recursive = TRUE, showWarnings = FALSE)
 data <- read_csv(file.path(root, "data/derived/lasso_model_table.csv"), show_col_types = FALSE) %>%
   mutate(row_id = row_number()) %>% filter(is.finite(lnRR_mean))
+if (!"effect_size_definition" %in% names(data) ||
+    any(is.na(data$effect_size_definition)) ||
+    any(data$effect_size_definition != "log_ratio_annual_arithmetic_means")) {
+  stop("Rebuild annual effects and model table using the annual arithmetic-mean ratio.")
+}
 dictionary <- read_csv(file.path(root, "config/predictor_dictionary.csv"), show_col_types = FALSE)
 old_set <- dictionary$predictor[as.character(dictionary$include_primary) == "TRUE"]
 primary_config <- read_csv(file.path(root, "config/issue6_revised_primary_predictors.csv"),

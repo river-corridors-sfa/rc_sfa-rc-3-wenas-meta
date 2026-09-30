@@ -3,8 +3,10 @@ library(tidyverse)
 library(here)
 
 root <- here("agent_workflows", "vibe_coding")
-out <- file.path(root, "output", "issue_6_revised_primary")
-dir.create(out, recursive = TRUE, showWarnings = FALSE)
+figure_dir <- file.path(root, "output", "paper", "figures", "si_figure_2_predictor_violins")
+table_dir <- file.path(root, "output", "paper", "tables")
+dir.create(figure_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(table_dir, recursive = TRUE, showWarnings = FALSE)
 
 config <- read_csv(file.path(root, "config/issue6_revised_primary_predictors.csv"),
                    show_col_types = FALSE)
@@ -36,7 +38,7 @@ summary <- values %>%
             maximum = max(value), .groups = "drop") %>%
   left_join(dictionary %>% select(predictor, predictor_label), by = "predictor") %>%
   mutate(observation_unit = if_else(predictor == "post_fire_year", "pair-year", "watershed pair"))
-write_csv(summary, file.path(out, "revised_primary_predictor_distribution_summary.csv"))
+write_csv(summary, file.path(table_dir, "si_figure_2_predictor_distribution_summary.csv"))
 
 panel_labels <- summary %>%
   mutate(detail = paste0(as.character(response_var), " n=", n,
@@ -71,6 +73,6 @@ figure <- ggplot(values, aes(x = response_var, y = value, fill = response_var)) 
         plot.title = element_text(face = "bold", size = 16),
         plot.caption = element_text(hjust = 0, size = 8))
 
-ggsave(file.path(out, "all_revised_primary_predictor_violins.png"), figure,
+ggsave(file.path(figure_dir, "si_figure_2_predictor_violins.png"), figure,
        width = 13, height = 11, dpi = 300, bg = "white")
-message("Saved combined revised-primary violin plot to ", out)
+message("Saved combined revised-primary violin plot to ", figure_dir)

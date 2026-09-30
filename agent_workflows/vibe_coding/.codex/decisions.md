@@ -1,5 +1,26 @@
 # Project decisions
 
+## September 30, 2026 — Annual arithmetic mean ratio selected
+
+- User selected `log(mean annual C_b / mean annual C_u)` as the primary response, superseding the mean of daily log ratios. Compute both arithmetic means on the same existing eligible matched positive-concentration dates within each calendar year; retain current interpolation, site selections, and time predictors. Partial-year summaries describe available coverage, not a reconstructed complete year. Zero/nonpositive-date eligibility remains a separate methods review.
+- Retain `lnRR_mean` as the downstream response column; export `annual_mean_burn`, `annual_mean_reference`, `effect_size_definition`, and `variance_method`. Retain daily-log summaries only as explicitly named diagnostics.
+- Replace daily-log `SD²/n` with provisional paired delta variance: `var(C_b/mean(C_b) - C_u/mean(C_u)) / n`. This includes same-date burned/reference covariance but assumes independent daily pairs; temporal correlation, interpolation, shared-reference dependence, and final manuscript uncertainty remain unresolved. Singletons retain missing variance.
+- Restore the archived strict workbook importer and its input inventory/workbook to active paths so reviewed rebuilding works.
+
+## September 30, 2026 — Pairing, gap-fill, and variance status clarified
+
+- The pairing review workbook settled which controls and watershed pairs to retain: 28 approved/included pairs and 8 excluded pairs passed strict import. Do not treat control selection or pair approval as an unresolved decision.
+- The observation-preserving gap-fill fix is active. It restored the Writer 2013 nitrate variance lost when an observed date after a gap was accidentally removed. The current model table has 110 annual response rows; six still have no calculable annual variance because each has exactly one matched observed date (four Murphy 2010 rows and two Writer 2012 rows). These are genuine singletons, not evidence that the gap-fill bug persists.
+- Approval of a shared control for multiple burned watersheds establishes valid pairings. The separate statistical question is how to account for dependence among effect sizes that reuse that control. The current model table records shared-control IDs and gives each pair a `reference_family_weight` of `1 / n_pairs_sharing_reference`; this is a weighting convention, not an exact sampling covariance model.
+- Before the annual arithmetic-mean change, annual variance was `lnRR_sd^2 / lnRR_n` across matched daily log ratios. Whether this is the manuscript's final uncertainty/weighting approach given temporal correlation, interpolation, and singleton rows remains a method decision. This is distinct from the fixed gap-fill bug and approved control choices.
+- These clarifications supersede older provisional pairing language below. The active annual effects come from reviewed site selections and corrected chemistry, not the historical established annual-effect source.
+
+## September 29, 2026 — Paper workflow organization
+
+- The active outputs are Figure 1 maps, Figure 2 response boxplots, Figure 3 final-primary LASSO results, SI Figure 1 correlations of all 24 available predictor-like fields, and SI Figure 2 violins for only the final DOC and nitrate sets.
+- Active figure code stays in `R/`; manuscript-facing figures and model tables are under `output/paper/`. The paper runner is `R/run_paper_workflow_agent_v1.R` and uses the user-defined sets in `config/issue6_revised_primary_predictors.csv`.
+- Earlier model variants, provisional outputs, and obsolete runners are preserved under `archive/preliminary_2026_09_29/`. The human map source outside the agent workflow is unchanged.
+
 ## September 22 — Corrected full run completed
 
 The full corrected workflow ran with 1000 bootstrap iterations per analyte/scenario. This supersedes earlier notes stating models and figures are stale. Current outputs use corrected chemistry and reviewed named-site selections. Execution is complete, but current variance, predictor, temporal, and bootstrap-method assumptions remain provisional; see output/reports/corrected_run_2026-09-22.md. No scientific defaults were changed during this run.
@@ -59,8 +80,8 @@ This file records current architectural and analytical decisions for the `agent_
 - Records from the same watershed pair must remain together during resampling.
 - Study-grouped or leave-one-study-out validation will be the primary test of transferability to new studies.
 - Pair-grouped validation may be reported secondarily to assess prediction for new pairs within represented study contexts.
-- **Provisional:** Automatically generated burned × unburned combinations will not be accepted as independent pairs without review of the original study design.
-- **Provisional:** Effect sizes sharing a reference watershed will be retained only with explicit shared-control identifiers and appropriate dependence handling.
+- The included burned × reference pairs were approved through the review workbook; no automatically generated combinations are admitted as independent pairs without that review.
+- Approved pairs may share a reference watershed. Preserve their shared-control identifiers and evaluate how this dependence affects uncertainty and weighting.
 
 ## Source data
 
@@ -103,16 +124,16 @@ The following remain preserved elsewhere in the repository but are not part of t
 
 ## Unresolved decisions
 
-1. Confirm designated watershed pairs versus automatically constructed comparisons for every study.
-2. Decide how to represent multiple controls and effect sizes sharing one control.
-3. Determine the final effect-size variance or weighting approach given interpolation and temporal autocorrelation.
-4. Confirm whether annual summaries should use calendar year, discrete time-since-fire year, or both.
-5. Finalize the candidate predictor set after pair-level missingness and redundancy audits.
-6. Decide whether the small DOC study count supports a primary LASSO claim or only an exploratory stability analysis.
+1. Decide whether the current family weighting adequately handles dependence among effect sizes sharing an approved control, or whether manuscript inference needs a more explicit covariance approach.
+2. Determine the final effect-size variance or weighting approach given temporal autocorrelation, interpolation, and six genuine singleton annual rows. The gap-fill data-loss bug has been fixed.
+3. Confirm whether annual summaries should use calendar year, discrete time-since-fire year, or both.
+4. Document the rationale for including both highly correlated burn predictors in the current user-defined primary sets, and finalize predictor decisions after missingness and redundancy audits.
+5. Decide whether the small DOC study count supports a primary LASSO claim or only an exploratory stability analysis.
 
-## Provisional use of established lnRR pairings
+## Historical, superseded: provisional use of established lnRR pairings
 
-- The 36 distinct pairs already present in `effect_sizes_yearly.csv` are treated as previously manually reviewed for interim workflow development.
+- The following bullets record the interim state before the reviewed workbook was promoted; they do not describe the active analysis.
+- The 36 distinct pairs already present in `effect_sizes_yearly.csv` were treated as previously manually reviewed for interim workflow development.
 - This is an explicit provisional assumption, not a replacement for co-author confirmation.
 - The original `pairing_decisions.csv`, review workbook, and final review fields remain unchanged.
 - A separate `pairing_decisions_analysis.csv` records all 36 pairs as provisionally included and keeps `Coauthor_Confirmation = pending`.
@@ -120,8 +141,9 @@ The following remain preserved elsewhere in the repository but are not part of t
 - `Comparison_ID` is used as `Fire_ID_Analysis` until multi-fire attribution is confirmed; final fire identifiers are not inferred.
 - Final analysis and manuscript reporting remain conditional on co-author confirmation or completion of the review workbook.
 
-## Runnable provisional workflow
+## Historical, superseded: runnable provisional workflow
 
+- The following bullets describe the earlier interim workflow. The active paper workflow uses the reviewed configuration and corrected annual effects described above.
 - Scripts 02–07 are executable as a linear provisional workflow, with `run_all_agent_v1.R` as the entry point.
 - **Provisional exception:** `effect_sizes_yearly.csv` is used as the response source so the established pair inventory is preserved while pairing provenance is confirmed. It remains subject to final rebuilding or variance revision.
 - Burned-watershed attributes are joined from the daily and geospatial source snapshots; no new burned × reference combinations are generated.
@@ -130,3 +152,11 @@ The following remain preserved elsewhere in the repository but are not part of t
 - The meta-analysis fits reported-variance models and family-adjusted sensitivity models. Family adjustment is not presented as an exact shared-control covariance matrix.
 - LASSO performance uses leave-one-study-out outer validation, grouped inner folds, training-fold preprocessing, `lambda.1se`, and held-out predictions.
 - Study-bootstrap stability defaults to 100 iterations for routine runs; set `N_BOOTSTRAP=1000` for final estimates.
+
+## Manuscript figure styling
+
+- Do not print figure titles, subtitles, or explanatory notes inside manuscript figures; place that information in manuscript captions.
+- Use one consistent color for axis text, axis titles, and other figure labels unless the user explicitly requests varying label colors.
+- Figure 2 retains the observation count (`n`) and distinct study count under each analyte.
+- Prefer a complete, thin box around manuscript plot panels.
+- Figure 3 displays bootstrap predictor-selection frequency only. Keep leave-one-study-out performance in supporting tables while the row-weighted RMSE interpretation is reviewed.

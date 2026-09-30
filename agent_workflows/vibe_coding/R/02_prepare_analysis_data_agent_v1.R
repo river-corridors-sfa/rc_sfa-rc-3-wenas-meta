@@ -43,7 +43,8 @@ required_daily_fields <- c(
 )
 required_effect_fields <- c(
   "Study_ID", "Comparison_ID", "Pair_Burn", "Pair_Unburn",
-  "response_var", "year", "lnRR_mean", "lnRR_var", "lnRR_n"
+  "response_var", "year", "lnRR_mean", "lnRR_var", "lnRR_n",
+  "annual_mean_burn", "annual_mean_reference", "effect_size_definition", "variance_method"
 )
 
 if (!all(required_pair_fields %in% names(pairing_decisions))) stop("Analysis pairing fields are incomplete.")
@@ -114,7 +115,7 @@ burned_annual <- burned_daily %>%
   )
 
 model_table <- annual_effect_sizes %>%
-  select(all_of(required_effect_fields), any_of(c("lnRR_sd", "pair_key", "n_both_observed", "n_with_interpolation"))) %>%
+  select(all_of(required_effect_fields), any_of(c("daily_lnRR_mean", "daily_lnRR_sd", "pair_key", "n_both_observed", "n_with_interpolation"))) %>%
   inner_join(
     approved_pairs %>%
       select(all_of(required_pair_fields), any_of(c("shared_reference", "Composite_Reference_Candidate"))),
