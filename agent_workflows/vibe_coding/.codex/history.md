@@ -337,3 +337,20 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Changes: Added an explicit six-record exclusion table, clarified that entire sites/studies were not removed, and recorded the 104-record primary and 89-record sensitivity inventories. Marked completed weighting, preprocessing, bootstrap, performance, conditional CR2 inference, runner, and figure regeneration tasks. Corrected bootstrap success counts to 994 DOC and 1,000 nitrate per scenario.
 - Remaining work: Annual uncertainty, influence review, elastic net, isolated shared-reference weighting sensitivity, fold exports, final captions/Methods and a clean from-source run remain open. Preserved the existing screening/biome checklist state and author-confirmed provenance decision.
 - Verification: Cross-checked issue against current decisions and September 30 run history; documentation only, no analyses rerun.
+
+## 2026-10-21 — Reviewed annual uncertainty and dependence candidates
+
+- Task: Evaluate defensible synthesis uncertainty without treating interpolated daily coverage as independent sampling information.
+- Files changed: Added script 20, `output/paper/annual_uncertainty_review.md`, and `output/paper/uncertainty_review/` tables/session record; added the review status to the manuscript checklist.
+- Analysis: Compared study-balanced WLS/CR2 candidates under publication and connected study/fire clustering on primary, observed-only, and matched-interpolated inventories. Exported leave-component-out point estimates and balancing weights. Rhea and Writer connect through High Park; six DOC and eleven nitrate components remain.
+- Findings: Balanced pooled nitrate intervals stay above zero; DOC intervals include zero. Balanced and existing precision-based REML time slopes reverse signs; balanced slope effective df are about 1.3. This supports caution about temporal claims, not validated annual variances.
+- Verification: Script completed successfully; assertions checked study/pair weight totals, pooled estimates against independently aggregated means, unique annual keys, finite coefficient uncertainty and positive df. Whitespace checks passed.
+- Decision status: Author choice of primary synthesis is pending. Recommended balanced pooled synthesis with component CR2 intervals and conditional REML sensitivities; existing primary models, annual variances, prediction groups and runner remain unchanged. Cross-publication links and time attribution need review before manuscript freeze. GitHub was not edited.
+
+## 2026-10-21 — Evaluated workflow against supplied Methods
+
+- Task: Compare the supplied Methods with active preparation, inference, LASSO code, saved outputs, and pending uncertainty candidates.
+- Files changed: This history entry only; existing analyses and manuscript documents preserved.
+- Verified: All 104 annual keys are unique and responses reproduce saved arithmetic-mean ratios to numerical tolerance. No current record uses the time-since-fire fallback; 21 records have time zero. Primary bootstrap success counts are 994 DOC and 1,000 nitrate. Nitrate held-out LASSO predictions equal the intercept-only benchmark to numerical tolerance.
+- Findings: Methods need the 46-watershed retained inventory, common positive-date/calendar-year coverage and six singleton exclusions, primary predictive balancing weights, actual study/pair random effects plus assumed shared-reference covariance, and custom grouped one-SE tuning details. Elastic net and an isolated shared-reference weighting comparison remain incomplete. Script 20 is a separate candidate synthesis, outside the paper runner and pending author selection.
+- Next steps: Select the primary synthesis and dependence assumptions, complete the promised sensitivities, reconcile Methods/SI and inventory references, and verify a clean from-source manuscript run. Study-identification provenance remains author-confirmed; original screening/biome counts were not independently reverified in this evaluation. No analyses rerun.
