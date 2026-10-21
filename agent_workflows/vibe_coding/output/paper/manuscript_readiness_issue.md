@@ -1,6 +1,6 @@
 # Finalize manuscript analysis and figures
 
-Bring the reviewed annual DOC and nitrate analysis to manuscript readiness by resolving the remaining statistical choices, validating the final models, and completing the five figure products. Status reflects project history and decisions through September 30, 2026, reconciled with the Methods draft supplied on that date. The Methods commit to multilevel inference, nested study-grouped LASSO, and sensitivity analyses; these are required manuscript deliverables, with implementation and wording to be reconciled before reporting. Existing figures are manuscript candidates; completed execution and publication styling do not establish final statistical inference.
+Bring the reviewed annual DOC and nitrate analysis to manuscript readiness by resolving the remaining statistical choices, validating the final models, and completing the five figure products. Status updated October 1, 2026, incorporating the September 30 decisions, completed workflow runs, and supplied Methods draft. The Methods commit to multilevel inference, nested study-grouped LASSO, and sensitivity analyses; these are required manuscript deliverables, with implementation and wording to be reconciled before reporting. Existing figures are manuscript candidates; completed execution and publication styling do not establish final statistical inference.
 
 This updates the workflow described in [issue 7](https://github.com/river-corridors-sfa/rc_sfa-rc-3-wenas-meta/issues/7) and coordinates the remaining work from [predictor issue 6](https://github.com/river-corridors-sfa/rc_sfa-rc-3-wenas-meta/issues/6) and [figure issue 10](https://github.com/river-corridors-sfa/rc_sfa-rc-3-wenas-meta/issues/10). All paths below are relative to `agent_workflows/vibe_coding/`.
 
@@ -11,7 +11,25 @@ This updates the workflow described in [issue 7](https://github.com/river-corrid
 - [x] Observation-preserving interpolation is active and restored the Writer 2013 nitrate variance. The gap-fill data-loss bug is fixed.
 - [x] The paper model table contains 104 annual responses: 35 DOC responses from 7 studies and 69 nitrate responses from 12 studies, all with usable provisional variances.
 - [x] Six genuine singleton rows (four Murphy 2010 and two Writer 2012) are excluded from paper analyses and figures by user decision; they remain in upstream annual data and the exclusion audit.
-- [x] User-defined eight-predictor sets, leave-one-study-out fits, and 1,000 study-bootstrap refits per analyte have been generated. Five candidate figures and source tables are organized under `output/paper/`.
+- [x] User-defined eight-predictor sets, leave-one-study-out fits, and 1,000 study-bootstrap attempts per analyte have been generated for the primary analysis and each of four sensitivities: 994 successful DOC refits and 1,000 successful nitrate refits per scenario. Five candidate figures and source tables are organized under `output/paper/`.
+
+## Implemented decisions and exclusions
+
+The singleton exclusion removes **six pair × analyte × year records, not six entire sites or studies**. Each excluded record has only one eligible matched concentration date.
+
+| Publication | Calendar year | Burned pair IDs | Analytes excluded | Annual records removed |
+|---|---:|---|---|---:|
+| Murphy et al. 2018 | 2010 | Site_1 and Site_2 | DOC and nitrate | 4 |
+| Writer et al. 2014 | 2012 | Site_1 and Site_2 | Nitrate only | 2 |
+
+- [x] Enforce `lnRR_n >= 2` in the paper model table. Retain all 110 upstream annual records and save the six excluded rows with reasons in `data/audit/paper_singleton_exclusions.csv`. Both publications and all 28 approved pairs remain represented; paper analyses and figures use 104 records.
+- [x] Use the log ratio of annual arithmetic mean concentrations as the response and **time since fire** as the analysis axis. Current calendar-year concentration aggregation is retained; fire attribution and fallback checks remain below.
+- [x] Use equal total study weight for primary LASSO, divided equally among retained pairs and then annual records within each pair. Recalculate weights inside training folds and preserve study-bootstrap draw multiplicity. Primary predictive weights do not use interpolated-day precision.
+- [x] Run equal-row and provisional precision/family weighting sensitivities. Run observed-only and matched-interpolated sensitivities on the same **89 records: 32 DOC and 57 nitrate**. The additional 15 sensitivity exclusions do not change the primary inventory.
+- [x] Complete the sampling-support audit. Only 18 records, all Murphy, meet the exploratory screen of at least 20 matched observed dates over at least 90 days; even these have 42–57-day maximum gaps. This is a diagnostic screen, not a validated eligibility threshold for uncertainty estimation. No automatic temporal block-bootstrap variances were assigned.
+- [x] Retain established study-identification provenance from previous versions, as confirmed by the author; rebuilding that provenance is not an issue task.
+
+Evidence: `output/paper/uncertainty_weighting_report.md`, `data/audit/paper_sampling_support.csv`, `data/audit/observed_only_exclusions.csv`, and `output/paper/tables/fitting_weights.csv`.
 
 The completed pairing and correction work is documented in [issue 4](https://github.com/river-corridors-sfa/rc_sfa-rc-3-wenas-meta/issues/4), [issue 8](https://github.com/river-corridors-sfa/rc_sfa-rc-3-wenas-meta/issues/8), and [issue 9](https://github.com/river-corridors-sfa/rc_sfa-rc-3-wenas-meta/issues/9); older unchecked tasks there may predate the current local results.
 
@@ -43,20 +61,23 @@ Acceptance: final choices and their rationale are recorded in `.codex/decisions.
 
 - [x] Update `R/11_fit_issue6_revised_primary_agent_v1.R` so imputation, predictor screening, scaling, and data-derived weight rules are learned separately within every inner training fold. Implemented explicit inner-fold preprocessing for outer fits and bootstrap tuning, with a fixed penalty grid.
 - [x] Correct bootstrap tuning groups: all copies of an original study now share a tuning fold. Draws with fewer than three distinct studies are logged as failures and excluded from frequency denominators.
-- [ ] Verify that all records for a watershed pair and its repeated years stay together and that outer test studies never contribute to preprocessing, tuning, or fitting. Export fold assignments and add targeted leakage checks.
-- [ ] Retain `lambda.1se` as primary and compare LASSO with intercept-only, time-only, and time-plus-fire benchmarks on identical held-out rows and folds.
-- [ ] Define the performance target explicitly. Report current pooled pair-year RMSE alongside equal-study performance, clearly distinguishing root mean study MSE from mean study RMSE. Report per-study performance and document fitting weights separately from evaluation weights. Include the Methods-promised MAE and out-of-sample R², with explicit aggregation and R² denominator/baseline definitions; use held-out predictions rather than training fit or squared correlation.
-- [ ] Regenerate selection frequency, standardized coefficient magnitude and direction, and sign stability using 1,000 bootstrap attempts per analyte. Report attempted, successful, and failed refits, failure reasons, and the denominator used for every frequency; unavailable fits must not become silent zero selections.
+- [x] Group tuning by original study, keeping pair histories and repeated bootstrap copies together. Targeted checks passed for equal study/pair/draw weights, training-only preprocessing, observed-only eligibility, and complete unique held-out predictions.
+- [ ] Export reusable outer/inner fold-assignment tables for manuscript reproducibility.
+- [x] Retain the one-standard-error penalty rule and compare LASSO with intercept-only, time-only, and time-plus-fire benchmarks on identical held-out rows and study folds. Tuning now uses a fixed 80-value penalty grid from 100 to 0.0001 and study-level validation loss; this implementation replaces the former `cv.glmnet` preprocessing path.
+- [x] Export pooled pair-year RMSE, MAE, and R²; per-study errors; and equal-study RMSE/MAE. Equal-study RMSE is the square root of mean study MSE; mean study RMSE is a separate column. Pooled R² uses the pooled observed-mean denominator. Fitting weights and evaluation summaries are saved separately in `fitting_weights.csv`, `performance.csv`, `performance_by_study.csv`, and `performance_equal_study.csv` under `output/paper/tables/`.
+- [x] Regenerate selection frequency and standardized coefficient magnitude/direction from 1,000 bootstrap attempts per analyte and scenario. Each scenario completed 994 DOC and 1,000 nitrate refits; six DOC draws had fewer than three distinct studies for tuning. Failure logs and `bootstrap_summary.csv` record these exclusions. Frequencies use successful refits only; failed fits are not zero selections. Positive/negative frequencies and bootstrap coefficients are exported.
+- [ ] Finalize manuscript interpretation of coefficient sign stability and predictive performance; do not equate selection frequency with predictive skill.
 
 Acceptance: reproducible held-out predictions, benchmark comparisons, fold checks, coefficient tables, and transparent bootstrap diagnostics support every predictive claim. Figure 3 remains selection-frequency only.
 
 ## 3. Complete inference and sensitivity analyses
 
-- [ ] Restore an updated agent-versioned multilevel inference step to `R/run_paper_workflow_agent_v1.R`. The supplied Methods explicitly include this analysis, but the active runner omits the archived meta-analysis scripts. Conditional REML pooled/time fits with CR2 inference and nine working-covariance scenarios are now implemented in script 19; finalize annual variance assumptions before treating these as manuscript inference.
-- [ ] Verify the Methods-promised random intercepts for study, burned–reference pair, and shared reference against the implemented model formula and identifier nesting. Assess estimability/redundancy with the available studies and report convergence or singular components. Distinguish random-effect structure from sampling covariance and family weighting.
-- [ ] Implement and document the claimed study-level adjustment of standard errors and confidence intervals: estimator, small-sample correction, degrees of freedom, and limitations with 7 DOC and 12 nitrate studies. Do not describe inference as adjusted merely because random intercepts are present.
-- [ ] Export pooled effects, temporal coefficients, intervals, heterogeneity, study/pair/row counts, and influence diagnostics. Ensure any back-transformed interpretation corresponds to the selected annual estimand.
-- [ ] Complete the sensitivities explicitly promised in the Methods/SI: gap-filling sensitivity including observed-only chemistry, reduced shared-reference weighting, elastic net with `alpha = 0.5`, and unweighted LASSO. Use the final predictor sets and corrected validation pipeline; archived results from earlier specifications do not establish completion for the final analysis.
+- [x] Restore multilevel inference to the active runner through `R/19_fit_working_covariance_inference_agent_v1.R`. All 36 conditional REML pooled/time fits completed across two analytes and nine working-covariance scenarios.
+- [x] Implement study/pair random intercepts with shared-reference dependence in the sampling covariance. The positive-semidefinite covariance mixes pair and shared-reference temporal kernels, evaluating reference rho and annual temporal phi in `{0, 0.5, 0.8}`. These are assumed sensitivity parameters, not estimates of daily temporal correlation.
+- [x] Implement study-clustered CR2 uncertainty with Satterthwaite degrees of freedom through `clubSandwich`. Export coefficients, intervals, degrees of freedom, study/row counts, heterogeneity components, model objects, and failure logs. See `output/paper/tables/working_covariance_inference.csv` and `output/paper/working_covariance_models.rds`.
+- [ ] Finalize annual variance and dependence assumptions before promoting these conditional fits to manuscript inference. Review small-study limitations, variance components, and influence diagnostics; reconcile Methods wording that currently promises a separate shared-reference random intercept.
+- [x] Complete observed-only, matched-interpolated, equal-row (unweighted), and provisional precision/family LASSO sensitivities using the current predictor sets and corrected tuning pipeline. Scenario outputs are under `output/paper/sensitivity/`; the combined performance table is `output/paper/tables/weighting_interpolation_performance.csv`.
+- [ ] Complete elastic net with `alpha = 0.5` and a controlled shared-reference weight comparison holding other weighting choices fixed. The completed equal-study versus precision/family comparison changes more than the reference-family multiplier and does not isolate that effect.
 - [ ] Complete the additional project-planned sensitivities for influential-study removal, matched DOC–nitrate subsets, and alternative burn/hydrology specifications. Include temporal-definition sensitivity if warranted by step 1; treat `lambda.min` as secondary if used. Document any author-approved changes to this scope.
 
 - [ ] Summarize which conclusions persist across sensitivities and which depend on particular studies, weight rules, or correlated predictors. Do not infer predictive skill from selection frequency alone.
@@ -66,8 +87,9 @@ Acceptance: saved multilevel model results support the Methods claims, and a com
 ## 4. Finish the five manuscript figures
 
 - [ ] **Figure 1, maps:** verify coordinate provenance and remaining approximate positions, including Murphy and Writer. Reconcile 14 unique fires with 15 study/fire records across 12 studies. Keep one High Park marker representing three included burned watersheds, preserve Rhea and Writer detail, and keep Wagner excluded. Check nearby-point overlap, symbol counts, left-side legend, scale, north arrow, projection, and boundary attribution. Explain coordinate precision in the caption.
-- [ ] **Figure 2, responses:** regenerate from the final table; retain unweighted annual pair-year points, zero reference, and observation/study counts (currently nitrate 69/12 and DOC 35/7). Explain the box/whisker definitions and singleton exclusion in the caption. Treat this as a descriptive distribution rather than a pooled meta-analytic estimate.
-- [ ] **Figure 3, selection:** regenerate after resampling corrections; show bootstrap selection frequency only, order predictors within analyte by frequency, and retain nitrate before DOC with matching blue/ochre colors. Describe the candidate sets, `lambda.1se`, successful-refit denominator, and limits of selection-frequency interpretation. Keep held-out performance in supporting tables.
+- [x] Regenerate all five analysis figures from the current paper inputs and updated models; visually check updated Figures 2 and 3. Figure 3 remains selection-frequency only, with performance in supporting tables.
+- [ ] **Figure 2, responses:** finalize the caption for the regenerated figure; retain unweighted annual pair-year points, zero reference, and observation/study counts (currently nitrate 69/12 and DOC 35/7). Explain the box/whisker definitions and singleton exclusion in the caption. Treat this as a descriptive distribution rather than a pooled meta-analytic estimate.
+- [ ] **Figure 3, selection:** finalize the caption after the completed resampling corrections; show bootstrap selection frequency only, order predictors within analyte by frequency, and retain nitrate before DOC with matching blue/ochre colors. Describe the candidate sets, `lambda.1se`, successful-refit denominator, and limits of selection-frequency interpretation. Keep held-out performance in supporting tables.
 - [ ] **SI Figure 1, correlations:** verify all 24 fields, labels, units, missing-data handling, and sample counts. The current matrix repeats static attributes across pair-years; explicitly document that weighting and assess whether a pair-level static-predictor diagnostic is needed before using it to justify redundancy decisions.
 - [ ] **SI Figure 2, distributions:** show only the nine-variable union of the final sets; verify one pair-level value for static attributes and pair-year values for post-fire year, with readable units, points, medians, and distribution summaries.
 - [ ] Apply established styling across figures: no in-figure titles, subtitles, or explanatory notes; consistent dark label text; thin complete panel borders where applicable. Preserve Figure 2 counts and Figure 3 scope.
@@ -78,7 +100,9 @@ Acceptance: five visually checked analysis figures, captions, and matching sourc
 
 ## 5. Rebuild and freeze the manuscript package
 
-- [ ] Verify the from-source path after the archive reorganization, including the strict workbook importer and all referenced files. The cleanup run was verified from the prepared table; its optional from-source mode was not rerun then.
+- [x] Restore the strict workbook importer and its input files to active paths; strict import and annual/model-table rebuilding succeeded.
+- [x] Complete the active paper runner from prepared data, including sampling audit, primary/sensitivity models, conditional multilevel inference, and five figures. Record package/session information, run logs, and bootstrap failures.
+- [ ] Verify a clean end-to-end from-source run including interpolation; recent full paper runs used the prepared corrected inputs.
 - [ ] After the method/code updates, run from a clean R session at repository root:
 
 ```sh
@@ -102,3 +126,6 @@ Acceptance: every manuscript number and figure can be regenerated from documente
 - `config/issue6_revised_primary_predictors.csv` and `config/issue6_revised_primary_dictionary.csv` for the primary sets.
 - `R/run_paper_workflow_agent_v1.R` and `R/11_fit_issue6_revised_primary_agent_v1.R` for the current execution and resampling behavior.
 - `output/paper/tables/figure_1_map_locations.csv` and `output/paper/tables/figure_1_study_fire_records.csv` for map reconciliation.
+
+- `output/paper/uncertainty_weighting_report.md`, `output/paper/uncertainty_weighting_run.log`, and `output/paper/uncertainty_session_info.txt` for completed runs and limitations.
+- `R/17_audit_sampling_support_agent_v1.R` through `R/19_fit_working_covariance_inference_agent_v1.R` for implemented audit, sensitivity, and conditional inference steps.

@@ -329,3 +329,11 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Findings: Observed-only eligibility retains 32 DOC and 57 nitrate records; matching interpolated runs isolate changes in record coverage. Only 18 annual records, all Murphy, pass the exploratory temporal-resampling support screen, and long gaps remain. No automatic block-bootstrap variance was promoted. The primary 104-record inventory is unchanged.
 - Verification: Full runner completed; all outer fits and 36 conditional multilevel fits succeeded. Each scenario completed 994 DOC and 1,000 nitrate bootstraps out of 1,000 attempts; six DOC draws with fewer than three distinct studies are logged and excluded from frequency denominators. Targeted weight/preprocessing/support checks and independent output-coverage checks passed; Figure 3 visually checked; whitespace checks passed.
 - Remaining limits: Final annual uncertainty remains unresolved. Temporal block construction, sparse-year precision, and seasonal dependence need scientific review before final inference. The issue retains this limitation explicitly; sensitivity output completion is not presented as validated annual precision.
+
+## 2026-10-01 — Reconciled manuscript issue with completed work
+
+- Task: Update the manuscript issue with implemented decisions and current completion status.
+- Files changed: `output/paper/manuscript_readiness_issue.md` and this history entry.
+- Changes: Added an explicit six-record exclusion table, clarified that entire sites/studies were not removed, and recorded the 104-record primary and 89-record sensitivity inventories. Marked completed weighting, preprocessing, bootstrap, performance, conditional CR2 inference, runner, and figure regeneration tasks. Corrected bootstrap success counts to 994 DOC and 1,000 nitrate per scenario.
+- Remaining work: Annual uncertainty, influence review, elastic net, isolated shared-reference weighting sensitivity, fold exports, final captions/Methods and a clean from-source run remain open. Preserved the existing screening/biome checklist state and author-confirmed provenance decision.
+- Verification: Cross-checked issue against current decisions and September 30 run history; documentation only, no analyses rerun.
