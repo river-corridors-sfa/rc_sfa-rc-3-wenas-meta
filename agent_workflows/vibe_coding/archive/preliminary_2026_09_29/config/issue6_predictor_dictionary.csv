@@ -1,0 +1,22 @@
+predictor,predictor_label,predictor_group,transformation,proportion_missing,n_unique,DOC_current,DOC_curated,NO3_current,NO3_curated,sensitivity_bfi,rationale
+post_fire_year,Post-fire year,recovery,none,0,7,TRUE,TRUE,TRUE,TRUE,FALSE,Annual paired response retains recovery time.
+burn_percent_fire_year,Burned watershed area (%),fire,none,0.10909090909090909,22,TRUE,FALSE,TRUE,TRUE,FALSE,Nitrate burn metric from human burned-nitrate list; avoid 0.92-correlated high severity.
+burn_sev_high,High-severity burn (%),fire,none,0.10909090909090909,23,TRUE,TRUE,TRUE,FALSE,FALSE,DOC burn metric from human burned-DOC list; avoid 0.92-correlated burned extent.
+Area_watershed_km,Watershed area (km),topography,log1p,0,28,TRUE,TRUE,TRUE,TRUE,FALSE,Retained from the union of human burned and reference lists for paired lnRR.
+runoffws,Mean annual runoff,hydrology,log1p,0,23,TRUE,TRUE,TRUE,TRUE,FALSE,Retained from the union of human burned and reference lists for paired lnRR.
+bfiws,Baseflow index,hydrology,none,0,27,FALSE,FALSE,FALSE,FALSE,TRUE,Hydrology sensitivity substituted for runoff to examine baseflow.
+permws,Soil permeability,hydrology,log1p,0,26,FALSE,FALSE,FALSE,FALSE,FALSE,"Available in audit, not in the issue #6 curated primary set."
+forest_cover,Forest cover (%),landscape,none,0,27,TRUE,TRUE,TRUE,TRUE,FALSE,Retained from the union of human burned and reference lists for paired lnRR.
+grassland_cover,Grassland cover (%),landscape,none,0,26,FALSE,FALSE,FALSE,FALSE,FALSE,"Available in audit, not in the issue #6 curated primary set."
+wetland_cover,Wetland cover (%),landscape,none,0,21,FALSE,TRUE,FALSE,FALSE,FALSE,DOC reference-watershed mechanism from human unburned-DOC list.
+ag_cover,Agricultural cover (%),landscape,none,0,11,FALSE,FALSE,FALSE,FALSE,FALSE,"Available in audit, not in the issue #6 curated primary set."
+urban_cover,Urban cover (%),landscape,none,0,25,FALSE,FALSE,FALSE,FALSE,FALSE,"Available in audit, not in the issue #6 curated primary set."
+omws,Soil organic matter,soil,none,0,26,TRUE,TRUE,TRUE,TRUE,FALSE,Retained from the union of human burned and reference lists for paired lnRR.
+clayws,Soil clay content,soil,none,0,26,FALSE,FALSE,FALSE,TRUE,FALSE,Nitrate soil mechanism from human burned-nitrate list.
+rckdepws,Depth to bedrock,geology,log1p,0,26,FALSE,FALSE,FALSE,FALSE,FALSE,"Available in audit, not in the issue #6 curated primary set."
+glacial_till,Glacial till (%),geology,none,0,13,FALSE,FALSE,FALSE,FALSE,FALSE,"Available in audit, not in the issue #6 curated primary set."
+precip8110ws,1981-2010 precipitation,climate,none,0,27,FALSE,FALSE,FALSE,FALSE,FALSE,"Available in audit, not in the issue #6 curated primary set."
+tmean8110ws,1981-2010 mean temperature,climate,none,0,27,FALSE,FALSE,FALSE,FALSE,FALSE,"Available in audit, not in the issue #6 curated primary set."
+slope,Watershed slope,topography,none,0.14545454545454545,20,FALSE,FALSE,FALSE,FALSE,FALSE,"Available in audit, not in the issue #6 curated primary set."
+maxelevsmo,Maximum smoothed elevation,topography,none,0.14545454545454545,22,FALSE,FALSE,FALSE,FALSE,FALSE,"Available in audit, not in the issue #6 curated primary set."
+long_term_aridity,Long-term aridity,climate,none,NA,NA,FALSE,FALSE,FALSE,FALSE,FALSE,Human-curated predictor absent from the current model table and source snapshot; no proxy substituted.

@@ -1,0 +1,577 @@
+predictor_1,predictor_2,rho,n_pairwise,label_1,label_2
+post_fire_year,post_fire_year,1,103,Post-fire year,Post-fire year
+burn_percent_fire_year,post_fire_year,0.3021173575680656,91,Burned watershed area (%),Post-fire year
+burn_sev_high,post_fire_year,0.3850222998466078,91,High-severity burn (%),Post-fire year
+Area_watershed_km,post_fire_year,-0.2570268572967779,103,Watershed area (km),Post-fire year
+runoffws,post_fire_year,-0.02352822811273348,103,Mean annual runoff,Post-fire year
+bfiws,post_fire_year,0.06817169878192536,103,Baseflow index,Post-fire year
+permws,post_fire_year,0.2521327261652599,103,Soil permeability,Post-fire year
+forest_cover,post_fire_year,-0.07169189633387922,103,Forest cover (%),Post-fire year
+grassland_cover,post_fire_year,0.0891254557810814,103,Grassland cover (%),Post-fire year
+wetland_cover,post_fire_year,-0.03919733173358196,103,Wetland cover (%),Post-fire year
+ag_cover,post_fire_year,-0.302122818430754,103,Agricultural cover (%),Post-fire year
+urban_cover,post_fire_year,-0.24763721129433375,103,Urban cover (%),Post-fire year
+omws,post_fire_year,-0.37599053564343937,103,Soil organic matter,Post-fire year
+clayws,post_fire_year,-0.3635466422162127,103,Soil clay content,Post-fire year
+rckdepws,post_fire_year,-0.018710542048077407,103,Depth to bedrock,Post-fire year
+glacial_till,post_fire_year,-0.0661743655965451,103,Glacial till (%),Post-fire year
+precip8110ws,post_fire_year,-0.1401513572966389,103,1981-2010 precipitation,Post-fire year
+tmean8110ws,post_fire_year,-0.19514466571938463,103,1981-2010 mean temperature,Post-fire year
+slope,post_fire_year,0.33142514019646413,89,Watershed slope,Post-fire year
+maxelevsmo,post_fire_year,0.4263793515650414,89,Maximum smoothed elevation,Post-fire year
+time_since_fire,post_fire_year,1,103,Reported time since fire,Post-fire year
+followup_year,post_fire_year,0.6645785996421382,103,Follow-up year,Post-fire year
+burn_sev_mod,post_fire_year,0.3007955532674854,91,Moderate-severity burn (%),Post-fire year
+burn_sev_low,post_fire_year,0.15054225135402502,91,Low-severity burn (%),Post-fire year
+post_fire_year,burn_percent_fire_year,0.3021173575680656,91,Post-fire year,Burned watershed area (%)
+burn_percent_fire_year,burn_percent_fire_year,1,91,Burned watershed area (%),Burned watershed area (%)
+burn_sev_high,burn_percent_fire_year,0.9309290029091271,91,High-severity burn (%),Burned watershed area (%)
+Area_watershed_km,burn_percent_fire_year,-0.32480624529762187,91,Watershed area (km),Burned watershed area (%)
+runoffws,burn_percent_fire_year,0.11355688905019344,91,Mean annual runoff,Burned watershed area (%)
+bfiws,burn_percent_fire_year,-0.042107033895042605,91,Baseflow index,Burned watershed area (%)
+permws,burn_percent_fire_year,-0.01954488705847448,91,Soil permeability,Burned watershed area (%)
+forest_cover,burn_percent_fire_year,-0.46290514634757335,91,Forest cover (%),Burned watershed area (%)
+grassland_cover,burn_percent_fire_year,0.1472968068211008,91,Grassland cover (%),Burned watershed area (%)
+wetland_cover,burn_percent_fire_year,-0.4439088817575991,91,Wetland cover (%),Burned watershed area (%)
+ag_cover,burn_percent_fire_year,-0.45630199306194946,91,Agricultural cover (%),Burned watershed area (%)
+urban_cover,burn_percent_fire_year,-0.4542422290446868,91,Urban cover (%),Burned watershed area (%)
+omws,burn_percent_fire_year,-0.1929106775501129,91,Soil organic matter,Burned watershed area (%)
+clayws,burn_percent_fire_year,-0.3018848327593868,91,Soil clay content,Burned watershed area (%)
+rckdepws,burn_percent_fire_year,-0.0806056444152653,91,Depth to bedrock,Burned watershed area (%)
+glacial_till,burn_percent_fire_year,-0.1959215685622662,91,Glacial till (%),Burned watershed area (%)
+precip8110ws,burn_percent_fire_year,-0.1452168233037436,91,1981-2010 precipitation,Burned watershed area (%)
+tmean8110ws,burn_percent_fire_year,-0.011073213134976978,91,1981-2010 mean temperature,Burned watershed area (%)
+slope,burn_percent_fire_year,0.5728924741830059,77,Watershed slope,Burned watershed area (%)
+maxelevsmo,burn_percent_fire_year,0.24813037983291797,77,Maximum smoothed elevation,Burned watershed area (%)
+time_since_fire,burn_percent_fire_year,0.3021173575680656,91,Reported time since fire,Burned watershed area (%)
+followup_year,burn_percent_fire_year,0.011520294960382928,91,Follow-up year,Burned watershed area (%)
+burn_sev_mod,burn_percent_fire_year,0.9542887010084914,91,Moderate-severity burn (%),Burned watershed area (%)
+burn_sev_low,burn_percent_fire_year,0.8949769273300785,91,Low-severity burn (%),Burned watershed area (%)
+post_fire_year,burn_sev_high,0.3850222998466078,91,Post-fire year,High-severity burn (%)
+burn_percent_fire_year,burn_sev_high,0.9309290029091271,91,Burned watershed area (%),High-severity burn (%)
+burn_sev_high,burn_sev_high,1,91,High-severity burn (%),High-severity burn (%)
+Area_watershed_km,burn_sev_high,-0.29468736033225534,91,Watershed area (km),High-severity burn (%)
+runoffws,burn_sev_high,0.1531296353735561,91,Mean annual runoff,High-severity burn (%)
+bfiws,burn_sev_high,0.003801639750092916,91,Baseflow index,High-severity burn (%)
+permws,burn_sev_high,0.044986171318130076,91,Soil permeability,High-severity burn (%)
+forest_cover,burn_sev_high,-0.4013261683750308,91,Forest cover (%),High-severity burn (%)
+grassland_cover,burn_sev_high,0.16009393081075846,91,Grassland cover (%),High-severity burn (%)
+wetland_cover,burn_sev_high,-0.3830978296664187,91,Wetland cover (%),High-severity burn (%)
+ag_cover,burn_sev_high,-0.504340967011155,91,Agricultural cover (%),High-severity burn (%)
+urban_cover,burn_sev_high,-0.4467964910488611,91,Urban cover (%),High-severity burn (%)
+omws,burn_sev_high,-0.26992506545948947,91,Soil organic matter,High-severity burn (%)
+clayws,burn_sev_high,-0.34829118487199046,91,Soil clay content,High-severity burn (%)
+rckdepws,burn_sev_high,-0.07030445605139964,91,Depth to bedrock,High-severity burn (%)
+glacial_till,burn_sev_high,-0.18756804533608648,91,Glacial till (%),High-severity burn (%)
+precip8110ws,burn_sev_high,-0.0967127507671629,91,1981-2010 precipitation,High-severity burn (%)
+tmean8110ws,burn_sev_high,-0.07338852549280848,91,1981-2010 mean temperature,High-severity burn (%)
+slope,burn_sev_high,0.5176861079741373,77,Watershed slope,High-severity burn (%)
+maxelevsmo,burn_sev_high,0.35107052551652623,77,Maximum smoothed elevation,High-severity burn (%)
+time_since_fire,burn_sev_high,0.3850222998466078,91,Reported time since fire,High-severity burn (%)
+followup_year,burn_sev_high,0.05249271872380045,91,Follow-up year,High-severity burn (%)
+burn_sev_mod,burn_sev_high,0.9060822974934518,91,Moderate-severity burn (%),High-severity burn (%)
+burn_sev_low,burn_sev_high,0.7468919865028765,91,Low-severity burn (%),High-severity burn (%)
+post_fire_year,Area_watershed_km,-0.2570268572967779,103,Post-fire year,Watershed area (km)
+burn_percent_fire_year,Area_watershed_km,-0.32480624529762187,91,Burned watershed area (%),Watershed area (km)
+burn_sev_high,Area_watershed_km,-0.29468736033225534,91,High-severity burn (%),Watershed area (km)
+Area_watershed_km,Area_watershed_km,0.9999999999999999,103,Watershed area (km),Watershed area (km)
+runoffws,Area_watershed_km,0.2845375167778709,103,Mean annual runoff,Watershed area (km)
+bfiws,Area_watershed_km,-0.15658439747275277,103,Baseflow index,Watershed area (km)
+permws,Area_watershed_km,-0.3334472767686279,103,Soil permeability,Watershed area (km)
+forest_cover,Area_watershed_km,-0.25031562043623345,103,Forest cover (%),Watershed area (km)
+grassland_cover,Area_watershed_km,0.01902258753340125,103,Grassland cover (%),Watershed area (km)
+wetland_cover,Area_watershed_km,0.09735462647840627,103,Wetland cover (%),Watershed area (km)
+ag_cover,Area_watershed_km,0.3664923780136751,103,Agricultural cover (%),Watershed area (km)
+urban_cover,Area_watershed_km,0.06036838769789994,103,Urban cover (%),Watershed area (km)
+omws,Area_watershed_km,0.022730405603509297,103,Soil organic matter,Watershed area (km)
+clayws,Area_watershed_km,0.47310447656200594,103,Soil clay content,Watershed area (km)
+rckdepws,Area_watershed_km,0.11881226562241787,103,Depth to bedrock,Watershed area (km)
+glacial_till,Area_watershed_km,0.29166090361790575,103,Glacial till (%),Watershed area (km)
+precip8110ws,Area_watershed_km,0.3413454965433381,103,1981-2010 precipitation,Watershed area (km)
+tmean8110ws,Area_watershed_km,-0.10178564695769582,103,1981-2010 mean temperature,Watershed area (km)
+slope,Area_watershed_km,-0.3911238607692686,89,Watershed slope,Watershed area (km)
+maxelevsmo,Area_watershed_km,-0.2569633056119755,89,Maximum smoothed elevation,Watershed area (km)
+time_since_fire,Area_watershed_km,-0.2570268572967779,103,Reported time since fire,Watershed area (km)
+followup_year,Area_watershed_km,-0.16884374524248497,103,Follow-up year,Watershed area (km)
+burn_sev_mod,Area_watershed_km,-0.25992641954483026,91,Moderate-severity burn (%),Watershed area (km)
+burn_sev_low,Area_watershed_km,-0.17120471019288921,91,Low-severity burn (%),Watershed area (km)
+post_fire_year,runoffws,-0.02352822811273348,103,Post-fire year,Mean annual runoff
+burn_percent_fire_year,runoffws,0.11355688905019344,91,Burned watershed area (%),Mean annual runoff
+burn_sev_high,runoffws,0.1531296353735561,91,High-severity burn (%),Mean annual runoff
+Area_watershed_km,runoffws,0.2845375167778709,103,Watershed area (km),Mean annual runoff
+runoffws,runoffws,1,103,Mean annual runoff,Mean annual runoff
+bfiws,runoffws,0.1769269790317966,103,Baseflow index,Mean annual runoff
+permws,runoffws,-0.5924705699194392,103,Soil permeability,Mean annual runoff
+forest_cover,runoffws,-0.3593914652397704,103,Forest cover (%),Mean annual runoff
+grassland_cover,runoffws,-0.6241042425804345,103,Grassland cover (%),Mean annual runoff
+wetland_cover,runoffws,-0.5027616282760415,103,Wetland cover (%),Mean annual runoff
+ag_cover,runoffws,0.26167475853029726,103,Agricultural cover (%),Mean annual runoff
+urban_cover,runoffws,-0.47604005771341623,103,Urban cover (%),Mean annual runoff
+omws,runoffws,0.43063572330596495,103,Soil organic matter,Mean annual runoff
+clayws,runoffws,-0.07485558739120145,103,Soil clay content,Mean annual runoff
+rckdepws,runoffws,0.41573487181901786,103,Depth to bedrock,Mean annual runoff
+glacial_till,runoffws,0.5262186091053428,103,Glacial till (%),Mean annual runoff
+precip8110ws,runoffws,0.8257800605795528,103,1981-2010 precipitation,Mean annual runoff
+tmean8110ws,runoffws,-0.29335404330594317,103,1981-2010 mean temperature,Mean annual runoff
+slope,runoffws,-0.2052715526431109,89,Watershed slope,Mean annual runoff
+maxelevsmo,runoffws,-0.5859416593371584,89,Maximum smoothed elevation,Mean annual runoff
+time_since_fire,runoffws,-0.02352822811273348,103,Reported time since fire,Mean annual runoff
+followup_year,runoffws,-0.15168553499790857,103,Follow-up year,Mean annual runoff
+burn_sev_mod,runoffws,0.1991378694231365,91,Moderate-severity burn (%),Mean annual runoff
+burn_sev_low,runoffws,0.3291902185713228,91,Low-severity burn (%),Mean annual runoff
+post_fire_year,bfiws,0.06817169878192536,103,Post-fire year,Baseflow index
+burn_percent_fire_year,bfiws,-0.042107033895042605,91,Burned watershed area (%),Baseflow index
+burn_sev_high,bfiws,0.003801639750092916,91,High-severity burn (%),Baseflow index
+Area_watershed_km,bfiws,-0.15658439747275277,103,Watershed area (km),Baseflow index
+runoffws,bfiws,0.1769269790317966,103,Mean annual runoff,Baseflow index
+bfiws,bfiws,1,103,Baseflow index,Baseflow index
+permws,bfiws,0.03396101569572442,103,Soil permeability,Baseflow index
+forest_cover,bfiws,0.3165820279114905,103,Forest cover (%),Baseflow index
+grassland_cover,bfiws,-0.3645892766461899,103,Grassland cover (%),Baseflow index
+wetland_cover,bfiws,0.037698378636735544,103,Wetland cover (%),Baseflow index
+ag_cover,bfiws,0.10390911647349628,103,Agricultural cover (%),Baseflow index
+urban_cover,bfiws,-0.19075203417505143,103,Urban cover (%),Baseflow index
+omws,bfiws,-0.03905599515713851,103,Soil organic matter,Baseflow index
+clayws,bfiws,-0.3416558684076605,103,Soil clay content,Baseflow index
+rckdepws,bfiws,0.6517879299095802,103,Depth to bedrock,Baseflow index
+glacial_till,bfiws,0.10000137534646172,103,Glacial till (%),Baseflow index
+precip8110ws,bfiws,0.10364525609426609,103,1981-2010 precipitation,Baseflow index
+tmean8110ws,bfiws,-0.4759455003611622,103,1981-2010 mean temperature,Baseflow index
+slope,bfiws,-0.26862812842159317,89,Watershed slope,Baseflow index
+maxelevsmo,bfiws,-0.01804571811369095,89,Maximum smoothed elevation,Baseflow index
+time_since_fire,bfiws,0.06817169878192536,103,Reported time since fire,Baseflow index
+followup_year,bfiws,0.22891884985734423,103,Follow-up year,Baseflow index
+burn_sev_mod,bfiws,0.02339731615989984,91,Moderate-severity burn (%),Baseflow index
+burn_sev_low,bfiws,-0.11352560219551021,91,Low-severity burn (%),Baseflow index
+post_fire_year,permws,0.2521327261652599,103,Post-fire year,Soil permeability
+burn_percent_fire_year,permws,-0.01954488705847448,91,Burned watershed area (%),Soil permeability
+burn_sev_high,permws,0.044986171318130076,91,High-severity burn (%),Soil permeability
+Area_watershed_km,permws,-0.3334472767686279,103,Watershed area (km),Soil permeability
+runoffws,permws,-0.5924705699194392,103,Mean annual runoff,Soil permeability
+bfiws,permws,0.03396101569572442,103,Baseflow index,Soil permeability
+permws,permws,1,103,Soil permeability,Soil permeability
+forest_cover,permws,0.45353588277139617,103,Forest cover (%),Soil permeability
+grassland_cover,permws,0.16618347863990565,103,Grassland cover (%),Soil permeability
+wetland_cover,permws,0.5360657275850506,103,Wetland cover (%),Soil permeability
+ag_cover,permws,-0.43762980931853007,103,Agricultural cover (%),Soil permeability
+urban_cover,permws,0.1252562697412204,103,Urban cover (%),Soil permeability
+omws,permws,-0.4229753351236001,103,Soil organic matter,Soil permeability
+clayws,permws,-0.5664429752248402,103,Soil clay content,Soil permeability
+rckdepws,permws,-0.17681181796626433,103,Depth to bedrock,Soil permeability
+glacial_till,permws,-0.10140160466122966,103,Glacial till (%),Soil permeability
+precip8110ws,permws,-0.46273331322771516,103,1981-2010 precipitation,Soil permeability
+tmean8110ws,permws,-0.1736207990276465,103,1981-2010 mean temperature,Soil permeability
+slope,permws,0.14080592836581438,89,Watershed slope,Soil permeability
+maxelevsmo,permws,0.7955205344524859,89,Maximum smoothed elevation,Soil permeability
+time_since_fire,permws,0.2521327261652599,103,Reported time since fire,Soil permeability
+followup_year,permws,0.11981135730282394,103,Follow-up year,Soil permeability
+burn_sev_mod,permws,-0.036821208355123314,91,Moderate-severity burn (%),Soil permeability
+burn_sev_low,permws,-0.27390415580568506,91,Low-severity burn (%),Soil permeability
+post_fire_year,forest_cover,-0.07169189633387922,103,Post-fire year,Forest cover (%)
+burn_percent_fire_year,forest_cover,-0.46290514634757335,91,Burned watershed area (%),Forest cover (%)
+burn_sev_high,forest_cover,-0.4013261683750308,91,High-severity burn (%),Forest cover (%)
+Area_watershed_km,forest_cover,-0.25031562043623345,103,Watershed area (km),Forest cover (%)
+runoffws,forest_cover,-0.3593914652397704,103,Mean annual runoff,Forest cover (%)
+bfiws,forest_cover,0.3165820279114905,103,Baseflow index,Forest cover (%)
+permws,forest_cover,0.45353588277139617,103,Soil permeability,Forest cover (%)
+forest_cover,forest_cover,1,103,Forest cover (%),Forest cover (%)
+grassland_cover,forest_cover,-0.13190989206612402,103,Grassland cover (%),Forest cover (%)
+wetland_cover,forest_cover,0.10479640272043511,103,Wetland cover (%),Forest cover (%)
+ag_cover,forest_cover,-0.03788221559587754,103,Agricultural cover (%),Forest cover (%)
+urban_cover,forest_cover,0.18134697586005108,103,Urban cover (%),Forest cover (%)
+omws,forest_cover,0.07896666760488219,103,Soil organic matter,Forest cover (%)
+clayws,forest_cover,-0.2894709272574192,103,Soil clay content,Forest cover (%)
+rckdepws,forest_cover,0.06382509444358016,103,Depth to bedrock,Forest cover (%)
+glacial_till,forest_cover,-0.004995579799595594,103,Glacial till (%),Forest cover (%)
+precip8110ws,forest_cover,-0.03536080370976903,103,1981-2010 precipitation,Forest cover (%)
+tmean8110ws,forest_cover,-0.18762234022022622,103,1981-2010 mean temperature,Forest cover (%)
+slope,forest_cover,-0.2937314662465564,89,Watershed slope,Forest cover (%)
+maxelevsmo,forest_cover,-0.014585599405607828,89,Maximum smoothed elevation,Forest cover (%)
+time_since_fire,forest_cover,-0.07169189633387922,103,Reported time since fire,Forest cover (%)
+followup_year,forest_cover,0.31375001503230954,103,Follow-up year,Forest cover (%)
+burn_sev_mod,forest_cover,-0.48513864860714345,91,Moderate-severity burn (%),Forest cover (%)
+burn_sev_low,forest_cover,-0.6015635173829209,91,Low-severity burn (%),Forest cover (%)
+post_fire_year,grassland_cover,0.0891254557810814,103,Post-fire year,Grassland cover (%)
+burn_percent_fire_year,grassland_cover,0.1472968068211008,91,Burned watershed area (%),Grassland cover (%)
+burn_sev_high,grassland_cover,0.16009393081075846,91,High-severity burn (%),Grassland cover (%)
+Area_watershed_km,grassland_cover,0.01902258753340125,103,Watershed area (km),Grassland cover (%)
+runoffws,grassland_cover,-0.6241042425804345,103,Mean annual runoff,Grassland cover (%)
+bfiws,grassland_cover,-0.3645892766461899,103,Baseflow index,Grassland cover (%)
+permws,grassland_cover,0.16618347863990565,103,Soil permeability,Grassland cover (%)
+forest_cover,grassland_cover,-0.13190989206612402,103,Forest cover (%),Grassland cover (%)
+grassland_cover,grassland_cover,0.9999999999999999,103,Grassland cover (%),Grassland cover (%)
+wetland_cover,grassland_cover,0.18592913767778546,103,Wetland cover (%),Grassland cover (%)
+ag_cover,grassland_cover,-0.10765648841927443,103,Agricultural cover (%),Grassland cover (%)
+urban_cover,grassland_cover,0.5244586206425037,103,Urban cover (%),Grassland cover (%)
+omws,grassland_cover,-0.28339383898622805,103,Soil organic matter,Grassland cover (%)
+clayws,grassland_cover,0.2128066392418582,103,Soil clay content,Grassland cover (%)
+rckdepws,grassland_cover,-0.565609934470533,103,Depth to bedrock,Grassland cover (%)
+glacial_till,grassland_cover,-0.7232327137805554,103,Glacial till (%),Grassland cover (%)
+precip8110ws,grassland_cover,-0.7231240899561512,103,1981-2010 precipitation,Grassland cover (%)
+tmean8110ws,grassland_cover,0.5966162167754109,103,1981-2010 mean temperature,Grassland cover (%)
+slope,grassland_cover,0.14658530857004923,89,Watershed slope,Grassland cover (%)
+maxelevsmo,grassland_cover,0.4880096710076193,89,Maximum smoothed elevation,Grassland cover (%)
+time_since_fire,grassland_cover,0.0891254557810814,103,Reported time since fire,Grassland cover (%)
+followup_year,grassland_cover,-0.06277294957318055,103,Follow-up year,Grassland cover (%)
+burn_sev_mod,grassland_cover,0.1285779998571698,91,Moderate-severity burn (%),Grassland cover (%)
+burn_sev_low,grassland_cover,-7.424534063561819e-4,91,Low-severity burn (%),Grassland cover (%)
+post_fire_year,wetland_cover,-0.03919733173358196,103,Post-fire year,Wetland cover (%)
+burn_percent_fire_year,wetland_cover,-0.4439088817575991,91,Burned watershed area (%),Wetland cover (%)
+burn_sev_high,wetland_cover,-0.3830978296664187,91,High-severity burn (%),Wetland cover (%)
+Area_watershed_km,wetland_cover,0.09735462647840627,103,Watershed area (km),Wetland cover (%)
+runoffws,wetland_cover,-0.5027616282760415,103,Mean annual runoff,Wetland cover (%)
+bfiws,wetland_cover,0.037698378636735544,103,Baseflow index,Wetland cover (%)
+permws,wetland_cover,0.5360657275850506,103,Soil permeability,Wetland cover (%)
+forest_cover,wetland_cover,0.10479640272043511,103,Forest cover (%),Wetland cover (%)
+grassland_cover,wetland_cover,0.18592913767778546,103,Grassland cover (%),Wetland cover (%)
+wetland_cover,wetland_cover,1,103,Wetland cover (%),Wetland cover (%)
+ag_cover,wetland_cover,-0.08561862886989796,103,Agricultural cover (%),Wetland cover (%)
+urban_cover,wetland_cover,0.42691330064829247,103,Urban cover (%),Wetland cover (%)
+omws,wetland_cover,-0.3555698321887879,103,Soil organic matter,Wetland cover (%)
+clayws,wetland_cover,-0.014074961926437361,103,Soil clay content,Wetland cover (%)
+rckdepws,wetland_cover,-0.12180595981621263,103,Depth to bedrock,Wetland cover (%)
+glacial_till,wetland_cover,-0.11868251968751467,103,Glacial till (%),Wetland cover (%)
+precip8110ws,wetland_cover,-0.42235019447143995,103,1981-2010 precipitation,Wetland cover (%)
+tmean8110ws,wetland_cover,-0.03078276764525926,103,1981-2010 mean temperature,Wetland cover (%)
+slope,wetland_cover,0.068381647279451,89,Watershed slope,Wetland cover (%)
+maxelevsmo,wetland_cover,0.6775497491340385,89,Maximum smoothed elevation,Wetland cover (%)
+time_since_fire,wetland_cover,-0.03919733173358196,103,Reported time since fire,Wetland cover (%)
+followup_year,wetland_cover,0.07825941849268413,103,Follow-up year,Wetland cover (%)
+burn_sev_mod,wetland_cover,-0.4498686496379551,91,Moderate-severity burn (%),Wetland cover (%)
+burn_sev_low,wetland_cover,-0.614093381500767,91,Low-severity burn (%),Wetland cover (%)
+post_fire_year,ag_cover,-0.302122818430754,103,Post-fire year,Agricultural cover (%)
+burn_percent_fire_year,ag_cover,-0.45630199306194946,91,Burned watershed area (%),Agricultural cover (%)
+burn_sev_high,ag_cover,-0.504340967011155,91,High-severity burn (%),Agricultural cover (%)
+Area_watershed_km,ag_cover,0.3664923780136751,103,Watershed area (km),Agricultural cover (%)
+runoffws,ag_cover,0.26167475853029726,103,Mean annual runoff,Agricultural cover (%)
+bfiws,ag_cover,0.10390911647349628,103,Baseflow index,Agricultural cover (%)
+permws,ag_cover,-0.43762980931853007,103,Soil permeability,Agricultural cover (%)
+forest_cover,ag_cover,-0.03788221559587754,103,Forest cover (%),Agricultural cover (%)
+grassland_cover,ag_cover,-0.10765648841927443,103,Grassland cover (%),Agricultural cover (%)
+wetland_cover,ag_cover,-0.08561862886989796,103,Wetland cover (%),Agricultural cover (%)
+ag_cover,ag_cover,1,103,Agricultural cover (%),Agricultural cover (%)
+urban_cover,ag_cover,-0.025518354397527566,103,Urban cover (%),Agricultural cover (%)
+omws,ag_cover,0.37962671900397105,103,Soil organic matter,Agricultural cover (%)
+clayws,ag_cover,0.2007643732850916,103,Soil clay content,Agricultural cover (%)
+rckdepws,ag_cover,0.3854213408384248,103,Depth to bedrock,Agricultural cover (%)
+glacial_till,ag_cover,0.16795984454343482,103,Glacial till (%),Agricultural cover (%)
+precip8110ws,ag_cover,0.3445101575124676,103,1981-2010 precipitation,Agricultural cover (%)
+tmean8110ws,ag_cover,-0.1092676016820541,103,1981-2010 mean temperature,Agricultural cover (%)
+slope,ag_cover,-0.4515304232000208,89,Watershed slope,Agricultural cover (%)
+maxelevsmo,ag_cover,-0.5387415397811255,89,Maximum smoothed elevation,Agricultural cover (%)
+time_since_fire,ag_cover,-0.302122818430754,103,Reported time since fire,Agricultural cover (%)
+followup_year,ag_cover,-0.22630369273044976,103,Follow-up year,Agricultural cover (%)
+burn_sev_mod,ag_cover,-0.4162536860407945,91,Moderate-severity burn (%),Agricultural cover (%)
+burn_sev_low,ag_cover,-0.19431803548665896,91,Low-severity burn (%),Agricultural cover (%)
+post_fire_year,urban_cover,-0.24763721129433375,103,Post-fire year,Urban cover (%)
+burn_percent_fire_year,urban_cover,-0.4542422290446868,91,Burned watershed area (%),Urban cover (%)
+burn_sev_high,urban_cover,-0.4467964910488611,91,High-severity burn (%),Urban cover (%)
+Area_watershed_km,urban_cover,0.06036838769789994,103,Watershed area (km),Urban cover (%)
+runoffws,urban_cover,-0.47604005771341623,103,Mean annual runoff,Urban cover (%)
+bfiws,urban_cover,-0.19075203417505143,103,Baseflow index,Urban cover (%)
+permws,urban_cover,0.1252562697412204,103,Soil permeability,Urban cover (%)
+forest_cover,urban_cover,0.18134697586005108,103,Forest cover (%),Urban cover (%)
+grassland_cover,urban_cover,0.5244586206425037,103,Grassland cover (%),Urban cover (%)
+wetland_cover,urban_cover,0.42691330064829247,103,Wetland cover (%),Urban cover (%)
+ag_cover,urban_cover,-0.025518354397527566,103,Agricultural cover (%),Urban cover (%)
+urban_cover,urban_cover,1,103,Urban cover (%),Urban cover (%)
+omws,urban_cover,0.22643881462344698,103,Soil organic matter,Urban cover (%)
+clayws,urban_cover,0.3620005605259159,103,Soil clay content,Urban cover (%)
+rckdepws,urban_cover,-0.5421807104512826,103,Depth to bedrock,Urban cover (%)
+glacial_till,urban_cover,-0.40870823326354977,103,Glacial till (%),Urban cover (%)
+precip8110ws,urban_cover,-0.5369388107315974,103,1981-2010 precipitation,Urban cover (%)
+tmean8110ws,urban_cover,0.7292703203488626,103,1981-2010 mean temperature,Urban cover (%)
+slope,urban_cover,-0.31227307271877963,89,Watershed slope,Urban cover (%)
+maxelevsmo,urban_cover,0.1673525806972463,89,Maximum smoothed elevation,Urban cover (%)
+time_since_fire,urban_cover,-0.24763721129433375,103,Reported time since fire,Urban cover (%)
+followup_year,urban_cover,-0.061894296793073046,103,Follow-up year,Urban cover (%)
+burn_sev_mod,urban_cover,-0.4412200373911802,91,Moderate-severity burn (%),Urban cover (%)
+burn_sev_low,urban_cover,-0.49808542374515646,91,Low-severity burn (%),Urban cover (%)
+post_fire_year,omws,-0.37599053564343937,103,Post-fire year,Soil organic matter
+burn_percent_fire_year,omws,-0.1929106775501129,91,Burned watershed area (%),Soil organic matter
+burn_sev_high,omws,-0.26992506545948947,91,High-severity burn (%),Soil organic matter
+Area_watershed_km,omws,0.022730405603509297,103,Watershed area (km),Soil organic matter
+runoffws,omws,0.43063572330596495,103,Mean annual runoff,Soil organic matter
+bfiws,omws,-0.03905599515713851,103,Baseflow index,Soil organic matter
+permws,omws,-0.4229753351236001,103,Soil permeability,Soil organic matter
+forest_cover,omws,0.07896666760488219,103,Forest cover (%),Soil organic matter
+grassland_cover,omws,-0.28339383898622805,103,Grassland cover (%),Soil organic matter
+wetland_cover,omws,-0.3555698321887879,103,Wetland cover (%),Soil organic matter
+ag_cover,omws,0.37962671900397105,103,Agricultural cover (%),Soil organic matter
+urban_cover,omws,0.22643881462344698,103,Urban cover (%),Soil organic matter
+omws,omws,1,103,Soil organic matter,Soil organic matter
+clayws,omws,0.09341553120743751,103,Soil clay content,Soil organic matter
+rckdepws,omws,0.023650269367138863,103,Depth to bedrock,Soil organic matter
+glacial_till,omws,0.1690518404044191,103,Glacial till (%),Soil organic matter
+precip8110ws,omws,0.36565300110903937,103,1981-2010 precipitation,Soil organic matter
+tmean8110ws,omws,0.2672272615135399,103,1981-2010 mean temperature,Soil organic matter
+slope,omws,-0.5453180064152078,89,Watershed slope,Soil organic matter
+maxelevsmo,omws,-0.755847715301272,89,Maximum smoothed elevation,Soil organic matter
+time_since_fire,omws,-0.37599053564343937,103,Reported time since fire,Soil organic matter
+followup_year,omws,-0.2727272478845994,103,Follow-up year,Soil organic matter
+burn_sev_mod,omws,-0.13906215362409702,91,Moderate-severity burn (%),Soil organic matter
+burn_sev_low,omws,0.09600631637936093,91,Low-severity burn (%),Soil organic matter
+post_fire_year,clayws,-0.3635466422162127,103,Post-fire year,Soil clay content
+burn_percent_fire_year,clayws,-0.3018848327593868,91,Burned watershed area (%),Soil clay content
+burn_sev_high,clayws,-0.34829118487199046,91,High-severity burn (%),Soil clay content
+Area_watershed_km,clayws,0.47310447656200594,103,Watershed area (km),Soil clay content
+runoffws,clayws,-0.07485558739120145,103,Mean annual runoff,Soil clay content
+bfiws,clayws,-0.3416558684076605,103,Baseflow index,Soil clay content
+permws,clayws,-0.5664429752248402,103,Soil permeability,Soil clay content
+forest_cover,clayws,-0.2894709272574192,103,Forest cover (%),Soil clay content
+grassland_cover,clayws,0.2128066392418582,103,Grassland cover (%),Soil clay content
+wetland_cover,clayws,-0.014074961926437361,103,Wetland cover (%),Soil clay content
+ag_cover,clayws,0.2007643732850916,103,Agricultural cover (%),Soil clay content
+urban_cover,clayws,0.3620005605259159,103,Urban cover (%),Soil clay content
+omws,clayws,0.09341553120743751,103,Soil organic matter,Soil clay content
+clayws,clayws,1,103,Soil clay content,Soil clay content
+rckdepws,clayws,-0.14471935638623443,103,Depth to bedrock,Soil clay content
+glacial_till,clayws,0.04947592840636142,103,Glacial till (%),Soil clay content
+precip8110ws,clayws,-0.09890546168764554,103,1981-2010 precipitation,Soil clay content
+tmean8110ws,clayws,0.4920349591778823,103,1981-2010 mean temperature,Soil clay content
+slope,clayws,-0.049803211177940954,89,Watershed slope,Soil clay content
+maxelevsmo,clayws,-0.34077341441480025,89,Maximum smoothed elevation,Soil clay content
+time_since_fire,clayws,-0.3635466422162127,103,Reported time since fire,Soil clay content
+followup_year,clayws,-0.13395304437923455,103,Follow-up year,Soil clay content
+burn_sev_mod,clayws,-0.34057005440186205,91,Moderate-severity burn (%),Soil clay content
+burn_sev_low,clayws,-0.16699826097602163,91,Low-severity burn (%),Soil clay content
+post_fire_year,rckdepws,-0.018710542048077407,103,Post-fire year,Depth to bedrock
+burn_percent_fire_year,rckdepws,-0.0806056444152653,91,Burned watershed area (%),Depth to bedrock
+burn_sev_high,rckdepws,-0.07030445605139964,91,High-severity burn (%),Depth to bedrock
+Area_watershed_km,rckdepws,0.11881226562241787,103,Watershed area (km),Depth to bedrock
+runoffws,rckdepws,0.41573487181901786,103,Mean annual runoff,Depth to bedrock
+bfiws,rckdepws,0.6517879299095802,103,Baseflow index,Depth to bedrock
+permws,rckdepws,-0.17681181796626433,103,Soil permeability,Depth to bedrock
+forest_cover,rckdepws,0.06382509444358016,103,Forest cover (%),Depth to bedrock
+grassland_cover,rckdepws,-0.565609934470533,103,Grassland cover (%),Depth to bedrock
+wetland_cover,rckdepws,-0.12180595981621263,103,Wetland cover (%),Depth to bedrock
+ag_cover,rckdepws,0.3854213408384248,103,Agricultural cover (%),Depth to bedrock
+urban_cover,rckdepws,-0.5421807104512826,103,Urban cover (%),Depth to bedrock
+omws,rckdepws,0.023650269367138863,103,Soil organic matter,Depth to bedrock
+clayws,rckdepws,-0.14471935638623443,103,Soil clay content,Depth to bedrock
+rckdepws,rckdepws,1,103,Depth to bedrock,Depth to bedrock
+glacial_till,rckdepws,0.5722662277731779,103,Glacial till (%),Depth to bedrock
+precip8110ws,rckdepws,0.4568994514634553,103,1981-2010 precipitation,Depth to bedrock
+tmean8110ws,rckdepws,-0.6885886798289284,103,1981-2010 mean temperature,Depth to bedrock
+slope,rckdepws,-0.12477096683024745,89,Watershed slope,Depth to bedrock
+maxelevsmo,rckdepws,-0.24397242088133272,89,Maximum smoothed elevation,Depth to bedrock
+time_since_fire,rckdepws,-0.018710542048077407,103,Reported time since fire,Depth to bedrock
+followup_year,rckdepws,0.03946060366851024,103,Follow-up year,Depth to bedrock
+burn_sev_mod,rckdepws,-0.0012297849548862404,91,Moderate-severity burn (%),Depth to bedrock
+burn_sev_low,rckdepws,0.04260159718776062,91,Low-severity burn (%),Depth to bedrock
+post_fire_year,glacial_till,-0.0661743655965451,103,Post-fire year,Glacial till (%)
+burn_percent_fire_year,glacial_till,-0.1959215685622662,91,Burned watershed area (%),Glacial till (%)
+burn_sev_high,glacial_till,-0.18756804533608648,91,High-severity burn (%),Glacial till (%)
+Area_watershed_km,glacial_till,0.29166090361790575,103,Watershed area (km),Glacial till (%)
+runoffws,glacial_till,0.5262186091053428,103,Mean annual runoff,Glacial till (%)
+bfiws,glacial_till,0.10000137534646172,103,Baseflow index,Glacial till (%)
+permws,glacial_till,-0.10140160466122966,103,Soil permeability,Glacial till (%)
+forest_cover,glacial_till,-0.004995579799595594,103,Forest cover (%),Glacial till (%)
+grassland_cover,glacial_till,-0.7232327137805554,103,Grassland cover (%),Glacial till (%)
+wetland_cover,glacial_till,-0.11868251968751467,103,Wetland cover (%),Glacial till (%)
+ag_cover,glacial_till,0.16795984454343482,103,Agricultural cover (%),Glacial till (%)
+urban_cover,glacial_till,-0.40870823326354977,103,Urban cover (%),Glacial till (%)
+omws,glacial_till,0.1690518404044191,103,Soil organic matter,Glacial till (%)
+clayws,glacial_till,0.04947592840636142,103,Soil clay content,Glacial till (%)
+rckdepws,glacial_till,0.5722662277731779,103,Depth to bedrock,Glacial till (%)
+glacial_till,glacial_till,1,103,Glacial till (%),Glacial till (%)
+precip8110ws,glacial_till,0.6295584853477517,103,1981-2010 precipitation,Glacial till (%)
+tmean8110ws,glacial_till,-0.519405630126117,103,1981-2010 mean temperature,Glacial till (%)
+slope,glacial_till,-0.09839069966979215,89,Watershed slope,Glacial till (%)
+maxelevsmo,glacial_till,-0.3697479409907526,89,Maximum smoothed elevation,Glacial till (%)
+time_since_fire,glacial_till,-0.0661743655965451,103,Reported time since fire,Glacial till (%)
+followup_year,glacial_till,-0.12280722619767283,103,Follow-up year,Glacial till (%)
+burn_sev_mod,glacial_till,-0.1595465359631877,91,Moderate-severity burn (%),Glacial till (%)
+burn_sev_low,glacial_till,-0.02151511753014419,91,Low-severity burn (%),Glacial till (%)
+post_fire_year,precip8110ws,-0.1401513572966389,103,Post-fire year,1981-2010 precipitation
+burn_percent_fire_year,precip8110ws,-0.1452168233037436,91,Burned watershed area (%),1981-2010 precipitation
+burn_sev_high,precip8110ws,-0.0967127507671629,91,High-severity burn (%),1981-2010 precipitation
+Area_watershed_km,precip8110ws,0.3413454965433381,103,Watershed area (km),1981-2010 precipitation
+runoffws,precip8110ws,0.8257800605795528,103,Mean annual runoff,1981-2010 precipitation
+bfiws,precip8110ws,0.10364525609426609,103,Baseflow index,1981-2010 precipitation
+permws,precip8110ws,-0.46273331322771516,103,Soil permeability,1981-2010 precipitation
+forest_cover,precip8110ws,-0.03536080370976903,103,Forest cover (%),1981-2010 precipitation
+grassland_cover,precip8110ws,-0.7231240899561512,103,Grassland cover (%),1981-2010 precipitation
+wetland_cover,precip8110ws,-0.42235019447143995,103,Wetland cover (%),1981-2010 precipitation
+ag_cover,precip8110ws,0.3445101575124676,103,Agricultural cover (%),1981-2010 precipitation
+urban_cover,precip8110ws,-0.5369388107315974,103,Urban cover (%),1981-2010 precipitation
+omws,precip8110ws,0.36565300110903937,103,Soil organic matter,1981-2010 precipitation
+clayws,precip8110ws,-0.09890546168764554,103,Soil clay content,1981-2010 precipitation
+rckdepws,precip8110ws,0.4568994514634553,103,Depth to bedrock,1981-2010 precipitation
+glacial_till,precip8110ws,0.6295584853477517,103,Glacial till (%),1981-2010 precipitation
+precip8110ws,precip8110ws,1,103,1981-2010 precipitation,1981-2010 precipitation
+tmean8110ws,precip8110ws,-0.5138041122855773,103,1981-2010 mean temperature,1981-2010 precipitation
+slope,precip8110ws,-0.20111118410665085,89,Watershed slope,1981-2010 precipitation
+maxelevsmo,precip8110ws,-0.6179994693543418,89,Maximum smoothed elevation,1981-2010 precipitation
+time_since_fire,precip8110ws,-0.1401513572966389,103,Reported time since fire,1981-2010 precipitation
+followup_year,precip8110ws,-0.058163026139599394,103,Follow-up year,1981-2010 precipitation
+burn_sev_mod,precip8110ws,-0.09428853173197699,91,Moderate-severity burn (%),1981-2010 precipitation
+burn_sev_low,precip8110ws,0.0685622618753683,91,Low-severity burn (%),1981-2010 precipitation
+post_fire_year,tmean8110ws,-0.19514466571938463,103,Post-fire year,1981-2010 mean temperature
+burn_percent_fire_year,tmean8110ws,-0.011073213134976978,91,Burned watershed area (%),1981-2010 mean temperature
+burn_sev_high,tmean8110ws,-0.07338852549280848,91,High-severity burn (%),1981-2010 mean temperature
+Area_watershed_km,tmean8110ws,-0.10178564695769582,103,Watershed area (km),1981-2010 mean temperature
+runoffws,tmean8110ws,-0.29335404330594317,103,Mean annual runoff,1981-2010 mean temperature
+bfiws,tmean8110ws,-0.4759455003611622,103,Baseflow index,1981-2010 mean temperature
+permws,tmean8110ws,-0.1736207990276465,103,Soil permeability,1981-2010 mean temperature
+forest_cover,tmean8110ws,-0.18762234022022622,103,Forest cover (%),1981-2010 mean temperature
+grassland_cover,tmean8110ws,0.5966162167754109,103,Grassland cover (%),1981-2010 mean temperature
+wetland_cover,tmean8110ws,-0.03078276764525926,103,Wetland cover (%),1981-2010 mean temperature
+ag_cover,tmean8110ws,-0.1092676016820541,103,Agricultural cover (%),1981-2010 mean temperature
+urban_cover,tmean8110ws,0.7292703203488626,103,Urban cover (%),1981-2010 mean temperature
+omws,tmean8110ws,0.2672272615135399,103,Soil organic matter,1981-2010 mean temperature
+clayws,tmean8110ws,0.4920349591778823,103,Soil clay content,1981-2010 mean temperature
+rckdepws,tmean8110ws,-0.6885886798289284,103,Depth to bedrock,1981-2010 mean temperature
+glacial_till,tmean8110ws,-0.519405630126117,103,Glacial till (%),1981-2010 mean temperature
+precip8110ws,tmean8110ws,-0.5138041122855773,103,1981-2010 precipitation,1981-2010 mean temperature
+tmean8110ws,tmean8110ws,1,103,1981-2010 mean temperature,1981-2010 mean temperature
+slope,tmean8110ws,-0.011629259177841827,89,Watershed slope,1981-2010 mean temperature
+maxelevsmo,tmean8110ws,0.055850084394579363,89,Maximum smoothed elevation,1981-2010 mean temperature
+time_since_fire,tmean8110ws,-0.19514466571938463,103,Reported time since fire,1981-2010 mean temperature
+followup_year,tmean8110ws,-0.22863408595947593,103,Follow-up year,1981-2010 mean temperature
+burn_sev_mod,tmean8110ws,-0.0364342267787104,91,Moderate-severity burn (%),1981-2010 mean temperature
+burn_sev_low,tmean8110ws,-0.004694063415617245,91,Low-severity burn (%),1981-2010 mean temperature
+post_fire_year,slope,0.33142514019646413,89,Post-fire year,Watershed slope
+burn_percent_fire_year,slope,0.5728924741830059,77,Burned watershed area (%),Watershed slope
+burn_sev_high,slope,0.5176861079741373,77,High-severity burn (%),Watershed slope
+Area_watershed_km,slope,-0.3911238607692686,89,Watershed area (km),Watershed slope
+runoffws,slope,-0.2052715526431109,89,Mean annual runoff,Watershed slope
+bfiws,slope,-0.26862812842159317,89,Baseflow index,Watershed slope
+permws,slope,0.14080592836581438,89,Soil permeability,Watershed slope
+forest_cover,slope,-0.2937314662465564,89,Forest cover (%),Watershed slope
+grassland_cover,slope,0.14658530857004923,89,Grassland cover (%),Watershed slope
+wetland_cover,slope,0.068381647279451,89,Wetland cover (%),Watershed slope
+ag_cover,slope,-0.4515304232000208,89,Agricultural cover (%),Watershed slope
+urban_cover,slope,-0.31227307271877963,89,Urban cover (%),Watershed slope
+omws,slope,-0.5453180064152078,89,Soil organic matter,Watershed slope
+clayws,slope,-0.049803211177940954,89,Soil clay content,Watershed slope
+rckdepws,slope,-0.12477096683024745,89,Depth to bedrock,Watershed slope
+glacial_till,slope,-0.09839069966979215,89,Glacial till (%),Watershed slope
+precip8110ws,slope,-0.20111118410665085,89,1981-2010 precipitation,Watershed slope
+tmean8110ws,slope,-0.011629259177841827,89,1981-2010 mean temperature,Watershed slope
+slope,slope,0.9999999999999998,89,Watershed slope,Watershed slope
+maxelevsmo,slope,0.4952130620900922,89,Maximum smoothed elevation,Watershed slope
+time_since_fire,slope,0.33142514019646413,89,Reported time since fire,Watershed slope
+followup_year,slope,0.13577335462244344,89,Follow-up year,Watershed slope
+burn_sev_mod,slope,0.4880065080738704,77,Moderate-severity burn (%),Watershed slope
+burn_sev_low,slope,0.3597185163148546,77,Low-severity burn (%),Watershed slope
+post_fire_year,maxelevsmo,0.4263793515650414,89,Post-fire year,Maximum smoothed elevation
+burn_percent_fire_year,maxelevsmo,0.24813037983291797,77,Burned watershed area (%),Maximum smoothed elevation
+burn_sev_high,maxelevsmo,0.35107052551652623,77,High-severity burn (%),Maximum smoothed elevation
+Area_watershed_km,maxelevsmo,-0.2569633056119755,89,Watershed area (km),Maximum smoothed elevation
+runoffws,maxelevsmo,-0.5859416593371584,89,Mean annual runoff,Maximum smoothed elevation
+bfiws,maxelevsmo,-0.01804571811369095,89,Baseflow index,Maximum smoothed elevation
+permws,maxelevsmo,0.7955205344524859,89,Soil permeability,Maximum smoothed elevation
+forest_cover,maxelevsmo,-0.014585599405607828,89,Forest cover (%),Maximum smoothed elevation
+grassland_cover,maxelevsmo,0.4880096710076193,89,Grassland cover (%),Maximum smoothed elevation
+wetland_cover,maxelevsmo,0.6775497491340385,89,Wetland cover (%),Maximum smoothed elevation
+ag_cover,maxelevsmo,-0.5387415397811255,89,Agricultural cover (%),Maximum smoothed elevation
+urban_cover,maxelevsmo,0.1673525806972463,89,Urban cover (%),Maximum smoothed elevation
+omws,maxelevsmo,-0.755847715301272,89,Soil organic matter,Maximum smoothed elevation
+clayws,maxelevsmo,-0.34077341441480025,89,Soil clay content,Maximum smoothed elevation
+rckdepws,maxelevsmo,-0.24397242088133272,89,Depth to bedrock,Maximum smoothed elevation
+glacial_till,maxelevsmo,-0.3697479409907526,89,Glacial till (%),Maximum smoothed elevation
+precip8110ws,maxelevsmo,-0.6179994693543418,89,1981-2010 precipitation,Maximum smoothed elevation
+tmean8110ws,maxelevsmo,0.055850084394579363,89,1981-2010 mean temperature,Maximum smoothed elevation
+slope,maxelevsmo,0.4952130620900922,89,Watershed slope,Maximum smoothed elevation
+maxelevsmo,maxelevsmo,1,89,Maximum smoothed elevation,Maximum smoothed elevation
+time_since_fire,maxelevsmo,0.4263793515650414,89,Reported time since fire,Maximum smoothed elevation
+followup_year,maxelevsmo,0.19870967474721066,89,Follow-up year,Maximum smoothed elevation
+burn_sev_mod,maxelevsmo,0.19770380168707935,77,Moderate-severity burn (%),Maximum smoothed elevation
+burn_sev_low,maxelevsmo,-0.12963815254829344,77,Low-severity burn (%),Maximum smoothed elevation
+post_fire_year,time_since_fire,1,103,Post-fire year,Reported time since fire
+burn_percent_fire_year,time_since_fire,0.3021173575680656,91,Burned watershed area (%),Reported time since fire
+burn_sev_high,time_since_fire,0.3850222998466078,91,High-severity burn (%),Reported time since fire
+Area_watershed_km,time_since_fire,-0.2570268572967779,103,Watershed area (km),Reported time since fire
+runoffws,time_since_fire,-0.02352822811273348,103,Mean annual runoff,Reported time since fire
+bfiws,time_since_fire,0.06817169878192536,103,Baseflow index,Reported time since fire
+permws,time_since_fire,0.2521327261652599,103,Soil permeability,Reported time since fire
+forest_cover,time_since_fire,-0.07169189633387922,103,Forest cover (%),Reported time since fire
+grassland_cover,time_since_fire,0.0891254557810814,103,Grassland cover (%),Reported time since fire
+wetland_cover,time_since_fire,-0.03919733173358196,103,Wetland cover (%),Reported time since fire
+ag_cover,time_since_fire,-0.302122818430754,103,Agricultural cover (%),Reported time since fire
+urban_cover,time_since_fire,-0.24763721129433375,103,Urban cover (%),Reported time since fire
+omws,time_since_fire,-0.37599053564343937,103,Soil organic matter,Reported time since fire
+clayws,time_since_fire,-0.3635466422162127,103,Soil clay content,Reported time since fire
+rckdepws,time_since_fire,-0.018710542048077407,103,Depth to bedrock,Reported time since fire
+glacial_till,time_since_fire,-0.0661743655965451,103,Glacial till (%),Reported time since fire
+precip8110ws,time_since_fire,-0.1401513572966389,103,1981-2010 precipitation,Reported time since fire
+tmean8110ws,time_since_fire,-0.19514466571938463,103,1981-2010 mean temperature,Reported time since fire
+slope,time_since_fire,0.33142514019646413,89,Watershed slope,Reported time since fire
+maxelevsmo,time_since_fire,0.4263793515650414,89,Maximum smoothed elevation,Reported time since fire
+time_since_fire,time_since_fire,1,103,Reported time since fire,Reported time since fire
+followup_year,time_since_fire,0.6645785996421382,103,Follow-up year,Reported time since fire
+burn_sev_mod,time_since_fire,0.3007955532674854,91,Moderate-severity burn (%),Reported time since fire
+burn_sev_low,time_since_fire,0.15054225135402502,91,Low-severity burn (%),Reported time since fire
+post_fire_year,followup_year,0.6645785996421382,103,Post-fire year,Follow-up year
+burn_percent_fire_year,followup_year,0.011520294960382928,91,Burned watershed area (%),Follow-up year
+burn_sev_high,followup_year,0.05249271872380045,91,High-severity burn (%),Follow-up year
+Area_watershed_km,followup_year,-0.16884374524248497,103,Watershed area (km),Follow-up year
+runoffws,followup_year,-0.15168553499790857,103,Mean annual runoff,Follow-up year
+bfiws,followup_year,0.22891884985734423,103,Baseflow index,Follow-up year
+permws,followup_year,0.11981135730282394,103,Soil permeability,Follow-up year
+forest_cover,followup_year,0.31375001503230954,103,Forest cover (%),Follow-up year
+grassland_cover,followup_year,-0.06277294957318055,103,Grassland cover (%),Follow-up year
+wetland_cover,followup_year,0.07825941849268413,103,Wetland cover (%),Follow-up year
+ag_cover,followup_year,-0.22630369273044976,103,Agricultural cover (%),Follow-up year
+urban_cover,followup_year,-0.061894296793073046,103,Urban cover (%),Follow-up year
+omws,followup_year,-0.2727272478845994,103,Soil organic matter,Follow-up year
+clayws,followup_year,-0.13395304437923455,103,Soil clay content,Follow-up year
+rckdepws,followup_year,0.03946060366851024,103,Depth to bedrock,Follow-up year
+glacial_till,followup_year,-0.12280722619767283,103,Glacial till (%),Follow-up year
+precip8110ws,followup_year,-0.058163026139599394,103,1981-2010 precipitation,Follow-up year
+tmean8110ws,followup_year,-0.22863408595947593,103,1981-2010 mean temperature,Follow-up year
+slope,followup_year,0.13577335462244344,89,Watershed slope,Follow-up year
+maxelevsmo,followup_year,0.19870967474721066,89,Maximum smoothed elevation,Follow-up year
+time_since_fire,followup_year,0.6645785996421382,103,Reported time since fire,Follow-up year
+followup_year,followup_year,1,103,Follow-up year,Follow-up year
+burn_sev_mod,followup_year,-0.033974274988232314,91,Moderate-severity burn (%),Follow-up year
+burn_sev_low,followup_year,-0.11926296290554873,91,Low-severity burn (%),Follow-up year
+post_fire_year,burn_sev_mod,0.3007955532674854,91,Post-fire year,Moderate-severity burn (%)
+burn_percent_fire_year,burn_sev_mod,0.9542887010084914,91,Burned watershed area (%),Moderate-severity burn (%)
+burn_sev_high,burn_sev_mod,0.9060822974934518,91,High-severity burn (%),Moderate-severity burn (%)
+Area_watershed_km,burn_sev_mod,-0.25992641954483026,91,Watershed area (km),Moderate-severity burn (%)
+runoffws,burn_sev_mod,0.1991378694231365,91,Mean annual runoff,Moderate-severity burn (%)
+bfiws,burn_sev_mod,0.02339731615989984,91,Baseflow index,Moderate-severity burn (%)
+permws,burn_sev_mod,-0.036821208355123314,91,Soil permeability,Moderate-severity burn (%)
+forest_cover,burn_sev_mod,-0.48513864860714345,91,Forest cover (%),Moderate-severity burn (%)
+grassland_cover,burn_sev_mod,0.1285779998571698,91,Grassland cover (%),Moderate-severity burn (%)
+wetland_cover,burn_sev_mod,-0.4498686496379551,91,Wetland cover (%),Moderate-severity burn (%)
+ag_cover,burn_sev_mod,-0.4162536860407945,91,Agricultural cover (%),Moderate-severity burn (%)
+urban_cover,burn_sev_mod,-0.4412200373911802,91,Urban cover (%),Moderate-severity burn (%)
+omws,burn_sev_mod,-0.13906215362409702,91,Soil organic matter,Moderate-severity burn (%)
+clayws,burn_sev_mod,-0.34057005440186205,91,Soil clay content,Moderate-severity burn (%)
+rckdepws,burn_sev_mod,-0.0012297849548862404,91,Depth to bedrock,Moderate-severity burn (%)
+glacial_till,burn_sev_mod,-0.1595465359631877,91,Glacial till (%),Moderate-severity burn (%)
+precip8110ws,burn_sev_mod,-0.09428853173197699,91,1981-2010 precipitation,Moderate-severity burn (%)
+tmean8110ws,burn_sev_mod,-0.0364342267787104,91,1981-2010 mean temperature,Moderate-severity burn (%)
+slope,burn_sev_mod,0.4880065080738704,77,Watershed slope,Moderate-severity burn (%)
+maxelevsmo,burn_sev_mod,0.19770380168707935,77,Maximum smoothed elevation,Moderate-severity burn (%)
+time_since_fire,burn_sev_mod,0.3007955532674854,91,Reported time since fire,Moderate-severity burn (%)
+followup_year,burn_sev_mod,-0.033974274988232314,91,Follow-up year,Moderate-severity burn (%)
+burn_sev_mod,burn_sev_mod,1,91,Moderate-severity burn (%),Moderate-severity burn (%)
+burn_sev_low,burn_sev_mod,0.8956698238978777,91,Low-severity burn (%),Moderate-severity burn (%)
+post_fire_year,burn_sev_low,0.15054225135402502,91,Post-fire year,Low-severity burn (%)
+burn_percent_fire_year,burn_sev_low,0.8949769273300785,91,Burned watershed area (%),Low-severity burn (%)
+burn_sev_high,burn_sev_low,0.7468919865028765,91,High-severity burn (%),Low-severity burn (%)
+Area_watershed_km,burn_sev_low,-0.17120471019288921,91,Watershed area (km),Low-severity burn (%)
+runoffws,burn_sev_low,0.3291902185713228,91,Mean annual runoff,Low-severity burn (%)
+bfiws,burn_sev_low,-0.11352560219551021,91,Baseflow index,Low-severity burn (%)
+permws,burn_sev_low,-0.27390415580568506,91,Soil permeability,Low-severity burn (%)
+forest_cover,burn_sev_low,-0.6015635173829209,91,Forest cover (%),Low-severity burn (%)
+grassland_cover,burn_sev_low,-7.424534063561819e-4,91,Grassland cover (%),Low-severity burn (%)
+wetland_cover,burn_sev_low,-0.614093381500767,91,Wetland cover (%),Low-severity burn (%)
+ag_cover,burn_sev_low,-0.19431803548665896,91,Agricultural cover (%),Low-severity burn (%)
+urban_cover,burn_sev_low,-0.49808542374515646,91,Urban cover (%),Low-severity burn (%)
+omws,burn_sev_low,0.09600631637936093,91,Soil organic matter,Low-severity burn (%)
+clayws,burn_sev_low,-0.16699826097602163,91,Soil clay content,Low-severity burn (%)
+rckdepws,burn_sev_low,0.04260159718776062,91,Depth to bedrock,Low-severity burn (%)
+glacial_till,burn_sev_low,-0.02151511753014419,91,Glacial till (%),Low-severity burn (%)
+precip8110ws,burn_sev_low,0.0685622618753683,91,1981-2010 precipitation,Low-severity burn (%)
+tmean8110ws,burn_sev_low,-0.004694063415617245,91,1981-2010 mean temperature,Low-severity burn (%)
+slope,burn_sev_low,0.3597185163148546,77,Watershed slope,Low-severity burn (%)
+maxelevsmo,burn_sev_low,-0.12963815254829344,77,Maximum smoothed elevation,Low-severity burn (%)
+time_since_fire,burn_sev_low,0.15054225135402502,91,Reported time since fire,Low-severity burn (%)
+followup_year,burn_sev_low,-0.11926296290554873,91,Follow-up year,Low-severity burn (%)
+burn_sev_mod,burn_sev_low,0.8956698238978777,91,Moderate-severity burn (%),Low-severity burn (%)
+burn_sev_low,burn_sev_low,1,91,Low-severity burn (%),Low-severity burn (%)

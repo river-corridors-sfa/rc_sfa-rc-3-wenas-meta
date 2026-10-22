@@ -1,0 +1,18 @@
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+here() starts at /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta
+Found 17 study files in meta_final/.
+Total rows read: 2178
+Studies present: Burd et al 2018; Coombs & Melack; 2013; Crandall et al. 2021; Gerla & Galloway; 1998; Gluns & Toews; 1989; Hauer & Spencer 1998; Hickenbottom et al. 2023; Mast & Clow; 2008; Murphy et al. 2018; Neary & Currier; 1982; Oliver et al. 2012; Rhea et al. 2021; Tiedemann; 1973; Uzun et al. 2020; Wagner et al. 2015; Writer et al. 2014
+Unit harmonization: all unit strings recognized.
+Warning message:
+Some Pair values did not link — see 01c_missing_comparison_links.csv 
+Corrected daily output: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/data/derived/gapfill_corrected_agent_v1/01_daily_time_series_paired.csv

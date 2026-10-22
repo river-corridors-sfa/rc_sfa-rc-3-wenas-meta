@@ -1,0 +1,3 @@
+
+# Local R dependencies installed for reproducible inference
+.R-library/
