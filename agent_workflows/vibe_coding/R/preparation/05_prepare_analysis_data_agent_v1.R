@@ -19,7 +19,8 @@ derived_dir <- file.path(workflow_dir, "data", "derived")
 audit_dir <- file.path(workflow_dir, "data", "audit")
 output_path <- file.path(derived_dir, "lasso_model_table.csv")
 
-required_files <- c(pairing_path, daily_path, geospatial_path, effect_size_path)
+required_files <- c(pairing_path, daily_path, geospatial_path, effect_size_path,
+                    file.path(workflow_dir, "config/paper_record_exclusions.csv"))
 missing_files <- required_files[!file.exists(required_files)]
 if (length(missing_files) > 0) stop("Missing required files: ", paste(missing_files, collapse = ", "))
 
@@ -144,7 +145,18 @@ model_table <- annual_effect_sizes %>%
 paper_exclusions <- model_table %>% filter(lnRR_n < 2 | is.na(lnRR_n)) %>%
   mutate(exclusion_reason = "Fewer than two eligible matched dates in annual summary")
 write_csv(paper_exclusions, file.path(audit_dir, "paper_singleton_exclusions.csv"), na = "")
+# Author-directed exclusions are exact annual keys, never response thresholds.
+# Preserve source records and export their full data and stated rationale.
+record_exclusions <- read_csv(file.path(workflow_dir, 'config/paper_record_exclusions.csv'),
+                               show_col_types = FALSE)
+exclusion_keys <- c('candidate_pair_id', 'response_var', 'year')
+stopifnot(!anyDuplicated(record_exclusions[exclusion_keys]),
+          !anyNA(record_exclusions[exclusion_keys]),
+          nrow(anti_join(record_exclusions, model_table, by = exclusion_keys)) == 0)
+excluded_records <- inner_join(model_table, record_exclusions, by = exclusion_keys)
+write_csv(excluded_records, file.path(audit_dir, 'paper_record_exclusions.csv'), na = '')
 model_table <- model_table %>% filter(!is.na(lnRR_n), lnRR_n >= 2) %>%
+  anti_join(record_exclusions, by = exclusion_keys) %>%
   group_by(candidate_pair_id, year) %>%
   mutate(matched_doc_no3 = all(c("DOC", "NO3") %in% response_var)) %>% ungroup()
 

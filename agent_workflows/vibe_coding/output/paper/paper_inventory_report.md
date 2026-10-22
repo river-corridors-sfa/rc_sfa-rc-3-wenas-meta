@@ -1,17 +1,17 @@
 # Verified paper study inventory
 
-After excluding six singleton annual records, the paper analysis includes **12 publications, 14 unique wildfires, 28 burned–reference pairs, and 46 watersheds (28 burned and 18 reference)**. These contribute **104 annual responses: 35 DOC from 7 studies and 69 nitrate from 12 studies**. DOC includes 16 pairs, 16 burned and 11 reference watersheds, and 9 unique fires. Nitrate includes the entire retained inventory.
+Updated October 22, 2026 after the author-directed nitrate exclusion. The paper analysis includes **12 publications, 14 unique fires, 28 burned–reference pairs and 46 study-specific physical watersheds (28 burned, 18 reference)**. It contains **103 annual responses: 35 DOC from seven studies and 68 nitrate from 12 studies**. DOC spans 16 pairs, 27 watersheds (16 burned, 11 reference) and nine fires. Nitrate spans 27 pairs, 44 watersheds (27 burned, 17 reference) and 14 fires. The excluded nitrate pair remains represented for DOC.
 
 Suggested Methods wording:
 
-> The final paired analysis included 12 publications representing 14 unique wildfires and 28 burned–reference watershed pairs, comprising 28 burned and 18 reference watersheds. After excluding six pair–analyte–year records with only one eligible matched concentration date, the dataset contained 35 annual DOC effect sizes from seven publications and 69 annual nitrate effect sizes from 12 publications.
+> The paired analysis included 12 publications representing 14 unique wildfires and 28 burned–reference watershed pairs. Six annual pair–analyte records were excluded for having only one eligible matched date. Following inspection of the response distribution, one additional nitrate record (Crandall et al. 2021, Site_2–Control_2, 2018; lnRR −4.507) was excluded by author decision as an extreme response. This post hoc exclusion was not based on a confirmed measurement error. The retained analysis comprised 35 annual DOC responses and 68 annual nitrate responses.
 
 ## Study counts
 
 | Publication | DOC rows | Nitrate rows | Pairs | Burned watersheds | Reference watersheds |
 |---|---:|---:|---:|---:|---:|
 | Coombs & Melack; 2013 | 0 | 6 | 3 | 3 | 1 |
-| Crandall et al. 2021 | 3 | 3 | 3 | 3 | 3 |
+| Crandall et al. 2021 | 3 | 2 | 3 | 3 | 3 |
 | Gerla & Galloway; 1998 | 0 | 5 | 1 | 1 | 1 |
 | Gluns & Toews; 1989 | 0 | 8 | 2 | 2 | 1 |
 | Hauer & Spencer 1998 | 0 | 15 | 5 | 5 | 3 |
@@ -25,15 +25,13 @@ Suggested Methods wording:
 
 ## Exclusion and counting rules
 
-- Murphy et al. 2018: remove 2010 DOC and nitrate records for Site_1 and Site_2 (four rows). Its later records remain.
-- Writer et al. 2014: remove 2012 nitrate records for Site_1 and Site_2 (two rows). DOC and later nitrate records remain.
-- Count a watershed once per study and approved role/site ID, regardless of analyte, year, or reuse of the reference. The reviewed physical-site selection maps reference IDs to actual retained sites; composite-looking ID names do not establish multiple reference watersheds.
-- Uzun's three seasonal labels per site are aliases of two burned watersheds and one reference watershed, not nine watersheds.
-- High Park occurs in Rhea and Writer with distinct retained watersheds: 15 study/fire records represent 14 unique fires. Do not sum per-study fire counts as unique fires.
-- All 28 approved pairs still have retained responses. The six-row exclusion does not remove either affected publication, any entire pair, or any fire.
-
-The manuscript's 52-watershed total (32 burned, 20 reference) is not supported by the retained reviewed analysis. The reported count above is based on reviewed study-specific physical-site identities; no new field-site or original-paper review was performed. The metadata ecosystem labels do not establish the claimed three climate/biome categories. The original 226-paper search inventory and three-category classification remain separate verification tasks.
+- Exclude four Murphy 2010 singleton records (Site_1/Site_2 × DOC/nitrate) and two Writer 2012 nitrate singleton records; preserve them upstream and in `data/audit/paper_singleton_exclusions.csv`.
+- Exclude only the configured Crandall Site_2–Control_2 nitrate 2018 key; retain its DOC record and all other Crandall records. Preserve full exclusion evidence in `data/audit/paper_record_exclusions.csv` and rationale in `config/paper_record_exclusions.csv`. No general low-response threshold is applied.
+- All 110 upstream annual records remain intact: 110 − 6 singletons − 1 author-selected outlier = 103 retained records.
+- Count physical watersheds once within study/role; deduplicate shared references and Uzun seasonal aliases. The 28-pair overall inventory remains, although nitrate loses one pair and its unique reference.
+- High Park is shared across Rhea and Writer; 15 study/fire records represent 14 unique fires. Connected study/fire inference uses six DOC and eleven nitrate components.
+- These retained data do not independently verify the original 226-screened-paper count or the proposed three biome categories. The earlier 52-watershed manuscript total remains unsupported.
 
 ## Reproducible evidence
 
-`R/checks/01_verify_paper_inventory_agent_v1.R` runs in the paper workflow. Its tables are `tables/paper_inventory_summary.csv`, `tables/paper_study_inventory.csv`, `tables/paper_pair_inventory.csv`, and `tables/paper_watershed_inventory.csv`. The physical-site table preserves original seasonal aliases. Full excluded records are in `data/audit/paper_singleton_exclusions.csv` relative to the workflow root; all annual records remain in `data/derived/reviewed_sites_agent_v1/effect_sizes_yearly.csv`.
+`R/checks/01_verify_paper_inventory_agent_v1.R` exports `tables/paper_inventory_summary.csv`, `tables/paper_study_inventory.csv`, `tables/paper_pair_inventory.csv` and `tables/paper_watershed_inventory.csv`. Source annual effects remain in `data/derived/reviewed_sites_agent_v1/effect_sizes_yearly.csv`. The complete prior 104-record package/model tables are preserved in `archive/pre_nitrate_exclusion_2026_10_22/`; paths outside `tables/` are relative to the workflow root.

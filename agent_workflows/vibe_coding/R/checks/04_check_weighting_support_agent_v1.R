@@ -24,6 +24,10 @@ stopifnot(identical(a$train,c$train),all(is.finite(as.matrix(a$train))))
 m <- read_csv(file.path(b,'data/derived/lasso_model_table.csv'),show_col_types=FALSE)
 o <- read_csv(file.path(b,'data/derived/paper_observed_only_model_table.csv'),show_col_types=FALSE)
 s <- read_csv(file.path(b,'data/audit/paper_sampling_support.csv'),show_col_types=FALSE)
-stopifnot(nrow(m)==104,nrow(o)==89,all(o$n_with_interpolation==0),all(o$lnRR_n>=2),
+exclusions <- read_csv(file.path(b,'config/paper_record_exclusions.csv'),show_col_types=FALSE)
+stopifnot(nrow(m)==103,nrow(o)==88,
+  nrow(semi_join(m,exclusions,by=c('candidate_pair_id','response_var','year')))==0,
+  nrow(semi_join(o,exclusions,by=c('candidate_pair_id','response_var','year')))==0,
+  all(o$n_with_interpolation==0),all(o$lnRR_n>=2),
   sum(s$observed_only_eligible)==nrow(o),all(s$n_observed<=s$n_daily))
 cat('PASS: equal study/pair/draw weights; training-only preprocessing; observed-only eligibility.\n')

@@ -1,10 +1,10 @@
 # Annual uncertainty and weighting implementation
 
-The primary predictive analysis now assigns equal total weight to each study, distributed equally among its pairs and then the retained annual records of each pair. It does not use the provisional daily delta variance to assign precision. The 104-record paper inventory and annual arithmetic-mean ratio definition are unchanged.
+The primary predictive analysis now assigns equal total weight to each study, distributed equally among its pairs and then the retained annual records of each pair. It does not use the provisional daily delta variance to assign precision. Following the October 22 author-directed exclusion, the paper inventory is 103 records (35 DOC and 68 nitrate); the annual arithmetic-mean ratio definition is unchanged. The excluded Crandall 2018 Site_2–Control_2 nitrate record is preserved upstream and in the exclusion audit. This is a post hoc response-based exclusion, not a confirmed data error.
 
 ## Actual sampling support
 
-The audit in `data/audit/paper_sampling_support.csv` (relative to the workflow root) reports positive matched observed dates, observed spacing, interpolated fraction, and covered duration for every paper record. Median matched observed-date counts are six for DOC and five for nitrate. An observed-only analysis requiring at least two such dates retains 32 DOC and 57 nitrate annual records. The other 15 records remain in the primary analysis but are explicitly excluded from this sensitivity.
+The audit in `data/audit/paper_sampling_support.csv` (relative to the workflow root) reports positive matched observed dates, observed spacing, interpolated fraction, and covered duration for every paper record. Median matched observed-date counts are six for DOC and 4.5 for nitrate. An observed-only analysis requiring at least two such dates retains 32 DOC and 56 nitrate annual records. The other 15 records remain in the primary analysis but are explicitly excluded from this sensitivity.
 
 Only 18 records, all from Murphy, pass an exploratory screen of at least 20 matched observed dates spanning at least 90 days; even these have maximum gaps of 42–57 days. The screen is diagnostic rather than a validated threshold. No automatic temporal block-bootstrap variance has been assigned. Defining defensible seasonal/time blocks, preserving joint shared-reference trajectories, and evaluating interpolation after resampling remain necessary before such a variance could replace the provisional delta estimate. Resampling interpolated daily rows independently would not solve the problem.
 
@@ -22,11 +22,15 @@ Outer performance files report pooled row RMSE/MAE/R², per-study errors, and eq
 
 Bootstrap attempts with fewer than three distinct studies are recorded as failures. Selection frequencies use successful refits only; failed fits do not count as zero coefficients. See each scenario's `bootstrap_summary.csv` and `bootstrap_failures.csv`. Predictors screened out of a successful fit count as unselected.
 
+## Primary balanced pooled inference
+
+Equal-study → equal-pair → equal-available-year weighted pooled log ratios use connected study/fire-component CR2 intervals with Satterthwaite degrees of freedom, nonprecision weights and an identity working target. Study/fire clustering links Rhea and Writer via High Park, leaving six DOC and eleven nitrate components. Publication-cluster, observed-only and matched-interpolated summaries are supporting comparisons; time associations remain exploratory. The exclusion is applied before recomputing balance weights for every inventory. Current coefficients, weights and deletion diagnostics are under `balanced_synthesis/`; the inclusion comparison is in `nitrate_exclusion_report.md` and the archived pre-exclusion package.
+
 ## Conditional pooled-effect inference
 
 The conditional covariance script fits REML pooled-effect and time-since-fire models with study/pair random intercepts. It evaluates nine working sampling-covariance scenarios using reference-family correlation rho and annual temporal correlation phi in {0, 0.5, 0.8}. The matrix is a positive-semidefinite mixture of pair and shared-reference AR(1) kernels scaled by the provisional annual delta standard errors. These scenarios are assumed correlations, not estimates of daily autocorrelation. Shared-reference dependence is represented in the working covariance, not by a third potentially redundant random intercept.
 
-Study-clustered CR2 standard errors and Satterthwaite degrees of freedom are computed through `metafor::robust(..., clubSandwich=TRUE)`. This follows the [metafor robust inference documentation](https://wviechtb.github.io/metafor/reference/robust.html). Estimates, confidence intervals, degrees of freedom, heterogeneity components, model objects, and failures are saved. These conditional fits do **not** validate annual precision or correct the effective information content of interpolated observations. Final manuscript uncertainty remains unresolved, especially with only seven DOC studies.
+Study-clustered CR2 standard errors and Satterthwaite degrees of freedom are computed through `metafor::robust(..., clubSandwich=TRUE)`. This follows the [metafor robust inference documentation](https://wviechtb.github.io/metafor/reference/robust.html). Estimates, confidence intervals, degrees of freedom, heterogeneity components, model objects, and failures are saved. These conditional fits do **not** validate annual precision or correct the effective information content of interpolated observations. These REML fits are conditional sensitivities. Primary manuscript synthesis is the author-selected balanced pooled estimator with connected study/fire-component CR2/Satterthwaite intervals; annual precision validation remains unresolved, and DOC has only six inference components across seven studies.
 
 ## Files and reproduction
 
@@ -48,12 +52,12 @@ All outer fits completed. Each scenario completed 994/1,000 DOC and 1,000/1,000 
 
 | Scenario | DOC | Nitrate |
 |---|---:|---:|
-| Primary equal-study weights | 0.279 | 1.293 |
-| Equal-row weights | 0.259 | 1.287 |
-| Provisional precision/family weights | 0.418 | 1.244 |
-| Observed-only, 89 records | 0.330 | 1.350 |
-| Interpolated, same 89 records | 0.191 | 1.273 |
+| Primary | 0.279 | 0.867 |
+| Equal row | 0.259 | 0.863 |
+| Precision/family | 0.418 | 0.838 |
+| Observed only | 0.330 | 0.921 |
+| Matched interpolated | 0.191 | 0.820 |
 
 The observed-only and interpolated targets differ, so these error differences do not establish that interpolation improves prediction of the underlying true annual response. They demonstrate sensitivity to response construction. Comparisons of primary versus matched-subset results additionally reflect coverage differences.
 
-Checks verified equal primary study totals, equal pair totals within studies, bootstrap-draw weighting, training-only preprocessing, observed-only eligibility, unique held-out predictions with complete coverage, positive finite CR2 degrees of freedom, and recorded bootstrap denominators. All five figures regenerated; Figure 3 was visually inspected. The paper inventory remains unchanged.
+Checks verified equal primary study totals, equal pair totals within studies, bootstrap-draw weighting, training-only preprocessing, observed-only eligibility, unique held-out predictions with complete coverage, positive finite CR2 degrees of freedom, and recorded bootstrap denominators. All five figures regenerated; Figure 3 was visually inspected. The updated inventory is 103 records; all inputs retain the exact-key exclusion.

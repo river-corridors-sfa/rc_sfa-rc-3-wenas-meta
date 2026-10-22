@@ -6,6 +6,8 @@ m <- read_csv(file.path(b,'data/derived/lasso_model_table.csv'),show_col_types=F
 s <- read_csv(file.path(b,'config/reviewed_site_selection.csv'),show_col_types=FALSE)
 out <- file.path(b,'output/paper/tables')
 stopifnot(all(m$lnRR_n >= 2), !anyDuplicated(m[c('candidate_pair_id','response_var','year')]))
+exclusions <- read_csv(file.path(b,'config/paper_record_exclusions.csv'),show_col_types=FALSE)
+stopifnot(nrow(semi_join(m,exclusions,by=c('candidate_pair_id','response_var','year'))) == 0)
 pairs <- m %>% distinct(Study_ID,candidate_pair_id,Pair_Burn,Pair_Unburn,Fire_ID_Analysis)
 # Approved role IDs represent physical watersheds; Uzun seasonal Site labels
 # are aliases of those same watersheds, not additional independent locations.

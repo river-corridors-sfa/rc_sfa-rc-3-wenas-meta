@@ -1,6 +1,8 @@
 # Annual uncertainty and dependence review
 
-October 21, 2026. Primary manuscript selection is pending author review. The exploratory annual-uncertainty script adds review candidates without replacing annual responses, variances, prediction models, or conditional REML outputs.
+Historical full-inventory review: the numerical results below precede the October 22 author-directed Crandall nitrate exclusion. Current 103-record inference is under `../output/paper/balanced_synthesis/`; do not quote this review as the current manuscript result.
+
+October 21, 2026 review; decision update October 22: the author selected balanced pooled summaries with connected study/fire-component CR2 uncertainty as primary. The active implementation is `../R/analysis/02_fit_balanced_synthesis_agent_v1.R`, with results in `../output/paper/balanced_synthesis/`. The review below preserves the original evidence and limitations. The exploratory annual-uncertainty script adds review candidates without replacing annual responses, variances, prediction models, or conditional REML outputs.
 
 The sampling audit does not support a validated annual sampling variance for every record. A defensible alternative for the main synthesis is equal-study, equal-pair, equal-available-year estimation with cluster-adjusted uncertainty, retaining variance-based multilevel models as conditional sensitivities. This changes the synthesis target and Methods specification; it does not validate individual annual variances.
 
@@ -36,16 +38,16 @@ Primary-inventory time slopes are −0.025 log units/year for DOC [−0.193, 0.1
 
 Deleting one study/fire component at a time gives pooled point estimates of 0.206–0.399 for DOC and 0.809–1.170 for nitrate. Time slopes span −0.082 to −0.014 and 0.088–0.250, respectively. High Park's component has the largest slope influence for both analytes. These are point-estimate deletion checks, not deletion-specific confidence intervals or influence validation for REML or LASSO.
 
-## Recommended choice pending author selection
+## Selected choice (author confirmation October 22, 2026)
 
 Use balanced pooled summaries with study/fire-component CR2 intervals as the main synthesis; retain publication-cluster intervals as sensitivity results. Treat DOC and all temporal associations cautiously given the effective degrees of freedom. Keep REML study/pair random-intercept models and their nine provisional annual covariance scenarios as conditional sensitivities. Do not attribute their heterogeneity components to the balanced analysis. Retain observed-only and matched-interpolated comparisons and revise Methods to distinguish balancing, coefficient uncertainty, and annual precision.
 
-This route specifies synthesis uncertainty without assigning unsupported annual variances. If REML remains primary, its inference must explicitly remain conditional on the selected variance/covariance model. Neither route supplies exact annual sampling uncertainty or guarantees small-sample interval coverage. Final selection changes the Methods' promised primary multilevel inference and requires an explicit author choice.
+This route specifies synthesis uncertainty without assigning unsupported annual variances. If REML remains primary, its inference must explicitly remain conditional on the selected variance/covariance model. Neither route supplies exact annual sampling uncertainty or guarantees small-sample interval coverage. The selected route changes the Methods' promised primary multilevel inference; revise it to identify balanced synthesis as primary and multilevel REML as conditional sensitivity.
 
 Before manuscript freeze, confirm the inference target, review cross-publication links and time attribution, and decide whether prediction also needs study/fire-component validation. Do not mark annual-variance validation complete because a candidate synthesis runs.
 
 ## Reproduction
 
-Run `Rscript agent_workflows/vibe_coding/exploratory/R/01_review_annual_uncertainty_agent_v1.R` from the repository root after model-table preparation and sampling-support audit produce the primary and observed-only inputs. This review remains separate from the paper runner pending method selection.
+Run `Rscript agent_workflows/vibe_coding/exploratory/R/01_review_annual_uncertainty_agent_v1.R` from the repository root after model-table preparation and sampling-support audit produce the primary and observed-only inputs. This historical review script remains separate from the runner. The selected active implementation runs in `primary` and `all`.
 
 `exploratory/output/annual_uncertainty/` contains coefficients, intervals, effective degrees of freedom, study/fire membership, weights, leave-component-out estimates, and session information. Checks verify equal study totals and pair totals within study, unique primary annual keys, finite inputs/uncertainty, positive degrees of freedom, and pooled-intercept agreement with independently aggregated study/pair means.

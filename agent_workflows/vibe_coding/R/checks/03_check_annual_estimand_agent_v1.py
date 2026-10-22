@@ -15,8 +15,11 @@ with (root / 'data/derived/reviewed_sites_agent_v1/effect_sizes_daily.csv').open
 with (root / 'data/derived/lasso_model_table.csv').open() as stream:
     rows = list(csv.DictReader(stream))
 assert len(groups) == 110
-assert len(rows) == 104
-assert {(r["candidate_pair_id"], r["response_var"], r["year"]) for r in rows} == {k for k,v in groups.items() if len(v) >= 2}
+with (root / 'config/paper_record_exclusions.csv').open() as stream:
+    exclusions = {(r['candidate_pair_id'], r['response_var'], r['year']) for r in csv.DictReader(stream)}
+assert exclusions <= groups.keys()
+assert len(rows) == 110 - sum(len(v) < 2 for v in groups.values()) - len(exclusions)
+assert {(r["candidate_pair_id"], r["response_var"], r["year"]) for r in rows} == {k for k,v in groups.items() if len(v) >= 2} - exclusions
 changed = 0
 singletons = 0
 for row in rows:

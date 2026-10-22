@@ -395,3 +395,41 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Findings: Current nitrate full-data and twelve outer fits converge; one-SE tuning selects no predictors. Nine exploratory exclusion scenarios preserve the intercept-only result in all outer folds. Removing the lowest Crandall observation reduces equal-study held-out RMSE from 1.293 to 0.867. No exclusions promoted to primary analysis.
 - Figure verification: All five fresh renders and five regenerated supporting CSVs match saved primary files byte for byte. Selection-stability input was copied, not refitted. No primary figures, scripts or data changed.
 - Remaining work: Fix SI Figure 1 hard-coded 110-row caption (current input 104); finish SI styling/color consistency, captions/units, map coordinate review, journal exports, and the pending full from-source validation.
+
+
+## 2026-10-22 — Selected and activated balanced primary synthesis
+
+- Task: Implement the author's choice of balanced pooled summaries with study/fire-clustered CR2 uncertainty, and explain implications for all manuscript figures.
+- Files changed: Added `R/analysis/02_fit_balanced_synthesis_agent_v1.R` and `output/paper/balanced_synthesis/` results/weights/clusters/deletion checks/session record. Updated the paper runner, workflow/R/exploratory/paper READMEs, annual uncertainty review, manuscript checklist, working decisions and decision history.
+- Decisions: Primary pooled estimates use equal study → pair → available-year balance and connected study/fire-component CR2/Satterthwaite uncertainty without annual precision weights. Publication-cluster intervals and observed/matched-interpolated summaries are sensitivities; time associations exploratory; REML conditional sensitivity. LASSO groups and all five graphics unchanged. Documented each figure's analysis unit, weighting and interpretive implications in the paper catalog; report pooled inference separately from the unweighted Figure 2 boxes.
+- Results: DOC pooled lnRR 0.295 (95% interval −0.098 to 0.689; six components); nitrate 0.978 (0.311 to 1.645; eleven components). Effective slope df about 1.3 preclude strong recovery-trend claims.
+- Verification: Active synthesis completed all 36 coefficient rows with built-in balance/pooled-estimate/finite-uncertainty assertions. All numerical coefficient fields reproduce reviewed candidate results exactly; weights, clusters and deletion tables match byte for byte. Exactly two pooled fits marked primary. Primary/all runner dry runs include the selected script; whitespace checks passed. No expensive LASSO rerun or figure regeneration was needed for this choice.
+- Next steps: Reconcile manuscript Methods/Results and captions with the selected synthesis, verify cross-publication links/time attribution, complete outstanding sensitivities and final figure QA (including stale SI correlation caption), and perform the clean from-source manuscript run. Annual variance validation remains open for conditional REML; balanced CR2 does not validate annual sampling precision.
+
+
+## 2026-10-22 — Built Figure 2 raincloud and archived boxplot
+
+- Task: Try the approved weighted raincloud design and archive the original boxplot.
+- Files changed: Archived exact original PNG, plotting script and summary CSV with SHA-256 manifest under `archive/figure_2_boxplot_2026_10_22/`. Replaced active plotting script with `R/figures/02_plot_response_raincloud_agent_v1.R`; exported PNG/PDF/caption under `output/paper/figures/figure_2_response_raincloud/`, extended summary table and added source point weights/cloud polygons. Updated runner prerequisites/path, workflow and paper indexes, manuscript checklist, archive index and decisions.
+- Design: Balance-weighted Gaussian half-violins with explicit per-analyte nrd0 bandwidths, observed-range trimming and equal maximum widths; all annual observations shown faintly with deterministic jitter. Separate diamonds/95% CR2 bars show saved primary synthesis. Counts include annual records, publications and dependence components. No analysis or uncertainty estimates refitted.
+- Verification: Script ran without warnings; visually inspected PNG for full-range retention, separate layers, legibility and no clipping. All 104 observations retained; balanced figure means match saved primary estimates to 1e-10; weights/keys/inventory validated in script. Archive hashes verified. Figure-only dry run uses the new script; whitespace check passed.
+- Next steps: Author review of the raincloud; journal-size and final caption review remain with the broader manuscript figure tasks. Other figures remain unchanged.
+
+
+## 2026-10-22 — Excluded author-selected Crandall nitrate outlier throughout manuscript analysis
+
+- Task: Remove the very low nitrate annual lnRR from all active analyses and regenerate downstream products.
+- Record: Crandall et al. 2021, comparison C2, Site_2–Control_2, NO3 2018; lnRR −4.506808658089654, 18 eligible dates. This is an author-directed post hoc response-based exclusion, not a confirmed measurement/transcription error.
+- Files changed: Added exact-key rule `config/paper_record_exclusions.csv`, full excluded-row audit, exclusion-propagation check 05 and `output/paper/nitrate_exclusion_report.md`. Updated preparation 05, inventory/estimand/weighting checks, Figure 2 caption and data-derived SI correlation count. Regenerated model tables/audits, primary/sensitivity LASSO outputs, balanced CR2 and conditional REML results, five figures and source tables. Updated workflow/paper/check indexes, inventory/weighting reports, manuscript checklist and decisions. Preserved the complete prior 104-record package/model inputs in `archive/pre_nitrate_exclusion_2026_10_22/` with hashes.
+- Inventory: 103 primary records (35 DOC, 68 nitrate); 88 observed-only/matched records (32 DOC, 56 nitrate). Overall 28 pairs/46 watersheds retained via DOC counterpart; nitrate now covers 27 pairs/44 watersheds. Source chemistry and 110 upstream annual effects unchanged.
+- Results: Nitrate balanced pooled lnRR becomes 1.119 [0.653, 1.585] from 0.978 [0.311, 1.645]; DOC remains 0.295 [−0.098, 0.689]. Primary nitrate equal-study held-out LASSO RMSE becomes 0.867 from 1.293; predictions still match intercept-only benchmark. Performance comparisons change the validation target and do not establish improved prediction of the original inventory.
+- Verification: Rebuilt preparation 05–06, then completed the full all-mode analysis from corrected prepared chemistry with 1,000 bootstrap attempts/analyte/scenario. Every scenario has 994 successful DOC and 1,000 nitrate refits; six DOC failures have fewer than three distinct studies. All 36 conditional REML fits complete. Annual-estimand, weighting/support and end-to-end exclusion propagation checks passed (complete unique predictions for all four benchmarks/models per row and scenario). All 104 archived artifact hashes verified. All five figures regenerated; Figures 2/3 visually inspected. Edited scripts parse and whitespace checks pass. Run logs saved under `output/logs/nitrate_exclusion_*_2026_10_22.log`.
+- Next steps: Transparently report the post hoc exclusion and archived inclusion comparison in final Methods/Results. Remaining manuscript methodology, sensitivity and journal-export tasks stay open; this run did not repeat upstream interpolation/import or constitute the final clean from-source freeze.
+
+
+## 2026-10-22 — Figure 2 fire-group label
+
+- Task: Rename the figure’s cluster counts using fire terminology.
+- Changes: Figure 2 plotting script now labels the counts “fire groups”; regenerated PNG/PDF and caption, and updated the paper index. Caption defines these as connected study/fire components, distinct from unique wildfire counts.
+- Verification: Plot script completed with balance/estimate checks; PNG visually inspected. Counts remain 11 nitrate and six DOC groups; data, fits and intervals unchanged.
+- Next steps: Remaining final caption/journal-export review as previously tracked.

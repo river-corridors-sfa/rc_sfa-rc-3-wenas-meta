@@ -62,7 +62,7 @@ DOC,revised_primary,Writer et al. 2014,runoffws,0.19024160914270752,0.1091376714
 DOC,revised_primary,Writer et al. 2014,bfiws,0,0.10913767146512728
 DOC,revised_primary,Writer et al. 2014,forest_cover,0,0.10913767146512728
 DOC,revised_primary,Writer et al. 2014,omws,0.03310309231820135,0.10913767146512728
-NO3,revised_primary,Coombs & Melack; 2013,(Intercept),0.9995466942503352,100
+NO3,revised_primary,Coombs & Melack; 2013,(Intercept),1.009301698884741,100
 NO3,revised_primary,Coombs & Melack; 2013,post_fire_year,0,100
 NO3,revised_primary,Coombs & Melack; 2013,burn_percent_fire_year,0,100
 NO3,revised_primary,Coombs & Melack; 2013,burn_sev_high,0,100
@@ -80,7 +80,7 @@ NO3,revised_primary,Crandall et al. 2021,runoffws,0,100
 NO3,revised_primary,Crandall et al. 2021,bfiws,0,100
 NO3,revised_primary,Crandall et al. 2021,forest_cover,0,100
 NO3,revised_primary,Crandall et al. 2021,clayws,0,100
-NO3,revised_primary,Gerla & Galloway; 1998,(Intercept),0.9885332788346163,100
+NO3,revised_primary,Gerla & Galloway; 1998,(Intercept),0.9988692154179822,100
 NO3,revised_primary,Gerla & Galloway; 1998,post_fire_year,0,100
 NO3,revised_primary,Gerla & Galloway; 1998,burn_percent_fire_year,0,100
 NO3,revised_primary,Gerla & Galloway; 1998,burn_sev_high,0,100
@@ -89,7 +89,7 @@ NO3,revised_primary,Gerla & Galloway; 1998,runoffws,0,100
 NO3,revised_primary,Gerla & Galloway; 1998,bfiws,0,100
 NO3,revised_primary,Gerla & Galloway; 1998,forest_cover,0,100
 NO3,revised_primary,Gerla & Galloway; 1998,clayws,0,100
-NO3,revised_primary,Gluns & Toews; 1989,(Intercept),0.9470079492227499,100
+NO3,revised_primary,Gluns & Toews; 1989,(Intercept),0.9602425784100603,100
 NO3,revised_primary,Gluns & Toews; 1989,post_fire_year,0,100
 NO3,revised_primary,Gluns & Toews; 1989,burn_percent_fire_year,0,100
 NO3,revised_primary,Gluns & Toews; 1989,burn_sev_high,0,100
@@ -98,7 +98,7 @@ NO3,revised_primary,Gluns & Toews; 1989,runoffws,0,100
 NO3,revised_primary,Gluns & Toews; 1989,bfiws,0,100
 NO3,revised_primary,Gluns & Toews; 1989,forest_cover,0,100
 NO3,revised_primary,Gluns & Toews; 1989,clayws,0,100
-NO3,revised_primary,Hauer & Spencer 1998,(Intercept),1.1786946546774502,100
+NO3,revised_primary,Hauer & Spencer 1998,(Intercept),1.2043353081585826,100
 NO3,revised_primary,Hauer & Spencer 1998,post_fire_year,0,100
 NO3,revised_primary,Hauer & Spencer 1998,burn_percent_fire_year,0,100
 NO3,revised_primary,Hauer & Spencer 1998,burn_sev_high,0,100
@@ -107,7 +107,7 @@ NO3,revised_primary,Hauer & Spencer 1998,runoffws,0,100
 NO3,revised_primary,Hauer & Spencer 1998,bfiws,0,100
 NO3,revised_primary,Hauer & Spencer 1998,forest_cover,0,100
 NO3,revised_primary,Hauer & Spencer 1998,clayws,0,100
-NO3,revised_primary,Hickenbottom et al. 2023,(Intercept),1.004565786648904,100
+NO3,revised_primary,Hickenbottom et al. 2023,(Intercept),1.0148779001559707,100
 NO3,revised_primary,Hickenbottom et al. 2023,post_fire_year,0,100
 NO3,revised_primary,Hickenbottom et al. 2023,burn_percent_fire_year,0,100
 NO3,revised_primary,Hickenbottom et al. 2023,burn_sev_high,0,100
@@ -116,7 +116,7 @@ NO3,revised_primary,Hickenbottom et al. 2023,runoffws,0,100
 NO3,revised_primary,Hickenbottom et al. 2023,bfiws,0,100
 NO3,revised_primary,Hickenbottom et al. 2023,forest_cover,0,100
 NO3,revised_primary,Hickenbottom et al. 2023,clayws,0,100
-NO3,revised_primary,Mast & Clow; 2008,(Intercept),0.9816830547910015,100
+NO3,revised_primary,Mast & Clow; 2008,(Intercept),0.9943808021855116,100
 NO3,revised_primary,Mast & Clow; 2008,post_fire_year,0,100
 NO3,revised_primary,Mast & Clow; 2008,burn_percent_fire_year,0,100
 NO3,revised_primary,Mast & Clow; 2008,burn_sev_high,0,100
@@ -125,7 +125,7 @@ NO3,revised_primary,Mast & Clow; 2008,runoffws,0,100
 NO3,revised_primary,Mast & Clow; 2008,bfiws,0,100
 NO3,revised_primary,Mast & Clow; 2008,forest_cover,0,100
 NO3,revised_primary,Mast & Clow; 2008,clayws,0,100
-NO3,revised_primary,Murphy et al. 2018,(Intercept),0.9887852708224344,100
+NO3,revised_primary,Murphy et al. 2018,(Intercept),1.0014512420324733,100
 NO3,revised_primary,Murphy et al. 2018,post_fire_year,0,100
 NO3,revised_primary,Murphy et al. 2018,burn_percent_fire_year,0,100
 NO3,revised_primary,Murphy et al. 2018,burn_sev_high,0,100
@@ -134,7 +134,7 @@ NO3,revised_primary,Murphy et al. 2018,runoffws,0,100
 NO3,revised_primary,Murphy et al. 2018,bfiws,0,100
 NO3,revised_primary,Murphy et al. 2018,forest_cover,0,100
 NO3,revised_primary,Murphy et al. 2018,clayws,0,100
-NO3,revised_primary,Oliver et al. 2012,(Intercept),1.036213976647679,100
+NO3,revised_primary,Oliver et al. 2012,(Intercept),1.0462315589359423,100
 NO3,revised_primary,Oliver et al. 2012,post_fire_year,0,100
 NO3,revised_primary,Oliver et al. 2012,burn_percent_fire_year,0,100
 NO3,revised_primary,Oliver et al. 2012,burn_sev_high,0,100
@@ -143,7 +143,7 @@ NO3,revised_primary,Oliver et al. 2012,runoffws,0,100
 NO3,revised_primary,Oliver et al. 2012,bfiws,0,100
 NO3,revised_primary,Oliver et al. 2012,forest_cover,0,100
 NO3,revised_primary,Oliver et al. 2012,clayws,0,100
-NO3,revised_primary,Rhea et al. 2021,(Intercept),0.9747587002570075,100
+NO3,revised_primary,Rhea et al. 2021,(Intercept),0.9855063520205873,100
 NO3,revised_primary,Rhea et al. 2021,post_fire_year,0,100
 NO3,revised_primary,Rhea et al. 2021,burn_percent_fire_year,0,100
 NO3,revised_primary,Rhea et al. 2021,burn_sev_high,0,100
@@ -152,7 +152,7 @@ NO3,revised_primary,Rhea et al. 2021,runoffws,0,100
 NO3,revised_primary,Rhea et al. 2021,bfiws,0,100
 NO3,revised_primary,Rhea et al. 2021,forest_cover,0,100
 NO3,revised_primary,Rhea et al. 2021,clayws,0,100
-NO3,revised_primary,Uzun et al. 2020,(Intercept),0.9945756782139559,100
+NO3,revised_primary,Uzun et al. 2020,(Intercept),1.0050586952366447,100
 NO3,revised_primary,Uzun et al. 2020,post_fire_year,0,100
 NO3,revised_primary,Uzun et al. 2020,burn_percent_fire_year,0,100
 NO3,revised_primary,Uzun et al. 2020,burn_sev_high,0,100
@@ -161,7 +161,7 @@ NO3,revised_primary,Uzun et al. 2020,runoffws,0,100
 NO3,revised_primary,Uzun et al. 2020,bfiws,0,100
 NO3,revised_primary,Uzun et al. 2020,forest_cover,0,100
 NO3,revised_primary,Uzun et al. 2020,clayws,0,100
-NO3,revised_primary,Writer et al. 2014,(Intercept),1.037797903655662,100
+NO3,revised_primary,Writer et al. 2014,(Intercept),1.0551129270807555,100
 NO3,revised_primary,Writer et al. 2014,post_fire_year,0,100
 NO3,revised_primary,Writer et al. 2014,burn_percent_fire_year,0,100
 NO3,revised_primary,Writer et al. 2014,burn_sev_high,0,100

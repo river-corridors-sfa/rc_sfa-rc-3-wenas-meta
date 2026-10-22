@@ -49,7 +49,7 @@ figure <- ggplot(correlation_long, aes(x = label_2, y = label_1, fill = rho)) +
        subtitle = "Twenty screened candidates plus four additional timing and burn-severity fields",
        x = NULL, y = NULL,
        caption = paste(
-         "Pairwise-complete Spearman correlations across the 110 finite annual DOC and nitrate model rows.",
+         paste("Pairwise-complete Spearman correlations across", nrow(data), "finite annual DOC and nitrate model rows."),
          "Annual rows from the same watershed pair repeat static attributes; this is a descriptive redundancy diagnostic.",
          "Cells with |ρ| ≥ 0.65 are labeled; exact values and pairwise counts are in the companion CSV.",
          sep = "\n")) +

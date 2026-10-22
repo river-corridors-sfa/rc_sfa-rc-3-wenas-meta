@@ -37,12 +37,13 @@ if (any(args %in% c('--help', '-h'))) {
   )
   audits <- c('checks/01_verify_paper_inventory_agent_v1.R',
               'checks/02_audit_sampling_support_agent_v1.R')
-  primary <- 'analysis/01_fit_issue6_revised_primary_agent_v1.R'
+  primary <- c('analysis/01_fit_issue6_revised_primary_agent_v1.R',
+               'analysis/02_fit_balanced_synthesis_agent_v1.R')
   sensitivities <- c('sensitivities/01_run_weighting_sensitivities_agent_v1.R',
                      'sensitivities/02_fit_working_covariance_inference_agent_v1.R')
   figures <- c(
     'figures/01_plot_paper_maps_agent_v1.R',
-    'figures/02_plot_response_boxplots_agent_v1.R',
+    'figures/02_plot_response_raincloud_agent_v1.R',
     'figures/03_plot_paper_lasso_results_agent_v1.R',
     'figures/04_plot_paper_predictor_correlations_agent_v1.R',
     'figures/05_plot_issue6_revised_primary_violins_agent_v1.R'
@@ -68,6 +69,8 @@ if (any(args %in% c('--help', '-h'))) {
     if (mode == 'sensitivities') required <- c(required, 'output/paper/tables/performance_equal_study.csv')
     if (mode == 'figures') required <- c(required,
       'output/paper/tables/selection_stability.csv',
+      'output/paper/balanced_synthesis/balanced_weights.csv',
+      'output/paper/balanced_synthesis/balanced_CR2_results.csv',
       'config/issue6_revised_primary_dictionary.csv',
       'config/predictor_dictionary.csv', 'config/issue6_revised_primary_predictors.csv')
     missing_inputs <- required[!file.exists(file.path(root, required))]
