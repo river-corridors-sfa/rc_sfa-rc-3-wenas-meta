@@ -1,6 +1,6 @@
 # User-defined issue #6 primary sets for paired annual lnRR.
 # Builds from 09_issue6_curated_lasso_agent_v1.R without changing prior results.
-# Run from repository root: N_BOOTSTRAP=1000 Rscript agent_workflows/vibe_coding/R/11_fit_issue6_revised_primary_agent_v1.R
+# Run from repository root: N_BOOTSTRAP=1000 Rscript agent_workflows/vibe_coding/R/analysis/11_fit_issue6_revised_primary_agent_v1.R
 
 library(tidyverse)
 library(here)

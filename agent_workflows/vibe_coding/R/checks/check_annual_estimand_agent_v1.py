@@ -5,7 +5,7 @@ import statistics
 from collections import defaultdict
 from pathlib import Path
 
-root = Path(__file__).resolve().parents[1]
+root = Path(__file__).resolve().parents[2]
 groups = defaultdict(list)
 with (root / 'data/derived/reviewed_sites_agent_v1/effect_sizes_daily.csv').open() as stream:
     for row in csv.DictReader(stream):

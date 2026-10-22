@@ -4,7 +4,10 @@ library(tidyverse)
 library(here)
 library(lubridate)
 b <- here('agent_workflows', 'vibe_coding')
-source(file.path(b, 'R', '01b_promote_reviewed_pairings_agent_v1.R'), local = new.env(parent = globalenv()))
+# The paper runner imports and promotes reviewed pairings before this step.
+required <- file.path(b, c('data/derived/gapfill_corrected_agent_v1/01_daily_time_series_paired.csv',
+                          'config/pairing_decisions_analysis.csv'))
+if (any(!file.exists(required))) stop('Missing corrected chemistry or promoted pairings; run the paper runner in prepare mode first.')
 d <- read_csv(file.path(b,'data/derived/gapfill_corrected_agent_v1/01_daily_time_series_paired.csv'), show_col_types=FALSE)
 p <- read_csv(file.path(b,'config/pairing_decisions_analysis.csv'), show_col_types=FALSE)
 audit <- file.path(b,'data/audit')

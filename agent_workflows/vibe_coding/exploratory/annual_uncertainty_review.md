@@ -46,6 +46,6 @@ Before manuscript freeze, confirm the inference target, review cross-publication
 
 ## Reproduction
 
-Run `Rscript agent_workflows/vibe_coding/R/20_review_annual_uncertainty_agent_v1.R` from the repository root after scripts 02 and 17 produce the primary and observed-only inputs. This review remains separate from the paper runner pending method selection.
+Run `Rscript agent_workflows/vibe_coding/exploratory/R/20_review_annual_uncertainty_agent_v1.R` from the repository root after scripts 02 and 17 produce the primary and observed-only inputs. This review remains separate from the paper runner pending method selection.
 
-`output/paper/uncertainty_review/` contains coefficients, intervals, effective degrees of freedom, study/fire membership, weights, leave-component-out estimates, and session information. Checks verify equal study totals and pair totals within study, unique primary annual keys, finite inputs/uncertainty, positive degrees of freedom, and pooled-intercept agreement with independently aggregated study/pair means.
+`exploratory/output/annual_uncertainty/` contains coefficients, intervals, effective degrees of freedom, study/fire membership, weights, leave-component-out estimates, and session information. Checks verify equal study totals and pair totals within study, unique primary annual keys, finite inputs/uncertainty, positive degrees of freedom, and pooled-intercept agreement with independently aggregated study/pair means.

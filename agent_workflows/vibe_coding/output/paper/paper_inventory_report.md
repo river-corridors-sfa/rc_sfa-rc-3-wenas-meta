@@ -36,4 +36,4 @@ The manuscript's 52-watershed total (32 burned, 20 reference) is not supported b
 
 ## Reproducible evidence
 
-`R/16_verify_paper_inventory_agent_v1.R` runs in the paper workflow. Its tables are `tables/paper_inventory_summary.csv`, `tables/paper_study_inventory.csv`, `tables/paper_pair_inventory.csv`, and `tables/paper_watershed_inventory.csv`. The physical-site table preserves original seasonal aliases. Full excluded records are in `data/audit/paper_singleton_exclusions.csv` relative to the workflow root; all annual records remain in `data/derived/reviewed_sites_agent_v1/effect_sizes_yearly.csv`.
+`R/checks/16_verify_paper_inventory_agent_v1.R` runs in the paper workflow. Its tables are `tables/paper_inventory_summary.csv`, `tables/paper_study_inventory.csv`, `tables/paper_pair_inventory.csv`, and `tables/paper_watershed_inventory.csv`. The physical-site table preserves original seasonal aliases. Full excluded records are in `data/audit/paper_singleton_exclusions.csv` relative to the workflow root; all annual records remain in `data/derived/reviewed_sites_agent_v1/effect_sizes_yearly.csv`.

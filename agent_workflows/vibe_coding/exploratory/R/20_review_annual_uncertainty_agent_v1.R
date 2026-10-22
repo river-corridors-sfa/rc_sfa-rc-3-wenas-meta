@@ -8,7 +8,7 @@ library(clubSandwich)
 
 m <- read_csv(file.path(b, 'data/derived/lasso_model_table.csv'), show_col_types=FALSE)
 observed <- read_csv(file.path(b, 'data/derived/paper_observed_only_model_table.csv'), show_col_types=FALSE)
-out <- file.path(b, 'output/paper/uncertainty_review')
+out <- file.path(b, 'exploratory/output/annual_uncertainty')
 dir.create(out, recursive=TRUE, showWarnings=FALSE)
 stopifnot(!anyNA(m$Study_ID), !anyNA(m$Fire_ID_Analysis),
           all(is.finite(m$lnRR_mean)), all(is.finite(m$post_fire_year)),

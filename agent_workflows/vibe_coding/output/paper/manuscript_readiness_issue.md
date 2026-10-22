@@ -1,5 +1,7 @@
 # Finalize manuscript analysis and figures
 
+Use the [active workflow index](../../README.md) for current methods, inputs, execution modes, and the summary of remaining work. This document retains the detailed acceptance checklist.
+
 Bring the reviewed annual DOC and nitrate analysis to manuscript readiness by resolving the remaining statistical choices, validating the final models, and completing the five figure products. Status updated October 1, 2026, incorporating the September 30 decisions, completed workflow runs, and supplied Methods draft. The Methods commit to multilevel inference, nested study-grouped LASSO, and sensitivity analyses; these are required manuscript deliverables, with implementation and wording to be reconciled before reporting. Existing figures are manuscript candidates; completed execution and publication styling do not establish final statistical inference.
 
 This updates the workflow described in [issue 7](https://github.com/river-corridors-sfa/rc_sfa-rc-3-wenas-meta/issues/7) and coordinates the remaining work from [predictor issue 6](https://github.com/river-corridors-sfa/rc_sfa-rc-3-wenas-meta/issues/6) and [figure issue 10](https://github.com/river-corridors-sfa/rc_sfa-rc-3-wenas-meta/issues/10). All paths below are relative to `agent_workflows/vibe_coding/`.
@@ -45,7 +47,7 @@ Acceptance: the Methods, screening inventory, response definition, and figure/ta
 
 ## 1. Record final analysis decisions before refitting
 
-October 21 uncertainty review: `output/paper/annual_uncertainty_review.md` and script 20 compare balanced CR2 synthesis without precision weights against conditional REML. Connected study/fire clustering links Rhea and Writer through High Park (six DOC and eleven nitrate components). Balanced versus REML time slopes reverse signs; balanced slope degrees of freedom are about 1.3. Primary-method selection remains pending author review. Annual sampling variances remain unvalidated, and prediction folds/bootstrap groups remain unchanged.
+October 21 uncertainty review: `exploratory/annual_uncertainty_review.md` and script 20 compare balanced CR2 synthesis without precision weights against conditional REML. Connected study/fire clustering links Rhea and Writer through High Park (six DOC and eleven nitrate components). Balanced versus REML time slopes reverse signs; balanced slope degrees of freedom are about 1.3. Primary-method selection remains pending author review. Annual sampling variances remain unvalidated, and prediction folds/bootstrap groups remain unchanged.
 
 - [x] **Select the analysis time axis: time since fire.** Author confirmed time since fire as the time axis. The annual response remains `log(mean annual C_b / mean annual C_u)`.
 - [ ] Verify that `post_fire_year` consistently represents time since the assigned fire, including multi-fire studies; audit and resolve follow-up-year fallbacks. Calendar-year concentration aggregation is distinct from the selected time-since-fire axis; the time-axis decision alone does not redefine annual aggregation windows. Document common-date coverage, observed/interpolated contributions, minimum annual coverage, zero/nonpositive-concentration handling, and partial-year treatment. Each analysis row represents one pair × analyte × annual period, indexed by time since fire.
@@ -57,11 +59,11 @@ October 21 uncertainty review: `output/paper/annual_uncertainty_review.md` and s
 - [ ] Match Table 1 to the predictor dictionary and source metadata: verify percent versus area for watershed burned area, the denominator for high-severity percentage, runoff units and temporal coverage, baseflow-index definition, and the provenance of each fire and watershed field. Avoid attributing every field to StreamCat unless supported by its source.
 - [ ] Explain inclusion of both highly correlated burn metrics and both hydrology metrics; assess alternatives as sensitivities without silently replacing the user-defined primary sets. Long-term aridity is unavailable and must not be represented by an undocumented proxy.
 
-Acceptance: final choices and their rationale are recorded in `.codex/decisions.md` and the predictor dictionary before the manuscript run.
+Acceptance: final choices and their rationale are recorded in the active workflow index and the predictor dictionary (preserve decision rationale in `.codex/decisions_history.md`) before the manuscript run.
 
 ## 2. Correct and verify resampling and performance
 
-- [x] Update `R/11_fit_issue6_revised_primary_agent_v1.R` so imputation, predictor screening, scaling, and data-derived weight rules are learned separately within every inner training fold. Implemented explicit inner-fold preprocessing for outer fits and bootstrap tuning, with a fixed penalty grid.
+- [x] Update `R/analysis/11_fit_issue6_revised_primary_agent_v1.R` so imputation, predictor screening, scaling, and data-derived weight rules are learned separately within every inner training fold. Implemented explicit inner-fold preprocessing for outer fits and bootstrap tuning, with a fixed penalty grid.
 - [x] Correct bootstrap tuning groups: all copies of an original study now share a tuning fold. Draws with fewer than three distinct studies are logged as failures and excluded from frequency denominators.
 - [x] Group tuning by original study, keeping pair histories and repeated bootstrap copies together. Targeted checks passed for equal study/pair/draw weights, training-only preprocessing, observed-only eligibility, and complete unique held-out predictions.
 - [ ] Export reusable outer/inner fold-assignment tables for manuscript reproducibility.
@@ -74,7 +76,7 @@ Acceptance: reproducible held-out predictions, benchmark comparisons, fold check
 
 ## 3. Complete inference and sensitivity analyses
 
-- [x] Restore multilevel inference to the active runner through `R/19_fit_working_covariance_inference_agent_v1.R`. All 36 conditional REML pooled/time fits completed across two analytes and nine working-covariance scenarios.
+- [x] Restore multilevel inference to the active runner through `R/sensitivities/19_fit_working_covariance_inference_agent_v1.R`. All 36 conditional REML pooled/time fits completed across two analytes and nine working-covariance scenarios.
 - [x] Implement study/pair random intercepts with shared-reference dependence in the sampling covariance. The positive-semidefinite covariance mixes pair and shared-reference temporal kernels, evaluating reference rho and annual temporal phi in `{0, 0.5, 0.8}`. These are assumed sensitivity parameters, not estimates of daily temporal correlation.
 - [x] Implement study-clustered CR2 uncertainty with Satterthwaite degrees of freedom through `clubSandwich`. Export coefficients, intervals, degrees of freedom, study/row counts, heterogeneity components, model objects, and failure logs. See `output/paper/tables/working_covariance_inference.csv` and `output/paper/working_covariance_models.rds`.
 - [ ] Finalize annual variance and dependence assumptions before promoting these conditional fits to manuscript inference. Review small-study limitations, variance components, and influence diagnostics; reconcile Methods wording that currently promises a separate shared-reference random intercept.
@@ -123,11 +125,11 @@ Acceptance: every manuscript number and figure can be regenerated from documente
 
 - User-supplied Methods draft, September 30, 2026: Study Identification; Data Compilation, harmonization and effect-size calculation; Statistical data analysis; and predictor Table 1. Its numerical and methodological claims are targets for verification, not evidence that every described analysis has been completed.
 
-- `.codex/history.md` and `.codex/decisions.md`, especially the September 29–30 entries.
+- `README.md` for current workflow status; `.codex/history.md` and `.codex/decisions_history.md` for dated evidence, especially the September 29–30 entries.
 - `README.md` and `output/paper/README.md` for active paths and figure specifications.
 - `config/issue6_revised_primary_predictors.csv` and `config/issue6_revised_primary_dictionary.csv` for the primary sets.
-- `R/run_paper_workflow_agent_v1.R` and `R/11_fit_issue6_revised_primary_agent_v1.R` for the current execution and resampling behavior.
+- `R/run_paper_workflow_agent_v1.R` and `R/analysis/11_fit_issue6_revised_primary_agent_v1.R` for the current execution and resampling behavior.
 - `output/paper/tables/figure_1_map_locations.csv` and `output/paper/tables/figure_1_study_fire_records.csv` for map reconciliation.
 
-- `output/paper/uncertainty_weighting_report.md`, `output/paper/uncertainty_weighting_run.log`, and `output/paper/uncertainty_session_info.txt` for completed runs and limitations.
-- `R/17_audit_sampling_support_agent_v1.R` through `R/19_fit_working_covariance_inference_agent_v1.R` for implemented audit, sensitivity, and conditional inference steps.
+- `output/paper/uncertainty_weighting_report.md`, `output/logs/uncertainty_weighting_run.log`, and `output/logs/uncertainty_session_info.txt` for completed runs and limitations.
+- `R/checks/17_audit_sampling_support_agent_v1.R` through `R/sensitivities/19_fit_working_covariance_inference_agent_v1.R` for implemented audit, sensitivity, and conditional inference steps.
