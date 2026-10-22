@@ -24,13 +24,13 @@ Bootstrap attempts with fewer than three distinct studies are recorded as failur
 
 ## Conditional pooled-effect inference
 
-Script 19 fits REML pooled-effect and time-since-fire models with study/pair random intercepts. It evaluates nine working sampling-covariance scenarios using reference-family correlation rho and annual temporal correlation phi in {0, 0.5, 0.8}. The matrix is a positive-semidefinite mixture of pair and shared-reference AR(1) kernels scaled by the provisional annual delta standard errors. These scenarios are assumed correlations, not estimates of daily autocorrelation. Shared-reference dependence is represented in the working covariance, not by a third potentially redundant random intercept.
+The conditional covariance script fits REML pooled-effect and time-since-fire models with study/pair random intercepts. It evaluates nine working sampling-covariance scenarios using reference-family correlation rho and annual temporal correlation phi in {0, 0.5, 0.8}. The matrix is a positive-semidefinite mixture of pair and shared-reference AR(1) kernels scaled by the provisional annual delta standard errors. These scenarios are assumed correlations, not estimates of daily autocorrelation. Shared-reference dependence is represented in the working covariance, not by a third potentially redundant random intercept.
 
 Study-clustered CR2 standard errors and Satterthwaite degrees of freedom are computed through `metafor::robust(..., clubSandwich=TRUE)`. This follows the [metafor robust inference documentation](https://wviechtb.github.io/metafor/reference/robust.html). Estimates, confidence intervals, degrees of freedom, heterogeneity components, model objects, and failures are saved. These conditional fits do **not** validate annual precision or correct the effective information content of interpolated observations. Final manuscript uncertainty remains unresolved, especially with only seven DOC studies.
 
 ## Files and reproduction
 
-Run `N_BOOTSTRAP=1000 Rscript agent_workflows/vibe_coding/R/run_paper_workflow_agent_v1.R` from the repository root. Scripts 17–19 are now included. Install `clubSandwich` in the normal R library or the workflow-local `.R-library/`; package versions are recorded in `uncertainty_session_info.txt`.
+Run `N_BOOTSTRAP=1000 Rscript agent_workflows/vibe_coding/R/run_paper_workflow_agent_v1.R` from the repository root. The sampling-support audit and both supporting sensitivity scripts are included in `all` mode. Install `clubSandwich` in the normal R library or the workflow-local `.R-library/`; package versions are recorded in `output/logs/uncertainty_session_info.txt` relative to the workflow root.
 
 - `tables/fitting_weights.csv`: primary fitting weights.
 - `tables/observed_only_response_comparison.csv`: annual response differences and eligibility.

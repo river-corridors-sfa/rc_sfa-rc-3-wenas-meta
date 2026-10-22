@@ -33,7 +33,7 @@ Replace `figures` with the mode you need:
 |---|---|---|
 | `prepare` | Rebuild corrected chemistry, import and promote reviewed pairings, apply site selections, build the annual model table, and run preparation/inventory/sampling audits | Source chemistry and attributes, completed review workbook, source snapshots |
 | `primary` | Inventory/sampling audits and primary DOC/nitrate LASSOs, including held-out predictions and bootstrap stability | Completed preparation |
-| `sensitivities` | Inventory/sampling audits, four LASSO sensitivity scenarios, and conditional working-covariance inference (script 19) | Completed preparation and primary results, including `tables/performance_equal_study.csv` |
+| `sensitivities` | Inventory/sampling audits, four LASSO sensitivity scenarios, and conditional working-covariance inference (`R/sensitivities/02_fit_working_covariance_inference_agent_v1.R`) | Completed preparation and primary results, including `tables/performance_equal_study.csv` |
 | `figures` | Regenerate the five figures and their supporting figure tables; no model fitting | Prepared model table, primary selection-stability table and generated predictor dictionary, local map inputs |
 | `all` | Audits, primary fits, sensitivities, and figures | Completed preparation; set `PAPER_FROM_SOURCE=1` to prepare first |
 
@@ -47,7 +47,7 @@ Rscript agent_workflows/vibe_coding/R/run_paper_workflow_agent_v1.R prepare --dr
 PAPER_FROM_SOURCE=1 N_BOOTSTRAP=1000 Rscript agent_workflows/vibe_coding/R/run_paper_workflow_agent_v1.R all
 ```
 
-`N_BOOTSTRAP` defaults to 1000 per analyte/scenario. Reduced values are for development; they overwrite selected-mode outputs and must not be presented as manuscript stability results. Unset `PAPER_SCENARIO`, `PAPER_WEIGHT_METHOD`, and `PAPER_MODEL_TABLE` before using the runner; those overrides are for direct custom calls to script 11.
+`N_BOOTSTRAP` defaults to 1000 per analyte/scenario. Reduced values are for development; they overwrite selected-mode outputs and must not be presented as manuscript stability results. Unset `PAPER_SCENARIO`, `PAPER_WEIGHT_METHOD`, and `PAPER_MODEL_TABLE` before using the runner; those overrides are for direct custom calls to `R/analysis/01_fit_issue6_revised_primary_agent_v1.R`.
 
 Modes use saved inputs without detecting whether they are stale. After changing source data or reviewed decisions, run `prepare`, then rerun the downstream analyses and figures you need. After changing the primary predictors, run `primary`, `sensitivities`, and `figures`. `all` is the complete production check. Individual scripts still validate their detailed inputs. R dependencies include tidyverse, here, lubridate, openxlsx, glmnet, metafor, sf, and clubSandwich; the latter may be supplied by the workflow-local `.R-library/` or the normal R library.
 
@@ -55,18 +55,43 @@ Modes use saved inputs without detecting whether they are stale. After changing 
 
 - Reviewed pair decisions: [`config/pairing_review_workbook.xlsx`](config/pairing_review_workbook.xlsx). This is the authority for inclusion, fire identifiers, pairing types, and review evidence. The original candidate inventory is `config/pairing_decisions.csv`; reviewed and analysis CSVs are generated exports.
 - Chemistry and watershed attributes: immutable snapshots in `data/source/`, documented in [`config/source_manifest.csv`](config/source_manifest.csv). Corrected chemistry is generated under `data/derived/gapfill_corrected_agent_v1/`; reviewed daily and annual effects are generated under `data/derived/reviewed_sites_agent_v1/`.
-- Primary ordered predictor sets: [`config/issue6_revised_primary_predictors.csv`](config/issue6_revised_primary_predictors.csv). Labels and transformations come from `config/predictor_dictionary.csv`; script 11 generates `config/issue6_revised_primary_dictionary.csv`.
+- Primary ordered predictor sets: [`config/issue6_revised_primary_predictors.csv`](config/issue6_revised_primary_predictors.csv). Labels and transformations come from `config/predictor_dictionary.csv`; `R/analysis/01_fit_issue6_revised_primary_agent_v1.R` generates `config/issue6_revised_primary_dictionary.csv`.
 - Shared analysis input: [`data/derived/lasso_model_table.csv`](data/derived/lasso_model_table.csv). Observed-only and matched-interpolated sensitivity tables are generated separately.
 
-The [paper runner](R/run_paper_workflow_agent_v1.R) owns preparation order: corrected gap-fill → strict workbook import → pairing promotion → reviewed site selection/annual effects → model table → preparation audit → inventory and sampling audits. Scripts 01b and 01c consume upstream files; they do not rerun earlier scripts. Script 18 deliberately calls script 11 once for each sensitivity scenario. `--dry-run` lists the exact scripts for any mode.
+The [paper runner](R/run_paper_workflow_agent_v1.R) owns preparation order: corrected gap-fill → strict workbook import → pairing promotion → reviewed site selection/annual effects → model table → preparation audit → inventory and sampling audits. Pairing promotion and site selection consume upstream files; they do not rerun earlier scripts. The weighting sensitivity script deliberately calls `R/analysis/01_fit_issue6_revised_primary_agent_v1.R` once for each sensitivity scenario. `--dry-run` lists the exact scripts for any mode.
+
+## Full execution order
+
+Script numbers restart at `01` within each folder. The runner defines order across folders; `checks/03` and `checks/04` are standalone verification commands, and exploratory scripts run separately.
+
+| Order | Script |
+|---|---|
+| 1 | [R/preparation/01_read_and_gapfill_preserve_observations_agent_v1.R](R/preparation/01_read_and_gapfill_preserve_observations_agent_v1.R) |
+| 2 | [R/preparation/02_pairing_review_workbook_agent_v1.R](R/preparation/02_pairing_review_workbook_agent_v1.R) |
+| 3 | [R/preparation/03_promote_reviewed_pairings_agent_v1.R](R/preparation/03_promote_reviewed_pairings_agent_v1.R) |
+| 4 | [R/preparation/04_apply_reviewed_sites_agent_v1.R](R/preparation/04_apply_reviewed_sites_agent_v1.R) |
+| 5 | [R/preparation/05_prepare_analysis_data_agent_v1.R](R/preparation/05_prepare_analysis_data_agent_v1.R) |
+| 6 | [R/preparation/06_audit_pairs_and_predictors_agent_v1.R](R/preparation/06_audit_pairs_and_predictors_agent_v1.R) |
+| 7 | [R/checks/01_verify_paper_inventory_agent_v1.R](R/checks/01_verify_paper_inventory_agent_v1.R) |
+| 8 | [R/checks/02_audit_sampling_support_agent_v1.R](R/checks/02_audit_sampling_support_agent_v1.R) |
+| 9 | [R/analysis/01_fit_issue6_revised_primary_agent_v1.R](R/analysis/01_fit_issue6_revised_primary_agent_v1.R) |
+| 10 | [R/sensitivities/01_run_weighting_sensitivities_agent_v1.R](R/sensitivities/01_run_weighting_sensitivities_agent_v1.R) |
+| 11 | [R/sensitivities/02_fit_working_covariance_inference_agent_v1.R](R/sensitivities/02_fit_working_covariance_inference_agent_v1.R) |
+| 12 | [R/figures/01_plot_paper_maps_agent_v1.R](R/figures/01_plot_paper_maps_agent_v1.R) |
+| 13 | [R/figures/02_plot_response_boxplots_agent_v1.R](R/figures/02_plot_response_boxplots_agent_v1.R) |
+| 14 | [R/figures/03_plot_paper_lasso_results_agent_v1.R](R/figures/03_plot_paper_lasso_results_agent_v1.R) |
+| 15 | [R/figures/04_plot_paper_predictor_correlations_agent_v1.R](R/figures/04_plot_paper_predictor_correlations_agent_v1.R) |
+| 16 | [R/figures/05_plot_issue6_revised_primary_violins_agent_v1.R](R/figures/05_plot_issue6_revised_primary_violins_agent_v1.R) |
+
+This is the `PAPER_FROM_SOURCE=1 ... all` sequence. Without source rebuilding, `all` starts at the inventory audit (step 7).
 
 ## Current analysis choices
 
 - Response: `log(annual_mean_burn / annual_mean_reference)` over the same matched positive-concentration dates within calendar year, retained downstream as `lnRR_mean`. The selected analysis axis is time since fire; calendar-year aggregation remains unchanged.
 - Inventory: 104 annual responses (35 DOC, 69 nitrate), 12 publications, 28 approved pairs, 14 unique fires, and 46 study-specific physical watersheds. Six singleton annual records remain upstream but are excluded from paper analyses. Pair approval and control selection are settled; the observation-preserving gap-fill fix is active.
 - Primary prediction: separate DOC/nitrate LASSOs using the requested eight-predictor sets, equal study → pair → annual-record weights, training-fold preprocessing, study-grouped tuning/validation, and the one-SE rule. Bootstrap copies of the same original study share tuning groups. Selection frequencies use successful refits only.
-- Completed sensitivities: equal-row, provisional precision/family, observed-only, and matched-interpolated LASSOs. The latter two use the same 89-record inventory (32 DOC, 57 nitrate). Script 19 provides 36 conditional REML pooled/time fits across nine assumed reference/temporal covariance scenarios, with study-clustered CR2 inference.
-- Annual paired delta variances include same-date covariance but remain provisional for temporal dependence and interpolation. Script 20 compares balanced CR2 synthesis candidates and connected study/fire clustering; it remains outside the runner, pending author selection of the primary synthesis.
+- Completed sensitivities: equal-row, provisional precision/family, observed-only, and matched-interpolated LASSOs. The latter two use the same 89-record inventory (32 DOC, 57 nitrate). The conditional covariance script provides 36 conditional REML pooled/time fits across nine assumed reference/temporal covariance scenarios, with study-clustered CR2 inference.
+- Annual paired delta variances include same-date covariance but remain provisional for temporal dependence and interpolation. The exploratory annual-uncertainty script compares balanced CR2 synthesis candidates and connected study/fire clustering; it remains outside the runner, pending author selection of the primary synthesis.
 
 ## Outputs and remaining work
 

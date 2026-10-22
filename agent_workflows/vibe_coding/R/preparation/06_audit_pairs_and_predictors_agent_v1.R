@@ -1,5 +1,5 @@
 # ==============================================================================
-# Script: 03_audit_pairs_and_predictors_agent_v1.R
+# Script: 06_audit_pairs_and_predictors_agent_v1.R
 # Purpose: Audit analysis structure and create a provisional predictor dictionary.
 # Builds from: diagnostic portions of R_scripts/03.1_variable_selection_for_LASSO.R.
 # ==============================================================================
@@ -12,7 +12,7 @@ model_table_path <- file.path(workflow_dir, "data", "derived", "lasso_model_tabl
 predictor_dictionary_path <- file.path(workflow_dir, "config", "predictor_dictionary.csv")
 audit_dir <- file.path(workflow_dir, "data", "audit")
 
-if (!file.exists(model_table_path)) stop("Run 02_prepare_analysis_data_agent_v1.R first.")
+if (!file.exists(model_table_path)) stop("Run 05_prepare_analysis_data_agent_v1.R first.")
 dir.create(audit_dir, recursive = TRUE, showWarnings = FALSE)
 
 model_table <- read_csv(model_table_path, show_col_types = FALSE)

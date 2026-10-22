@@ -1,5 +1,5 @@
 # ==============================================================================
-# Script: 01_pairing_review_workbook_agent_v1.R
+# Script: 02_pairing_review_workbook_agent_v1.R
 # Purpose: Create an author-review workbook for candidate watershed pairings,
 #          or validate and import decisions from the completed workbook.
 #

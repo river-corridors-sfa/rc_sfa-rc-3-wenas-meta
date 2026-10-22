@@ -14,7 +14,7 @@ settings <- tribble(~scenario,~weight,~input,
 for(i in seq_len(nrow(settings))) {
   Sys.setenv(PAPER_SCENARIO=settings$scenario[i],PAPER_WEIGHT_METHOD=settings$weight[i],
     PAPER_MODEL_TABLE=file.path(b,'data/derived',settings$input[i]))
-  tryCatch(source(file.path(b,'R/analysis/11_fit_issue6_revised_primary_agent_v1.R'),local=new.env(parent=globalenv())),
+  tryCatch(source(file.path(b,'R/analysis/01_fit_issue6_revised_primary_agent_v1.R'),local=new.env(parent=globalenv())),
     finally=Sys.unsetenv(c('PAPER_SCENARIO','PAPER_WEIGHT_METHOD','PAPER_MODEL_TABLE')))
 }
 all_performance <- bind_rows(read_csv(file.path(b,'output/paper/tables/performance_equal_study.csv'),show_col_types=FALSE) %>% mutate(scenario='primary'),

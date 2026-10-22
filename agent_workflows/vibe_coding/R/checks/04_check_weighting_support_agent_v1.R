@@ -5,7 +5,7 @@ b <- here('agent_workflows','vibe_coding')
 # Load definitions without running the model loops.
 e <- new.env(parent=globalenv())
 Sys.setenv(PAPER_SCENARIO='validation')
-for(expr in parse(file.path(b,'R/analysis/11_fit_issue6_revised_primary_agent_v1.R'))) {
+for(expr in parse(file.path(b,'R/analysis/01_fit_issue6_revised_primary_agent_v1.R'))) {
   if(is.call(expr) && identical(expr[[1]],as.name('<-')) && identical(expr[[2]],as.name('predictions'))) break
   eval(expr,e)
 }

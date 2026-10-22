@@ -7,7 +7,7 @@ workflow_dir <- here("agent_workflows", "vibe_coding")
 # The paper runner imports the workbook before this step.
 required <- file.path(workflow_dir, c("data/audit/pairing_review_validation.csv",
                                     "config/pairing_decisions_reviewed.csv"))
-if (any(!file.exists(required))) stop("Import the reviewed workbook first with 01_pairing_review_workbook_agent_v1.R, or run the paper runner in prepare mode.")
+if (any(!file.exists(required))) stop("Import the reviewed workbook first with 02_pairing_review_workbook_agent_v1.R, or run the paper runner in prepare mode.")
 
 validation <- read_csv(file.path(workflow_dir, "data", "audit", "pairing_review_validation.csv"),
                        show_col_types = FALSE)

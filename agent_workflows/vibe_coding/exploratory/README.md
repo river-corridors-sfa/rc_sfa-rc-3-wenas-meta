@@ -4,12 +4,12 @@ This folder contains methods under review that have not been selected for the pa
 
 | Work | Script | Review | Saved outputs |
 |---|---|---|---|
-| Balanced annual synthesis with study/fire-component CR2 uncertainty | [Script 20](R/20_review_annual_uncertainty_agent_v1.R) | [Annual uncertainty review](annual_uncertainty_review.md) | `output/annual_uncertainty/` |
+| Balanced annual synthesis with study/fire-component CR2 uncertainty | [The exploratory annual-uncertainty script](R/01_review_annual_uncertainty_agent_v1.R) | [Annual uncertainty review](annual_uncertainty_review.md) | `output/annual_uncertainty/` |
 
 To rerun the candidate after preparing the primary and observed-only inputs, run from the repository root:
 
 ```sh
-Rscript agent_workflows/vibe_coding/exploratory/R/20_review_annual_uncertainty_agent_v1.R
+Rscript agent_workflows/vibe_coding/exploratory/R/01_review_annual_uncertainty_agent_v1.R
 ```
 
 This writes only the candidate result set. It does not replace the selected primary fits, annual variances, or conditional inference results. Moving these results here does not reject the candidate; primary synthesis selection is still pending author review.

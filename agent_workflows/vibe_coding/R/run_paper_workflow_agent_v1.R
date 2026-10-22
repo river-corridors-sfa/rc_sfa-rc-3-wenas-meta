@@ -23,29 +23,29 @@ if (any(args %in% c('--help', '-h'))) {
   # The primary output location must not depend on a leftover sensitivity override.
   overrides <- c('PAPER_SCENARIO', 'PAPER_WEIGHT_METHOD', 'PAPER_MODEL_TABLE')
   if (any(nzchar(Sys.getenv(overrides)))) {
-    stop('Unset PAPER_SCENARIO, PAPER_WEIGHT_METHOD, and PAPER_MODEL_TABLE before using the runner; use script 11 directly for custom scenarios.')
+    stop('Unset PAPER_SCENARIO, PAPER_WEIGHT_METHOD, and PAPER_MODEL_TABLE before using the runner; use `R/analysis/01_fit_issue6_revised_primary_agent_v1.R` directly for custom scenarios.')
   }
   root <- here('agent_workflows', 'vibe_coding')
   script_dir <- file.path(root, 'R')
   preparation <- c(
     'preparation/01_read_and_gapfill_preserve_observations_agent_v1.R',
-    'preparation/01_pairing_review_workbook_agent_v1.R',
-    'preparation/01b_promote_reviewed_pairings_agent_v1.R',
-    'preparation/01c_apply_reviewed_sites_agent_v1.R',
-    'preparation/02_prepare_analysis_data_agent_v1.R',
-    'preparation/03_audit_pairs_and_predictors_agent_v1.R'
+    'preparation/02_pairing_review_workbook_agent_v1.R',
+    'preparation/03_promote_reviewed_pairings_agent_v1.R',
+    'preparation/04_apply_reviewed_sites_agent_v1.R',
+    'preparation/05_prepare_analysis_data_agent_v1.R',
+    'preparation/06_audit_pairs_and_predictors_agent_v1.R'
   )
-  audits <- c('checks/16_verify_paper_inventory_agent_v1.R',
-              'checks/17_audit_sampling_support_agent_v1.R')
-  primary <- 'analysis/11_fit_issue6_revised_primary_agent_v1.R'
-  sensitivities <- c('sensitivities/18_run_weighting_sensitivities_agent_v1.R',
-                     'sensitivities/19_fit_working_covariance_inference_agent_v1.R')
+  audits <- c('checks/01_verify_paper_inventory_agent_v1.R',
+              'checks/02_audit_sampling_support_agent_v1.R')
+  primary <- 'analysis/01_fit_issue6_revised_primary_agent_v1.R'
+  sensitivities <- c('sensitivities/01_run_weighting_sensitivities_agent_v1.R',
+                     'sensitivities/02_fit_working_covariance_inference_agent_v1.R')
   figures <- c(
-    'figures/13_plot_paper_maps_agent_v1.R',
-    'figures/08_plot_response_boxplots_agent_v1.R',
-    'figures/14_plot_paper_lasso_results_agent_v1.R',
-    'figures/15_plot_paper_predictor_correlations_agent_v1.R',
-    'figures/12_plot_issue6_revised_primary_violins_agent_v1.R'
+    'figures/01_plot_paper_maps_agent_v1.R',
+    'figures/02_plot_response_boxplots_agent_v1.R',
+    'figures/03_plot_paper_lasso_results_agent_v1.R',
+    'figures/04_plot_paper_predictor_correlations_agent_v1.R',
+    'figures/05_plot_issue6_revised_primary_violins_agent_v1.R'
   )
   steps <- switch(mode,
     prepare = c(preparation, audits),

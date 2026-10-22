@@ -47,7 +47,7 @@ Acceptance: the Methods, screening inventory, response definition, and figure/ta
 
 ## 1. Record final analysis decisions before refitting
 
-October 21 uncertainty review: `exploratory/annual_uncertainty_review.md` and script 20 compare balanced CR2 synthesis without precision weights against conditional REML. Connected study/fire clustering links Rhea and Writer through High Park (six DOC and eleven nitrate components). Balanced versus REML time slopes reverse signs; balanced slope degrees of freedom are about 1.3. Primary-method selection remains pending author review. Annual sampling variances remain unvalidated, and prediction folds/bootstrap groups remain unchanged.
+October 21 uncertainty review: `exploratory/annual_uncertainty_review.md` and the exploratory annual-uncertainty script compare balanced CR2 synthesis without precision weights against conditional REML. Connected study/fire clustering links Rhea and Writer through High Park (six DOC and eleven nitrate components). Balanced versus REML time slopes reverse signs; balanced slope degrees of freedom are about 1.3. Primary-method selection remains pending author review. Annual sampling variances remain unvalidated, and prediction folds/bootstrap groups remain unchanged.
 
 - [x] **Select the analysis time axis: time since fire.** Author confirmed time since fire as the time axis. The annual response remains `log(mean annual C_b / mean annual C_u)`.
 - [ ] Verify that `post_fire_year` consistently represents time since the assigned fire, including multi-fire studies; audit and resolve follow-up-year fallbacks. Calendar-year concentration aggregation is distinct from the selected time-since-fire axis; the time-axis decision alone does not redefine annual aggregation windows. Document common-date coverage, observed/interpolated contributions, minimum annual coverage, zero/nonpositive-concentration handling, and partial-year treatment. Each analysis row represents one pair × analyte × annual period, indexed by time since fire.
@@ -63,7 +63,7 @@ Acceptance: final choices and their rationale are recorded in the active workflo
 
 ## 2. Correct and verify resampling and performance
 
-- [x] Update `R/analysis/11_fit_issue6_revised_primary_agent_v1.R` so imputation, predictor screening, scaling, and data-derived weight rules are learned separately within every inner training fold. Implemented explicit inner-fold preprocessing for outer fits and bootstrap tuning, with a fixed penalty grid.
+- [x] Update `R/analysis/01_fit_issue6_revised_primary_agent_v1.R` so imputation, predictor screening, scaling, and data-derived weight rules are learned separately within every inner training fold. Implemented explicit inner-fold preprocessing for outer fits and bootstrap tuning, with a fixed penalty grid.
 - [x] Correct bootstrap tuning groups: all copies of an original study now share a tuning fold. Draws with fewer than three distinct studies are logged as failures and excluded from frequency denominators.
 - [x] Group tuning by original study, keeping pair histories and repeated bootstrap copies together. Targeted checks passed for equal study/pair/draw weights, training-only preprocessing, observed-only eligibility, and complete unique held-out predictions.
 - [ ] Export reusable outer/inner fold-assignment tables for manuscript reproducibility.
@@ -76,7 +76,7 @@ Acceptance: reproducible held-out predictions, benchmark comparisons, fold check
 
 ## 3. Complete inference and sensitivity analyses
 
-- [x] Restore multilevel inference to the active runner through `R/sensitivities/19_fit_working_covariance_inference_agent_v1.R`. All 36 conditional REML pooled/time fits completed across two analytes and nine working-covariance scenarios.
+- [x] Restore multilevel inference to the active runner through `R/sensitivities/02_fit_working_covariance_inference_agent_v1.R`. All 36 conditional REML pooled/time fits completed across two analytes and nine working-covariance scenarios.
 - [x] Implement study/pair random intercepts with shared-reference dependence in the sampling covariance. The positive-semidefinite covariance mixes pair and shared-reference temporal kernels, evaluating reference rho and annual temporal phi in `{0, 0.5, 0.8}`. These are assumed sensitivity parameters, not estimates of daily temporal correlation.
 - [x] Implement study-clustered CR2 uncertainty with Satterthwaite degrees of freedom through `clubSandwich`. Export coefficients, intervals, degrees of freedom, study/row counts, heterogeneity components, model objects, and failure logs. See `output/paper/tables/working_covariance_inference.csv` and `output/paper/working_covariance_models.rds`.
 - [ ] Finalize annual variance and dependence assumptions before promoting these conditional fits to manuscript inference. Review small-study limitations, variance components, and influence diagnostics; reconcile Methods wording that currently promises a separate shared-reference random intercept.
@@ -128,8 +128,8 @@ Acceptance: every manuscript number and figure can be regenerated from documente
 - `README.md` for current workflow status; `.codex/history.md` and `.codex/decisions_history.md` for dated evidence, especially the September 29–30 entries.
 - `README.md` and `output/paper/README.md` for active paths and figure specifications.
 - `config/issue6_revised_primary_predictors.csv` and `config/issue6_revised_primary_dictionary.csv` for the primary sets.
-- `R/run_paper_workflow_agent_v1.R` and `R/analysis/11_fit_issue6_revised_primary_agent_v1.R` for the current execution and resampling behavior.
+- `R/run_paper_workflow_agent_v1.R` and `R/analysis/01_fit_issue6_revised_primary_agent_v1.R` for the current execution and resampling behavior.
 - `output/paper/tables/figure_1_map_locations.csv` and `output/paper/tables/figure_1_study_fire_records.csv` for map reconciliation.
 
 - `output/paper/uncertainty_weighting_report.md`, `output/logs/uncertainty_weighting_run.log`, and `output/logs/uncertainty_session_info.txt` for completed runs and limitations.
-- `R/checks/17_audit_sampling_support_agent_v1.R` through `R/sensitivities/19_fit_working_covariance_inference_agent_v1.R` for implemented audit, sensitivity, and conditional inference steps.
+- `R/checks/02_audit_sampling_support_agent_v1.R` through `R/sensitivities/02_fit_working_covariance_inference_agent_v1.R` for implemented audit, sensitivity, and conditional inference steps.

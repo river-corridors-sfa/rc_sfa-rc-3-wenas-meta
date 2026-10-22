@@ -1,5 +1,5 @@
 # ==============================================================================
-# Script: 02_prepare_analysis_data_agent_v1.R
+# Script: 05_prepare_analysis_data_agent_v1.R
 # Purpose: Build the provisional annual lnRR modeling table from the established
 #          pair inventory, annual effect sizes, and burned-watershed predictors.
 # Builds from: R_scripts/03_merge_geospatial.R and

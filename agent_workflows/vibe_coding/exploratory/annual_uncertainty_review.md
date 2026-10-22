@@ -1,6 +1,6 @@
 # Annual uncertainty and dependence review
 
-October 21, 2026. Primary manuscript selection is pending author review. Script 20 adds review candidates without replacing annual responses, variances, prediction models, or conditional REML outputs.
+October 21, 2026. Primary manuscript selection is pending author review. The exploratory annual-uncertainty script adds review candidates without replacing annual responses, variances, prediction models, or conditional REML outputs.
 
 The sampling audit does not support a validated annual sampling variance for every record. A defensible alternative for the main synthesis is equal-study, equal-pair, equal-available-year estimation with cluster-adjusted uncertainty, retaining variance-based multilevel models as conditional sensitivities. This changes the synthesis target and Methods specification; it does not validate individual annual variances.
 
@@ -46,6 +46,6 @@ Before manuscript freeze, confirm the inference target, review cross-publication
 
 ## Reproduction
 
-Run `Rscript agent_workflows/vibe_coding/exploratory/R/20_review_annual_uncertainty_agent_v1.R` from the repository root after scripts 02 and 17 produce the primary and observed-only inputs. This review remains separate from the paper runner pending method selection.
+Run `Rscript agent_workflows/vibe_coding/exploratory/R/01_review_annual_uncertainty_agent_v1.R` from the repository root after model-table preparation and sampling-support audit produce the primary and observed-only inputs. This review remains separate from the paper runner pending method selection.
 
 `exploratory/output/annual_uncertainty/` contains coefficients, intervals, effective degrees of freedom, study/fire membership, weights, leave-component-out estimates, and session information. Checks verify equal study totals and pair totals within study, unique primary annual keys, finite inputs/uncertainty, positive degrees of freedom, and pooled-intercept agreement with independently aggregated study/pair means.
