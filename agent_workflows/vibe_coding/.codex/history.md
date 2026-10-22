@@ -387,3 +387,11 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Decisions: The runner retains its established name and defines ordering across folders; standalone checks 03–04 and the exploratory candidate remain outside the production sequence. Data/output names, model settings, archives, and historical logs remain unchanged.
 - Verification: All six role folders have contiguous script numbers; all R scripts parse. Every runner mode resolves its renamed scripts. Isolated full from-source execution calls 16 unique scripts in exactly the README order. Current direct references and Markdown links resolve, with no superseded script names in active code/docs. Independent annual-estimand check passes all 104 annual ratios/variances; whitespace checks passed.
 - Remaining work: No models, interpolation, or figures rerun. Full scientific validation and unresolved synthesis choices remain as documented in the workflow index.
+
+## 2026-10-22 — Nitrate influence diagnostic and manuscript figure freshness audit
+
+- Task: Explain nitrate LASSO behavior, evaluate extreme-effect influence, and check manuscript figure currency.
+- Files added: exploratory/nitrate_outlier_diagnostic_2026_10_22.R; exploratory/output/nitrate_outlier_diagnostic_2026_10_22/; exploratory/output/figure_freshness_2026_10_22/. Updated this history.
+- Findings: Current nitrate full-data and twelve outer fits converge; one-SE tuning selects no predictors. Nine exploratory exclusion scenarios preserve the intercept-only result in all outer folds. Removing the lowest Crandall observation reduces equal-study held-out RMSE from 1.293 to 0.867. No exclusions promoted to primary analysis.
+- Figure verification: All five fresh renders and five regenerated supporting CSVs match saved primary files byte for byte. Selection-stability input was copied, not refitted. No primary figures, scripts or data changed.
+- Remaining work: Fix SI Figure 1 hard-coded 110-row caption (current input 104); finish SI styling/color consistency, captions/units, map coordinate review, journal exports, and the pending full from-source validation.

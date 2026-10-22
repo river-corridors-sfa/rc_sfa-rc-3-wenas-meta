@@ -1,0 +1,15 @@
+Fire_ID_Analysis,Study_ID,Fire_name,latitude,longitude,number_of_burn,n_pairs,analytes,coordinate_source
+Angora_Fire_2007,Oliver et al. 2012,Angora Fire,38.896382,-120.04163000000001,1,1,NO3,Original Map_input.csv
+Caldor_Fire_2021,Hickenbottom et al. 2023,Caldor Fire,38.898689,-119.948785,1,1,DOC + NO3,Original Map_input.csv
+Clover_Mist_Wildfire_1988,Gerla & Galloway; 1998,Clover-Mist Wildfire,44.512950000000004,-109.98415600000001,1,1,NO3,Original Map_input.csv
+Fourmile_Canyon_Fire_2010,Murphy et al. 2018,Fourmile Canyon Fire,40.050263699999995,-105.36665990000002,3,3,DOC + NO3,Study metadata (approximate)
+Gaviota_Fire_2004,Coombs & Melack; 2013,Gaviota Fire,34.472966,-120.187279,3,3,NO3,Original Map_input.csv
+Hayman_Fire_2002,Rhea et al. 2021,Hayman Fire,40.26237000000001,-105.5908,2,2,DOC + NO3,Original Map_input.csv
+High_Park_Fire_2012,Rhea et al. 2021; Writer et al. 2014,High Park Fire,40.64578750326206,-105.35333211675147,3,3,DOC + NO3,High Park boundary centroid
+Matt_Fire_1985,Gluns & Toews; 1989,Matt fire,49.677328,-116.00612400000001,2,2,NO3,Original Map_input.csv
+Mosquito_Fire_2022,Hickenbottom et al. 2023,Mosquito Fire,38.958701,-120.920501,1,1,DOC + NO3,Original Map_input.csv
+Pole_Creek_Fire_Complex_2018,Crandall et al. 2021,Pole Creek Fire Complex,40.133514000000005,-111.771241,3,3,DOC + NO3,Original Map_input.csv
+Rampage_Fire_2003,Mast & Clow; 2008,Rampage Fire,48.789,-113.796,1,1,DOC + NO3,Original Map_input.csv
+Red_Bench_Fire_1988,Hauer & Spencer 1998,Red Bench Fire,48.763000000000005,-114.226,5,5,NO3,Original Map_input.csv
+Rocky_Fire_2015,Uzun et al. 2020,Rocky Fire,38.923564,-122.32647799999998,1,1,DOC + NO3,Original Map_input.csv
+Wragg_Fire_2015,Uzun et al. 2020,Wragg Fire,38.512031,-122.09722800000002,1,1,DOC + NO3,Original Map_input.csv
