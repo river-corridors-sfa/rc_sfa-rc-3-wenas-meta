@@ -433,3 +433,115 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Changes: Figure 2 plotting script now labels the counts “fire groups”; regenerated PNG/PDF and caption, and updated the paper index. Caption defines these as connected study/fire components, distinct from unique wildfire counts.
 - Verification: Plot script completed with balance/estimate checks; PNG visually inspected. Counts remain 11 nitrate and six DOC groups; data, fits and intervals unchanged.
 - Next steps: Remaining final caption/journal-export review as previously tracked.
+
+
+## 2026-10-27 — Suggested manuscript Methods structure
+
+- Task: Review the current workflow and suggest Methods subsections.
+- Files changed: This history entry only; no analysis or manuscript artifacts changed.
+- Recommendations: Separate study/pair selection, chemistry harmonization, annual effect-size construction, predictor assembly, balanced pooled synthesis, LASSO validation/stability, and sensitivity/reproducibility methods. Ground descriptions in the active 103-record workflow and disclose the post hoc nitrate exclusion.
+- Outstanding: Verify screening details, predictor units/provenance and time attribution; distinguish completed sensitivities from planned work and retain conditional/exploratory interpretation where documented.
+
+
+## 2026-10-27 — Assessed balanced-synthesis Methods paragraph
+
+- Task: Compare user-supplied statistical text with the implemented pooled synthesis and sensitivities.
+- Files changed: This history entry only.
+- Findings: Hierarchical balance and CR2/Satterthwaite descriptions match. Dependence components are built from publication/fire links, without a separate site-link algorithm. Equal-row and precision/family weighting comparisons belong to LASSO, not alternate balanced pooled fits. Balanced-synthesis sensitivities include publication clustering, observed-only/matched-interpolated data and component-deletion estimates; REML is a separate provisional-variance covariance sensitivity.
+- Recommendations: Specify retained available annual responses, independent components, nonprecision weights/identity CR2 target and 95% intervals; revise sensitivity paragraph to match implemented scope.
+- Next steps: Reconcile final manuscript wording and SI references; broader scientific-review items remain as tracked.
+
+
+## 2026-10-27 — Moved conditional REML to exploratory
+
+- Task: Reclassify REML at author request and remove it from the manuscript workflow.
+- Files changed: Moved the REML script to `exploratory/R/02_fit_working_covariance_inference_agent_v1.R` and three saved result/model files to `exploratory/output/working_covariance/`; redirected future outputs there. Updated runner, manuscript exclusion check, active/exploratory/R/paper indexes, weighting report, readiness checklist and working decisions; added exploratory review/reproduction notes.
+- Decisions: REML is exploratory and not required by any paper runner mode or manuscript readiness check. Preserve historical logs/archives and all numerical results; primary balanced synthesis and LASSO analyses remain unchanged.
+- Verification: SHA-256 checks confirmed byte-identical moved outputs; moved R script parses; all-mode runner dry run excludes REML and resolves all remaining scripts; manuscript exclusion-propagation check passes for all five scenarios, balanced synthesis and Figure 2; whitespace check passed. No model fitting was required.
+- Next steps: Continue manuscript Methods/SI revision using the balanced synthesis and its direct supporting checks; rerun exploratory REML only by explicit standalone command if needed.
+
+
+## 2026-10-27 — Assessed LASSO Methods draft
+
+- Task: Compare the supplied LASSO section with active fitting and sensitivity scripts.
+- Files changed: This history entry only.
+- Findings: Primary models use specified eight-predictor sets, hierarchical balance weights, alpha=1, nested publication-grouped validation and a one-SE penalty. Correlations are descriptive, not an automated exclusion rule; a priori timing requires author evidence. Fold-specific preprocessing and tuning are implemented. Bootstrap attempts number 1,000, with successful-refit denominators. Elastic net is not implemented. Completed sensitivities are equal-row, provisional precision/family, observed-only and matched-interpolated. Equal-study errors and pooled row-level R2 must be distinguished; validation/bootstrap remain publication-based rather than fire-component-based.
+- Next steps: Revise Methods placeholders and sensitivity claims; document candidate rationale, exact benchmark terms and tuning/metric definitions in SI.
+
+
+## 2026-10-27 — Implemented predictor-omission analysis and SI Figure 3
+
+- Task: Perform author-approved structured predictor-set sensitivity with publication bootstraps and create a new SI figure.
+- Files changed: Added `R/sensitivities/02_run_predictor_omission_agent_v1.R`, `R/figures/06_plot_predictor_omission_agent_v1.R`, `R/checks/06_check_predictor_omission_agent_v1.py`, `output/paper/predictor_omission/` tables/compressed draws/provenance, SI Figure 3 PNG/PDF/caption/source tables and execution/validation logs. Updated runner, active/R/paper indexes, manuscript checklist and decisions. Preserved existing primary fits and Figure 3.
+- Design: Full set plus individual/joint omissions of burned area/high severity and runoff/baseflow. Nested LOSO and 1,000 paired publication-bootstrap attempts per analyte; training-fold preprocessing/weights/tuning, identical splits across sets, original-publication grouping of bootstrap copies. Selection summaries include successful no-OOB draws; paired prediction-error comparisons exclude them. Empirical OOB spreads are descriptive, not confidence intervals.
+- Results: 994 successful DOC fits (six insufficient-unique-study failures) and 1,000 nitrate fits; eight successful DOC draws have no OOB studies, leaving 986/1,000 paired error comparisons. All nitrate LOSO RMSE values remain 0.8666; DOC decreases from 0.2789 to 0.2351 without runoff or both hydrology predictors. DOC organic matter selection remains 75.1–80.2%; nitrate selection is <=5.2%. All median paired OOB RMSE differences are zero. No causal/unique-importance ranking inferred.
+- Verification: Exact primary full-set LOSO predictions and 1,000-attempt selection/sign/coefficient stability reproduced. Independent check verifies disjoint study groups, common held-out records, omission availability, exclusion propagation and recomputed paired errors. Existing manuscript exclusion check passes. All-mode dry run includes new analysis/figure and no REML; whitespace checks pass. PNG visually reviewed; vector PDF exports without warnings.
+- Correction: Audit caught dplyr summary name shadowing in failure/OOB counts; corrected summary expression, regenerated counts from saved status and independently verified against R. Fits, coefficients and error contrasts were unaffected. Compressed detailed prediction/coefficient tables with byte-for-byte round-trip checks; corrected script hash recorded.
+- Next steps: Author review of SI Figure 3 and caption; integrate focused sensitivity Methods/Results and reconcile final SI numbering/journal dimensions. Component-grouped validation, elastic net and final from-source freeze remain outside this change.
+
+
+## 2026-10-27 — Extended omission analysis to manuscript hypotheses
+
+- Task: Align the new analysis with the author’s structured full/individual/group predictor framework and primary nested-CV performance comparisons.
+- Files changed: Extended the omission script to 12 specifications and complete watershed/wildfire contrasts; expanded SI Figure 3 and caption; extended independent check 06, added sparse-training/fresh-primary check 07, updated indexes/checklist/decisions and regenerated omission tables, provenance and figure outputs. Added extension/final-run/training-edge logs.
+- Design: Watershed group = area, runoff, baseflow index, forest cover and soil variable; wildfire = the two burn metrics; time separate and retained in both group exclusions. Reuse seven previously completed specifications only after input hashes, candidate sets and every ordered training/held-out draw match; fit the five additional specifications with the same draws/folds. Primary contribution = nested LOSO error differences; OOB distributions/frequencies secondary; selection/sign stability across successful publication bootstraps.
+- Implementation correction: The initial extension exposed 16 DOC bootstrap samples with fewer than two usable inner predictors in the fully excluded watershed specification. The original two-column guard was too restrictive for the expanded subsets. Added one-predictor fits with zero padding and weighted-intercept fits when no predictor varies. Tests cover zero/one/sparse folds and fresh primary LOSO reproduction. The failed extension wrote no final prediction/selection outputs; the corrected extension completed all intended fits.
+- Results: 994 DOC / 1,000 nitrate successful refits; 986 / 1,000 paired OOB comparisons. DOC watershed exclusion raises LOSO RMSE 0.2789→0.3733 (+33.9%); wildfire exclusion unchanged. Nitrate watershed exclusion changes 0.8666→0.8733 (+0.8%); wildfire exclusion unchanged and primary predictions equal intercept-only. DOC organic matter selection 75.1–82.0% when available; nitrate maximum 6.8%. Watershed group exclusion produces a larger OOB error increase than wildfire exclusion in 74.2% DOC comparisons (16.4% ties), 6.3% nitrate comparisons (88.1% ties); descriptive ranges span zero.
+- Verification: Independent twelve-specification audit passes shared held-out inventory, disjoint publication groups, error recomputation, individual/group definitions, relative/group contrasts, exclusions and original primary prediction/coefficient/selection reproduction. Fresh full-set fits pass after sparse-fold handling changes. Updated PNG visually inspected; PDF exports without warnings; runner dry run and whitespace checks pass. Primary files and Figure 3 remain unchanged.
+- Limits/next steps: Author review of SI figure/caption and Methods/Results integration; final journal-size and SI-numbering review pending. Publication grouping allows shared wildfires across splits; group sizes/analyte coverage differ. These are conditional predictive comparisons, not causal importance or formal between-analyte tests.
+
+
+## 2026-10-27 — New main Figure 3 CV comparisons and Figure 4 renumbering
+
+- Task: Rename selection-stability Figure 3 to Figure 4; create main Figure 3 comparing cross-validated group contributions relative to time-only. Author subsequently requested three time-plus-group formulations and intercept-only.
+- Files changed: Added `R/analysis/03_fit_predictor_group_cv_agent_v1.R`, `R/figures/03_plot_predictor_group_importance_agent_v1.R`, `R/checks/08_check_predictor_group_cv_agent_v1.py`, `output/paper/predictor_group_cv/`, Figure 3 PNG/PDF/caption and source table. Renamed selection plot/directory/files to Figure 4 and shifted plotting-script numbers to 04–07; added Figure 4 PDF/caption. Updated runner prerequisites/order, active/R/paper indexes, manuscript checklist and SI caption’s selection-figure reference; added run/check logs.
+- Decisions: Display time + watershed, time + wildfire, time + both groups, and intercept-only against a shared time-only zero reference. Time is unpenalized in the three time-plus-group models; group predictors have LASSO penalties. Dedicated group CV repeats training-only preprocessing and inner tuning, with identical outer publication folds and hierarchical weights. Original primary LASSO/omission fits and bootstrap selection data remain unchanged; those models penalize time. Negative improvement is displayed.
+- Results: DOC baseline RMSE 0.378661; watershed model 0.289321 (23.6% improvement), wildfire unchanged, combined 0.271231 (28.4%), intercept 0.373320 (1.4%). Nitrate baseline 0.792764; all group models unchanged, intercept 0.866600 (−9.3% improvement). All actual RMSE reductions are in the caption and source tables.
+- Verification: Independent audit passes all 515 matched held-out predictions, intended group membership, shared folds, original time/intercept benchmark reproduction, unpenalized time behavior, independently recomputed RMSE/reduction metrics, source hashes and file renumbering. Both main PNGs visually checked; vector PDFs/captions exported without warnings; all-mode dry run includes 3 analysis/7 plotting scripts and excludes REML; whitespace checks pass. No bootstrap rerun was needed.
+- Next steps: Author review of Figure 3/Figure 4 and captions; reconcile manuscript Methods with dedicated unpenalized-time comparisons versus full-set selection models and finalize journal-size exports. Cross-analyte conclusions remain descriptive and validation remains publication-based, with shared fires potentially crossing folds.
+
+
+## 2026-10-27 — Finalized Figure 3 with intercept reference and five rows
+
+- Task: Incorporate author’s successive requests for combined predictors, intercept-only, and a just-time comparison; use intercept-only as the reference.
+- Files changed: Group-CV analysis/comparison expression, Figure 3 plot/caption/source table, independent check 08, regenerated group-CV comparison/settings/provenance tables, current indexes/checklist and decisions; added reference-update log.
+- Final design: Five displayed rows in order intercept only, time, time + wildfire, time + watershed, time + watershed + wildfire. The three group models keep time unpenalized and penalize group candidates; simple intercept/time benchmarks reproduce original predictions. All 515 held-out predictions are retained. Reference switch regenerates summaries and plots from saved predictions/performance without refitting.
+- Results relative to intercept-only: DOC time/wildfire −1.4%, watershed +22.5%, combined +27.3%; nitrate all time-containing models +8.5%, with no further predictive gain beyond time. Baseline points are zero. Actual RMSE/differences are in caption/source data.
+- Verification: Check 08 passes baseline reproduction, group definitions, folds, unpenalized time behavior, independently computed metrics, provenance and renumbering. Updated PNG visually checked; negative labels placed to the left to avoid the zero line; vector PDF/caption exported. Figure 4 and SI numbering unchanged.
+- Next steps: Author review of final Figure 3 and caption; complete manuscript/journal-size reconciliation.
+
+
+## 2026-10-27 — Updated Figure 3 x-axis wording
+
+- Task: Apply the author-supplied axis label: “Change in cross-validated RMSE compared to Intercept only model (%)”.
+- Files changed: Figure 3 plotting script and regenerated PNG/PDF/caption/source export; this history entry.
+- Decisions: Wording change only; retain the established positive-improvement convention and formula in the caption.
+- Verification: Plot regenerated successfully and PNG visually checked for label legibility/clipping. No model refitting or numerical changes.
+- Next steps: Final manuscript-size review remains pending.
+
+
+## 2026-10-27 — Verified and revised manuscript Results numbers
+
+- Task: Check supplied Results sections 3.1–3.3 against current saved inventory, synthesis, Figure 3 CV and Figure 4 selection outputs.
+- Files changed: This history entry only; revised prose returned in chat.
+- Findings: Inventory and draft selection/CV percentages match. Replace rounded pooled claims with nitrate lnRR 1.119 [0.653,1.585], ratio 3.06, and DOC 0.295 [−0.098,0.689], ratio 1.34 (34.4% higher). Annual ranges: nitrate −1.528 to 2.922; DOC −0.341 to 0.885. Add current RMSE values, successful bootstrap denominators (994 DOC/1000 nitrate), and exact nitrate remaining selection frequencies. Verify all additional nitrate group coefficients are zero in current dedicated group CV. Distinguish time-unpenalized Figure 3 models from full-set Figure 4 models.
+- Next steps: Integrate the revised text into the manuscript; no numerical output/model changes required.
+
+
+## 2026-10-27 — Calculated paired publication RMSE comparisons and uncertainty
+
+- Task: Calculate publication-specific paired RMSE differences, counts of improvement, and uncertainty in overall RMSE improvement allowing for shared-wildfire dependence.
+- Files changed: Added analysis 04 and check 09; saved publication/model errors, all 190 publication pair comparisons, improvement counts, 20 overall pairwise uncertainty summaries, model intervals, component membership, 100,000 compressed bootstrap draws/analyte, methods/limits, session/settings/hash records and logs under `predictor_group_cv/paired_uncertainty/`. Updated runner, indexes, checklist and decisions. No figures or fitted models changed.
+- Method: Recompute errors from all 515 Figure 3 predictions. Sample six DOC/eleven nitrate connected publication-fire groups with replacement, keeping Rhea and Writer together. Reuse identical draws across models; preserve equal-publication overall mean MSE, then take square root. Compute paired absolute/relative percentile intervals and publication win/tie/loss counts; tie threshold 1e-10. Intervals condition on saved predictions and omit refitting/tuning and full overlapping-training covariance; original shared-fire validation leakage is not corrected.
+- Results: Full DOC beats intercept-only in six/seven (Uzun exception) and watershed-only in five/seven. Full DOC overall improvement 0.10209 [0.01361,0.16014], 27.3% [4.4%,40.9%]. Watershed DOC 0.08400 [−0.01499,0.14924], 22.5% [−5.2%,39.5%]. Full versus watershed DOC 0.01809 [0.00156,0.03696]. Nitrate time-containing models improve six/twelve publications versus intercept-only and tie one another in all twelve; overall improvement 0.07384 [−0.00882,0.15970], 8.5% [−1.2%,18.7%].
+- Verification: Independent audit rebuilds connected components, recomputes all 190 publication comparisons and counts, verifies every one of 200,000 resampled model-error vectors, independently reconstructs percentile intervals, equal-publication targets and input hashes. Primary/all runner order and whitespace checked.
+- Next steps: Incorporate paired-count and conditional interval findings into manuscript interpretation; component-grouped prediction validation and refitting uncertainty remain separate work.
+
+
+## 2026-10-27 — Saved statistical SI for all three Results sections
+
+- Task: Update and save supporting information for pooled synthesis and LASSO Methods, covering Results 3.1–3.3.
+- Files changed: Added `R/manuscript/01_build_supporting_information_agent_v1.py` and `output/paper/supporting_information/` with three SI sections, Tables S1–S14, complete publication paired errors and zero-filled bootstrap coefficient distributions, source hashes, figure captions/links and main-text citation replacements. Added runner `si` mode and final `all` step; updated workflow/R/output indexes and build log.
+- Decisions: Build from saved outputs without refitting. Keep Figure 3 time-unpenalized performance separate from Figure 4 all-penalized selection and omission analyses. Include completed alternative weighting with provisional precision and tuning-loss differences explicit. Report deletion point estimates only; distinguish fixed-error component-bootstrap percentile intervals from empirical omission/OOB ranges. No exploratory REML inference added.
+- Verification: SI runner completes; builder checks source metrics, coefficient selection frequencies/denominators, table row counts, saved readback and local links. Dry runs confirm SI-only and final all-mode execution. No model or figure changes.
+- Next steps: Insert saved exact SI citations into the manuscript; reconcile packet table numbering with journal-wide SI and verify predictor units/provenance against main Table 1.

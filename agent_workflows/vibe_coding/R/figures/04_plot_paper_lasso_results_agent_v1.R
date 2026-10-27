@@ -1,10 +1,10 @@
-# Figure 3: study-bootstrap predictor selection stability.
+# Figure 4: study-bootstrap predictor selection stability.
 library(tidyverse)
 library(here)
 
 root <- here("agent_workflows", "vibe_coding")
 table_dir <- file.path(root, "output/paper/tables")
-figure_dir <- file.path(root, "output/paper/figures/figure_3_lasso_results")
+figure_dir <- file.path(root, "output/paper/figures/figure_4_lasso_results")
 dir.create(figure_dir, recursive = TRUE, showWarnings = FALSE)
 
 stability <- read_csv(file.path(table_dir, "selection_stability.csv"),
@@ -55,6 +55,10 @@ stability_plot <- ggplot(stability,
   paper_theme +
   theme(axis.text.y = element_text(colour = ink, size = 8))
 
-ggsave(file.path(figure_dir, "figure_3_lasso_results.png"), stability_plot,
+ggsave(file.path(figure_dir, "figure_4_lasso_results.png"), stability_plot,
        width = 12, height = 6, dpi = 300, bg = "white")
-message("Saved Figure 3 from the final primary-set selection table.")
+message("Saved Figure 4 from the final primary-set selection table.")
+
+ggsave(file.path(figure_dir, "figure_4_lasso_results.pdf"), stability_plot,
+       width=12, height=6, device=pdf, useDingbats=FALSE, bg="white")
+writeLines(paste0("Figure 4. Predictor-selection stability. Points show the percentage of successful publication-bootstrap refits selecting each predictor in the full eight-predictor LASSO set at the one-standard-error penalty. Separate models use equal publication–pair–available-year fitting weights, training-fold preprocessing and publication-grouped tuning. Frequencies use 994 successful DOC and 1,000 nitrate refits from 1,000 attempts per analyte; six DOC attempts had fewer than three unique publications. All candidates, including time since fire, are penalized in these full-set selection models. In contrast, Figure 3 uses dedicated group-comparison models with time unpenalized. Selection frequencies are conditional stability summaries, not significance tests or causal importance rankings. Publication-based resampling does not ensure independent wildfire settings."),file.path(figure_dir,"figure_4_caption.txt"))

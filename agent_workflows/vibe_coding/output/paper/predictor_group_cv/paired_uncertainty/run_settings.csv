@@ -1,0 +1,2 @@
+seed,draws,tie_tolerance,resampling_unit,target,interval,model_refitting,prediction_source
+20261027,100000,1e-10,connected_publication_fire_component,equal_publication_mean_MSE_then_square_root,95_percentile,FALSE,Figure_3_time_unpenalized_group_CV

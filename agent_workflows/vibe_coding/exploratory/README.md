@@ -4,6 +4,7 @@ This folder contains unselected diagnostics and historical candidate work. The b
 
 | Work | Script | Review | Saved outputs |
 |---|---|---|---|
+| Conditional working-covariance REML (exploratory; annual variances unvalidated) | [REML script](R/02_fit_working_covariance_inference_agent_v1.R) | [REML review and reproduction](working_covariance_review.md) | `output/working_covariance/` |
 | Balanced annual synthesis with study/fire-component CR2 uncertainty | [The exploratory annual-uncertainty script](R/01_review_annual_uncertainty_agent_v1.R) | [Annual uncertainty review](annual_uncertainty_review.md) | `output/annual_uncertainty/` |
 
 To rerun the candidate after preparing the primary and observed-only inputs, run from the repository root:
@@ -12,6 +13,6 @@ To rerun the candidate after preparing the primary and observed-only inputs, run
 Rscript agent_workflows/vibe_coding/exploratory/R/01_review_annual_uncertainty_agent_v1.R
 ```
 
-This writes only the candidate result set. It does not replace the selected primary fits, annual variances, or conditional inference results. Moving these results here does not reject the candidate; primary synthesis selection is resolved; use the active script for current results.
+This writes only the candidate result set. It does not replace the selected primary fits, annual variances, or the separate exploratory REML results. Moving these results here does not reject the candidate; primary synthesis selection is resolved; use the active script for current results.
 
 Keep future unselected methods and trial specifications here with their own output folders and brief status notes. When a method is selected, explicitly update the active workflow and Methods before promoting it. Superseded work belongs in [archive](../archive/README.md).

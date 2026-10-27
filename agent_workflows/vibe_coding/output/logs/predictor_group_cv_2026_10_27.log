@@ -1,0 +1,52 @@
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+here() starts at /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta
+Loading required package: Matrix
+
+Attaching package: ‘Matrix’
+
+The following objects are masked from ‘package:tidyr’:
+
+    expand, pack, unpack
+
+Loaded glmnet 5.0
+# A tibble: 8 × 12
+  response_var model          publications records  RMSE   MAE baseline_RMSE
+  <chr>        <chr>                 <int>   <int> <dbl> <dbl>         <dbl>
+1 DOC          intercept_only            7      35 0.373 0.319         0.379
+2 DOC          time_full                 7      35 0.271 0.217         0.379
+3 DOC          time_watershed            7      35 0.289 0.232         0.379
+4 DOC          time_wildfire             7      35 0.379 0.332         0.379
+5 NO3          intercept_only           12      68 0.867 0.664         0.793
+6 NO3          time_full                12      68 0.793 0.599         0.793
+7 NO3          time_watershed           12      68 0.793 0.599         0.793
+8 NO3          time_wildfire            12      68 0.793 0.599         0.793
+  baseline_MAE RMSE_improvement relative_RMSE_improvement MAE_improvement
+         <dbl>            <dbl>                     <dbl>           <dbl>
+1        0.332         5.34e- 3                  1.41e- 2        1.34e- 2
+2        0.332         1.07e- 1                  2.84e- 1        1.15e- 1
+3        0.332         8.93e- 2                  2.36e- 1        9.97e- 2
+4        0.332         1.11e-16                  2.93e-16        1.11e-16
+5        0.599        -7.38e- 2                 -9.31e- 2       -6.45e- 2
+6        0.599         1.11e-16                  1.40e-16        1.11e-16
+7        0.599         1.11e-16                  1.40e-16        1.11e-16
+8        0.599         1.11e-16                  1.40e-16        1.11e-16
+  definition                         
+  <chr>                              
+1 positive=lower_error_than_time_only
+2 positive=lower_error_than_time_only
+3 positive=lower_error_than_time_only
+4 positive=lower_error_than_time_only
+5 positive=lower_error_than_time_only
+6 positive=lower_error_than_time_only
+7 positive=lower_error_than_time_only
+8 positive=lower_error_than_time_only
+Predictor-group CV complete; time-only predictions reproduce the saved primary benchmark.

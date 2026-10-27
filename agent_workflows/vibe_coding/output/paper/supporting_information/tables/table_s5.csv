@@ -1,0 +1,10 @@
+predictor,label,group,transformation,DOC_included,DOC_missing,DOC_records,NO3_included,NO3_missing,NO3_records
+post_fire_year,Time since fire,time,none,True,0,35,True,0,68
+burn_percent_fire_year,Watershed burned percentage,wildfire,none,True,2,35,True,10,68
+burn_sev_high,High-severity burn percentage,wildfire,none,True,2,35,True,10,68
+Area_watershed_km,Watershed area,watershed,log1p,True,0,35,True,0,68
+runoffws,Mean annual runoff,watershed,log1p,True,0,35,True,0,68
+bfiws,Baseflow index,watershed,none,True,0,35,True,0,68
+forest_cover,Forest cover,watershed,none,True,0,35,True,0,68
+omws,Soil organic matter,watershed,none,True,0,35,False,0,68
+clayws,Soil clay content,watershed,none,False,0,35,True,0,68

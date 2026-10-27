@@ -1,0 +1,15 @@
+table,title,file,rows
+S1,Retained publication inventory,tables/table_s1.csv,12
+S2,Pooled responses under alternative clustering definitions,tables/table_s2.csv,4
+S3,Interpolation and annual record inventory comparisons,tables/table_s3.csv,6
+S4,Deletion of each complete dependence group,tables/table_s4.csv,17
+S5,Predictor groups transformations and missingness,tables/table_s5.csv,9
+S6,Cross validated performance of the five time adjusted models,tables/table_s6.csv,10
+S7,Publication specific held out RMSE,tables/table_s7.csv,19
+S8,Paired improvements and conditional error resampling intervals,tables/table_s8.csv,20
+S9,Full set penalized model and linear benchmark performance,tables/table_s9.csv,8
+S10,Selection frequencies signs and coefficient distributions,tables/table_s10.csv,16
+S11,Full set performance under alternative weighting,tables/table_s11.csv,6
+S12,Predictor selection under alternative weighting,tables/table_s12.csv,48
+S13,Individual and group omission performance,tables/table_s13.csv,24
+S14,Complete selection and sign summaries for predictor omissions,tables/table_s14.csv,192

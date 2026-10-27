@@ -1,0 +1,1 @@
+PASS: 515 matched held-out predictions; common time-only and intercept-only benchmarks; intended predictor groups; unpenalized time behavior; disjoint study folds; independent RMSE/improvement calculations; provenance and renumbering.

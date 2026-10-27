@@ -37,3 +37,38 @@ At author request, Figure 2 now displays balance-weighted half-violins, faint an
 ## October 22, 2026 — Author-directed nitrate outlier exclusion
 
 Exclude exactly Crandall et al. 2021 / Crandall_et_al_2021_C2 / Site_2–Control_2 / NO3 / 2018 (lnRR −4.506808658089654) from all current manuscript analyses, sensitivities and figures. This is a post hoc exclusion based on extremeness, with no confirmed measurement/transcription error. Preserve chemistry and all 110 upstream annual effects; keep the complete prior 104-record package/model tables in `archive/pre_nitrate_exclusion_2026_10_22/`. Enforce the exact configured annual key in preparation script 05 and export the full row/reason. Recompute balance weights, validation, 1,000-attempt bootstrap stability, interpolation/weight sensitivities, CR2 synthesis, REML sensitivities and all figures. Retain the DOC counterpart; overall inventory remains 28 pairs/46 watersheds, nitrate now spans 27 pairs/44 watersheds. Primary inventory is 103 records (35 DOC, 68 nitrate); observed-only/matched inventory is 88 (32 DOC, 56 nitrate). Earlier keep-all-observations figure guidance is superseded for this record only.
+
+
+## October 27, 2026 — REML moved to exploratory work
+
+At author request, conditional working-covariance REML is exploratory, not a manuscript sensitivity or readiness requirement. Its standalone script is `exploratory/R/02_fit_working_covariance_inference_agent_v1.R`; saved tables/model objects and future outputs live in `exploratory/output/working_covariance/`. All paper runner modes and the manuscript exclusion check exclude REML. Balanced CR2 synthesis, publication-cluster/interpolation/deletion comparisons, and LASSO sensitivities remain unchanged. Prior October 22 descriptions of REML as a supporting manuscript sensitivity are superseded. Historical logs and archives remain intact.
+
+
+## October 27, 2026 — Paired predictor-omission LASSO and SI Figure 3
+
+At author request, add focused individual/joint burn and hydrology omissions (seven specifications per analyte). Retain primary balance weights, preprocessing, penalty grid and one-SE rule. Use identical publication-bootstrap training draws, inner folds and OOB test publications across specifications, plus nested LOSO predictions. Run 1,000 attempts/analyte; selection summaries use successful refits including no-OOB draws, paired error differences require OOB publications. Empirical OOB ranges are descriptive, not formal confidence intervals. Publication grouping remains unchanged. Preserve Figure 3 and primary outputs; add SI Figure 3 and saved omission outputs to paper sensitivity/figure/all modes. Reproduction of full-set primary predictions and bootstrap coefficient/selection summaries is required. The primary model is not replaced by an omission model selected after viewing these results.
+
+
+## October 27, 2026 — Extended to hypothesis-oriented predictor groups
+
+The author selected structured predictor-subset bootstrapping augmented with complete group exclusions as the primary predictor-stability framework, with nested publication-level CV as the primary measure of predictive contribution. Extend the initial seven specifications to 12: full set, eight individual omissions, complete wildfire group, complete watershed group, and joint hydrology omission. Watershed = area/runoff/baseflow/forest/soil; wildfire = burned area/high-severity burn; time remains separate in both group exclusions. Use primary nested-LOSO contrasts and secondary paired OOB stability summaries; preserve original fits/Figure 3. Sparse folds fit one available predictor or a weighted intercept if none vary; internal zero padding is not a candidate. Across-analyte comparisons are descriptive because inventories and soil variables differ; no causal ranking or independent-wildfire validation is claimed. This supersedes the initial seven-specification scope.
+
+
+## October 27, 2026 — Figure 3 time-baseline comparisons; selection becomes Figure 4
+
+Author requested Figure 3 for cross-validated predictor-group importance and renumbered the original selection graphic to Figure 4. Final Figure 3 rows are time + watershed, time + wildfire, time + watershed + wildfire, and intercept-only; the common time-only model is the zero reference. Fit dedicated time-adjusted group models with time unpenalized (factor zero), group predictors penalized (factor one), identical publication LOSO and inner study folds, training-fold preprocessing, hierarchical fitting weights and one-SE tuning. The intercept-only and time-only predictions reproduce the established benchmarks. Report percent RMSE reduction relative to time-only and retain actual RMSE/differences in caption/source tables, including negative values. These dedicated models differ from Figure 4/full-set omission models that penalize time; preserve those original fits. Renumber plotting scripts sequentially 01–07; SI numbering unchanged. Add group CV to primary/all and the new main figure to figures/all. This supersedes older references calling the selection graphic Figure 3.
+
+
+## October 27, 2026 — Final Figure 3 reference and model order
+
+Author revised the comparison basis to intercept-only and explicitly requested the row order intercept only, time, time + wildfire, time + watershed, time + watershed + wildfire. Use all five fitted models in the comparison table, with intercept-only at zero. Compute positive improvement as (intercept RMSE − model RMSE) / intercept RMSE; keep negative results visible. Reuse existing CV predictions; no refit is needed for this reference change. Time remains unpenalized in all three time-plus-group models. This supersedes the time-only zero-reference choice above.
+
+
+## October 27, 2026 — Paired CV error resampling
+
+At author request, calculate all publication-level paired model RMSE differences, improved/tied/worsened counts and uncertainty in overall improvement from fixed Figure 3 held-out errors. Resample connected publication/fire components jointly (Rhea/Writer linked), preserving publication weight in the mean MSE before square root. Use 100,000 paired draws, seed 20261027, default `N_ERROR_BOOTSTRAP=100000`, 95% percentile intervals and tie tolerance 1e-10 lnRR units. These conditional error-composition intervals do not refit models, fully account for overlapping CV training sets or remove shared-fire information across original validation folds. Positive improvement means reference minus candidate; standard difference has opposite sign. Add analysis 04 after group CV in primary/all and save detailed provenance/draws. Leave Figure 3 unchanged.
+
+
+## October 27, 2026 — Statistical SI packet
+
+At author request, maintain editable statistical SI for Results 3.1–3.3 under `output/paper/supporting_information/`. Three sections cover pooled synthesis sensitivities, validation/predictor-group comparisons, and selection/weighting/omission stability. Tables S1–S14 are numbered within this packet; preserve existing SI Figures 1–3 and main Figures 1–4. Generate text/tables from saved results with the Python manuscript builder through `si` mode or after figures in `all`, without refitting. Retain exact main-text citation replacements and provenance hashes. Explicitly distinguish time-unpenalized group models from time-penalized selection models, publication folds from dependence-group error resampling, and conditional/empirical intervals from full refitting uncertainty. Final journal numbering and predictor units/provenance remain authoring checks.

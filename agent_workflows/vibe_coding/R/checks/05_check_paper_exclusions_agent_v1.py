@@ -53,9 +53,6 @@ counts = {'DOC': 35, 'NO3': 68}
 for r in read('output/paper/balanced_synthesis/balanced_CR2_results.csv'):
     expected = counts if r['scenario'] == 'primary' else {'DOC': 32, 'NO3': 56}
     assert int(r['rows']) == expected[r['response_var']]
-for r in read('output/paper/tables/working_covariance_inference.csv'):
-    assert int(r['rows']) == counts[r['response_var']]
-assert not read('output/paper/tables/working_covariance_failures.csv')
 for r in read('output/paper/balanced_synthesis/balanced_weights.csv'):
     assert key(r) not in excluded
 figure_rows = read('output/paper/tables/figure_2_response_points_weights.csv')
@@ -63,4 +60,4 @@ assert len(figure_rows) == 103 and {key(r) for r in figure_rows} == {key(r) for 
 for r in read('output/paper/tables/figure_2_response_summary.csv'):
     assert int(r['n']) == counts[r['response_var']]
     assert math.isclose(float(r['balanced_mean']), float(r['estimate']), abs_tol=1e-12)
-print('PASS: balanced CR2, conditional REML and Figure 2 all use the excluded-record-free inventories.')
+print('PASS: balanced CR2 and Figure 2 all use the excluded-record-free inventories.')

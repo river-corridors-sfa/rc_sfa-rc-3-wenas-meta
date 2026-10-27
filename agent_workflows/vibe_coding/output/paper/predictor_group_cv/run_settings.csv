@@ -1,0 +1,2 @@
+alpha,time_penalty_factor,group_penalty_factor,penalty_rule,penalty_min,penalty_max,penalty_count,weighting,validation,baseline
+1,0,1,one_SE,1e-4,100,80,equal_study_pair_year,nested_publication_LOSO,weighted_intercept_only

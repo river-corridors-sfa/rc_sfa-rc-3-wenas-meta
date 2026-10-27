@@ -1,0 +1,25 @@
+response_var,specification,label,omitted,candidates
+DOC,full,Full set,,post_fire_year;burn_percent_fire_year;burn_sev_high;Area_watershed_km;runoffws;bfiws;forest_cover;omws
+DOC,omit_all_watershed,Omit watershed group,Area_watershed_km;runoffws;bfiws;forest_cover;omws,post_fire_year;burn_percent_fire_year;burn_sev_high
+DOC,omit_baseflow,Omit baseflow index,bfiws,post_fire_year;burn_percent_fire_year;burn_sev_high;Area_watershed_km;runoffws;forest_cover;omws
+DOC,omit_both_burn,Omit wildfire group,burn_percent_fire_year;burn_sev_high,post_fire_year;Area_watershed_km;runoffws;bfiws;forest_cover;omws
+DOC,omit_both_hydrology,Omit both hydrology metrics,runoffws;bfiws,post_fire_year;burn_percent_fire_year;burn_sev_high;Area_watershed_km;forest_cover;omws
+DOC,omit_burned_percent,Omit burned area (%),burn_percent_fire_year,post_fire_year;burn_sev_high;Area_watershed_km;runoffws;bfiws;forest_cover;omws
+DOC,omit_forest_cover,Omit forest cover,forest_cover,post_fire_year;burn_percent_fire_year;burn_sev_high;Area_watershed_km;runoffws;bfiws;omws
+DOC,omit_high_severity,Omit high-severity burn,burn_sev_high,post_fire_year;burn_percent_fire_year;Area_watershed_km;runoffws;bfiws;forest_cover;omws
+DOC,omit_runoff,Omit runoff,runoffws,post_fire_year;burn_percent_fire_year;burn_sev_high;Area_watershed_km;bfiws;forest_cover;omws
+DOC,omit_soil,Omit soil property,omws,post_fire_year;burn_percent_fire_year;burn_sev_high;Area_watershed_km;runoffws;bfiws;forest_cover
+DOC,omit_time,Omit time since fire,post_fire_year,burn_percent_fire_year;burn_sev_high;Area_watershed_km;runoffws;bfiws;forest_cover;omws
+DOC,omit_watershed_area,Omit watershed area,Area_watershed_km,post_fire_year;burn_percent_fire_year;burn_sev_high;runoffws;bfiws;forest_cover;omws
+NO3,full,Full set,,post_fire_year;burn_percent_fire_year;burn_sev_high;Area_watershed_km;runoffws;bfiws;forest_cover;clayws
+NO3,omit_all_watershed,Omit watershed group,Area_watershed_km;runoffws;bfiws;forest_cover;clayws,post_fire_year;burn_percent_fire_year;burn_sev_high
+NO3,omit_baseflow,Omit baseflow index,bfiws,post_fire_year;burn_percent_fire_year;burn_sev_high;Area_watershed_km;runoffws;forest_cover;clayws
+NO3,omit_both_burn,Omit wildfire group,burn_percent_fire_year;burn_sev_high,post_fire_year;Area_watershed_km;runoffws;bfiws;forest_cover;clayws
+NO3,omit_both_hydrology,Omit both hydrology metrics,runoffws;bfiws,post_fire_year;burn_percent_fire_year;burn_sev_high;Area_watershed_km;forest_cover;clayws
+NO3,omit_burned_percent,Omit burned area (%),burn_percent_fire_year,post_fire_year;burn_sev_high;Area_watershed_km;runoffws;bfiws;forest_cover;clayws
+NO3,omit_forest_cover,Omit forest cover,forest_cover,post_fire_year;burn_percent_fire_year;burn_sev_high;Area_watershed_km;runoffws;bfiws;clayws
+NO3,omit_high_severity,Omit high-severity burn,burn_sev_high,post_fire_year;burn_percent_fire_year;Area_watershed_km;runoffws;bfiws;forest_cover;clayws
+NO3,omit_runoff,Omit runoff,runoffws,post_fire_year;burn_percent_fire_year;burn_sev_high;Area_watershed_km;bfiws;forest_cover;clayws
+NO3,omit_soil,Omit soil property,clayws,post_fire_year;burn_percent_fire_year;burn_sev_high;Area_watershed_km;runoffws;bfiws;forest_cover
+NO3,omit_time,Omit time since fire,post_fire_year,burn_percent_fire_year;burn_sev_high;Area_watershed_km;runoffws;bfiws;forest_cover;clayws
+NO3,omit_watershed_area,Omit watershed area,Area_watershed_km,post_fire_year;burn_percent_fire_year;burn_sev_high;runoffws;bfiws;forest_cover;clayws

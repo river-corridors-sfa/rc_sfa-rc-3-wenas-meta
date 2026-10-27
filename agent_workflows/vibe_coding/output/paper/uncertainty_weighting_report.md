@@ -26,29 +26,26 @@ Bootstrap attempts with fewer than three distinct studies are recorded as failur
 
 Equal-study → equal-pair → equal-available-year weighted pooled log ratios use connected study/fire-component CR2 intervals with Satterthwaite degrees of freedom, nonprecision weights and an identity working target. Study/fire clustering links Rhea and Writer via High Park, leaving six DOC and eleven nitrate components. Publication-cluster, observed-only and matched-interpolated summaries are supporting comparisons; time associations remain exploratory. The exclusion is applied before recomputing balance weights for every inventory. Current coefficients, weights and deletion diagnostics are under `balanced_synthesis/`; the inclusion comparison is in `nitrate_exclusion_report.md` and the archived pre-exclusion package.
 
-## Conditional pooled-effect inference
+## Exploratory REML
 
-The conditional covariance script fits REML pooled-effect and time-since-fire models with study/pair random intercepts. It evaluates nine working sampling-covariance scenarios using reference-family correlation rho and annual temporal correlation phi in {0, 0.5, 0.8}. The matrix is a positive-semidefinite mixture of pair and shared-reference AR(1) kernels scaled by the provisional annual delta standard errors. These scenarios are assumed correlations, not estimates of daily autocorrelation. Shared-reference dependence is represented in the working covariance, not by a third potentially redundant random intercept.
-
-Study-clustered CR2 standard errors and Satterthwaite degrees of freedom are computed through `metafor::robust(..., clubSandwich=TRUE)`. This follows the [metafor robust inference documentation](https://wviechtb.github.io/metafor/reference/robust.html). Estimates, confidence intervals, degrees of freedom, heterogeneity components, model objects, and failures are saved. These conditional fits do **not** validate annual precision or correct the effective information content of interpolated observations. These REML fits are conditional sensitivities. Primary manuscript synthesis is the author-selected balanced pooled estimator with connected study/fire-component CR2/Satterthwaite intervals; annual precision validation remains unresolved, and DOC has only six inference components across seven studies.
+Conditional working-covariance REML analyses were moved out of the manuscript workflow on October 27, 2026. See [the exploratory review](../../exploratory/working_covariance_review.md) for assumptions, saved results, and standalone reproduction.
 
 ## Files and reproduction
 
-Run `N_BOOTSTRAP=1000 Rscript agent_workflows/vibe_coding/R/run_paper_workflow_agent_v1.R` from the repository root. The sampling-support audit and both supporting sensitivity scripts are included in `all` mode. Install `clubSandwich` in the normal R library or the workflow-local `.R-library/`; package versions are recorded in `output/logs/uncertainty_session_info.txt` relative to the workflow root.
+Run `N_BOOTSTRAP=1000 Rscript agent_workflows/vibe_coding/R/run_paper_workflow_agent_v1.R` from the repository root. The sampling-support audit and four-scenario LASSO sensitivity script is included in `all` mode. Install `clubSandwich` in the normal R library or the workflow-local `.R-library/`; package versions are recorded in `output/logs/uncertainty_session_info.txt` relative to the workflow root.
 
 - `tables/fitting_weights.csv`: primary fitting weights.
 - `tables/observed_only_response_comparison.csv`: annual response differences and eligibility.
 - `tables/weighting_interpolation_performance.csv`: scenario comparisons.
 - `tables/bootstrap_summary.csv`: primary success denominators.
 - `sensitivity/`: separate outputs for four sensitivity scenarios.
-- `tables/working_covariance_inference.csv` and `working_covariance_models.rds`: conditional pooled/time results.
 - `uncertainty_weighting_run.log` and `weighting_checks.log`: execution and focused validation.
 
 Temporal block-bootstrap variances have deliberately not been manufactured for sparsely observed years. The completed audit identifies the remaining methodological work rather than marking annual uncertainty finalized.
 
 ## Completed run and checks
 
-All outer fits completed. Each scenario completed 994/1,000 DOC and 1,000/1,000 nitrate bootstrap attempts; the six DOC failures contain fewer than three distinct studies and are explicitly logged. All 36 conditional multilevel fits completed (54 coefficient rows). Equal-study LASSO held-out RMSE was:
+All outer fits completed. Each scenario completed 994/1,000 DOC and 1,000/1,000 nitrate bootstrap attempts; the six DOC failures contain fewer than three distinct studies and are explicitly logged. The separately preserved exploratory REML run completed 36 fits (54 coefficient rows). Equal-study LASSO held-out RMSE was:
 
 | Scenario | DOC | Nitrate |
 |---|---:|---:|

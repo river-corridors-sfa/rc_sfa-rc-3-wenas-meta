@@ -1,9 +1,12 @@
+# Exploratory inference, excluded from every paper runner mode.
 # Conditional inference using provisional annual variances and a PSD working covariance.
 # These fits assess covariance assumptions; they do not validate daily-derived precision.
 library(tidyverse)
 library(here)
 library(metafor)
 b <- here('agent_workflows','vibe_coding')
+out <- file.path(b, 'exploratory/output/working_covariance')
+dir.create(out, recursive=TRUE, showWarnings=FALSE)
 .libPaths(c(file.path(b,'.R-library'),.libPaths()))
 if(!requireNamespace('clubSandwich',quietly=TRUE)) stop('Install clubSandwich for CR2 inference')
 m <- read_csv(file.path(b,'data/derived/lasso_model_table.csv'),show_col_types=FALSE)
@@ -40,6 +43,6 @@ for(a in c('DOC','NO3')) {
     }
   }
 }
-write_csv(bind_rows(results),file.path(b,'output/paper/tables/working_covariance_inference.csv'))
-write_csv(bind_rows(failures),file.path(b,'output/paper/tables/working_covariance_failures.csv'))
-saveRDS(fits,file.path(b,'output/paper/working_covariance_models.rds'))
+write_csv(bind_rows(results),file.path(out,'working_covariance_inference.csv'))
+write_csv(bind_rows(failures),file.path(out,'working_covariance_failures.csv'))
+saveRDS(fits,file.path(out,'working_covariance_models.rds'))
