@@ -545,3 +545,11 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Decisions: Build from saved outputs without refitting. Keep Figure 3 time-unpenalized performance separate from Figure 4 all-penalized selection and omission analyses. Include completed alternative weighting with provisional precision and tuning-loss differences explicit. Report deletion point estimates only; distinguish fixed-error component-bootstrap percentile intervals from empirical omission/OOB ranges. No exploratory REML inference added.
 - Verification: SI runner completes; builder checks source metrics, coefficient selection frequencies/denominators, table row counts, saved readback and local links. Dry runs confirm SI-only and final all-mode execution. No model or figure changes.
 - Next steps: Insert saved exact SI citations into the manuscript; reconcile packet table numbering with journal-wide SI and verify predictor units/provenance against main Table 1.
+
+
+## 2026-10-29 — Identified removed nitrate outlier sites
+
+- Task: Explain the site associated with the excluded extreme nitrate response.
+- Sources checked: Exact excluded annual record, reviewed site-selection decisions, source Crandall chemistry, preparation 04 named-reference logic, exclusion comparison report, and original Crandall et al. (2021), DOI 10.1371/journal.pone.0257733.
+- Findings: Burned Payson (Site_2, 54 square km, 20.2356% burned) versus selected Mill Race reference (Control_2, 47 square km), October 2018 Pole Creek Fire Complex study in Utah. Historical Control_2 source rows also contain Dry Creek/Mitsubishi Race, but reviewed analysis selects Mill Race only. Excluded lnRR −4.50681 from means 0.10410/9.43508 mg N/L on 18 matched dates (10 both measured, 8 with interpolation); burned/reference ratio 0.01103. This is a short-event record summarized by calendar year, not full-year monitoring.
+- Interpretation: Original publication identifies land use as a stronger influence on nutrients than burn status. This makes background/pair comparability worth checking, but no specific explanation or measurement error is confirmed. Exclusion remains author-directed/post hoc; no analytical files changed.
