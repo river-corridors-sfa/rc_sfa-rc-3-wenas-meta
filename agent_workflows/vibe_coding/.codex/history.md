@@ -553,3 +553,18 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Sources checked: Exact excluded annual record, reviewed site-selection decisions, source Crandall chemistry, preparation 04 named-reference logic, exclusion comparison report, and original Crandall et al. (2021), DOI 10.1371/journal.pone.0257733.
 - Findings: Burned Payson (Site_2, 54 square km, 20.2356% burned) versus selected Mill Race reference (Control_2, 47 square km), October 2018 Pole Creek Fire Complex study in Utah. Historical Control_2 source rows also contain Dry Creek/Mitsubishi Race, but reviewed analysis selects Mill Race only. Excluded lnRR −4.50681 from means 0.10410/9.43508 mg N/L on 18 matched dates (10 both measured, 8 with interpolation); burned/reference ratio 0.01103. This is a short-event record summarized by calendar year, not full-year monitoring.
 - Interpretation: Original publication identifies land use as a stronger influence on nutrients than burn status. This makes background/pair comparability worth checking, but no specific explanation or measurement error is confirmed. Exclusion remains author-directed/post hoc; no analytical files changed.
+## 2026-11-02 — Interpreted overall LASSO predictive skill
+
+- Task: Assess variance captured in DOC and nitrate from current saved held-out results.
+- Files changed: This history entry only; no models or manuscript outputs changed.
+- Findings: Figure 3 full models have pooled held-out R² 0.222 DOC and −0.062 nitrate; all-penalized selection models have 0.216 and −0.103. Figure 3 equal-publication RMSE improvement is 27.3% DOC and 8.5% nitrate; nitrate group predictors add nothing beyond unpenalized time. Responses are annual burned/reference concentration ln ratios, not raw concentrations. Conditional improvement intervals and limited publication/shared-fire validation scope constrain interpretation.
+- Next steps: No refitting needed for this interpretation.
+
+## 2026-11-02 — Calculated full-data in-sample R²
+
+- Task: Obtain ordinary-style apparent R² for both full LASSO specifications using existing preprocessing, balance weights, grouped inner tuning and one-SE selection.
+- Files changed: Added `exploratory/R/03_calculate_in_sample_r2_agent_v1.R` and `exploratory/output/in_sample_r2/` with performance, predictions, standardized coefficients and session info. Original model outputs unchanged.
+- Results: DOC unweighted R² 0.81832 (all penalized), 0.81824 (time unpenalized); weighted R² 0.90687 and 0.90685. Nitrate unweighted −0.03882 and −0.00702; weighted 0 and 0.14976. Weighted fitting can yield negative unweighted apparent R². Nitrate all-penalized fit is intercept-only; time-unpenalized fit retains time only.
+- Verification: Independently recomputed all eight R² values from saved predictions with Python and confirmed record counts. These are newly fitted full-data descriptive results, not CV scores or an unpenalized OLS refit.
+- Next steps: No manuscript changes requested; retain held-out metrics for predictive claims.
+
