@@ -568,3 +568,12 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Verification: Independently recomputed all eight R² values from saved predictions with Python and confirmed record counts. These are newly fitted full-data descriptive results, not CV scores or an unpenalized OLS refit.
 - Next steps: No manuscript changes requested; retain held-out metrics for predictive claims.
 
+
+
+## 2026-11-05 — Publication styling for SI Figures 1 and 2
+
+- Task: Complete repository-specified SI figure styling and exports.
+- Files changed: Figure scripts 05/06; manuscript SI builder; regenerated SI 1/2 PNGs; added vector PDFs and standalone captions; rebuilt statistical SI and source manifest; updated paper index/readiness notes and this history.
+- Decisions: Caption-only explanations; dark text and thin borders. SI 1 retains all 24 fields with numbered column keys and full row labels, fixed −1/1 scale, native 7.5 × 7.2-inch size. SI 2 uses nine lettered raw-scale panels, verified units, nitrate blue before DOC ochre, native 7.5 × 8-inch size. Both export at 600 dpi with fully vector PDFs using the standard R PDF device (local Cairo/X11 unavailable). Units verified from repository dictionaries; no numerical/source/model changes.
+- Validation: Both plotting scripts and SI builder passed. All 576 correlation/count cells and 16 distribution summaries unchanged; companion CSVs byte-identical. Independently verified 103 retained source rows, nine variables, static within-pair invariance, counts, medians, extrema and sample variances. PNGs and PDF rasters visually inspected; both PDFs verified free of raster images; SI source hashes verified. Unrelated regenerated gzip restored after confirming decompressed equality.
+- Next steps/limits: Separate pair-level/balance-weighted correlations, final journal placement and other manuscript-readiness items remain separate. No outstanding rendering issue for these exports.

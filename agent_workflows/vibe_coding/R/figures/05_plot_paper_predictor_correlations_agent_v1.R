@@ -35,31 +35,57 @@ correlation_long <- as.data.frame(as.table(correlation), stringsAsFactors = FALS
          label_2 = labels[as.character(predictor_2)])
 write_csv(correlation_long, file.path(table_dir, "si_figure_1_predictor_correlations.csv"))
 
+# Numeric column keys keep the full 24-field matrix readable at export size.
+# The matching row labels retain every predictor name without rotated text.
+labels["Area_watershed_km"] <- "Watershed area (km²)"
+axis_labels <- paste0(seq_along(predictors), ". ", labels[predictors])
 correlation_long <- correlation_long %>%
+  mutate(label_1 = labels[as.character(predictor_1)],
+         label_2 = labels[as.character(predictor_2)]) %>%
   mutate(label_1 = factor(label_1, levels = rev(labels[predictors])),
          label_2 = factor(label_2, levels = labels[predictors]))
 figure <- ggplot(correlation_long, aes(x = label_2, y = label_1, fill = rho)) +
   geom_tile(colour = "white", linewidth = .16) +
   geom_text(aes(label = if_else(abs(rho) >= .65, sprintf("%.2f", rho), "")),
-            size = 2.2, colour = "#20292C") +
-  scale_fill_gradient2(low = "#3A6C9A", mid = "white", high = "#B65F4A",
-                       midpoint = 0, limits = c(-1, 1), name = "Spearman ρ") +
+            size = 1.9, colour = "#222222") +
+  scale_x_discrete(labels = seq_along(predictors), position = "top", expand = c(0, 0)) +
+  scale_y_discrete(labels = rev(axis_labels), expand = c(0, 0)) +
+  scale_fill_gradient2(low = "#6399BE", mid = "white", high = "#D99A87",
+                       midpoint = 0, limits = c(-1, 1),
+                       breaks = seq(-1, 1, .5), name = expression(Spearman~rho),
+                       na.value = "#D9D9D9") +
+  guides(fill = guide_colourbar(display = "rectangles")) +
   coord_equal() +
-  labs(title = "SI Figure 1. Correlations among all available predictors",
-       subtitle = "Twenty screened candidates plus four additional timing and burn-severity fields",
-       x = NULL, y = NULL,
-       caption = paste(
-         paste("Pairwise-complete Spearman correlations across", nrow(data), "finite annual DOC and nitrate model rows."),
-         "Annual rows from the same watershed pair repeat static attributes; this is a descriptive redundancy diagnostic.",
-         "Cells with |ρ| ≥ 0.65 are labeled; exact values and pairwise counts are in the companion CSV.",
-         sep = "\n")) +
-  theme_minimal(base_size = 10) +
-  theme(axis.text.x = element_text(angle = 55, hjust = 1, size = 7),
-        axis.text.y = element_text(size = 7),
+  labs(x = NULL, y = NULL) +
+  theme_minimal(base_size = 9) +
+  theme(text = element_text(colour = "#222222"),
+        axis.text.x = element_text(size = 7, colour = "#222222"),
+        axis.text.y = element_text(size = 7.5, colour = "#222222"),
         panel.grid = element_blank(),
-        plot.title = element_text(face = "bold", size = 16),
-        plot.caption = element_text(hjust = 0, size = 8),
-        plot.margin = margin(12, 15, 12, 12))
+        panel.border = element_rect(colour = "#222222", fill = NA, linewidth = .45),
+        legend.position = "bottom", legend.title = element_text(size = 9),
+        legend.text = element_text(size = 8),
+        legend.key.width = grid::unit(1, "cm"),
+        plot.margin = margin(8, 8, 8, 8))
 ggsave(file.path(figure_dir, "si_figure_1_predictor_correlation_matrix.png"),
-       figure, width = 15, height = 13, dpi = 300, bg = "white")
-message("Saved SI Figure 1 and correlation table for ", length(predictors), " variables.")
+       figure, width = 7.5, height = 7.2, dpi = 600, bg = "white")
+ggsave(file.path(figure_dir, "si_figure_1_predictor_correlation_matrix.pdf"),
+       figure, width = 7.5, height = 7.2, device = pdf, useDingbats = FALSE, bg = "white")
+caption <- paste0(
+  "SI Figure 1. Predictor correlations. Pairwise-complete Spearman correlations among ",
+  length(predictors), " fields: ", nrow(dictionary),
+  " screened candidate fields and four additional timing and burn-severity fields. ",
+  "Column numbers match the numbered predictor labels on the rows. ",
+  "The matrix uses ", nrow(data), " retained annual DOC and nitrate analyte records; ",
+  "static watershed attributes repeat across years and analytes. ",
+  "This is an unweighted descriptive matrix, not an independent-sample or balance-weighted diagnostic. ",
+  "Cells with absolute correlation at least 0.65 are labeled; all coefficients are dimensionless. ",
+  "Gray cells, if present, indicate undefined correlations. ",
+  "Pairwise sample counts range from ", min(pair_counts), " to ", max(pair_counts),
+  "; missing values are omitted separately for each pair of fields. ",
+  "Exact coefficients and pairwise counts are in si_figure_1_predictor_correlations.csv. ",
+  "A separate pair-level or balance-weighted diagnostic would be needed before using these correlations to justify redundancy decisions."
+)
+writeLines(caption, file.path(figure_dir, "si_figure_1_caption.txt"))
+message("Saved SI Figure 1 PNG/PDF, standalone caption and correlation table for ",
+        length(predictors), " variables.")

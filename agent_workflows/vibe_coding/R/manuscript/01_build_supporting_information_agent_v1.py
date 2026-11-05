@@ -413,15 +413,14 @@ document += '''Deleting the complete watershed group increases all-penalized DOC
 
 ### Supporting figure captions
 
-**SI Figure 1. Predictor correlations.** Pairwise-complete Spearman correlations among 24 fields: 20 screened candidate fields and four additional timing/burn-severity fields. The matrix uses 103 retained annual analyte records and repeats static attributes across pair histories and analytes. It is an unweighted descriptive diagnostic, not an independent-sample or balance-weighted correlation matrix. Cells with absolute correlation at least 0.65 are labeled; exact values and pairwise sample counts are in the [correlation source table](../tables/si_figure_1_predictor_correlations.csv).
-
-![SI Figure 1 predictor correlations](../figures/si_figure_1_predictor_correlations/si_figure_1_predictor_correlation_matrix.png)
-
-**SI Figure 2. Candidate predictor distributions.** The panels show the nine-variable union of the two final eight-predictor sets. Static characteristics contribute one value per watershed pair and time contributes pair–year values, separately by analyte. Values are raw before transformation and standardization; panels use separate scales. Violin width describes smoothed density, crossbars mark medians, points show retained values, and s² is sample variance in squared source units. Organic matter is a DOC candidate and clay content a nitrate candidate. These coverage distributions do not depict the equal-publication fitting target. Numerical summaries are in the [distribution source table](../tables/si_figure_2_predictor_distribution_summary.csv).
-
-![SI Figure 2 predictor distributions](../figures/si_figure_2_predictor_violins/si_figure_2_predictor_violins.png)
-
 '''
+for number, directory, image_name in (
+    (1, 'si_figure_1_predictor_correlations', 'si_figure_1_predictor_correlation_matrix'),
+    (2, 'si_figure_2_predictor_violins', 'si_figure_2_predictor_violins'),
+):
+    caption = text_source(f'output/paper/figures/{directory}/si_figure_{number}_caption.txt').strip()
+    document += caption + f'\n\n![SI Figure {number}](../figures/{directory}/{image_name}.png)\n\n'
+    document += f'[Vector PDF](../figures/{directory}/{image_name}.pdf).\n\n'
 si3_caption = text_source('output/paper/figures/si_figure_3_predictor_omission/si_figure_3_caption.txt').strip()
 document += si3_caption + '\n\n![SI Figure 3 predictor omissions](../figures/si_figure_3_predictor_omission/si_figure_3_predictor_omission.png)\n\n'
 document += '''### Software and reproducibility
