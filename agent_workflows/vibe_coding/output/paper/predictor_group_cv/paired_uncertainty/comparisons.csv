@@ -1,0 +1,11 @@
+comparison_id,reference_model,candidate_model,reference_label,candidate_label
+1,intercept_only,time_only,Intercept only,Time
+2,intercept_only,time_wildfire,Intercept only,Time + wildfire
+3,intercept_only,time_watershed,Intercept only,Time + watershed
+4,intercept_only,time_full,Intercept only,Time + watershed + wildfire
+5,time_only,time_wildfire,Time,Time + wildfire
+6,time_only,time_watershed,Time,Time + watershed
+7,time_only,time_full,Time,Time + watershed + wildfire
+8,time_wildfire,time_watershed,Time + wildfire,Time + watershed
+9,time_wildfire,time_full,Time + wildfire,Time + watershed + wildfire
+10,time_watershed,time_full,Time + watershed,Time + watershed + wildfire

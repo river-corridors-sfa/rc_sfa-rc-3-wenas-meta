@@ -1,0 +1,20 @@
+Study_ID,dependence_cluster,publications,draw_column,response_var
+Crandall et al. 2021,Crandall et al. 2021,1,component_1,DOC
+Hickenbottom et al. 2023,Hickenbottom et al. 2023,1,component_2,DOC
+Mast & Clow; 2008,Mast & Clow; 2008,1,component_3,DOC
+Murphy et al. 2018,Murphy et al. 2018,1,component_4,DOC
+Rhea et al. 2021,Rhea et al. 2021 + Writer et al. 2014,2,component_5,DOC
+Uzun et al. 2020,Uzun et al. 2020,1,component_6,DOC
+Writer et al. 2014,Rhea et al. 2021 + Writer et al. 2014,2,component_5,DOC
+Coombs & Melack; 2013,Coombs & Melack; 2013,1,component_1,NO3
+Crandall et al. 2021,Crandall et al. 2021,1,component_2,NO3
+Gerla & Galloway; 1998,Gerla & Galloway; 1998,1,component_3,NO3
+Gluns & Toews; 1989,Gluns & Toews; 1989,1,component_4,NO3
+Hauer & Spencer 1998,Hauer & Spencer 1998,1,component_5,NO3
+Hickenbottom et al. 2023,Hickenbottom et al. 2023,1,component_6,NO3
+Mast & Clow; 2008,Mast & Clow; 2008,1,component_7,NO3
+Murphy et al. 2018,Murphy et al. 2018,1,component_8,NO3
+Oliver et al. 2012,Oliver et al. 2012,1,component_9,NO3
+Rhea et al. 2021,Rhea et al. 2021 + Writer et al. 2014,2,component_10,NO3
+Uzun et al. 2020,Uzun et al. 2020,1,component_11,NO3
+Writer et al. 2014,Rhea et al. 2021 + Writer et al. 2014,2,component_10,NO3

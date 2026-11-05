@@ -1,0 +1,28 @@
+here() starts at /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta
+
+===== Running 01_read_and_gapfill_preserve_observations_agent_v1.R =====
+Completed 01_read_and_gapfill_preserve_observations_agent_v1.R
+
+===== Running 01c_apply_reviewed_sites_agent_v1.R =====
+Completed 01c_apply_reviewed_sites_agent_v1.R
+
+===== Running 02_prepare_analysis_data_agent_v1.R =====
+Completed 02_prepare_analysis_data_agent_v1.R
+
+===== Running 03_audit_pairs_and_predictors_agent_v1.R =====
+Completed 03_audit_pairs_and_predictors_agent_v1.R
+
+===== Running 04_fit_meta_analysis_agent_v1.R =====
+Completed 04_fit_meta_analysis_agent_v1.R
+
+===== Running 05_fit_grouped_lasso_agent_v1.R =====
+Completed 05_fit_grouped_lasso_agent_v1.R
+
+===== Running 06_run_stability_sensitivity_agent_v1.R =====
+Completed 06_run_stability_sensitivity_agent_v1.R
+
+===== Running 07_make_results_agent_v1.R =====
+Completed 07_make_results_agent_v1.R
+
+Workflow completed.
+Markdown report written to: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/output/reports/run_all_agent_v1_report.md

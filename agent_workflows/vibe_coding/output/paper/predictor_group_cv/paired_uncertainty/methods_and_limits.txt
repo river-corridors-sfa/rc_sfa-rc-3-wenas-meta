@@ -1,0 +1,9 @@
+Paired Figure 3 cross-validation error comparisons
+Positive RMSE improvement = reference RMSE minus candidate RMSE. RMSE_difference has the opposite sign.
+Within-publication RMSE is sqrt(mean squared held-out annual error). Counts classify differences within 1e-10 lnRR units as ties.
+Overall RMSE is sqrt(mean publication MSE), not the mean publication RMSE. Every publication has equal point-estimate weight.
+Bootstrap draws select the same number of connected publication/fire components as observed, with replacement. All publications in a selected component enter together, once per component selection. Model comparisons use identical draw multiplicities.
+Rhea and Writer share one dependence component through High Park. There are six DOC and eleven nitrate components. Publication counts can vary across bootstrap draws because this component contains two publications.
+Percentile intervals resample fixed held-out prediction errors. They describe uncertainty from the represented publication/fire-group composition conditional on the fitted CV predictions. They do not refit/re-tune models, account fully for covariance induced by overlapping CV training sets, or remove shared-fire information crossing the original publication validation splits.
+Few independent components, especially for DOC, limit interval reliability. Resample-positive fractions are descriptive frequencies, not posterior probabilities or formal p-values. Improvement counts are publication counts, not independent binomial trials.
+No cross-analyte significance test is performed; publication coverage and candidate soil variables differ. Figure 3 is not modified by this calculation.

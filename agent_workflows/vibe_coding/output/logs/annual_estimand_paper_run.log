@@ -1,0 +1,396 @@
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+here() starts at /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta
+Wrote 110 annual effect-size rows to: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/data/derived/lasso_model_table.csv
+Predictor columns joined: time_since_fire, Area_watershed_km, maxelevsmo, slope, tmean8110ws, precip8110ws, forest_cover, urban_cover, grassland_cover, wetland_cover, ag_cover, omws, rckdepws, clayws, glacial_till, bfiws, permws, runoffws, burn_percent_fire_year, burn_sev_high, burn_sev_mod, burn_sev_low
+Wrote audit tables to: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/data/audit
+Primary predictor rule: pre-specified primary candidate, <=50% missing, and at least 3 unique values.
+
+Analysis structure by analyte:
+# A tibble: 2 × 8
+  response_var n_rows n_studies n_comparisons n_pairs n_shared_control_families
+  <chr>         <int>     <int>         <int>   <int>                     <int>
+1 DOC              37         7            16      16                        11
+2 NO3              73        12            28      28                        18
+  n_calendar_years n_pending_pair_rows
+             <int>               <int>
+1               14                   0
+2               25                   0
+
+Response-value and variance audit:
+# A tibble: 2 × 7
+  response_var lnRR_min lnRR_median lnRR_max n_finite n_usable_variances
+  <chr>           <dbl>       <dbl>    <dbl>    <int>              <int>
+1 DOC            -0.341       0.126    0.885       37                 35
+2 NO3            -4.51        1.29     2.92        73                 69
+  n_matched_doc_no3
+              <int>
+1                37
+2                37
+
+Predictor selection diagnostics:
+# A tibble: 20 × 9
+   predictor_label            predictor_group primary_candidate
+   <chr>                      <chr>           <lgl>            
+ 1 Burned watershed area (%)  fire            TRUE             
+ 2 High-severity burn (%)     fire            TRUE             
+ 3 Mean annual runoff         hydrology       TRUE             
+ 4 Forest cover (%)           landscape       TRUE             
+ 5 Post-fire year             recovery        TRUE             
+ 6 Soil organic matter        soil            TRUE             
+ 7 Watershed area (km)        topography      TRUE             
+ 8 1981-2010 mean temperature climate         FALSE            
+ 9 1981-2010 precipitation    climate         FALSE            
+10 Depth to bedrock           geology         FALSE            
+11 Glacial till (%)           geology         FALSE            
+12 Baseflow index             hydrology       FALSE            
+13 Soil permeability          hydrology       FALSE            
+14 Agricultural cover (%)     landscape       FALSE            
+15 Grassland cover (%)        landscape       FALSE            
+16 Urban cover (%)            landscape       FALSE            
+17 Wetland cover (%)          landscape       FALSE            
+18 Soil clay content          soil            FALSE            
+19 Maximum smoothed elevation topography      FALSE            
+20 Watershed slope            topography      FALSE            
+   proportion_missing n_unique passes_missingness passes_variation
+                <dbl>    <int> <lgl>              <lgl>           
+ 1              0.109       22 TRUE               TRUE            
+ 2              0.109       23 TRUE               TRUE            
+ 3              0           23 TRUE               TRUE            
+ 4              0           27 TRUE               TRUE            
+ 5              0            7 TRUE               TRUE            
+ 6              0           26 TRUE               TRUE            
+ 7              0           28 TRUE               TRUE            
+ 8              0           27 TRUE               TRUE            
+ 9              0           27 TRUE               TRUE            
+10              0           26 TRUE               TRUE            
+11              0           13 TRUE               TRUE            
+12              0           27 TRUE               TRUE            
+13              0           26 TRUE               TRUE            
+14              0           11 TRUE               TRUE            
+15              0           26 TRUE               TRUE            
+16              0           25 TRUE               TRUE            
+17              0           21 TRUE               TRUE            
+18              0           26 TRUE               TRUE            
+19              0.145       22 TRUE               TRUE            
+20              0.145       20 TRUE               TRUE            
+   include_primary decision_status      
+   <lgl>           <chr>                
+ 1 TRUE            provisional_include  
+ 2 TRUE            provisional_include  
+ 3 TRUE            provisional_include  
+ 4 TRUE            provisional_include  
+ 5 TRUE            provisional_include  
+ 6 TRUE            provisional_include  
+ 7 TRUE            provisional_include  
+ 8 FALSE           available_sensitivity
+ 9 FALSE           available_sensitivity
+10 FALSE           available_sensitivity
+11 FALSE           available_sensitivity
+12 FALSE           available_sensitivity
+13 FALSE           available_sensitivity
+14 FALSE           available_sensitivity
+15 FALSE           available_sensitivity
+16 FALSE           available_sensitivity
+17 FALSE           available_sensitivity
+18 FALSE           available_sensitivity
+19 FALSE           available_sensitivity
+20 FALSE           available_sensitivity
+
+Primary provisional predictors:
+# A tibble: 7 × 5
+  predictor_label           predictor_group transformation proportion_missing
+  <chr>                     <chr>           <chr>                       <dbl>
+1 Burned watershed area (%) fire            none                        0.109
+2 High-severity burn (%)    fire            none                        0.109
+3 Mean annual runoff        hydrology       log1p                       0    
+4 Forest cover (%)          landscape       none                        0    
+5 Post-fire year            recovery        none                        0    
+6 Soil organic matter       soil            none                        0    
+7 Watershed area (km)       topography      log1p                       0    
+  n_unique
+     <int>
+1       22
+2       23
+3       23
+4       27
+5        7
+6       26
+7       28
+
+Predictors not included in the primary set:
+# A tibble: 13 × 4
+   predictor_label            predictor_group decision_status      
+   <chr>                      <chr>           <chr>                
+ 1 1981-2010 mean temperature climate         available_sensitivity
+ 2 1981-2010 precipitation    climate         available_sensitivity
+ 3 Depth to bedrock           geology         available_sensitivity
+ 4 Glacial till (%)           geology         available_sensitivity
+ 5 Baseflow index             hydrology       available_sensitivity
+ 6 Soil permeability          hydrology       available_sensitivity
+ 7 Agricultural cover (%)     landscape       available_sensitivity
+ 8 Grassland cover (%)        landscape       available_sensitivity
+ 9 Urban cover (%)            landscape       available_sensitivity
+10 Wetland cover (%)          landscape       available_sensitivity
+11 Soil clay content          soil            available_sensitivity
+12 Maximum smoothed elevation topography      available_sensitivity
+13 Watershed slope            topography      available_sensitivity
+   decision_note                                           
+   <chr>                                                   
+ 1 Available, but not pre-specified as a primary candidate.
+ 2 Available, but not pre-specified as a primary candidate.
+ 3 Available, but not pre-specified as a primary candidate.
+ 4 Available, but not pre-specified as a primary candidate.
+ 5 Available, but not pre-specified as a primary candidate.
+ 6 Available, but not pre-specified as a primary candidate.
+ 7 Available, but not pre-specified as a primary candidate.
+ 8 Available, but not pre-specified as a primary candidate.
+ 9 Available, but not pre-specified as a primary candidate.
+10 Available, but not pre-specified as a primary candidate.
+11 Available, but not pre-specified as a primary candidate.
+12 Available, but not pre-specified as a primary candidate.
+13 Available, but not pre-specified as a primary candidate.
+
+Spearman correlation matrix among screened predictors:
+                           Post-fire year Burned watershed area (%)
+Post-fire year                      1.000                     0.315
+Burned watershed area (%)           0.315                     1.000
+High-severity burn (%)              0.397                     0.930
+Watershed area (km)                -0.226                    -0.305
+Mean annual runoff                  0.070                     0.148
+Baseflow index                      0.055                    -0.035
+Soil permeability                   0.166                    -0.070
+Forest cover (%)                   -0.126                    -0.468
+Grassland cover (%)                 0.051                     0.155
+Wetland cover (%)                  -0.132                    -0.478
+Agricultural cover (%)             -0.279                    -0.450
+Urban cover (%)                    -0.267                    -0.414
+Soil organic matter                -0.288                    -0.133
+Soil clay content                  -0.358                    -0.292
+Depth to bedrock                   -0.018                    -0.090
+Glacial till (%)                   -0.040                    -0.203
+1981-2010 precipitation            -0.067                    -0.137
+1981-2010 mean temperature         -0.177                     0.017
+Watershed slope                     0.265                     0.553
+Maximum smoothed elevation          0.336                     0.208
+                           High-severity burn (%) Watershed area (km)
+Post-fire year                              0.397              -0.226
+Burned watershed area (%)                   0.930              -0.305
+High-severity burn (%)                      1.000              -0.299
+Watershed area (km)                        -0.299               1.000
+Mean annual runoff                          0.187               0.241
+Baseflow index                              0.018              -0.184
+Soil permeability                          -0.009              -0.296
+Forest cover (%)                           -0.399              -0.253
+Grassland cover (%)                         0.163               0.017
+Wetland cover (%)                          -0.417               0.106
+Agricultural cover (%)                     -0.506               0.366
+Urban cover (%)                            -0.401               0.045
+Soil organic matter                        -0.208               0.025
+Soil clay content                          -0.344               0.477
+Depth to bedrock                           -0.084               0.119
+Glacial till (%)                           -0.215               0.322
+1981-2010 precipitation                    -0.102               0.335
+1981-2010 mean temperature                 -0.034              -0.116
+Watershed slope                             0.494              -0.406
+Maximum smoothed elevation                  0.311              -0.277
+                           Mean annual runoff Baseflow index Soil permeability
+Post-fire year                          0.070          0.055             0.166
+Burned watershed area (%)               0.148         -0.035            -0.070
+High-severity burn (%)                  0.187          0.018            -0.009
+Watershed area (km)                     0.241         -0.184            -0.296
+Mean annual runoff                      1.000          0.199            -0.618
+Baseflow index                          0.199          1.000            -0.016
+Soil permeability                      -0.618         -0.016             1.000
+Forest cover (%)                       -0.386          0.294             0.469
+Grassland cover (%)                    -0.596         -0.352             0.155
+Wetland cover (%)                      -0.529          0.029             0.551
+Agricultural cover (%)                  0.244          0.109            -0.417
+Urban cover (%)                        -0.443         -0.153             0.110
+Soil organic matter                     0.461         -0.019            -0.455
+Soil clay content                      -0.081         -0.324            -0.538
+Depth to bedrock                        0.394          0.646            -0.184
+Glacial till (%)                        0.463          0.063            -0.066
+1981-2010 precipitation                 0.789          0.076            -0.444
+1981-2010 mean temperature             -0.231         -0.418            -0.197
+Watershed slope                        -0.250         -0.273             0.172
+Maximum smoothed elevation             -0.612         -0.029             0.801
+                           Forest cover (%) Grassland cover (%)
+Post-fire year                       -0.126               0.051
+Burned watershed area (%)            -0.468               0.155
+High-severity burn (%)               -0.399               0.163
+Watershed area (km)                  -0.253               0.017
+Mean annual runoff                   -0.386              -0.596
+Baseflow index                        0.294              -0.352
+Soil permeability                     0.469               0.155
+Forest cover (%)                      1.000              -0.126
+Grassland cover (%)                  -0.126               1.000
+Wetland cover (%)                     0.140               0.174
+Agricultural cover (%)               -0.055              -0.115
+Urban cover (%)                       0.167               0.541
+Soil organic matter                   0.023              -0.253
+Soil clay content                    -0.292               0.223
+Depth to bedrock                      0.047              -0.567
+Glacial till (%)                     -0.015              -0.706
+1981-2010 precipitation              -0.051              -0.725
+1981-2010 mean temperature           -0.202               0.604
+Watershed slope                      -0.241               0.173
+Maximum smoothed elevation            0.032               0.494
+                           Wetland cover (%) Agricultural cover (%)
+Post-fire year                        -0.132                 -0.279
+Burned watershed area (%)             -0.478                 -0.450
+High-severity burn (%)                -0.417                 -0.506
+Watershed area (km)                    0.106                  0.366
+Mean annual runoff                    -0.529                  0.244
+Baseflow index                         0.029                  0.109
+Soil permeability                      0.551                 -0.417
+Forest cover (%)                       0.140                 -0.055
+Grassland cover (%)                    0.174                 -0.115
+Wetland cover (%)                      1.000                 -0.044
+Agricultural cover (%)                -0.044                  1.000
+Urban cover (%)                        0.420                 -0.026
+Soil organic matter                   -0.369                  0.379
+Soil clay content                      0.010                  0.227
+Depth to bedrock                      -0.098                  0.405
+Glacial till (%)                      -0.092                  0.182
+1981-2010 precipitation               -0.423                  0.320
+1981-2010 mean temperature            -0.047                 -0.107
+Watershed slope                        0.073                 -0.470
+Maximum smoothed elevation             0.676                 -0.543
+                           Urban cover (%) Soil organic matter
+Post-fire year                      -0.267              -0.288
+Burned watershed area (%)           -0.414              -0.133
+High-severity burn (%)              -0.401              -0.208
+Watershed area (km)                  0.045               0.025
+Mean annual runoff                  -0.443               0.461
+Baseflow index                      -0.153              -0.019
+Soil permeability                    0.110              -0.455
+Forest cover (%)                     0.167               0.023
+Grassland cover (%)                  0.541              -0.253
+Wetland cover (%)                    0.420              -0.369
+Agricultural cover (%)              -0.026               0.379
+Urban cover (%)                      1.000               0.231
+Soil organic matter                  0.231               1.000
+Soil clay content                    0.365               0.116
+Depth to bedrock                    -0.532               0.025
+Glacial till (%)                    -0.421               0.150
+1981-2010 precipitation             -0.556               0.332
+1981-2010 mean temperature           0.732               0.297
+Watershed slope                     -0.287              -0.556
+Maximum smoothed elevation           0.174              -0.765
+                           Soil clay content Depth to bedrock Glacial till (%)
+Post-fire year                        -0.358           -0.018           -0.040
+Burned watershed area (%)             -0.292           -0.090           -0.203
+High-severity burn (%)                -0.344           -0.084           -0.215
+Watershed area (km)                    0.477            0.119            0.322
+Mean annual runoff                    -0.081            0.394            0.463
+Baseflow index                        -0.324            0.646            0.063
+Soil permeability                     -0.538           -0.184           -0.066
+Forest cover (%)                      -0.292            0.047           -0.015
+Grassland cover (%)                    0.223           -0.567           -0.706
+Wetland cover (%)                      0.010           -0.098           -0.092
+Agricultural cover (%)                 0.227            0.405            0.182
+Urban cover (%)                        0.365           -0.532           -0.421
+Soil organic matter                    0.116            0.025            0.150
+Soil clay content                      1.000           -0.134            0.064
+Depth to bedrock                      -0.134            1.000            0.559
+Glacial till (%)                       0.064            0.559            1.000
+1981-2010 precipitation               -0.103            0.441            0.624
+1981-2010 mean temperature             0.481           -0.676           -0.533
+Watershed slope                       -0.060           -0.151           -0.121
+Maximum smoothed elevation            -0.336           -0.255           -0.398
+                           1981-2010 precipitation 1981-2010 mean temperature
+Post-fire year                              -0.067                     -0.177
+Burned watershed area (%)                   -0.137                      0.017
+High-severity burn (%)                      -0.102                     -0.034
+Watershed area (km)                          0.335                     -0.116
+Mean annual runoff                           0.789                     -0.231
+Baseflow index                               0.076                     -0.418
+Soil permeability                           -0.444                     -0.197
+Forest cover (%)                            -0.051                     -0.202
+Grassland cover (%)                         -0.725                      0.604
+Wetland cover (%)                           -0.423                     -0.047
+Agricultural cover (%)                       0.320                     -0.107
+Urban cover (%)                             -0.556                      0.732
+Soil organic matter                          0.332                      0.297
+Soil clay content                           -0.103                      0.481
+Depth to bedrock                             0.441                     -0.676
+Glacial till (%)                             0.624                     -0.533
+1981-2010 precipitation                      1.000                     -0.513
+1981-2010 mean temperature                  -0.513                      1.000
+Watershed slope                             -0.210                     -0.003
+Maximum smoothed elevation                  -0.611                      0.058
+                           Watershed slope Maximum smoothed elevation
+Post-fire year                       0.265                      0.336
+Burned watershed area (%)            0.553                      0.208
+High-severity burn (%)               0.494                      0.311
+Watershed area (km)                 -0.406                     -0.277
+Mean annual runoff                  -0.250                     -0.612
+Baseflow index                      -0.273                     -0.029
+Soil permeability                    0.172                      0.801
+Forest cover (%)                    -0.241                      0.032
+Grassland cover (%)                  0.173                      0.494
+Wetland cover (%)                    0.073                      0.676
+Agricultural cover (%)              -0.470                     -0.543
+Urban cover (%)                     -0.287                      0.174
+Soil organic matter                 -0.556                     -0.765
+Soil clay content                   -0.060                     -0.336
+Depth to bedrock                    -0.151                     -0.255
+Glacial till (%)                    -0.121                     -0.398
+1981-2010 precipitation             -0.210                     -0.611
+1981-2010 mean temperature          -0.003                      0.058
+Watershed slope                      1.000                      0.515
+Maximum smoothed elevation           0.515                      1.000
+
+Largest absolute Spearman correlations among screened predictors:
+# A tibble: 10 × 3
+   predictor_1_label          predictor_2_label             rho
+   <chr>                      <chr>                       <dbl>
+ 1 Burned watershed area (%)  High-severity burn (%)      0.930
+ 2 Maximum smoothed elevation Soil permeability           0.801
+ 3 1981-2010 precipitation    Mean annual runoff          0.789
+ 4 Maximum smoothed elevation Soil organic matter        -0.765
+ 5 1981-2010 mean temperature Urban cover (%)             0.732
+ 6 Grassland cover (%)        1981-2010 precipitation    -0.725
+ 7 Glacial till (%)           Grassland cover (%)        -0.706
+ 8 Depth to bedrock           1981-2010 mean temperature -0.676
+ 9 Maximum smoothed elevation Wetland cover (%)           0.676
+10 Baseflow index             Depth to bedrock            0.646
+Primary provisional predictors: Burned watershed area (%), High-severity burn (%), Mean annual runoff, Forest cover (%), Post-fire year, Soil organic matter, Watershed area (km)
+Running 11_fit_issue6_revised_primary_agent_v1.R
+Loading required package: Matrix
+
+Attaching package: ‘Matrix’
+
+The following objects are masked from ‘package:tidyr’:
+
+    expand, pack, unpack
+
+Loaded glmnet 5.0
+DOC bootstrap done: 1000
+NO3 bootstrap done: 1000
+Issue #6 revised-primary rerun complete. Outputs: /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/output/paper/tables
+Running 13_plot_paper_maps_agent_v1.R
+Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE
+Saved Figure 1 for 12 studies and 14 unique fires.
+Running 08_plot_response_boxplots_agent_v1.R
+# A tibble: 2 × 8
+  analyte     n studies minimum      q1 median    q3 maximum
+  <fct>   <int>   <int>   <dbl>   <dbl>  <dbl> <dbl>   <dbl>
+1 Nitrate    73      12  -4.51  0.717    1.29  1.80    2.92 
+2 DOC        37       7  -0.341 0.00306  0.126 0.321   0.885
+Running 14_plot_paper_lasso_results_agent_v1.R
+Saved Figure 3 from the final primary-set selection table.
+Running 15_plot_paper_predictor_correlations_agent_v1.R
+Saved SI Figure 1 and correlation table for 24 variables.
+Running 12_plot_issue6_revised_primary_violins_agent_v1.R
+Saved combined revised-primary violin plot to /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/output/paper/figures/si_figure_2_predictor_violins
+Paper workflow complete: agent_workflows/vibe_coding/output/paper/figures

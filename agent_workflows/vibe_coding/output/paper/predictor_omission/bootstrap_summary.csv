@@ -1,0 +1,3 @@
+response_var,attempted,successful,failed,successful_without_oob,paired_oob_refits
+DOC,1000,994,6,8,986
+NO3,1000,1000,0,0,1000

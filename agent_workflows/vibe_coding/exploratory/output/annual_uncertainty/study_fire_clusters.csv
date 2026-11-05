@@ -1,0 +1,16 @@
+Study_ID,Fire_ID_Analysis,component,dependence_cluster
+Crandall et al. 2021,Pole_Creek_Fire_Complex_2018,2,Crandall et al. 2021
+Hickenbottom et al. 2023,Caldor_Fire_2021,6,Hickenbottom et al. 2023
+Hickenbottom et al. 2023,Mosquito_Fire_2022,6,Hickenbottom et al. 2023
+Mast & Clow; 2008,Rampage_Fire_2003,7,Mast & Clow; 2008
+Murphy et al. 2018,Fourmile_Canyon_Fire_2010,8,Murphy et al. 2018
+Rhea et al. 2021,High_Park_Fire_2012,10,Rhea et al. 2021 + Writer et al. 2014
+Rhea et al. 2021,Hayman_Fire_2002,10,Rhea et al. 2021 + Writer et al. 2014
+Uzun et al. 2020,Rocky_Fire_2015,11,Uzun et al. 2020
+Uzun et al. 2020,Wragg_Fire_2015,11,Uzun et al. 2020
+Writer et al. 2014,High_Park_Fire_2012,10,Rhea et al. 2021 + Writer et al. 2014
+Coombs & Melack; 2013,Gaviota_Fire_2004,1,Coombs & Melack; 2013
+Gerla & Galloway; 1998,Clover_Mist_Wildfire_1988,3,Gerla & Galloway; 1998
+Gluns & Toews; 1989,Matt_Fire_1985,4,Gluns & Toews; 1989
+Hauer & Spencer 1998,Red_Bench_Fire_1988,5,Hauer & Spencer 1998
+Oliver et al. 2012,Angora_Fire_2007,9,Oliver et al. 2012

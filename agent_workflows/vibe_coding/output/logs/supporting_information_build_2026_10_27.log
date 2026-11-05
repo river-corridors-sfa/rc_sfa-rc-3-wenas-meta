@@ -1,0 +1,6 @@
+here() starts at /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta
+Paper workflow mode: si
+Running manuscript/01_build_supporting_information_agent_v1.py
+Saved three SI sections and 14 full-precision tables to /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta/agent_workflows/vibe_coding/output/paper/supporting_information
+Verified source metrics, bootstrap denominators, table dimensions, saved readback and all local figure/data links.
+Paper workflow complete (si). Outputs: agent_workflows/vibe_coding/output/paper/
