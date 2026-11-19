@@ -653,3 +653,9 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Task: Convert the portable 18-pair rebuild to R.
 - Files changed: Added `independent_analysis_18_pairs/rebuild_inputs.R`, updated the bundle README, and regenerated its three model-input CSVs.
 - Verification: Ran the R script from a temporary copy with a space in its path and only the bundled inputs. Verified all fields and row orders against the Python export for 21 primary effects, 18 observed-only effects, and 36 coverage rows.
+
+## 2026-11-19 — Retain agent instructions on simplified
+
+- Task: Review the files included in the local simplified branch cleanup and preserve the project instructions.
+- Files changed: Restored `.codex/decisions.md`, `.codex/decisions_history.md`, and `.codex/history.md` to the working tree from their tracked copies. Appended this history entry.
+- Verification: `agent_workflows/AGENTS.md` matches the committed version. The working tree contains the 18-pair rebuild entry points, six source preparation scripts, 17 study CSVs, the review workbook, and the source snapshots. The branch cleanup still has unstaged deletions. The checked-out commit still matches `origin/simplified`.

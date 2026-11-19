@@ -29,7 +29,7 @@ The year-since-fire predictor is constant at 1 for these rows. The number of hol
 ## Rebuild
 
 ```sh
-Rscript agent_workflows/vibe_coding/R/run_paper_workflow_agent_v1.R first-water-year
+Rscript agent_workflows/vibe_coding/R/rebuild_18_pairs_from_source.R
 ```
 
-The preparation mode builds the revised input and its coverage audit. Existing model fits, figures, and supporting information were built from the prior calendar-year analysis. Updated results and graphics require fitting the revised model input and updating those downstream products.
+The source runner rebuilds the revised inputs and coverage audit from the study CSVs, pairing workbook, and saved GIS attributes. See the [workflow README](../../README.md) for input details. Updated results and graphics require fitting the revised model input.
