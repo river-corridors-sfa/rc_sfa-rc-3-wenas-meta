@@ -4,7 +4,7 @@ library(here)
 
 args <- commandArgs(trailingOnly = TRUE)
 if (any(args %in% c('--help', '-h'))) {
-  cat('Usage: Rscript agent_workflows/vibe_coding/R/run_paper_workflow_agent_v1.R [prepare|primary|sensitivities|figures|si|all] [--dry-run]\n',
+  cat('Usage: Rscript agent_workflows/vibe_coding/R/run_paper_workflow_agent_v1.R [prepare|first-water-year|primary|sensitivities|figures|si|all] [--dry-run]\n',
       'Default: all. PAPER_FROM_SOURCE=1 rebuilds source data with all.\n',
       'prepare always rebuilds source data; other modes use saved inputs.\n',
       '--dry-run prints the execution order without running scripts.\n', sep = '')
@@ -12,8 +12,8 @@ if (any(args %in% c('--help', '-h'))) {
   dry_run <- '--dry-run' %in% args
   modes <- args[args != '--dry-run']
   if (length(modes) > 1 || (length(modes) == 1 &&
-      !modes %in% c('prepare', 'primary', 'sensitivities', 'figures', 'si', 'all'))) {
-    stop('Choose one mode: prepare, primary, sensitivities, figures, si, or all. Use --help for usage.')
+      !modes %in% c('prepare', 'first-water-year', 'primary', 'sensitivities', 'figures', 'si', 'all'))) {
+    stop('Choose one mode: prepare, first-water-year, primary, sensitivities, figures, si, or all. Use --help for usage.')
   }
   mode <- if (length(modes)) modes else 'all'
   from_source <- Sys.getenv('PAPER_FROM_SOURCE', '0') == '1'
@@ -53,13 +53,16 @@ if (any(args %in% c('--help', '-h'))) {
     'figures/07_plot_predictor_omission_agent_v1.R'
   )
   manuscript <- 'manuscript/01_build_supporting_information_agent_v1.py'
+  first_water_year <- 'preparation/07_prepare_first_water_year_agent_v1.R'
   steps <- switch(mode,
-    prepare = c(preparation, audits),
+    prepare = c(preparation, audits, first_water_year),
+    `first-water-year` = first_water_year,
     primary = c(audits, primary),
     sensitivities = c(audits, sensitivities),
     figures = figures,
     si = manuscript,
-    all = c(if (from_source) preparation, audits, primary, sensitivities, figures, manuscript)
+    all = c(if (from_source) preparation, audits, first_water_year,
+            primary, sensitivities, figures, manuscript)
   )
   missing_scripts <- steps[!file.exists(file.path(script_dir, steps))]
   if (length(missing_scripts)) stop('Missing workflow scripts: ', paste(missing_scripts, collapse = ', '))
@@ -101,6 +104,7 @@ if (any(args %in% c('--help', '-h'))) {
         source(file.path(script_dir, step), local = new.env(parent = globalenv()))
       }
     }
-    message('Paper workflow complete (', mode, '). Outputs: agent_workflows/vibe_coding/output/paper/')
+    message('Paper workflow complete (', mode, '). Outputs: agent_workflows/vibe_coding/',
+            if (mode == 'first-water-year') 'data/derived/ and data/audit/' else 'output/paper/')
   }
 }

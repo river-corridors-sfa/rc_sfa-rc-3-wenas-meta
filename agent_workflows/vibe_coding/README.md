@@ -31,7 +31,8 @@ Replace `figures` with the mode you need:
 
 | Mode | Work performed | Prerequisites |
 |---|---|---|
-| `prepare` | Rebuild corrected chemistry, import and promote reviewed pairings, apply site selections, build the annual model table, and run preparation/inventory/sampling audits | Source chemistry and attributes, completed review workbook, source snapshots |
+| `prepare` | Rebuild corrected chemistry, import and promote reviewed pairings, build the calendar-year and first-water-year tables, and run preparation/inventory/sampling audits | Source chemistry and attributes, completed review workbook, source snapshots |
+| `first-water-year` | Build the revised paper input and coverage audit for the first water year after each fire from the 18 selected pairs | Reviewed site selections, daily paired effect sizes, calendar-year model table for static predictors |
 | `primary` | Inventory/sampling audits, primary DOC/nitrate LASSOs, balanced pooled CR2 synthesis, and time-adjusted predictor-group CV | Completed preparation |
 | `sensitivities` | Inventory/sampling audits, four weighting/interpolation LASSO scenarios, and paired predictor-omission fits | Completed preparation and primary results, including `tables/performance_equal_study.csv` |
 | `figures` | Regenerate the seven figures and their supporting figure tables; no model fitting | Prepared model table, primary selection stability/dictionary, saved group-CV improvement table, balanced synthesis weights/CR2 results, local map inputs, and predictor-omission tables |
@@ -60,7 +61,8 @@ Modes use saved inputs without detecting whether they are stale. After changing 
 - Reviewed pair decisions: [`config/pairing_review_workbook.xlsx`](config/pairing_review_workbook.xlsx). This is the authority for inclusion, fire identifiers, pairing types, and review evidence. The original candidate inventory is `config/pairing_decisions.csv`; reviewed and analysis CSVs are generated exports.
 - Chemistry and watershed attributes: immutable snapshots in `data/source/`, documented in [`config/source_manifest.csv`](config/source_manifest.csv). Corrected chemistry is generated under `data/derived/gapfill_corrected_agent_v1/`; reviewed daily and annual effects are generated under `data/derived/reviewed_sites_agent_v1/`.
 - Primary ordered predictor sets: [`config/issue6_revised_primary_predictors.csv`](config/issue6_revised_primary_predictors.csv). Labels and transformations come from `config/predictor_dictionary.csv`; `R/analysis/01_fit_issue6_revised_primary_agent_v1.R` generates `config/issue6_revised_primary_dictionary.csv`.
-- Shared analysis input: [`data/derived/lasso_model_table.csv`](data/derived/lasso_model_table.csv). Observed-only and matched-interpolated sensitivity tables are generated separately.
+- Revised paper inclusion uses the [18-pair selection](config/paper_first_water_year_pairs.csv) and one effect per analyte in the first full water year after the fire's start water year. See the [inclusion and independence assessment](output/paper/first_water_year_inclusion.md) and [revised model input](data/derived/paper_first_water_year_model_table.csv).
+- Calendar-year input underlying the saved fits, figures, and supporting information: [`data/derived/lasso_model_table.csv`](data/derived/lasso_model_table.csv). The existing `primary`, `sensitivities`, `figures`, `si`, and `all` modes reproduce those analyses.
 
 The [paper runner](R/run_paper_workflow_agent_v1.R) owns preparation order: corrected gap-fill → strict workbook import → pairing promotion → reviewed site selection/annual effects → model table → preparation audit → inventory and sampling audits. Pairing promotion and site selection consume upstream files; they do not rerun earlier scripts. The weighting sensitivity script deliberately calls `R/analysis/01_fit_issue6_revised_primary_agent_v1.R` once for each sensitivity scenario. `--dry-run` lists the exact scripts for any mode.
 

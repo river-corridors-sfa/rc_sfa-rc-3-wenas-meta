@@ -577,3 +577,79 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Decisions: Caption-only explanations; dark text and thin borders. SI 1 retains all 24 fields with numbered column keys and full row labels, fixed −1/1 scale, native 7.5 × 7.2-inch size. SI 2 uses nine lettered raw-scale panels, verified units, nitrate blue before DOC ochre, native 7.5 × 8-inch size. Both export at 600 dpi with fully vector PDFs using the standard R PDF device (local Cairo/X11 unavailable). Units verified from repository dictionaries; no numerical/source/model changes.
 - Validation: Both plotting scripts and SI builder passed. All 576 correlation/count cells and 16 distribution summaries unchanged; companion CSVs byte-identical. Independently verified 103 retained source rows, nine variables, static within-pair invariance, counts, medians, extrema and sample variances. PNGs and PDF rasters visually inspected; both PDFs verified free of raster images; SI source hashes verified. Unrelated regenerated gzip restored after confirming decompressed equality.
 - Next steps/limits: Separate pair-level/balance-weighted correlations, final journal placement and other manuscript-readiness items remain separate. No outstanding rendering issue for these exports.
+
+## 2026-11-19 — Count 1:1 sampling support by post-fire year
+
+- Task: Count existing one-reference/one-burn comparisons and identify the best-supported post-fire year.
+- Files changed: This history entry.
+- Findings: The retained site inventory gives 11 physical pairs with an exclusive reference within publication, covering 23 pair-years and 32 annual analyte records (10 DOC, 22 nitrate). Two Hauer & Spencer pairs have exclusive controls despite the shared-reference label. Filtering by designation alone gives 9 pairs and 26 annual records. The physical subset peaks at year 1 with 8 annual records across 6 pairs. The full paper table peaks at year 1 with 23 records under the model coding or 29 using calendar-year subtraction. Six Murphy 2011 records drive that coding difference.
+- Next steps: Selecting one burn per shared reference would require choosing which burns to retain.
+
+## 2026-11-19 — Retain one burn per shared reference
+
+- Task: Count sample size when keeping the 11 existing exclusive-reference pairs and one pair from each study's shared reference.
+- Files changed: This history entry.
+- Findings: Seven publications each have one shared-reference group, giving 18 pairs. Across all 432 selections, the primary inventory has 41–43 pair-years and 59–61 annual effect sizes (20 DOC, 39–41 nitrate). The observed-only inventory has 47–51 effect sizes (17 DOC, 30–34 nitrate).
+- Next steps: Select the retained burn in each shared-reference group if an exact annual count is needed.
+
+## 2026-11-19 — Plot annual counts for the 18-pair design
+
+- Task: Plot annual DOC and nitrate effect-size counts by year since fire for the 11 existing exclusive-reference pairs plus one burn per shared-reference group.
+- Files changed: Added `exploratory/R/04_plot_one_to_one_annual_counts_agent_v1.R` and `exploratory/output/one_to_one_annual_effect_sizes.png`, and appended this history entry.
+- Decisions and verification: Use sampling calendar year minus assigned fire year. Plot the range over all eligible burns at each year, verified independently by enumerating 432 designs. The fire-year count is 10 and year 1 peaks at 16–17. The full design yields 59–61 effect sizes.
+
+## 2026-11-19 — Export watershed names by pair
+
+- Task: Export a three-column CSV with the study, burned watershed, and reference watershed from the reviewed site selection.
+- Files changed: Added `output/paper/tables/paper_pair_watershed_names.csv` and appended this history entry.
+- Decisions and verification: Filtered to retained site rows and verified one export row for every approved pair in the paper inventory, covering 28 pairs across 12 studies. Collapsed Uzun's seasonal sampling labels into Rocky Fire, Wragg Fire, and Reference. Preserved the source site labels for all other studies.
+
+## 2026-11-19 — Verify Uzun's shared reference
+
+- Task: Verify the Rocky and Wragg reference assignment against the original study.
+- Files changed: This history entry.
+- Findings: Uzun et al. (2020), DOI 10.1016/j.watres.2020.115891, reports two burned watersheds and one unburned reference. Section 2.2 calls it Miller Canyon Creek, adjacent to Cold Creek (Wragg), and notes differences in geology and soils relative to Cache Creek (Rocky). A later analysis of these sites, DOI 10.1021/acs.est.4c09364, uses the name Mill Canyon Creek. The reviewed configuration assigns both comparisons to Control_1_2.
+
+## 2026-11-19 — Suggest one burn for each shared reference
+
+- Task: Suggest seven pairs to add to the 11 exclusive-reference pairs, based on review notes and sampling support.
+- Files changed: This history entry.
+- Findings: Suggested Gaviota–Rattlesnake, East Fork–West Fork Kootenai, Akokala–Logging Creek, DS1–US1, B2–U3, Wragg (Cold Creek)–shared reference, and PSF–PBR. Used reference suitability and fire attribution where review notes distinguished sites, then annual and observed sampling coverage. Used lower site number for the Rhea tie. The proposed set has 18 pairs, 43 pair-years, 61 annual effect sizes (20 DOC, 41 nitrate), and 51 observed-only annual effect sizes.
+
+## 2026-11-19 — Count year-specific LASSO samples
+
+- Task: Count observations and study/wildfire groups by analyte and calendar year since fire for the proposed 18 pairs.
+- Files changed: This history entry.
+- Findings: At years 0, 1, 2, 3, 4, 5, and 15, DOC has 5, 5, 3, 2, 2, 2, and 1 effects from 3, 5, 3, 2, 2, 2, and 1 publications. Nitrate has 5, 12, 7, 7, 3, 6, and 1 effects from 4, 10, 7, 5, 3, 4, and 1 publications. Within each analyte/year the numbers of publications, wildfires, and connected groups coincide. Model-coded year moves one Murphy effect per analyte from year 1 to year 0.
+
+## 2026-11-19 — Verify year-0 sampling dates against wildfire starts
+
+- Task: Trace the daily sampling windows behind the 10 calendar-year-0 annual effects in the proposed 18-pair design.
+- Files changed: This history entry.
+- Findings: Observed paired windows are 17–20 days after Mosquito Fire start (2 effects), 26–50 after Pole Creek ignition (5 effects; 39–63 after Bald Mountain or 59–83 after Coal Hollow), 67–149 after reported High Park start (1), 70–128 after Matt Fire discovery (1), and 204–209 after Gaviota start (1). Fire-level date bounds agree when including eligible interpolated dates.
+
+## 2026-11-19 — Count LASSO observations by water year
+
+- Task: Rebin the proposed 18-pair design by USGS October–September water year relative to the water year of each fire start.
+- Files changed: This history entry.
+- Findings: Regrouped valid paired daily rows (including interpolated dates), carried forward the Crandall nitrate exclusion, and required at least two dates per pair, analyte, and water year. Counts by DOC and nitrate for years 0, 1, 2, 3, 4, 5, 6, and 15 are (2,2), (8,13), (3,7), (2,7), (2,4), (2,6), (1,1), and (1,1). Total 62 effects (21 DOC, 41 nitrate); observed-only total 48 (18 DOC, 30 nitrate). Restricting source days to the primary calendar-year inventory gives the same counts. Crandall and Gaviota move fully to water year 1. Writer and Gluns & Toews split across water years 0 and 1. The observed-only rule excludes Gluns & Toews from water year 0, leaving two DOC and one nitrate effect.
+
+## 2026-11-19 — Update paper inclusion to the first post-fire water year
+
+- Task: Freeze the proposed 18 pair selections, prepare the revised paper input, and assess dependence.
+- Files changed: Added the first-water-year pair configuration, preparation script, 21-row model table, 36-row coverage audit and paper inclusion report. Updated the runner and workflow indexes.
+- Findings: Fifteen pairs contribute 8 DOC effects from six publication/fire groups and 13 nitrate effects from ten groups. The retained design removes reference reuse and repeated-year rows. Crandall and Hauer & Spencer still contribute multiple effects from the same fire. Each Hauer & Spencer effect has one directly observed paired date. Angora Creek is an upstream/downstream contrast. Gluns & Toews has ambiguous extracted concentration provenance and a common GIS reach for distinct fork coordinates.
+- Verification: Ran the new runner mode and independently checked all effect-size values, date windows, observed counts, selected pairs, and publication/fire groups against the daily records. Existing model and figure outputs describe the earlier calendar-year analysis.
+
+## 2026-11-19 — Package the inputs for the independent 18-pair analysis
+
+- Task: Create a standalone folder containing the input data for the selected first-water-year analysis.
+- Files changed: Added `independent_analysis_18_pairs/` with the 18-pair roster, 25,004 reviewed daily rows, covariates, predictor definitions, exclusions, source extracts, and a standard-library Python rebuild. Exported the primary, observed-only, and coverage tables.
+- Verification: Copied only the script and input files to a temporary directory and rebuilt successfully. Compared all fields for 21 primary effects to the project model table, verified 18 observed-only effects and 36 coverage rows, and confirmed the 12 raw study copies are byte-identical to their originals.
+- Scope: The portable rebuild begins with reviewed daily paired chemistry and prepared covariates. The raw study and GIS extracts are included for reviewing upstream decisions.
+
+## 2026-11-19 — Rebuild the standalone input tables in R
+
+- Task: Convert the portable 18-pair rebuild to R.
+- Files changed: Added `independent_analysis_18_pairs/rebuild_inputs.R`, updated the bundle README, and regenerated its three model-input CSVs.
+- Verification: Ran the R script from a temporary copy with a space in its path and only the bundled inputs. Verified all fields and row orders against the Python export for 21 primary effects, 18 observed-only effects, and 36 coverage rows.

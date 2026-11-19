@@ -1,5 +1,7 @@
 # Paper figures, primary synthesis and LASSO
 
+The [revised paper inclusion criteria and independence assessment](first_water_year_inclusion.md) apply the first post-fire water year to the 18-pair design. The saved analyses and figures cataloged below use the earlier calendar-year inventory.
+
 This is the figure and output catalog. Use the [active workflow index](../../README.md) for execution modes, authoritative inputs, current analysis choices, and remaining work. To regenerate only figures from saved inputs, run the paper runner with `figures`.
 
 | Item | Figure | Generating script | Supporting table |

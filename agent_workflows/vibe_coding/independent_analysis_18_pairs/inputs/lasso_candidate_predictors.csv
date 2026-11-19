@@ -1,0 +1,17 @@
+response_var,predictor,position
+DOC,post_fire_year,1
+DOC,burn_percent_fire_year,2
+DOC,burn_sev_high,3
+DOC,Area_watershed_km,4
+DOC,runoffws,5
+DOC,bfiws,6
+DOC,forest_cover,7
+DOC,omws,8
+NO3,post_fire_year,1
+NO3,burn_percent_fire_year,2
+NO3,burn_sev_high,3
+NO3,Area_watershed_km,4
+NO3,runoffws,5
+NO3,bfiws,6
+NO3,forest_cover,7
+NO3,clayws,8
