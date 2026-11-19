@@ -1,0 +1,46 @@
+[
+  {
+    "file": "figures/figure_1_maps/figure_1_maps.png",
+    "bytes_match": true
+  },
+  {
+    "file": "figures/figure_2_response_boxplots/figure_2_response_boxplots.png",
+    "bytes_match": true
+  },
+  {
+    "file": "figures/figure_3_lasso_results/figure_3_lasso_results.png",
+    "bytes_match": true
+  },
+  {
+    "file": "figures/si_figure_1_predictor_correlations/si_figure_1_predictor_correlation_matrix.png",
+    "bytes_match": true
+  },
+  {
+    "file": "figures/si_figure_2_predictor_violins/si_figure_2_predictor_violins.png",
+    "bytes_match": true
+  },
+  {
+    "file": "tables/figure_1_map_locations.csv",
+    "bytes_match": true
+  },
+  {
+    "file": "tables/figure_1_study_fire_records.csv",
+    "bytes_match": true
+  },
+  {
+    "file": "tables/figure_2_response_summary.csv",
+    "bytes_match": true
+  },
+  {
+    "file": "tables/selection_stability.csv",
+    "bytes_match": true
+  },
+  {
+    "file": "tables/si_figure_1_predictor_correlations.csv",
+    "bytes_match": true
+  },
+  {
+    "file": "tables/si_figure_2_predictor_distribution_summary.csv",
+    "bytes_match": true
+  }
+]

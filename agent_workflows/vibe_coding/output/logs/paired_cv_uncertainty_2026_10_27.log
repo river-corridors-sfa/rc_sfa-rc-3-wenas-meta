@@ -1,0 +1,83 @@
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+here() starts at /Users/allisonmyerspigg/GitHub/rc_sfa-rc-3-wenas-meta
+# A tibble: 8 × 21
+  response_var comparison_id reference_model candidate_model components
+  <chr>                <int> <chr>           <chr>                <int>
+1 DOC                      1 intercept_only  time_only                6
+2 DOC                      2 intercept_only  time_wildfire            6
+3 DOC                      3 intercept_only  time_watershed           6
+4 DOC                      4 intercept_only  time_full                6
+5 NO3                      1 intercept_only  time_only               11
+6 NO3                      2 intercept_only  time_wildfire           11
+7 NO3                      3 intercept_only  time_watershed          11
+8 NO3                      4 intercept_only  time_full               11
+  bootstrap_draws reference_RMSE candidate_RMSE RMSE_improvement
+            <int>          <dbl>          <dbl>            <dbl>
+1          100000          0.373          0.379         -0.00534
+2          100000          0.373          0.379         -0.00534
+3          100000          0.373          0.289          0.0840 
+4          100000          0.373          0.271          0.102  
+5          100000          0.867          0.793          0.0738 
+6          100000          0.867          0.793          0.0738 
+7          100000          0.867          0.793          0.0738 
+8          100000          0.867          0.793          0.0738 
+  lower_RMSE_improvement upper_RMSE_improvement improvement_percent
+                   <dbl>                  <dbl>               <dbl>
+1               -0.0373                  0.0313               -1.43
+2               -0.0373                  0.0313               -1.43
+3               -0.0150                  0.149                22.5 
+4                0.0136                  0.160                27.3 
+5               -0.00882                 0.160                 8.52
+6               -0.00882                 0.160                 8.52
+7               -0.00882                 0.160                 8.52
+8               -0.00882                 0.160                 8.52
+  lower_improvement_percent upper_improvement_percent
+                      <dbl>                     <dbl>
+1                    -11.2                       7.93
+2                    -11.2                       7.93
+3                     -5.22                     39.5 
+4                      4.42                     40.9 
+5                     -1.15                     18.7 
+6                     -1.15                     18.7 
+7                     -1.15                     18.7 
+8                     -1.15                     18.7 
+  fraction_resamples_positive fraction_resamples_tied
+                        <dbl>                   <dbl>
+1                       0.407                       0
+2                       0.407                       0
+3                       0.955                       0
+4                       0.985                       0
+5                       0.955                       0
+6                       0.955                       0
+7                       0.955                       0
+8                       0.955                       0
+  interval                                               publications improved
+  <chr>                                                         <int>    <int>
+1 95_percentile_component_bootstrap_fixed_heldout_errors            7        3
+2 95_percentile_component_bootstrap_fixed_heldout_errors            7        3
+3 95_percentile_component_bootstrap_fixed_heldout_errors            7        6
+4 95_percentile_component_bootstrap_fixed_heldout_errors            7        6
+5 95_percentile_component_bootstrap_fixed_heldout_errors           12        6
+6 95_percentile_component_bootstrap_fixed_heldout_errors           12        6
+7 95_percentile_component_bootstrap_fixed_heldout_errors           12        6
+8 95_percentile_component_bootstrap_fixed_heldout_errors           12        6
+   tied worsened
+  <int>    <int>
+1     0        4
+2     0        4
+3     0        1
+4     0        1
+5     0        6
+6     0        6
+7     0        6
+8     0        6
+Paired CV comparisons and component-resampled error uncertainty complete.

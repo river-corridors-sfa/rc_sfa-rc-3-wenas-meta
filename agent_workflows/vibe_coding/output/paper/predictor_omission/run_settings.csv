@@ -1,0 +1,2 @@
+seed,attempts,alpha,penalty_rule,penalty_min,penalty_max,penalty_count,weighting,validation
+20260929,1000,1,one_SE,1e-4,100,80,equal_study_pair_year,publication_LOSO_and_paired_bootstrap_OOB

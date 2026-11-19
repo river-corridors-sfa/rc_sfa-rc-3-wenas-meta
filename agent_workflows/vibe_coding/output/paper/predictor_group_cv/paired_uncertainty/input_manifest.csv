@@ -1,0 +1,6 @@
+path,md5
+data/derived/lasso_model_table.csv,9ddc6352750395dda09969c0cbb8ace1
+output/paper/predictor_group_cv/heldout_predictions.csv,d4f2bcbe1aac1bfb85ed87204384331a
+output/paper/predictor_group_cv/performance.csv,352ceb55f86635801ee6a9fa3f5ab7ee
+output/paper/balanced_synthesis/study_fire_clusters.csv,1fe66afdd4041fef8e6d292dc0a52625
+R/analysis/04_summarize_paired_cv_uncertainty_agent_v1.R,11553b57cccd8d3e036437157a5e4c95

@@ -1,0 +1,21 @@
+predictor,predictor_group,transformation,definition,predictor_label
+post_fire_year,recovery,none,Sampling water year minus the fire start water year (fixed at 1 in the first-water-year dataset),Post-fire year
+burn_percent_fire_year,fire,none,Percent of burned watershed affected in the fire year,Burned watershed area (%)
+burn_sev_high,fire,none,Percent high-severity burn,High-severity burn (%)
+Area_watershed_km,topography,log1p,Burned watershed area,Watershed area (km)
+runoffws,hydrology,log1p,Mean annual runoff,Mean annual runoff
+bfiws,hydrology,none,Baseflow index,Baseflow index
+permws,hydrology,log1p,Soil permeability,Soil permeability
+forest_cover,landscape,none,Combined forest-cover percentage,Forest cover (%)
+grassland_cover,landscape,none,Grassland-cover percentage,Grassland cover (%)
+wetland_cover,landscape,none,Combined wetland-cover percentage,Wetland cover (%)
+ag_cover,landscape,none,Combined agricultural-cover percentage,Agricultural cover (%)
+urban_cover,landscape,none,Combined urban-cover percentage,Urban cover (%)
+omws,soil,none,Watershed soil organic matter,Soil organic matter
+clayws,soil,none,Watershed clay content,Soil clay content
+rckdepws,geology,log1p,Depth to bedrock,Depth to bedrock
+glacial_till,geology,none,Combined glacial-till percentage,Glacial till (%)
+precip8110ws,climate,none,1981-2010 precipitation normal,1981-2010 precipitation
+tmean8110ws,climate,none,1981-2010 mean temperature,1981-2010 mean temperature
+slope,topography,none,Watershed slope,Watershed slope
+maxelevsmo,topography,none,Maximum smoothed elevation,Maximum smoothed elevation

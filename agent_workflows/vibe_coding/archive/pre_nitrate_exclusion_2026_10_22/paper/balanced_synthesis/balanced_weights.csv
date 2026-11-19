@@ -1,0 +1,283 @@
+Study_ID,candidate_pair_id,response_var,year,dependence_cluster,review_weight,scenario
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C1 | Site_1 | Control_1,DOC,2018,Crandall et al. 2021,0.3333333333333333,primary
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C2 | Site_2 | Control_2,DOC,2018,Crandall et al. 2021,0.3333333333333333,primary
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C3 | Site_3 | Control_3_4,DOC,2018,Crandall et al. 2021,0.3333333333333333,primary
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Hickenbottom_et_al_2023_C1 | Site_1 | Control_1,DOC,2022,Hickenbottom et al. 2023,0.5,primary
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Hickenbottom_et_al_2023_C2 | Site_2 | Control_2,DOC,2022,Hickenbottom et al. 2023,0.5,primary
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,DOC,2004,Mast & Clow; 2008,0.25,primary
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,DOC,2005,Mast & Clow; 2008,0.25,primary
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,DOC,2006,Mast & Clow; 2008,0.25,primary
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,DOC,2007,Mast & Clow; 2008,0.25,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2011,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2012,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2013,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2014,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2015,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2011,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2012,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2013,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2014,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2015,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2011,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2012,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2013,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2014,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2015,Murphy et al. 2018,0.06666666666666667,primary
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C1 | Site_1 | Control_1,DOC,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,primary
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C2 | Site_2 | Control_2_3,DOC,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,primary
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C3 | Site_3 | Control_2_3,DOC,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,primary
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C1 | Site_1 | Control_1_2,DOC,2016,Uzun et al. 2020,0.25,primary
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C1 | Site_1 | Control_1_2,DOC,2017,Uzun et al. 2020,0.25,primary
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C2 | Site_2 | Control_1_2,DOC,2016,Uzun et al. 2020,0.25,primary
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C2 | Site_2 | Control_1_2,DOC,2017,Uzun et al. 2020,0.25,primary
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C1 | Site_1 | Control_1_2,DOC,2012,Rhea et al. 2021 + Writer et al. 2014,0.25,primary
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C1 | Site_1 | Control_1_2,DOC,2013,Rhea et al. 2021 + Writer et al. 2014,0.25,primary
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C2 | Site_2 | Control_1_2,DOC,2012,Rhea et al. 2021 + Writer et al. 2014,0.25,primary
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C2 | Site_2 | Control_1_2,DOC,2013,Rhea et al. 2021 + Writer et al. 2014,0.25,primary
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C1 | Site_1 | Control_1_2_3,NO3,2004,Coombs & Melack; 2013,0.16666666666666666,primary
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C1 | Site_1 | Control_1_2_3,NO3,2005,Coombs & Melack; 2013,0.16666666666666666,primary
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C2 | Site_2 | Control_1_2_3,NO3,2004,Coombs & Melack; 2013,0.16666666666666666,primary
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C2 | Site_2 | Control_1_2_3,NO3,2005,Coombs & Melack; 2013,0.16666666666666666,primary
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C3 | Site_3 | Control_1_2_3,NO3,2004,Coombs & Melack; 2013,0.16666666666666666,primary
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C3 | Site_3 | Control_1_2_3,NO3,2005,Coombs & Melack; 2013,0.16666666666666666,primary
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C1 | Site_1 | Control_1,NO3,2018,Crandall et al. 2021,0.3333333333333333,primary
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C2 | Site_2 | Control_2,NO3,2018,Crandall et al. 2021,0.3333333333333333,primary
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C3 | Site_3 | Control_3_4,NO3,2018,Crandall et al. 2021,0.3333333333333333,primary
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1989,Gerla & Galloway; 1998,0.2,primary
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1990,Gerla & Galloway; 1998,0.2,primary
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1991,Gerla & Galloway; 1998,0.2,primary
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1992,Gerla & Galloway; 1998,0.2,primary
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1993,Gerla & Galloway; 1998,0.2,primary
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C1 | Site_1 | Control_1_2,NO3,1985,Gluns & Toews; 1989,0.125,primary
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C1 | Site_1 | Control_1_2,NO3,1986,Gluns & Toews; 1989,0.125,primary
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C1 | Site_1 | Control_1_2,NO3,1987,Gluns & Toews; 1989,0.125,primary
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C1 | Site_1 | Control_1_2,NO3,1988,Gluns & Toews; 1989,0.125,primary
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C2 | Site_2 | Control_1_2,NO3,1985,Gluns & Toews; 1989,0.125,primary
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C2 | Site_2 | Control_1_2,NO3,1986,Gluns & Toews; 1989,0.125,primary
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C2 | Site_2 | Control_1_2,NO3,1987,Gluns & Toews; 1989,0.125,primary
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C2 | Site_2 | Control_1_2,NO3,1988,Gluns & Toews; 1989,0.125,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C1 | Site_1 | Control_1,NO3,1989,Hauer & Spencer 1998,0.06666666666666667,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C1 | Site_1 | Control_1,NO3,1991,Hauer & Spencer 1998,0.06666666666666667,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C1 | Site_1 | Control_1,NO3,1993,Hauer & Spencer 1998,0.06666666666666667,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C2 | Site_2 | Control_2,NO3,1989,Hauer & Spencer 1998,0.06666666666666667,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C2 | Site_2 | Control_2,NO3,1991,Hauer & Spencer 1998,0.06666666666666667,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C2 | Site_2 | Control_2,NO3,1993,Hauer & Spencer 1998,0.06666666666666667,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C3 | Site_3 | Control_3_4_5,NO3,1989,Hauer & Spencer 1998,0.05,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C3 | Site_3 | Control_3_4_5,NO3,1990,Hauer & Spencer 1998,0.05,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C3 | Site_3 | Control_3_4_5,NO3,1991,Hauer & Spencer 1998,0.05,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C3 | Site_3 | Control_3_4_5,NO3,1993,Hauer & Spencer 1998,0.05,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C4 | Site_4 | Control_3_4_5,NO3,1991,Hauer & Spencer 1998,0.1,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C4 | Site_4 | Control_3_4_5,NO3,1993,Hauer & Spencer 1998,0.1,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C5 | Site_5 | Control_3_4_5,NO3,1989,Hauer & Spencer 1998,0.06666666666666667,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C5 | Site_5 | Control_3_4_5,NO3,1990,Hauer & Spencer 1998,0.06666666666666667,primary
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C5 | Site_5 | Control_3_4_5,NO3,1991,Hauer & Spencer 1998,0.06666666666666667,primary
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Hickenbottom_et_al_2023_C1 | Site_1 | Control_1,NO3,2022,Hickenbottom et al. 2023,0.5,primary
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Hickenbottom_et_al_2023_C2 | Site_2 | Control_2,NO3,2022,Hickenbottom et al. 2023,0.5,primary
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,NO3,2004,Mast & Clow; 2008,0.25,primary
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,NO3,2005,Mast & Clow; 2008,0.25,primary
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,NO3,2006,Mast & Clow; 2008,0.25,primary
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,NO3,2007,Mast & Clow; 2008,0.25,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2011,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2012,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2013,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2014,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2015,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2011,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2012,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2013,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2014,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2015,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2011,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2012,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2013,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2014,Murphy et al. 2018,0.06666666666666667,primary
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2015,Murphy et al. 2018,0.06666666666666667,primary
+Oliver et al. 2012,Oliver et al. 2012 | Oliver_et_al_2012_C3 | Site_3 | Control_1_2_3,NO3,2008,Oliver et al. 2012,0.5,primary
+Oliver et al. 2012,Oliver et al. 2012 | Oliver_et_al_2012_C3 | Site_3 | Control_1_2_3,NO3,2009,Oliver et al. 2012,0.5,primary
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C1 | Site_1 | Control_1,NO3,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,primary
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C2 | Site_2 | Control_2_3,NO3,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,primary
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C3 | Site_3 | Control_2_3,NO3,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,primary
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C1 | Site_1 | Control_1_2,NO3,2016,Uzun et al. 2020,0.25,primary
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C1 | Site_1 | Control_1_2,NO3,2017,Uzun et al. 2020,0.25,primary
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C2 | Site_2 | Control_1_2,NO3,2016,Uzun et al. 2020,0.25,primary
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C2 | Site_2 | Control_1_2,NO3,2017,Uzun et al. 2020,0.25,primary
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C1 | Site_1 | Control_1_2,NO3,2013,Rhea et al. 2021 + Writer et al. 2014,0.5,primary
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C2 | Site_2 | Control_1_2,NO3,2013,Rhea et al. 2021 + Writer et al. 2014,0.5,primary
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C1 | Site_1 | Control_1,DOC,2018,Crandall et al. 2021,0.3333333333333333,observed_only
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C2 | Site_2 | Control_2,DOC,2018,Crandall et al. 2021,0.3333333333333333,observed_only
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C3 | Site_3 | Control_3_4,DOC,2018,Crandall et al. 2021,0.3333333333333333,observed_only
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Hickenbottom_et_al_2023_C1 | Site_1 | Control_1,DOC,2022,Hickenbottom et al. 2023,0.5,observed_only
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Hickenbottom_et_al_2023_C2 | Site_2 | Control_2,DOC,2022,Hickenbottom et al. 2023,0.5,observed_only
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,DOC,2004,Mast & Clow; 2008,1,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2011,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2012,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2013,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2014,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2015,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2011,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2012,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2013,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2014,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2015,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2011,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2012,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2013,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2014,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2015,Murphy et al. 2018,0.06666666666666667,observed_only
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C1 | Site_1 | Control_1,DOC,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,observed_only
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C2 | Site_2 | Control_2_3,DOC,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,observed_only
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C3 | Site_3 | Control_2_3,DOC,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,observed_only
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C1 | Site_1 | Control_1_2,DOC,2016,Uzun et al. 2020,0.25,observed_only
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C1 | Site_1 | Control_1_2,DOC,2017,Uzun et al. 2020,0.25,observed_only
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C2 | Site_2 | Control_1_2,DOC,2016,Uzun et al. 2020,0.25,observed_only
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C2 | Site_2 | Control_1_2,DOC,2017,Uzun et al. 2020,0.25,observed_only
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C1 | Site_1 | Control_1_2,DOC,2012,Rhea et al. 2021 + Writer et al. 2014,0.25,observed_only
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C1 | Site_1 | Control_1_2,DOC,2013,Rhea et al. 2021 + Writer et al. 2014,0.25,observed_only
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C2 | Site_2 | Control_1_2,DOC,2012,Rhea et al. 2021 + Writer et al. 2014,0.25,observed_only
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C2 | Site_2 | Control_1_2,DOC,2013,Rhea et al. 2021 + Writer et al. 2014,0.25,observed_only
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C1 | Site_1 | Control_1_2_3,NO3,2004,Coombs & Melack; 2013,0.16666666666666666,observed_only
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C1 | Site_1 | Control_1_2_3,NO3,2005,Coombs & Melack; 2013,0.16666666666666666,observed_only
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C2 | Site_2 | Control_1_2_3,NO3,2004,Coombs & Melack; 2013,0.16666666666666666,observed_only
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C2 | Site_2 | Control_1_2_3,NO3,2005,Coombs & Melack; 2013,0.16666666666666666,observed_only
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C3 | Site_3 | Control_1_2_3,NO3,2004,Coombs & Melack; 2013,0.16666666666666666,observed_only
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C3 | Site_3 | Control_1_2_3,NO3,2005,Coombs & Melack; 2013,0.16666666666666666,observed_only
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C1 | Site_1 | Control_1,NO3,2018,Crandall et al. 2021,0.3333333333333333,observed_only
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C2 | Site_2 | Control_2,NO3,2018,Crandall et al. 2021,0.3333333333333333,observed_only
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C3 | Site_3 | Control_3_4,NO3,2018,Crandall et al. 2021,0.3333333333333333,observed_only
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1989,Gerla & Galloway; 1998,0.2,observed_only
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1990,Gerla & Galloway; 1998,0.2,observed_only
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1991,Gerla & Galloway; 1998,0.2,observed_only
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1992,Gerla & Galloway; 1998,0.2,observed_only
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1993,Gerla & Galloway; 1998,0.2,observed_only
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C1 | Site_1 | Control_1_2,NO3,1985,Gluns & Toews; 1989,0.16666666666666666,observed_only
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C1 | Site_1 | Control_1_2,NO3,1987,Gluns & Toews; 1989,0.16666666666666666,observed_only
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C1 | Site_1 | Control_1_2,NO3,1988,Gluns & Toews; 1989,0.16666666666666666,observed_only
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C2 | Site_2 | Control_1_2,NO3,1987,Gluns & Toews; 1989,0.5,observed_only
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C1 | Site_1 | Control_1,NO3,1989,Hauer & Spencer 1998,0.1,observed_only
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C1 | Site_1 | Control_1,NO3,1993,Hauer & Spencer 1998,0.1,observed_only
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C2 | Site_2 | Control_2,NO3,1989,Hauer & Spencer 1998,0.1,observed_only
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C2 | Site_2 | Control_2,NO3,1991,Hauer & Spencer 1998,0.1,observed_only
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C3 | Site_3 | Control_3_4_5,NO3,1989,Hauer & Spencer 1998,0.06666666666666667,observed_only
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C3 | Site_3 | Control_3_4_5,NO3,1990,Hauer & Spencer 1998,0.06666666666666667,observed_only
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C3 | Site_3 | Control_3_4_5,NO3,1993,Hauer & Spencer 1998,0.06666666666666667,observed_only
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C4 | Site_4 | Control_3_4_5,NO3,1991,Hauer & Spencer 1998,0.2,observed_only
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C5 | Site_5 | Control_3_4_5,NO3,1989,Hauer & Spencer 1998,0.06666666666666667,observed_only
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C5 | Site_5 | Control_3_4_5,NO3,1990,Hauer & Spencer 1998,0.06666666666666667,observed_only
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C5 | Site_5 | Control_3_4_5,NO3,1991,Hauer & Spencer 1998,0.06666666666666667,observed_only
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Hickenbottom_et_al_2023_C1 | Site_1 | Control_1,NO3,2022,Hickenbottom et al. 2023,0.5,observed_only
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Hickenbottom_et_al_2023_C2 | Site_2 | Control_2,NO3,2022,Hickenbottom et al. 2023,0.5,observed_only
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,NO3,2004,Mast & Clow; 2008,0.3333333333333333,observed_only
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,NO3,2005,Mast & Clow; 2008,0.3333333333333333,observed_only
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,NO3,2006,Mast & Clow; 2008,0.3333333333333333,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2011,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2012,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2013,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2014,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2015,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2011,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2012,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2013,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2014,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2015,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2011,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2012,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2013,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2014,Murphy et al. 2018,0.06666666666666667,observed_only
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2015,Murphy et al. 2018,0.06666666666666667,observed_only
+Oliver et al. 2012,Oliver et al. 2012 | Oliver_et_al_2012_C3 | Site_3 | Control_1_2_3,NO3,2008,Oliver et al. 2012,1,observed_only
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C1 | Site_1 | Control_1,NO3,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,observed_only
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C2 | Site_2 | Control_2_3,NO3,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,observed_only
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C3 | Site_3 | Control_2_3,NO3,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,observed_only
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C1 | Site_1 | Control_1_2,NO3,2017,Uzun et al. 2020,0.5,observed_only
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C2 | Site_2 | Control_1_2,NO3,2017,Uzun et al. 2020,0.5,observed_only
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C1 | Site_1 | Control_1_2,NO3,2013,Rhea et al. 2021 + Writer et al. 2014,0.5,observed_only
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C2 | Site_2 | Control_1_2,NO3,2013,Rhea et al. 2021 + Writer et al. 2014,0.5,observed_only
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C1 | Site_1 | Control_1,DOC,2018,Crandall et al. 2021,0.3333333333333333,matched_interpolated
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C2 | Site_2 | Control_2,DOC,2018,Crandall et al. 2021,0.3333333333333333,matched_interpolated
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C3 | Site_3 | Control_3_4,DOC,2018,Crandall et al. 2021,0.3333333333333333,matched_interpolated
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Hickenbottom_et_al_2023_C1 | Site_1 | Control_1,DOC,2022,Hickenbottom et al. 2023,0.5,matched_interpolated
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Hickenbottom_et_al_2023_C2 | Site_2 | Control_2,DOC,2022,Hickenbottom et al. 2023,0.5,matched_interpolated
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,DOC,2004,Mast & Clow; 2008,1,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2011,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2012,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2013,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2014,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,DOC,2015,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2011,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2012,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2013,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2014,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,DOC,2015,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2011,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2012,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2013,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2014,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,DOC,2015,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C1 | Site_1 | Control_1,DOC,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,matched_interpolated
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C2 | Site_2 | Control_2_3,DOC,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,matched_interpolated
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C3 | Site_3 | Control_2_3,DOC,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,matched_interpolated
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C1 | Site_1 | Control_1_2,DOC,2016,Uzun et al. 2020,0.25,matched_interpolated
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C1 | Site_1 | Control_1_2,DOC,2017,Uzun et al. 2020,0.25,matched_interpolated
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C2 | Site_2 | Control_1_2,DOC,2016,Uzun et al. 2020,0.25,matched_interpolated
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C2 | Site_2 | Control_1_2,DOC,2017,Uzun et al. 2020,0.25,matched_interpolated
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C1 | Site_1 | Control_1_2,DOC,2012,Rhea et al. 2021 + Writer et al. 2014,0.25,matched_interpolated
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C1 | Site_1 | Control_1_2,DOC,2013,Rhea et al. 2021 + Writer et al. 2014,0.25,matched_interpolated
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C2 | Site_2 | Control_1_2,DOC,2012,Rhea et al. 2021 + Writer et al. 2014,0.25,matched_interpolated
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C2 | Site_2 | Control_1_2,DOC,2013,Rhea et al. 2021 + Writer et al. 2014,0.25,matched_interpolated
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C1 | Site_1 | Control_1_2_3,NO3,2004,Coombs & Melack; 2013,0.16666666666666666,matched_interpolated
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C1 | Site_1 | Control_1_2_3,NO3,2005,Coombs & Melack; 2013,0.16666666666666666,matched_interpolated
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C2 | Site_2 | Control_1_2_3,NO3,2004,Coombs & Melack; 2013,0.16666666666666666,matched_interpolated
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C2 | Site_2 | Control_1_2_3,NO3,2005,Coombs & Melack; 2013,0.16666666666666666,matched_interpolated
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C3 | Site_3 | Control_1_2_3,NO3,2004,Coombs & Melack; 2013,0.16666666666666666,matched_interpolated
+Coombs & Melack; 2013,Coombs & Melack; 2013 | Coombs_Melack_2013_C3 | Site_3 | Control_1_2_3,NO3,2005,Coombs & Melack; 2013,0.16666666666666666,matched_interpolated
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C1 | Site_1 | Control_1,NO3,2018,Crandall et al. 2021,0.3333333333333333,matched_interpolated
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C2 | Site_2 | Control_2,NO3,2018,Crandall et al. 2021,0.3333333333333333,matched_interpolated
+Crandall et al. 2021,Crandall et al. 2021 | Crandall_et_al_2021_C3 | Site_3 | Control_3_4,NO3,2018,Crandall et al. 2021,0.3333333333333333,matched_interpolated
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1989,Gerla & Galloway; 1998,0.2,matched_interpolated
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1990,Gerla & Galloway; 1998,0.2,matched_interpolated
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1991,Gerla & Galloway; 1998,0.2,matched_interpolated
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1992,Gerla & Galloway; 1998,0.2,matched_interpolated
+Gerla & Galloway; 1998,Gerla & Galloway; 1998 | Gerla_Galloway_1998_C1 | Site_1 | Control_1,NO3,1993,Gerla & Galloway; 1998,0.2,matched_interpolated
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C1 | Site_1 | Control_1_2,NO3,1985,Gluns & Toews; 1989,0.16666666666666666,matched_interpolated
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C1 | Site_1 | Control_1_2,NO3,1987,Gluns & Toews; 1989,0.16666666666666666,matched_interpolated
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C1 | Site_1 | Control_1_2,NO3,1988,Gluns & Toews; 1989,0.16666666666666666,matched_interpolated
+Gluns & Toews; 1989,Gluns & Toews; 1989 | Gluns_Toews_1989_C2 | Site_2 | Control_1_2,NO3,1987,Gluns & Toews; 1989,0.5,matched_interpolated
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C1 | Site_1 | Control_1,NO3,1989,Hauer & Spencer 1998,0.1,matched_interpolated
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C1 | Site_1 | Control_1,NO3,1993,Hauer & Spencer 1998,0.1,matched_interpolated
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C2 | Site_2 | Control_2,NO3,1989,Hauer & Spencer 1998,0.1,matched_interpolated
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C2 | Site_2 | Control_2,NO3,1991,Hauer & Spencer 1998,0.1,matched_interpolated
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C3 | Site_3 | Control_3_4_5,NO3,1989,Hauer & Spencer 1998,0.06666666666666667,matched_interpolated
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C3 | Site_3 | Control_3_4_5,NO3,1990,Hauer & Spencer 1998,0.06666666666666667,matched_interpolated
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C3 | Site_3 | Control_3_4_5,NO3,1993,Hauer & Spencer 1998,0.06666666666666667,matched_interpolated
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C4 | Site_4 | Control_3_4_5,NO3,1991,Hauer & Spencer 1998,0.2,matched_interpolated
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C5 | Site_5 | Control_3_4_5,NO3,1989,Hauer & Spencer 1998,0.06666666666666667,matched_interpolated
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C5 | Site_5 | Control_3_4_5,NO3,1990,Hauer & Spencer 1998,0.06666666666666667,matched_interpolated
+Hauer & Spencer 1998,Hauer & Spencer 1998 | Hauer_Spencer_1998_C5 | Site_5 | Control_3_4_5,NO3,1991,Hauer & Spencer 1998,0.06666666666666667,matched_interpolated
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Hickenbottom_et_al_2023_C1 | Site_1 | Control_1,NO3,2022,Hickenbottom et al. 2023,0.5,matched_interpolated
+Hickenbottom et al. 2023,Hickenbottom et al. 2023 | Hickenbottom_et_al_2023_C2 | Site_2 | Control_2,NO3,2022,Hickenbottom et al. 2023,0.5,matched_interpolated
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,NO3,2004,Mast & Clow; 2008,0.3333333333333333,matched_interpolated
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,NO3,2005,Mast & Clow; 2008,0.3333333333333333,matched_interpolated
+Mast & Clow; 2008,Mast & Clow; 2008 | Mast_Clow_2008_C1 | Site_1 | Control_1,NO3,2006,Mast & Clow; 2008,0.3333333333333333,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2011,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2012,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2013,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2014,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C1 | Site_1 | Control_1_2_3,NO3,2015,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2011,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2012,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2013,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2014,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C2 | Site_2 | Control_1_2_3,NO3,2015,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2011,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2012,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2013,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2014,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Murphy et al. 2018,Murphy et al. 2018 | Murphy_et_al_2018_C3 | Site_3 | Control_1_2_3,NO3,2015,Murphy et al. 2018,0.06666666666666667,matched_interpolated
+Oliver et al. 2012,Oliver et al. 2012 | Oliver_et_al_2012_C3 | Site_3 | Control_1_2_3,NO3,2008,Oliver et al. 2012,1,matched_interpolated
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C1 | Site_1 | Control_1,NO3,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,matched_interpolated
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C2 | Site_2 | Control_2_3,NO3,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,matched_interpolated
+Rhea et al. 2021,Rhea et al. 2021 | Rhea_et_al_2021_C3 | Site_3 | Control_2_3,NO3,2017,Rhea et al. 2021 + Writer et al. 2014,0.3333333333333333,matched_interpolated
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C1 | Site_1 | Control_1_2,NO3,2017,Uzun et al. 2020,0.5,matched_interpolated
+Uzun et al. 2020,Uzun et al. 2020 | Uzun_et_al_2020_C2 | Site_2 | Control_1_2,NO3,2017,Uzun et al. 2020,0.5,matched_interpolated
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C1 | Site_1 | Control_1_2,NO3,2013,Rhea et al. 2021 + Writer et al. 2014,0.5,matched_interpolated
+Writer et al. 2014,Writer et al. 2014 | Writer_et_al_2014_C2 | Site_2 | Control_1_2,NO3,2013,Rhea et al. 2021 + Writer et al. 2014,0.5,matched_interpolated

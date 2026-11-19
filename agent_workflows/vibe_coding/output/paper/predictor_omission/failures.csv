@@ -1,0 +1,7 @@
+response_var,validation,iteration,specification,error
+DOC,bootstrap_oob,196,all,Fewer than three unique studies available for inner tuning
+DOC,bootstrap_oob,388,all,Fewer than three unique studies available for inner tuning
+DOC,bootstrap_oob,612,all,Fewer than three unique studies available for inner tuning
+DOC,bootstrap_oob,736,all,Fewer than three unique studies available for inner tuning
+DOC,bootstrap_oob,852,all,Fewer than three unique studies available for inner tuning
+DOC,bootstrap_oob,853,all,Fewer than three unique studies available for inner tuning

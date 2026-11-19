@@ -1,0 +1,9 @@
+Figure freshness audit — October 22, 2026
+
+Regenerated all five figures using current scripts and saved inputs, with output paths redirected to this audit directory. All five PNGs and five regenerated figure-support CSVs match the primary files byte for byte. selection_stability.csv was copied as a rendering input, not refitted. See comparison.json. Primary outputs and scripts were preserved. This is not a full from-source analysis rebuild.
+
+Outstanding findings:
+- SI Figure 1 caption hard-codes 110 annual rows although current input contains 104. Its correlation values reproduce the current input.
+- SI Figures 1 and 2 retain titles, subtitles and explanatory notes contrary to the requested manuscript styling. SI Figure 2 also reverses the blue/ochre analyte colors used in Figures 2 and 3.
+- Final captions, units, map-coordinate verification and journal exports remain open in manuscript_readiness_issue.md.
+- Recent nitrate exclusions are exploratory and do not change selected primary inputs or require replacement primary figures.

@@ -1,0 +1,47 @@
+Study_ID,Burn_Unburn,Pair,site_labels
+Coombs & Melack; 2013,Burn,Site_1,San Onofre
+Coombs & Melack; 2013,Burn,Site_2,Gaviota
+Coombs & Melack; 2013,Burn,Site_3,Arroyo Hondo
+Coombs & Melack; 2013,Unburn,Control_1_2_3,Rattlesnake
+Crandall et al. 2021,Burn,Site_1,Benjamin Slough
+Crandall et al. 2021,Burn,Site_2,Payson
+Crandall et al. 2021,Burn,Site_3,Spanish Fork Lower
+Crandall et al. 2021,Unburn,Control_1,Hobble Creek Lower
+Crandall et al. 2021,Unburn,Control_2,Mill Race
+Crandall et al. 2021,Unburn,Control_3_4,Provo River
+Gerla & Galloway; 1998,Burn,Site_1,Jones Creek
+Gerla & Galloway; 1998,Unburn,Control_1,Crow Creek
+Gluns & Toews; 1989,Burn,Site_1,East Fork Kootenai
+Gluns & Toews; 1989,Burn,Site_2,Middle Fork Kootenai
+Gluns & Toews; 1989,Unburn,Control_1_2,West Fork Kootenai
+Hauer & Spencer 1998,Burn,Site_1,Red_Bench_Creek
+Hauer & Spencer 1998,Burn,Site_2,Red_Meadow_Creek
+Hauer & Spencer 1998,Burn,Site_3,Akokala_Creek
+Hauer & Spencer 1998,Burn,Site_4,Bowman_Creek
+Hauer & Spencer 1998,Burn,Site_5,Quartz_Creek
+Hauer & Spencer 1998,Unburn,Control_1,Wally_Creek
+Hauer & Spencer 1998,Unburn,Control_2,Coal_Creek
+Hauer & Spencer 1998,Unburn,Control_3_4_5,Logging_Creek
+Hickenbottom et al. 2023,Burn,Site_1,Trout_Creek
+Hickenbottom et al. 2023,Burn,Site_2,Middle_Fork_American
+Hickenbottom et al. 2023,Unburn,Control_1,Cold_Creek
+Hickenbottom et al. 2023,Unburn,Control_2,North_Fork_American
+Mast & Clow; 2008,Burn,Site_1,Coal
+Mast & Clow; 2008,Unburn,Control_1,Pinchot
+Murphy et al. 2018,Burn,Site_1,DS1
+Murphy et al. 2018,Burn,Site_2,DS2
+Murphy et al. 2018,Burn,Site_3,DS3
+Murphy et al. 2018,Unburn,Control_1_2_3,US1
+Oliver et al. 2012,Burn,Site_3,Site_4
+Oliver et al. 2012,Unburn,Control_1_2_3,Site_1
+Rhea et al. 2021,Burn,Site_1,B1
+Rhea et al. 2021,Burn,Site_2,B2
+Rhea et al. 2021,Burn,Site_3,B3
+Rhea et al. 2021,Unburn,Control_1,U1
+Rhea et al. 2021,Unburn,Control_2_3,U3
+Uzun et al. 2020,Burn,Site_1,Rocky Fire First Rainy Season Initial Flush; Rocky Fire First Rainy Season Subsequent Flush; Rocky Fire Second Rainy Season
+Uzun et al. 2020,Burn,Site_2,Wragg Fire First Rainy Season Initial Flush; Wragg Fire First Rainy Season Subsequent Flush; Wragg Fire Second Rainy Season
+Uzun et al. 2020,Unburn,Control_1_2,Reference First Rainy Season; Reference Second Rainy Season; Reference Subsequent Flush
+Writer et al. 2014,Burn,Site_1,PNF
+Writer et al. 2014,Burn,Site_2,PSF
+Writer et al. 2014,Unburn,Control_1_2,PBR
