@@ -659,3 +659,9 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Task: Review the files included in the local simplified branch cleanup and preserve the project instructions.
 - Files changed: Restored `.codex/decisions.md`, `.codex/decisions_history.md`, and `.codex/history.md` to the working tree from their tracked copies. Appended this history entry.
 - Verification: `agent_workflows/AGENTS.md` matches the committed version. The working tree contains the 18-pair rebuild entry points, six source preparation scripts, 17 study CSVs, the review workbook, and the source snapshots. The branch cleanup still has unstaged deletions. The checked-out commit still matches `origin/simplified`.
+
+## 2026-11-19 — Remove redundant files from simplified
+
+- Task: Remove the 37 files identified in the GitHub branch audit.
+- Scope: Remove 23 regenerated preparation files and 14 duplicate source extracts. Retain the source inputs, both R rebuild scripts, prepared analysis tables, and agent instructions. Update the README and inclusion assessment to point to retained files or describe how to regenerate local outputs.
+- Verification: A 50-file source-only test copy rebuilt the same 21 primary effect sizes, 18 observed-only effect sizes, and 36 coverage rows.

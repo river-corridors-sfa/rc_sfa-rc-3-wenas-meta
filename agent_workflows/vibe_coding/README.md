@@ -14,7 +14,7 @@ The [source runner](R/rebuild_18_pairs_from_source.R) uses `tidyverse`, `lubrida
 
 The [source snapshots](config/source_manifest.csv) trace the GIS pull and the two historical comparison inputs. The historical daily table supplies site labels for the workbook import, and the historical annual effects support a before/after audit. Fresh effect sizes use chemistry rebuilt from the per-study extracts. The digitized study extracts, workbook decisions, and GIS pull are starting inputs.
 
-Fresh outputs land under `data/derived/rebuild_18_pairs/`. Its `inputs/` contains the regenerated roster, predictors, daily paired chemistry, and exclusions. Its `model_inputs/` contains the primary and observed-only tables and the coverage table. The [paper inclusion and independence assessment](output/paper/first_water_year_inclusion.md) explains which pairs contribute data and which share a publication or fire.
+Fresh outputs land under `data/derived/rebuild_18_pairs/`. Its `inputs/` contains the regenerated roster, predictors, daily paired chemistry, and exclusions. Its `model_inputs/` contains the primary and observed-only tables and the coverage table. The runner also creates local audits under `data/audit/` and exports the reviewed pair and site decisions under `config/`. The [paper inclusion and independence assessment](output/paper/first_water_year_inclusion.md) explains which pairs contribute data and which share a publication or fire.
 
 ## Rebuild from prepared inputs
 
@@ -29,9 +29,8 @@ From the directory containing this README, run `Rscript rebuild_inputs.R` with `
 | `inputs/watershed_predictors.csv` | One row of prepared static watershed and wildfire predictors per pair |
 | `inputs/calendar_year_exclusions.csv` | The carried-forward Payson nitrate exclusion, applied before aggregating by water year |
 | `inputs/lasso_candidate_predictors.csv` and `inputs/predictor_dictionary.csv` | Prior candidate lists and predictor transformations. Omit `post_fire_year` from a first-water-year fit because it is constant. |
-| `source_extracts/` | The 12 original per-study chemistry extracts, reviewed site selections for the 18 pairs, and source GIS rows for the selected site labels |
 
-The prepared paired chemistry comes from `data/derived/reviewed_sites_agent_v1/effect_sizes_daily.csv` and the static covariates come from `data/derived/lasso_model_table.csv`. The files in `source_extracts/study_chemistry/` are copies of the 12 contributing studies' source CSVs.
+The source runner prepares the paired chemistry in `data/derived/reviewed_sites_agent_v1/effect_sizes_daily.csv` and the static covariates in `data/derived/lasso_model_table.csv`.
 
 ## Rebuilt model inputs
 
