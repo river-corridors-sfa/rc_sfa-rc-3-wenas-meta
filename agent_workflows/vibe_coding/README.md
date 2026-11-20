@@ -18,7 +18,7 @@ Fresh outputs land under `data/derived/rebuild_18_pairs/`. Its `inputs/` contain
 
 ## Rebuild from prepared inputs
 
-From the directory containing this README, run `Rscript rebuild_inputs.R` with `dplyr`, `readr`, and `tidyr`. This shorter route reads the local `inputs/` and writes to `model_inputs/`.
+From the directory containing this README, run `Rscript rebuild_inputs.R` with `dplyr`, `readr`, and `tidyr`. From an R session at the repository root, run `source("agent_workflows/vibe_coding/rebuild_inputs.R")`. Both commands read `agent_workflows/vibe_coding/inputs/` and write to `agent_workflows/vibe_coding/model_inputs/`.
 
 ## Analysis inputs
 

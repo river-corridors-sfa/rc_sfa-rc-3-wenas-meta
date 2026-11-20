@@ -1,19 +1,36 @@
-# Run with Rscript rebuild_inputs.R from the analysis folder.
+# Run with Rscript or source() to rebuild the model inputs.
 library(dplyr)
 library(readr)
 library(tidyr)
 
-script_path <- sub("^--file=", "", grep("^--file=", commandArgs(), value = TRUE))
+# Prefer the sourced file over the path of an outer Rscript driver.
+sourced_files <- as.character(unlist(lapply(sys.frames(), function(frame) frame$ofile)))
+command_file <- sub("^--file=", "", grep("^--file=", commandArgs(), value = TRUE))
 # Rscript escapes spaces in the --file value on some platforms.
-script_path <- gsub("~+~", " ", script_path, fixed = TRUE)
-folder <- if (length(script_path)) dirname(normalizePath(script_path, mustWork = TRUE)) else getwd()
+script_paths <- c(rev(sourced_files), gsub("~+~", " ", command_file, fixed = TRUE))
+script_paths <- script_paths[basename(script_paths) == "rebuild_inputs.R" & file.exists(script_paths)]
+if (length(script_paths)) {
+  folder <- dirname(normalizePath(script_paths[1], mustWork = TRUE))
+} else {
+  folder <- getwd()
+  repository_folder <- file.path(folder, "agent_workflows", "vibe_coding")
+  if (file.exists(file.path(repository_folder, "rebuild_inputs.R"))) folder <- repository_folder
+}
 inputs <- file.path(folder, "inputs")
 output <- file.path(folder, "model_inputs")
 
-pairs <- read_csv(file.path(inputs, "pairs.csv"), show_col_types = FALSE)
-predictors <- read_csv(file.path(inputs, "watershed_predictors.csv"), show_col_types = FALSE)
-daily <- read_csv(file.path(inputs, "daily_paired_chemistry.csv"), show_col_types = FALSE)
-exclusions <- read_csv(file.path(inputs, "calendar_year_exclusions.csv"), show_col_types = FALSE)
+input_files <- c(pairs = "pairs.csv", predictors = "watershed_predictors.csv",
+                 daily = "daily_paired_chemistry.csv", exclusions = "calendar_year_exclusions.csv")
+input_paths <- setNames(file.path(inputs, input_files), names(input_files))
+missing <- input_paths[!file.exists(input_paths)]
+if (length(missing)) {
+  stop("Missing prepared CSVs in ", inputs, ": ", paste(basename(missing), collapse = ", "),
+       call. = FALSE)
+}
+pairs <- read_csv(input_paths[["pairs"]], show_col_types = FALSE)
+predictors <- read_csv(input_paths[["predictors"]], show_col_types = FALSE)
+daily <- read_csv(input_paths[["daily"]], show_col_types = FALSE)
+exclusions <- read_csv(input_paths[["exclusions"]], show_col_types = FALSE)
 
 analytes <- c("DOC", "NO3")
 pair_keys <- c("candidate_pair_id", "response_var")

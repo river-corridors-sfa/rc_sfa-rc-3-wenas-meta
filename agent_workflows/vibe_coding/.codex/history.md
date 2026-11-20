@@ -665,3 +665,15 @@ Task: Implement site selection and explicitly exclude the three Mast & Clow site
 - Task: Remove the 37 files identified in the GitHub branch audit.
 - Scope: Remove 23 regenerated preparation files and 14 duplicate source extracts. Retain the source inputs, both R rebuild scripts, prepared analysis tables, and agent instructions. Update the README and inclusion assessment to point to retained files or describe how to regenerate local outputs.
 - Verification: A 50-file source-only test copy rebuilt the same 21 primary effect sizes, 18 observed-only effect sizes, and 36 coverage rows.
+
+## 2026-11-19 — Resolve prepared input paths in R sessions
+
+- Task: Diagnose reports that the four prepared CSVs were missing after the branch cleanup.
+- Files changed: Updated `rebuild_inputs.R` and the workflow README for console and IDE use. All four CSVs remain tracked at `agent_workflows/vibe_coding/inputs/`.
+- Verification: Reproduced the failure when `source()` ran from the repository root and used the root `inputs/` directory. Tested the fix with Rscript, source from the root and from a separate working directory, console-style evaluation, and the full source rebuild. All produced identical model tables.
+
+## 2026-11-19 — Assess independence when pooling water years
+
+- Task: Count annual effects, distinct pairs, and connected publication–wildfire validation groups for pooled years in the 18-pair design.
+- Files changed: This history entry.
+- Findings: From water year 1 to years 1–2, DOC increases from 8 effects to 11 with the same 8 pairs and 6 groups. Nitrate increases from 13 to 20 effects, 13 to 14 pairs, and 10 to 11 groups. All post-fire years provide 19 DOC effects from 10 pairs and 6 groups and 39 nitrate effects from 16 pairs and 11 groups. Rhea and Writer share High Park across years and must be held out together under a publication–fire split. Only 3 DOC pairs and 6 nitrate pairs cover both years 1 and 2 under primary eligibility.
